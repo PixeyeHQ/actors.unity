@@ -46,7 +46,7 @@ ManagerPool.Instance.Despawn(PoolType.Entities, ##YOUR_SPAWNED_GAMEOBJECT##);
 ```
 
 
-You can gain control on such events as OnSpawn/OnDespawn by adding an *IPoolable* interface to a component of your object in pool.
+You can gain control of such events as OnSpawn/OnDespawn by adding an IPoolable interface to a component of your object in the pool.
 ```C#
 public class BigShip : MonoBehaviour , IPoolable {
     public void OnSpawn()
