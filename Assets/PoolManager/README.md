@@ -7,6 +7,7 @@ Uses Unix extension and based on object instance ids. You can pool  prefabs with
 [![https://gyazo.com/ebf0f27a5e5ec29ecfe019a9897e105c](https://i.gyazo.com/ebf0f27a5e5ec29ecfe019a9897e105c.gif)](https://gyazo.com/ebf0f27a5e5ec29ecfe019a9897e105c)
 
 *How to use*
+
 Firstly, add a new pool to the game.
 ```C#
  ManagerPool.Instance.AddPool(PoolType.Entities);
