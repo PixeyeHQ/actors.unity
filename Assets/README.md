@@ -1,5 +1,5 @@
 # Reactive PoolManager
-An ultra fast and lightweight object pool manager with zero allocations with customizable prepopulate feature. You can group uploading objects in chunks and set how many frames you need for uploading.
+An ultra fast and lightweight object pool manager with zero allocations with customizable prepopulate feature. You can group uploading objects in chunks and set how many frames you need for uploading to reduce allocation spikes.
 Uses Unix extension and based on object instance ids. You can pool  prefabs without any extra components and can mix different prefab types in one pool.
 
 [![https://gyazo.com/ebf0f27a5e5ec29ecfe019a9897e105c](https://i.gyazo.com/ebf0f27a5e5ec29ecfe019a9897e105c.gif)](https://gyazo.com/ebf0f27a5e5ec29ecfe019a9897e105c)
