@@ -15,7 +15,9 @@ public class Loader : MonoBehaviour
 
     void Awake()
     {
-        ManagerPool.Instance.AddPool(PoolType.Entities);
+        ManagerPool.Instance.AddPool(PoolType.Entities).PopulateWith(prefab, 100, 10);
+
+        ManagerPool.Instance.Get(PoolType.Entities).PopulateWith(prefab, 10, 1, 100);
 
     }
 

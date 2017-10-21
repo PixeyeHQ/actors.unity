@@ -13,8 +13,14 @@ namespace Homebrew
  
     public class ManagerPool : Singleton<ManagerPool>
     {
-        public Dictionary<int, Pool> pools = new Dictionary<int, Pool>();
+        private Dictionary<int, Pool> pools = new Dictionary<int, Pool>();
 
+
+        public Pool Get(PoolType id)
+        {
+            return pools[(int) id];
+        }
+        
         public Pool AddPool(PoolType id, bool reparent = true)
         {
             Pool pool;
@@ -33,6 +39,8 @@ namespace Homebrew
             return pool;
         }
 
+        
+        
         public GameObject Spawn(PoolType id, GameObject prefab, Vector3 position = default(Vector3),
             Quaternion rotation = default(Quaternion),
             Transform parent = null)
