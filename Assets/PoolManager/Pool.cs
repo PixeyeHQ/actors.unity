@@ -25,8 +25,10 @@ namespace Homebrew
         public Pool PopulateWith(GameObject prefab, int amount, int amountPerTick, int tickSize = 1)
         {
             var key = prefab.GetInstanceID();
-            var stack = new Stack<GameObject>(amount);
-            cachedObjects.Add(key, stack);
+            Stack<GameObject> stack;
+            var stacked = cachedObjects.TryGetValue(key, out stack);
+            if (stacked==false)
+            cachedObjects.Add(key, new Stack<GameObject>());
 
             Observable.IntervalFrame(tickSize, FrameCountType.EndOfFrame).Where(val => amount > 0).Subscribe(_loop =>
             {
