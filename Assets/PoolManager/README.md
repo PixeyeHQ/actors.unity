@@ -1,8 +1,6 @@
- 
-
 # Reactive PoolManager
-An ultra fast and lightweight object pool manager with zero allocations with prepopulate feature.
-Uses Unix extension and based on object instance ids. You can pool  prefabs without any extra components and can mix different prefab types in one pool.
+An ultra fast and lightweight object pool manager with zero allocations and customizable prepopulate feature. You can group uploading objects in chunks and set how many frames you need for uploading to reduce allocation spikes.
+Uses Unirx extension and based on object instance ids. You can pool  prefabs without any extra components and can mix different prefab types in one pool.
 
 [![https://gyazo.com/ebf0f27a5e5ec29ecfe019a9897e105c](https://i.gyazo.com/ebf0f27a5e5ec29ecfe019a9897e105c.gif)](https://gyazo.com/ebf0f27a5e5ec29ecfe019a9897e105c)
 
@@ -26,7 +24,7 @@ If needed you can prepopulate some objects at any time:
 //right after adding new pool
  ManagerPool.Instance.AddPool(PoolType.Entities).PopulateWith(prefab, 100, 10);
 //or by getting pool from manager
- ManagerPool.Instance.Get(PoolType.Entities).PopulateWith(prefab, 10, 1, 100);
+ ManagerPool.Instance.PopulateWith(PoolType.Entities,prefab,10,1,100);
 ```
 
 + First values if object you want to add to pool
