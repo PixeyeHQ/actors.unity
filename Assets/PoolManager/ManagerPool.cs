@@ -5,21 +5,22 @@ Company:    Homebrew - http://hbrew.store
 Date:       16/09/2017 01:51
 ================================================================*/
 
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace Homebrew
 {
  
-    public class ManagerPool : Singleton<ManagerPool>
+    public class ManagerPool : Singleton<ManagerPool>, IDisposable
     {
         private Dictionary<int, Pool> pools = new Dictionary<int, Pool>();
 
-
-        public Pool Get(PoolType id)
+        public Pool PopulateWith(PoolType id,GameObject prefab, int amount, int amountPerTick, int tickSize = 1)
         {
-            return pools[(int) id];
-        }
+            var  obj = pools[(int) id].PopulateWith(prefab, amount, amountPerTick, tickSize);
+            return obj;
+        }     
         
         public Pool AddPool(PoolType id, bool reparent = true)
         {

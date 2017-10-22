@@ -6,6 +6,7 @@ Date:       16/09/2017 01:51
 ================================================================*/
 
 
+using System;
 using System.Collections.Generic;
 using UniRx;
 using UnityEngine;
@@ -14,7 +15,7 @@ using Object = UnityEngine.Object;
 namespace Homebrew
 {
 
-    public class Pool
+    public class Pool : IDisposable
     {
 
         private Transform parentPool;
