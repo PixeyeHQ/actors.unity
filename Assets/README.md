@@ -24,7 +24,7 @@ If needed you can prepopulate some objects at any time:
 //right after adding new pool
  ManagerPool.Instance.AddPool(PoolType.Entities).PopulateWith(prefab, 100, 10);
 //or by getting pool from manager
- ManagerPool.Instance.Get(PoolType.Entities).PopulateWith(prefab, 10, 1, 100);
+ ManagerPool.Instance.PopulateWith(PoolType.Entities,prefab,10,1,100);
 ```
 
 + First values if object you want to add to pool
