@@ -10,5 +10,4 @@ public class ActorTest : Actor, ITick
 		Add(t);
 		Add<BehaviorTest>();
 	}
-	
 }

@@ -1,5 +1,5 @@
 {
-    "name": "ASM-FrameworkEditor",
+    "name": "ASM-EditorFramework",
     "references": [
         "ASM-Framework"
     ],
