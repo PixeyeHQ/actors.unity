@@ -10,5 +10,5 @@ namespace Homebrew
 {
 	public struct SignalTimeScaleChanged
 	{
-	}
+	} 
 }
