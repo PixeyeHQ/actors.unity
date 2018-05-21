@@ -1,0 +1,12 @@
+{
+    "name": "ASM-EditorRider",
+    "references": [
+        "ASM-Plugins"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false
+}

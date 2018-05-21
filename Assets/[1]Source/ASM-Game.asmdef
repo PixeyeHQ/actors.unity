@@ -1,0 +1,11 @@
+{
+    "name": "ASM-Game",
+    "references": [
+        "ASM-Framework",
+        "ASM-Plugins"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false
+}
