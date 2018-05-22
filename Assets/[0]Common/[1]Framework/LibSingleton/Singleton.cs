@@ -4,13 +4,14 @@ public class Singleton<T> : MonoBehaviour where T: MonoBehaviour
 {
 
     private static T _instance;
-
+/* TODO: clean shit
 	protected void Initialize()
 	{
 		if (_instance) return;
 		_instance = this as T;
 		DontDestroyOnLoad ( _instance );
 	}
+	*/
     // ReSharper disable once StaticMemberInGenericType
     private static System.Object _lock = new System.Object();  
     
