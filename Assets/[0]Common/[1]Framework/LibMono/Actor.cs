@@ -15,7 +15,7 @@ using Object = UnityEngine.Object;
 namespace Homebrew
 {
 	public abstract class Actor : MonoCached
-	{
+	{                      
 		[HideInInspector] public int hashCode;
 		[HideInInspector] public ProcessingTags tags;
 		[HideInInspector] public ProcessingSignals signals;

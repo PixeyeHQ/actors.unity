@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using UnityEditor;
 using UnityEngine;
-using Object = UnityEngine.Object;	
+using Object = UnityEngine.Object;
 
 namespace Homebrew
 {
@@ -16,15 +17,43 @@ namespace Homebrew
 		private SerializedProperty propScript;
 		private Type type;
 		private int length;
-		private FieldInfo[] objectFields;
+		private List<FieldInfo> objectFields;
 		private bool initialized;
 		private Colors colors;
 		private FoldoutAttribute prevFold;
+		private GUIStyle style;
+
+		private void Awake()
+		{
+			var uiTex_in = Resources.Load<Texture2D>("IN foldout focus-6510");
+			var uiTex_in_on = Resources.Load<Texture2D>("IN foldout focus on-5718");
+
+
+			var c_on = Color.white;
+            
+			style = new GUIStyle(EditorStyles.foldout);
+
+			style.overflow = new RectOffset(-10, 0, 3, 0);
+			style.padding = new RectOffset(25, 0, -3, 0);
+
+			style.active.textColor = c_on;
+			style.active.background = uiTex_in;
+			style.onActive.textColor = c_on;
+			style.onActive.background = uiTex_in_on;
+
+			style.focused.textColor = c_on;
+			style.focused.background = uiTex_in;
+			style.onFocused.textColor = c_on;
+			style.onFocused.background = uiTex_in_on;	
+			
+		 
+			
+		}
 
 		void OnEnable()
 		{
+  
 			bool pro = EditorGUIUtility.isProSkin;
-
 			if (!pro)
 			{
 				colors = new Colors();
@@ -39,13 +68,20 @@ namespace Homebrew
 				colors.col1 = new Color(1, 1, 1, 0.1f);
 				colors.col2 = new Color(0.25f, 0.25f, 0.25f, 1f);
 			}
+			
+			var t = target.GetType();
+			var typeTree = t.GetTypeTree();
+			objectFields = target.GetType().GetFields(BindingFlags.Public | BindingFlags.NonPublic |
+			                                          BindingFlags.Instance)
+				.OrderByDescending(x => typeTree.IndexOf(x.DeclaringType)).ToList();
 
+
+			length = objectFields.Count;
+			
+			
 			Repaint();
 			initialized = false;
-
-			objectFields = target.GetType().GetFields(BindingFlags.Public | BindingFlags.NonPublic |
-			                                          BindingFlags.Instance);
-			length = objectFields.Length;
+		 
 		}
 
 		private void OnDisable()
@@ -67,6 +103,7 @@ namespace Homebrew
 				for (var i = 0; i < length; i++)
 				{
 					var fold = Attribute.GetCustomAttribute(objectFields[i], typeof(FoldoutAttribute)) as FoldoutAttribute;
+
 					Cache c;
 					if (fold == null)
 					{
@@ -129,16 +166,15 @@ namespace Homebrew
 				var rect = EditorGUILayout.BeginVertical();
 
 				EditorGUILayout.Space();
+
 				EditorGUI.DrawRect(new Rect(rect.x - 1, rect.y - 1, rect.width + 1, rect.height + 1),
 					colors.col0);
 
 				EditorGUI.DrawRect(new Rect(rect.x - 1, rect.y - 1, rect.width + 1, rect.height + 1), colors.col1);
 
 
-				var v = EditorGUILayout.GetControlRect();
-
-				pair.Value.expanded = EditorGUI.Foldout(new Rect(v.x + 12, v.y - 4, v.width, v.height),
-					pair.Value.expanded, new GUIContent(pair.Value.atr.name), EditorStyles.foldout);
+				pair.Value.expanded = EditorGUILayout.Foldout(pair.Value.expanded, pair.Value.atr.name, true,
+					style != null ? style : EditorStyles.foldout);
 
 
 				EditorGUILayout.EndVertical();
@@ -156,7 +192,8 @@ namespace Homebrew
 						{
 							EditorGUI.indentLevel = 1;
 
-							EditorGUILayout.PropertyField(pair.Value.props[i], new GUIContent(pair.Value.props[i].name.FirstLetterToUpperCase()), true);
+							EditorGUILayout.PropertyField(pair.Value.props[i],
+								new GUIContent(pair.Value.props[i].name.FirstLetterToUpperCase()), true);
 							if (i == pair.Value.props.Count - 1)
 								EditorGUILayout.Space();
 						}
@@ -165,6 +202,7 @@ namespace Homebrew
 
 				EditorGUI.indentLevel = 0;
 				EditorGUILayout.EndVertical();
+				EditorGUILayout.Space();
 			}
 
 
@@ -235,6 +273,18 @@ namespace Homebrew
 			char[] a = s.ToCharArray();
 			a[0] = char.ToUpper(a[0]);
 			return new string(a);
+		}
+
+		public static IList<Type> GetTypeTree(this Type t)
+		{
+			var types = new List<Type>();
+			while (t.BaseType != null)
+			{
+				types.Add(t);
+				t = t.BaseType;
+			}
+
+			return types;
 		}
 	}
 }
