@@ -35,16 +35,21 @@ namespace Homebrew
 
 		# region EXTENDED MONOBEHAVIOR
 
-		protected virtual void Awake()
-		{
-			if (Starter.initialized == false)
-			{
-				state |= EntityState.OnHold;
-				Starter.objs.Add(this);
-			}
+		void Awake()
+    		{
+    			selfTransform = transform;
+    			if (Starter.initialized == false)
+    			{
+    				state |= EntityState.OnHold;
+    				Starter.objs.Add(this);
+    			}
+    			else OnAwake();
+    		}
+    
+    		protected virtual void OnAwake()
+    		{
+    		}
 
-			selfTransform = transform;
-		}
 
 		public void Initialize()
 		{

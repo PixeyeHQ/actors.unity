@@ -37,10 +37,8 @@ namespace Homebrew
 
 		protected abstract void Setup();
 
-		protected override void Awake()
+		protected override void OnAwake()
 		{
-			base.Awake();
-			if (state.HasState(EntityState.OnHold)) return;
 			hashCode = GetHashCode();
 			tags.SetActor(this);
 			tags.Add(hashCode);
