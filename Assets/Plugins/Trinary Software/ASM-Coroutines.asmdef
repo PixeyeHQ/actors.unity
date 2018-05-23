@@ -1,0 +1,10 @@
+{
+    "name": "ASM-Coroutines",
+    "references": [
+        "ASM-Plugins"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false
+}

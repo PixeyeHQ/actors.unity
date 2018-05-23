@@ -1,0 +1,10 @@
+{
+    "name": "ASM-Framework",
+    "references": [
+        "ASM-Coroutines"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false
+}

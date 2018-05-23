@@ -1,0 +1,10 @@
+{
+    "name": "ASM-Common",
+    "references": [
+        "ASM-Framework"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false
+}

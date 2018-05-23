@@ -2,7 +2,7 @@
     "name": "ASM-Game",
     "references": [
         "ASM-Framework",
-        "ASM-Plugins"
+        "ASM-Common"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [],
