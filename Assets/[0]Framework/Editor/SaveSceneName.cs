@@ -19,13 +19,13 @@ public class SaveSceneName : MonoCached
 		EditorBuildSettingsScene[] scenes = EditorBuildSettings.scenes;
  
 		// First, try to load the list if already exists
-		ScenesList list = (ScenesList) AssetDatabase.LoadAssetAtPath("Assets/Resources/ScenesList.asset", typeof(ScenesList)) ;
+		ScenesList list = (ScenesList) AssetDatabase.LoadAssetAtPath("Assets/[0]Framework/Resources/ScenesList.asset", typeof(ScenesList)) ;
  
 		// If doesn't exist, create it !
 		if( list == null )
 		{
 			list = ScriptableObject.CreateInstance<ScenesList>() ;
-			AssetDatabase.CreateAsset( list, "Assets/[-]Common/Resources/ScenesList.asset" );
+			AssetDatabase.CreateAsset( list, "Assets/[0]Framework/Resources/ScenesList.asset" );
 		}
 		Regex regex = new Regex( @"([^/]*/)*([\w\d\-]*)\.unity" ) ;
 		// Fill the array

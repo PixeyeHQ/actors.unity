@@ -10,6 +10,7 @@ using UnityEngine;
 namespace Homebrew{
 
 [System.Serializable]
+[CreateAssetMenu(fileName = "SceneList", menuName = "Data/ScenesList")]
 public class ScenesList : ScriptableObject
 {
 	public List<string> scenesNames;
