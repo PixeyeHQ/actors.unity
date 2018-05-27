@@ -4,6 +4,7 @@
 <p align="center">
     
 [![Join the chat at https://gitter.im/ActorsFramework/Lobby](https://img.shields.io/badge/gitter-join%20chat-green.svg?style=flat-square)](https://gitter.im/ActorsFramework/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Twitter Follow](https://img.shields.io/badge/twitter-%40dimmPixeye-blue.svg?style=flat-square&label=Follow)](https://twitter.com/dimmPixeye)
+[![license](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](https://github.com/dimmpixeyeUnity-Framework/master/LICENSE)
 </p>
 
 Actors - The component based pattern for Unity3d
@@ -59,6 +60,107 @@ Starter variables :
 
 
 [![https://gyazo.com/1285f0b0feb8ecb0495ca536aae25606](https://i.gyazo.com/1285f0b0feb8ecb0495ca536aae25606.png)](https://gyazo.com/1285f0b0feb8ecb0495ca536aae25606)
+
+
+### Creating new objects
+So from this point we are ready to go and add new gameobjects. 
+
+#### Monocached
+Instead of using Monobehaviors it's recommended to use Monocached classes.
+You can customize destroy time and pool type for your object. If pool is set the object will be deactivated and cached. If pool is set to none the object will be destroyed. Pooling is a great concenpt for objects that instantiate constantly. Bullets for example.
+
+#### Actors
+Base class for your game actors. Inherit from Monocached. It's basically a container for your data and behaviors. When you want to add new game entity inherit from Actor. For Example: ActorPlayer : Actor. 
+Actor is the *ONLY* game-logic monobehavior you will need on the game object.
+
+##### Actor setup example
+
+```csharp
+// inherit from Actor. Inherit from ITick interface to mark that this object must be updated.
+  public class ActorPlayer : Actor, ITick
+{
+    // add serializable data classes to ActorPlayer so we can inspect them in the Inspector
+    // Use [FoldoutGroup("Setup")] to make nice foldable groups of variables in the inspector
+	[FoldoutGroup("Setup")] public DataMove dataMove;
+	
+        // Use protected override void Setup to initialize Actor.
+        // Setup is used to add data into Actor's container and create behavior scripts for an Actor.
+    	protected override void Setup()
+		{
+            // use Add(object) to add already created object into Actor's container. For example data.
+			Add(dataMove);
+            // use Add<T>() to create new object and add into Actor's container. For example behavior.
+			Add<BehaviorInput>();
+		}
+ 
+}
+```
+[![https://gyazo.com/f3960af1f36566e3d114d97af9e3f0b6](https://i.gyazo.com/f3960af1f36566e3d114d97af9e3f0b6.png)](https://gyazo.com/f3960af1f36566e3d114d97af9e3f0b6)
+
+#### Data component
+Data components are serializable, plain c# classes inherited from IData interface. All game variables are held in data components.
+The same data components may be shared through various of behaviors.
+
+
+##### Data setup example
+
+```csharp
+// Always put [System.Serializable] to all data components and be sure to inherit from IData
+	[System.Serializable]
+    // Inhe
+	public class DataMove : IData
+	{
+		public float x;
+		public float y;
+
+		public void Dispose()
+		{
+		}
+	}
+```
+
+##### ISetup interface
+If you need to make setup in data components use ISetup interface for that. It will allow getting current Actor in the Setup method of your data for further customizations. 
+```csharp
+
+	[System.Serializable]
+	public class DataMove : IData, ISetup
+	{
+		public float x;
+		public float y;
+
+		public void Dispose()
+		{
+		}
+
+		public void Setup(Actor actor)
+		{
+			x = actor.selfTransform.position.x;
+		}
+	}
+ ```
+ 
+#### Behavior component
+Behaviors are plain c# classes that need data components to work and can't live without actors. Behaviors are workhorses of actors and define how actor behaves.
+
+##### Behavior example
+
+```csharp
+
+// Inherit from ITick to mark this behavior for updates
+		public class BehaviorInput : Behavior, ITick
+	{
+        // use [Bind] attribute for lazy initialization from Actor
+		[Bind] private DataMove dataMove;
+
+        // Update analogue, populating dataMove variables.
+		public override void OnTick()
+		{
+			dataMove.x = Input.GetAxis("Horizontal");
+			dataMove.y = Input.GetAxis("Vertical");
+		}
+	}
+ ```
 
 
 
