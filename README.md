@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="http://raw.pixeye.games/logo_framework.png" alt="Actor">
+    <img src="http://raw.pixeye.games/logo_framework.png" alt="Actors">
 </p>
 
 
