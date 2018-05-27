@@ -2,9 +2,9 @@
     <img src="http://raw.pixeye.games/logo_framework.png" alt="Actors">
 </p>
 <p align="center">
+    
 [![Join the chat at https://gitter.im/ActorsFramework/Lobby](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/ActorsFramework/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
-
+    
 [![Twitter Follow](https://img.shields.io/twitter/follow/espadrine.svg?style=flat-square&label=Follow)](https://twitter.com/dimmPixeye)
 </p>
 
