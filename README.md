@@ -23,7 +23,7 @@ The project consists of several folders :
 * [3]ThirdParty : libraries you use from asset store.
 * Plugins : unity3d plugin folder.
 
-### Project Setup and StarterKernel
+### Project Setup
 The framework heavily rely on Unity3D additive scenes. To use it in the way it was designed you need to make some preparations.
 
 1. Open sceneKernel scene. You can find it in Assets/[2]Content/Scenes
