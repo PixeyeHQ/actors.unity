@@ -3,7 +3,7 @@
 </p>
 <p align="center">
     
-[![Join the chat at https://gitter.im/ActorsFramework/Lobby](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/ActorsFramework/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Twitter Follow](https://img.shields.io/twitter/follow/espadrine.svg?style=flat-square&label=Follow)](https://twitter.com/dimmPixeye)
+[![Join the chat at https://gitter.im/ActorsFramework/Lobby](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/ActorsFramework/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Twitter Follow](https://img.shields.io/badge/twitter-%40dimmPixeye-blue.svg?style=flat-square&label=Follow)](https://twitter.com/dimmPixeye)
 </p>
 
 Actors - The component based pattern for Unity3d
