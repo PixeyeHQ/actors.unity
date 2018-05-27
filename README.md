@@ -4,5 +4,6 @@
 
 
 
-# Unity Framework
+Actors - The component based pattern for Unity3d
+================================================================
 Documentation is coming soon
