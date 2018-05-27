@@ -39,3 +39,26 @@ StarterKernel has few public variables you can set up:
 
 [![https://gyazo.com/1e79f2d6bf54c3762f35eab153cb0bfe](https://i.gyazo.com/1e79f2d6bf54c3762f35eab153cb0bfe.png)](https://gyazo.com/1e79f2d6bf54c3762f35eab153cb0bfe)
 
+### Scenes Setup
+
+Add new scenes in game from File->New Scene command. You will notice that scene will be generated differently from normal unity3d scene setup. A scene doesn't have camera or light. It's because you add them additively from other scenes. ( sceneKernel by default )
+
+#### Scene overview 
+All scenes have essential objects that you don't want to change.
+* [SETUP]: this is a root object for starter scripts and any settings related objects.
+* [SCENE]: this is a root object for your game-related game objects in a scene. Put all your level here.
+* [SCENE]/Dynamic: this is an object to hold all game objects that will be created at runtime. It's essential to separate loaded stuff from static to ease the process of debugging in hierarchy view.
+
+#### Starters
+A starter is a monobehavior component that you attach to [SETUP] game object. Starter controls scene loading&setup. You can inherit from starter component to extend it and add your custom logic. For example "startLevelOne."
+
+Starter variables :
+* Factories: by a factory, I call scriptable object that handles of creating complex objects. (For example factory player - spawn player object + spawn and setup player UI bars: hp, attack and so on.)
+* Scenes to keep: add string names of views you want to save after this scene close. Usually, you would always want to save sceneKernel.
+* Scenes depend on: scenes that need to be added when this scene starts. Typically, you would always want to depend on sceneKernel.
+
+
+[![https://gyazo.com/1285f0b0feb8ecb0495ca536aae25606](https://i.gyazo.com/1285f0b0feb8ecb0495ca536aae25606.png)](https://gyazo.com/1285f0b0feb8ecb0495ca536aae25606)
+
+
+
