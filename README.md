@@ -6,4 +6,4 @@
 
 Actors - The component based pattern for Unity3d
 ================================================================
-Documentation is coming soon
+ACTORS  is a small framework explicitly built for Unit3d. It is used to ease the pain of decoupling data from behaviors without tons of boilerplate code. 
