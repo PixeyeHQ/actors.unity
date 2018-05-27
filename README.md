@@ -162,5 +162,11 @@ Behaviors are plain c# classes that need data components to work and can't live 
 	}
  ```
 
+### Interfaces overivew
+The framework use single monobehavior update for *ALL* entities. Because of that we don't use any Update methods in actors/behaviors. 
+Instead we mark actors and behaviors with interfaces to define update type.
 
+* ITick: analogue for Update. Uses method OnTick();
+* ITickFixed: analogue for FixedUpdate. Uses method OnTickFixed();
+* ITickLate: analogue for LateUpdate. Uses method OnTickLate();
 
