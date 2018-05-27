@@ -2,6 +2,7 @@
     <img src="http://raw.pixeye.games/logo_framework.png" alt="Actors">
 </p>
 
+[![Join the chat at https://gitter.im/ActorsFramework/Lobby](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/dwyl/?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 
 Actors - The component based pattern for Unity3d
