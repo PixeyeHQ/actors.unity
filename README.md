@@ -421,18 +421,21 @@ IReceiveGlobal<T> interface is used when you want entity to receive a signal wit
 		}
   }
 ```
-
+## Toolbox
+Coming soon. Service locator.
+	
 ## Processings
-Coming soon.
+Coming soon. Global scripts to control groups of actors. Similar to ECS systems.
+Or used like "managers" classes. 
 
 ## Blueprints
-Coming soon.	
+Coming soon. Scriptable objects that define common resources for similar actors
 
 ## Tags
-Coming soon.
+Coming soon. Glue to identify actors and work with game logic.
 
 ## ECS
-Coming soon.
+Coming soon. Simple ECS pattern for working with actors.
 
 
 	
