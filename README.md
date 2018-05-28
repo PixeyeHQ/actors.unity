@@ -7,15 +7,15 @@
 [![license](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](https://github.com/dimmpixeyeUnity-Framework/master/LICENSE)
 </p>
 
-Actors - The component based pattern for Unity3d
-================================================================
+## Actors - The component based pattern for Unity3d
+
 ACTORS  is a small framework explicitly built for Unit3d. It is used to ease the pain of decoupling data from behaviors without tons of boilerplate code. 
 
-### Installation
+## Installation
 From Source
 * Clone this repo and open it as a new Unity3D project.
 
-### Project Overview
+## Project Overview
 The project consists of several folders :
 * [-]Common : for in-house libraries, framework plugables.
 * [0]Framework : the framework code. You generally don't need to touch here anything.
@@ -24,7 +24,7 @@ The project consists of several folders :
 * [3]ThirdParty : libraries you use from asset store.
 * Plugins : unity3d plugin folder.
 
-### Project Setup
+## Project Setup
 The framework heavily rely on Unity3D additive scenes. To use it in the way it was designed you need to make some preparations.
 
 1. Open sceneKernel scene. You can find it in Assets/[2]Content/Scenes
@@ -40,7 +40,7 @@ StarterKernel has few public variables you can set up:
 
 [![https://gyazo.com/1e79f2d6bf54c3762f35eab153cb0bfe](https://i.gyazo.com/1e79f2d6bf54c3762f35eab153cb0bfe.png)](https://gyazo.com/1e79f2d6bf54c3762f35eab153cb0bfe)
 
-### Scenes Setup
+## Scenes Setup
 
 Add new scenes in game from File->New Scene command. You will notice that scene will be generated differently from normal unity3d scene setup. A scene doesn't have camera or light. It's because you add them additively from other scenes. ( sceneKernel by default )
 
@@ -62,18 +62,18 @@ Starter variables :
 [![https://gyazo.com/1285f0b0feb8ecb0495ca536aae25606](https://i.gyazo.com/1285f0b0feb8ecb0495ca536aae25606.png)](https://gyazo.com/1285f0b0feb8ecb0495ca536aae25606)
 
 
-### Creating new objects
+## Creating new objects
 So from this point we are ready to go and add new gameobjects. 
 
-#### Monocached
+### Monocached
 Instead of using Monobehaviors it's recommended to use Monocached classes.
 You can customize destroy time and pool type for your object. If pool is set the object will be deactivated and cached. If pool is set to none the object will be destroyed. Pooling is a great concenpt for objects that instantiate constantly. Bullets for example.
 
-#### Actors
+### Actors
 Base class for your game actors. Inherit from Monocached. It's basically a container for your data and behaviors. When you want to add new game entity inherit from Actor. For Example: ActorPlayer : Actor. 
 Actor is the *ONLY* game-logic monobehavior you will need on the game object.
 
-##### Actor setup example
+#### Actor setup example
 
 ```csharp
 // inherit from Actor. Inherit from ITick interface to mark that this object must be updated.
@@ -97,12 +97,12 @@ Actor is the *ONLY* game-logic monobehavior you will need on the game object.
 ```
 [![https://gyazo.com/f3960af1f36566e3d114d97af9e3f0b6](https://i.gyazo.com/f3960af1f36566e3d114d97af9e3f0b6.png)](https://gyazo.com/f3960af1f36566e3d114d97af9e3f0b6)
 
-#### Data component
+### Data component
 Data components are serializable, plain c# classes inherited from IData interface. All game variables are held in data components.
 The same data components may be shared through various of behaviors.
 
 
-##### Data setup example
+#### Data setup example
 
 ```csharp
 // Always put [System.Serializable] to all data components and be sure to inherit from IData
@@ -140,10 +140,10 @@ If you need to make setup in data components use ISetup interface for that. It w
 	}
  ```
  
-#### Behavior component
+### Behavior component
 Behaviors are plain c# classes that need data components to work and can't live without actors. Behaviors are workhorses of actors and define how actor behaves.
 
-##### Behavior example
+#### Behavior example
 
 ```csharp
 
@@ -162,7 +162,7 @@ Behaviors are plain c# classes that need data components to work and can't live 
 	}
  ```
 
-### Interfaces overivew
+## **Interfaces overivew**
 The framework use single monobehavior update for *ALL* entities. Because of that we don't use any Update methods in actors/behaviors. 
 Instead we mark actors and behaviors with interfaces to define update type.
 
