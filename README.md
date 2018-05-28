@@ -17,7 +17,7 @@ From Source
 
 ## Project Overview
 The project consists of several folders :
-* [-]Common : for in-house libraries, framework plugables.
+* [-]Common : for in-house libraries, framework pluggables.
 * [0]Framework : the framework code. You generally don't need to touch here anything.
 * [1]Source : the game code.
 * [2]Content : the game content such as scenes, graphics, audio and so on.
@@ -163,10 +163,106 @@ Behaviors are plain c# classes that need data components to work and can't live 
  ```
 
 ## **Interfaces overivew**
+There are several interfaces in the framework to extend entity functionality.
+
+### ITick
 The framework use single monobehavior update for *ALL* entities. Because of that we don't use any Update methods in actors/behaviors. 
-Instead we mark actors and behaviors with interfaces to define update type.
+Instead we mark actors and behaviors with interfaces to define update type. Use ITick if you have code that needs to run per frame.
 
-* ITick: analogue for Update. Uses method OnTick();
-* ITickFixed: analogue for FixedUpdate. Uses method OnTickFixed();
-* ITickLate: analogue for LateUpdate. Uses method OnTickLate();
+```csharp
+public class BehaviorExample : Behavior, ITick{
+    public override void OnTick() { }
+}
+```
+### ITickFixed
+Use it when you have code that needs to run every fixed framerate frame.
 
+```csharp
+public class BehaviorExample : Behavior, ITickFixed{
+    public override void OnTickFixed() { }
+}
+```
+### ITickLate
+Use it when you have code that needs to run after all other updates.
+
+```csharp
+public class BehaviorExample : Behavior, ITickLate{
+    public override void OnTickLate() { }
+}
+``` 
+
+ ### IData
+Use it when you want mark class as a data container. Remember that you need use [System.Serializable] attribute for data containers.
+```csharp
+[System.Serializable]
+public class DataExample : IData{
+    public override void Dispose() { }
+}
+``` 
+
+ ### ISetup
+Sometimes your data containers might need extra setup from code instead of Unity3d Inspector. In this case, use this interface for your
+data components. When data component is added to an actor he will check all components for ISetup interface and trigger them.
+```csharp
+[System.Serializable]    
+public class DataRender: ISetup, IData
+{
+	public MaterialPropertyBlock matPropBlock;
+	public int ID = 0;
+ 
+	public void Setup(Actor actor)
+	{
+			var rend = actor.Get<SpriteRenderer>("view");
+			matPropBlock = new MaterialPropertyBlock();
+			rend.GetPropertyBlock(matPropBlock);
+	}
+
+	public void Dispose()
+	{
+		source = null;
+	}
+}
+```
+
+### IMustBeWiped
+IMstBeWiped interface marks processings that must be cleaned from toolbox when scene changed.
+```csharp
+  public class ProcessingShakeCamera : IDisposable, IMustBeWiped 
+  {
+  }
+```
+
+### IRecieve<T>
+IRecieve<T> interface is used when you want entity to recieve a signal with type of T from local signal dispatcher. IRecieve<T> normally used inside of Actors for local communication.
+```csharp
+  public class ProcessingShakeCamera : IDisposable, IMustBeWiped, IRecieve<SignalCameraShake> 
+  {
+	public void HandleSignal(SignalCameraShake arg)
+		{
+			if (arg.strength == 0)
+				tweenShakeAverage.Restart();
+			else if (arg.strength == 1)
+				tweenShakeStrong.Restart();
+			else if (arg.strength == 2)
+				tweenShakeVeryStrong.Restart();
+		}
+  }
+```
+
+### IRecieveGlobal<T>
+IRecieveGlobal<T> interface is used when you want entity to recieve a signal with type of T from global signal dispatcher. 
+```csharp
+  public class ProcessingShakeCamera : IDisposable, IMustBeWiped, IRecieveGlobal<SignalCameraShake> 
+  {
+	public void HandleSignal(SignalCameraShake arg)
+		{
+			if (arg.strength == 0)
+				tweenShakeAverage.Restart();
+			else if (arg.strength == 1)
+				tweenShakeStrong.Restart();
+			else if (arg.strength == 2)
+				tweenShakeVeryStrong.Restart();
+		}
+  }
+```
+ 
