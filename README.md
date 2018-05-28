@@ -97,6 +97,47 @@ Actor is the *ONLY* game-logic monobehavior you will need on the game object.
 ```
 [![https://gyazo.com/f3960af1f36566e3d114d97af9e3f0b6](https://i.gyazo.com/f3960af1f36566e3d114d97af9e3f0b6.png)](https://gyazo.com/f3960af1f36566e3d114d97af9e3f0b6)
 
+You don't need to write any logic inside of actor classes. Use behavior classes instead. Normally your actor class should look like this:
+```csharp
+	public class ActorHero : Actor, ITickFixed, ITick, ITickLate
+	{
+		[FoldoutGroup("Setup"), SerializeField]
+		private DataBlueprint dataBlueprint;
+		[FoldoutGroup("Setup"), HideInInspector, SerializeField]
+		private DataAnimationState dataAnimationState;
+		[FoldoutGroup("Setup"), SerializeField]
+		private DataInput dataInput;
+		[FoldoutGroup("Setup"), SerializeField]
+		private DataHealth dataHealth;
+		[FoldoutGroup("Setup"), SerializeField]
+		private DataDepthRender dataDepthRender;
+
+
+
+		protected override void Setup()
+		{
+			Add(dataBlueprint);
+			Add(dataAnimationState);
+			Add(dataDepthRender);
+			Add(dataHealth);
+			Add(dataInput);
+		
+			Add<DecorateDamageReturn>();
+			Add<DecorateBloodFloor>();
+			Add<DecorateDamageBlink>();
+			Add<DecorateBloodSplats>();
+
+			Add<BehaviorTurn>();
+			Add<BehaviorMove>();
+			Add<BehaviorRoll>();
+			
+			Add<BehaviorPlayerInput>();
+			Add<BehaviorDamageble>();
+
+		}
+	}
+```
+
 ### Data component
 Data components are serializable, plain c# classes inherited from IData interface. All game variables are held in data components.
 The same data components may be shared through various of behaviors.
@@ -120,7 +161,8 @@ The same data components may be shared through various of behaviors.
 ```
 
 ##### ISetup interface
-If you need to make setup in data components use ISetup interface for that. It will allow getting current Actor in the Setup method of your data for further customizations. 
+Sometimes your data containers might need extra setup from code instead of Unity3d Inspector. In this case, use this interface for your
+data components. When data component is added to an actor he will check all components for ISetup interface and trigger them.
 ```csharp
 
 	[System.Serializable]
@@ -161,6 +203,106 @@ Behaviors are plain c# classes that need data components to work and can't live 
 		}
 	}
  ```
+
+## **Signals**
+Signals are in-memory publish/subscribe system and effectively replace Unity3d SendMessage.
+There are two layers of signal disptachers : local is implemented inside Actor class. Global can be reached from ProcessingSignals.Default.
+
+Steps to use signals :
+
+1. Create a new structure. I prefer to call them like Singal*YourName*
+The structure holds all your arguments you want to pass.
+```csharp
+public struct SignalCameraShake 
+{
+	public int strength;
+}
+```
+2. Add an IReceive<T> to an object interested in receiving your signal. T is a type of your signal.
+A method HandleSignal(T arg) will be added to your script. It's an entry point for your signal.
+ 
+```csharp
+  public class ProcessingShakeCamera : IDisposable, IMustBeWiped, IReceive<SignalCameraShake> 
+  {
+	public void HandleSignal(SignalCameraShake arg)
+		{
+			if (arg.strength == 0)
+				tweenShakeAverage.Restart();
+			else if (arg.strength == 1)
+				tweenShakeStrong.Restart();
+			else if (arg.strength == 2)
+				tweenShakeVeryStrong.Restart();
+		}
+  }
+```
+
+3. Add subscription to your signal dispatcher.
+```csharp
+  public class ProcessingShakeCamera : IDisposable, IMustBeWiped, IReceive<SignalCameraShake> 
+  {
+	
+	public ProcessingShakeCamera()
+		{
+		        // subscribe this object on global signal dispatcher.
+			ProcessingSignals.Default.Add(this);
+	        }
+		
+	public void HandleSignal(SignalCameraShake arg)
+		{
+			if (arg.strength == 0)
+				tweenShakeAverage.Restart();
+			else if (arg.strength == 1)
+				tweenShakeStrong.Restart();
+			else if (arg.strength == 2)
+				tweenShakeVeryStrong.Restart();
+		}
+  }
+```
+ 4. Provide unsubscribe logic
+```csharp
+  public class ProcessingShakeCamera : IDisposable, IMustBeWiped, IReceive<SignalCameraShake> 
+  {
+	
+	public ProcessingShakeCamera()
+		{
+		        // subscribe this object on global signal dispatcher.
+			ProcessingSignals.Default.Add(this);
+	        }
+		
+	public void HandleSignal(SignalCameraShake arg)
+		{
+			if (arg.strength == 0)
+				tweenShakeAverage.Restart();
+			else if (arg.strength == 1)
+				tweenShakeStrong.Restart();
+			else if (arg.strength == 2)
+				tweenShakeVeryStrong.Restart();
+		}
+		
+		// We don't want object to recieve signals when it's destroyed.
+			public void Dispose()
+		{
+		        // Unsubscribe 
+			ProcessingSignals.Default.Remove(this);
+		}
+		
+  }
+ ``` 
+  Please note that you don't need to implement subscribe/unsubscribe logic that when you inherit from behavior or actor class.
+  Just add IReceive interfaces :
+  ```csharp
+  	public class DecorateDamageBlink : Behavior, IReceive<SignalDamage>
+	{
+	 
+		public void HandleSignal(SignalDamage val)
+		{
+			Blink();
+		}
+	
+	}
+  
+ ``` 
+
 
 ## **Interfaces overivew**
 There are several interfaces in the framework to extend entity functionality.
@@ -232,10 +374,10 @@ IMstBeWiped interface marks processings that must be cleaned from toolbox when s
   }
 ```
 
-### IRecieve<T>
-IRecieve<T> interface is used when you want entity to recieve a signal with type of T from local signal dispatcher. IRecieve<T> normally used inside of Actors for local communication.
+### IReceive<T>
+IReceive<T> interface is used when you want entity to recieve a signal with type of T from local signal dispatcher. IReceive<T> normally used inside of Actors for local communication.
 ```csharp
-  public class ProcessingShakeCamera : IDisposable, IMustBeWiped, IRecieve<SignalCameraShake> 
+  public class ProcessingShakeCamera : IDisposable, IMustBeWiped, IReceive<SignalCameraShake> 
   {
 	public void HandleSignal(SignalCameraShake arg)
 		{
@@ -249,10 +391,10 @@ IRecieve<T> interface is used when you want entity to recieve a signal with type
   }
 ```
 
-### IRecieveGlobal<T>
-IRecieveGlobal<T> interface is used when you want entity to recieve a signal with type of T from global signal dispatcher. 
+### IReceiveGlobal<T>
+IReceiveGlobal<T> interface is used when you want entity to receive a signal with type of T from global signal dispatcher. 
 ```csharp
-  public class ProcessingShakeCamera : IDisposable, IMustBeWiped, IRecieveGlobal<SignalCameraShake> 
+  public class ProcessingShakeCamera : IDisposable, IMustBeWiped, IReceiveGlobal<SignalCameraShake> 
   {
 	public void HandleSignal(SignalCameraShake arg)
 		{
@@ -265,4 +407,6 @@ IRecieveGlobal<T> interface is used when you want entity to recieve a signal wit
 		}
   }
 ```
+	
+	
  
