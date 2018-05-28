@@ -36,7 +36,7 @@ StarterKernel has few public variables you can set up:
 * ScriptableObject Blueprints: a blueprint is a container for all game blueprints. I call customizable game-data scriptable object as "blueprint. 
 * ScriptableObject DataGameSettings: use this to add some game settings related stuff.
 * ScriptableObject DataGameSessiom : in-game session blackboard. Customize it as you need. 
-* Pluggable: a list of all used pluggables. Plugable is a wrapper for a custom third-party asset you want to link with game and framework and initialize from the start. By default, you have a pluggable called PlugableConsole that add debug game console in the project.
+* Pluggable: a list of all used pluggables. Pluggable is a wrapper for a custom third-party asset you want to link with game and framework and initialize from the start. By default, you have a pluggable called PlugableConsole that add debug game console in the project.
 
 [![https://gyazo.com/1e79f2d6bf54c3762f35eab153cb0bfe](https://i.gyazo.com/1e79f2d6bf54c3762f35eab153cb0bfe.png)](https://gyazo.com/1e79f2d6bf54c3762f35eab153cb0bfe)
 
