@@ -225,8 +225,7 @@ There are two layers of signal disptachers : local is implemented inside Actor c
 
 Steps to use signals :
 
-1. Create a new structure. I prefer to call them like Singal*YourName*
-The structure holds all your arguments you want to pass.
+1. Create a new structure. I prefer to call them like Singal*YourName*. The structure holds all your arguments you want to pass.
 ```csharp
 public struct SignalCameraShake 
 {
