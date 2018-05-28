@@ -7,12 +7,12 @@ Date:       2/17/2018  9:27 PM
 
 namespace Homebrew
 {
-	public interface IRecieve<T> : IRecieve
+	public interface IReceive<T> : IRecieve
 	{
 		void HandleSignal(T arg);
 	}
 
-	public interface IRecieveGlobal<T> : IRecieve<T>
+	public interface IReceiveGlobal<T> : IReceive<T>
 	{
 	}
 

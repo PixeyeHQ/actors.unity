@@ -11,7 +11,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 270481230cd849e3a3dfedc74c399f82, type: 3}
   m_Name: ScenesList
   m_EditorClassIdentifier: 
-  scenesNames:
-  - sceneTest
-  - sceneKernel
-  - sceneUI
+  scenesNames: []

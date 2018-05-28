@@ -29,7 +29,7 @@ namespace Homebrew
 		 
 			for (int i = 0; i < len; i++)
 			{
-				(cachedSignals[i] as IRecieve<T>).HandleSignal(val);
+				(cachedSignals[i] as IReceive<T>).HandleSignal(val);
 			}
 		}
 
@@ -92,11 +92,11 @@ namespace Homebrew
 
 			foreach (var intType in all)
 			{
-				if (intType.IsGenericType && intType.GetGenericTypeDefinition() == typeof(IRecieveGlobal<>))
+				if (intType.IsGenericType && intType.GetGenericTypeDefinition() == typeof(IReceiveGlobal<>))
 				{
 					Default.Add(reciever, intType.GetGenericArguments()[0]);
 				}
-				else if (intType.IsGenericType && intType.GetGenericTypeDefinition() == typeof(IRecieve<>))
+				else if (intType.IsGenericType && intType.GetGenericTypeDefinition() == typeof(IReceive<>))
 				{
 			 
 				 
@@ -113,11 +113,11 @@ namespace Homebrew
 
 			foreach (Type intType in all)
 			{
-				if (intType.IsGenericType && intType.GetGenericTypeDefinition() == typeof(IRecieveGlobal<>))
+				if (intType.IsGenericType && intType.GetGenericTypeDefinition() == typeof(IReceiveGlobal<>))
 				{
 					Default.Remove(reciever, intType.GetGenericArguments()[0]);
 				}
-				else if (intType.IsGenericType && intType.GetGenericTypeDefinition() == typeof(IRecieve<>))
+				else if (intType.IsGenericType && intType.GetGenericTypeDefinition() == typeof(IReceive<>))
 				{
 					Remove(reciever, intType.GetGenericArguments()[0]);
 				}

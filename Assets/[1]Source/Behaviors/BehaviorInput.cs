@@ -2,19 +2,22 @@
 Product:    Unity3dTools
 Developer:  Dimitry Pixeye - info@pixeye,games
 Company:    Homebrew
-Date:       5/21/2018 9:06 PM
+Date:       5/21/2018 9:08 PM
 ================================================================*/
 
 
+using UnityEngine;
+
 namespace Homebrew
 {
-	[System.Serializable]
-	public class DataTest : IData
+	public class BehaviorInput : Behavior, ITick
 	{
-		public int Test;
+		[Bind] private DataMove dataMove;
 
-		public void Dispose()
+		public override void OnTick()
 		{
+			dataMove.x = Input.GetAxis("Horizontal");
+			dataMove.y = Input.GetAxis("Vertical");
 		}
 	}
 }

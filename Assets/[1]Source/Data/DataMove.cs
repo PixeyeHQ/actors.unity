@@ -2,21 +2,25 @@
 Product:    Unity3dTools
 Developer:  Dimitry Pixeye - info@pixeye,games
 Company:    Homebrew
-Date:       5/21/2018 9:08 PM
+Date:       5/21/2018 9:06 PM
 ================================================================*/
 
 
-using UnityEngine;
-
 namespace Homebrew
 {
-	public class BehaviorTest : Behavior, ITick
+	[System.Serializable]
+	public class DataMove : IData, ISetup
 	{
-		[Bind] private DataTest test;
+		public float x;
+		public float y;
 
-		public override void OnTick()
+		public void Dispose()
 		{
-			Debug.Log(test.Test);
+		}
+
+		public void Setup(Actor actor)
+		{
+			x = actor.selfTransform.position.x;
 		}
 	}
 }
