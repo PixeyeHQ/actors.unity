@@ -138,12 +138,27 @@ You don't need to write any logic inside of actor classes. Use behavior classes 
 	}
 ```
 
-### Data component
+### Get method
+When you are working with actors/behaviors use Get<T> instead of GetComponent<T>. Get<T> method tries to find component inside of actor
+container.
+Example:
+	
+```csharp
+Get<DataMovement>().facing
+```
+You can get unity components as well by adding path to child transform
+```csharp
+labelScore = Get<TextMeshProUGUI>("anchor_left/label_score");
+```
+
+	 
+
+## Data component
 Data components are serializable, plain c# classes inherited from IData interface. All game variables are held in data components.
 The same data components may be shared through various of behaviors.
 
 
-#### Data setup example
+### Data setup example
 
 ```csharp
 // Always put [System.Serializable] to all data components and be sure to inherit from IData
@@ -160,7 +175,7 @@ The same data components may be shared through various of behaviors.
 	}
 ```
 
-##### ISetup interface
+#### ISetup interface
 Sometimes your data containers might need extra setup from code instead of Unity3d Inspector. In this case, use this interface for your
 data components. When data component is added to an actor he will check all components for ISetup interface and trigger them.
 ```csharp
@@ -182,10 +197,10 @@ data components. When data component is added to an actor he will check all comp
 	}
  ```
  
-### Behavior component
+## Behavior component
 Behaviors are plain c# classes that need data components to work and can't live without actors. Behaviors are workhorses of actors and define how actor behaves.
 
-#### Behavior example
+### Behavior example
 
 ```csharp
 
@@ -407,6 +422,19 @@ IReceiveGlobal<T> interface is used when you want entity to receive a signal wit
 		}
   }
 ```
-	
+
+## Processings
+Coming soon.
+
+## Blueprints
+Coming soon.	
+
+## Tags
+Coming soon.
+
+## ECS
+Coming soon.
+
+
 	
  
