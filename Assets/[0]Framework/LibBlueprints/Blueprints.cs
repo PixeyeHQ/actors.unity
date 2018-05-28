@@ -17,7 +17,7 @@ namespace Homebrew
 {
 	[CreateAssetMenu(fileName = "Blueprints", menuName = "Data/Blueprints")]
 	[System.Serializable]
-	public class Blueprints : Plugable, IAwake
+	public class Blueprints : Pluggable, IAwake
 	{
 		public List<Blueprint> blueprints = new List<Blueprint>();
 

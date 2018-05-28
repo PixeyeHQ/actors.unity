@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace Homebrew
 {
-	public abstract class Plugable : ScriptableObject
+	public abstract class Pluggable : ScriptableObject
 	{
 		public abstract void Plug();
 	}

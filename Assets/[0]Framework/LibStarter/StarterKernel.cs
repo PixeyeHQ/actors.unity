@@ -20,7 +20,7 @@ namespace Homebrew
 		[FoldoutGroup("Setup")] public DataGame dataGameSettings;
 		[FoldoutGroup("Setup")] public DataGame dataGameSession;
 
-		[FoldoutGroup("Setup")] public List<Plugable> plugables = new List<Plugable>();
+		[FoldoutGroup("Setup")] public List<Pluggable> plugables = new List<Pluggable>();
  
 
 		private void Awake()

@@ -14,7 +14,7 @@ using UnityEngine;
 namespace Homebrew
 {
 	[CreateAssetMenu(menuName = "Plugables/Console", fileName = "Console")]
-	public class PlugableConsole : Plugable
+	public class PluggableConsole : Pluggable
 	{
 		[FoldoutGroup("Setup")] public CommandsConsole commandsDebug;
 		public override void Plug()
