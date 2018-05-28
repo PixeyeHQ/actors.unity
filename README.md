@@ -1,11 +1,11 @@
 <p align="center">
     <img src="http://raw.pixeye.games/logo_framework.png" alt="Actors">
 </p>
-<p align="center">
-    
-[![Join the chat at https://gitter.im/ActorsFramework/Lobby](https://img.shields.io/badge/gitter-join%20chat-green.svg?style=flat-square)](https://gitter.im/ActorsFramework/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Twitter Follow](https://img.shields.io/badge/twitter-%40dimmPixeye-blue.svg?style=flat-square&label=Follow)](https://twitter.com/dimmPixeye)
+
+[![Join the chat at https://gitter.im/ActorsFramework/Lobby](https://img.shields.io/badge/gitter-join%20chat-green.svg?style=flat-square)](https://gitter.im/ActorsFramework/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Join the chat at https://discord.gg/ukhzx83](https://img.shields.io/badge/discord-join%20channel-brightgreen.svg?style=flat-square)](https://discord.gg/ukhzx83)
+[![Twitter Follow](https://img.shields.io/badge/twitter-%40dimmPixeye-blue.svg?style=flat-square&label=Follow)](https://twitter.com/dimmPixeye)
 [![license](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](https://github.com/dimmpixeyeUnity-Framework/master/LICENSE)
-</p>
 
 ## Actors - The component based pattern for Unity3d
 
@@ -138,12 +138,27 @@ You don't need to write any logic inside of actor classes. Use behavior classes 
 	}
 ```
 
-### Data component
+### Get method
+When you are working with actors/behaviors use Get<T> instead of GetComponent<T>. Get<T> method tries to find component inside of actor
+container.
+Example:
+	
+```csharp
+Get<DataMovement>().facing
+```
+You can get unity components as well by adding path to child transform
+```csharp
+labelScore = Get<TextMeshProUGUI>("anchor_left/label_score");
+```
+
+	 
+
+## Data component
 Data components are serializable, plain c# classes inherited from IData interface. All game variables are held in data components.
 The same data components may be shared through various of behaviors.
 
 
-#### Data setup example
+### Data setup example
 
 ```csharp
 // Always put [System.Serializable] to all data components and be sure to inherit from IData
@@ -160,7 +175,7 @@ The same data components may be shared through various of behaviors.
 	}
 ```
 
-##### ISetup interface
+#### ISetup interface
 Sometimes your data containers might need extra setup from code instead of Unity3d Inspector. In this case, use this interface for your
 data components. When data component is added to an actor he will check all components for ISetup interface and trigger them.
 ```csharp
@@ -182,10 +197,10 @@ data components. When data component is added to an actor he will check all comp
 	}
  ```
  
-### Behavior component
+## Behavior component
 Behaviors are plain c# classes that need data components to work and can't live without actors. Behaviors are workhorses of actors and define how actor behaves.
 
-#### Behavior example
+### Behavior example
 
 ```csharp
 
@@ -210,8 +225,7 @@ There are two layers of signal disptachers : local is implemented inside Actor c
 
 Steps to use signals :
 
-1. Create a new structure. I prefer to call them like Singal*YourName*
-The structure holds all your arguments you want to pass.
+1. Create a new structure. I prefer to call them like Singal*YourName*. The structure holds all your arguments you want to pass.
 ```csharp
 public struct SignalCameraShake 
 {
@@ -407,6 +421,19 @@ IReceiveGlobal<T> interface is used when you want entity to receive a signal wit
 		}
   }
 ```
+## Toolbox
+Coming soon. Service locator.
 	
+## Processings
+Docs are coming soon. Global scripts to control groups of actors. Similar to ECS systems.
+Or used like "managers" classes. 
+## Blueprints
+Docs are coming soon. Scriptable objects that define common resources for similar actors
+## Tags
+Docs are coming soon. Glue to identify actors and work with game logic.
+## ECS
+Docs are coming soon. Simple ECS pattern for working with actors.
+
+
 	
  
