@@ -234,7 +234,7 @@ MonoBehaviour:
   blueprints: {fileID: 11400000, guid: 680dcb9179fd4fe4fb3740eb34c428f1, type: 2}
   dataGameSettings: {fileID: 11400000, guid: 50d71f0570a7f0f4692192dcf5847c84, type: 2}
   dataGameSession: {fileID: 11400000, guid: e1103066b832c6345b793813b7c1af75, type: 2}
-  plugables:
+  pluggables:
   - {fileID: 11400000, guid: dafd99ce458d5694a87a091455eadc9a, type: 2}
 --- !u!4 &1230017401
 Transform:

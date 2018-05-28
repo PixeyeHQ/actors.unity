@@ -20,7 +20,7 @@ namespace Homebrew
 		[FoldoutGroup("Setup")] public DataGame dataGameSettings;
 		[FoldoutGroup("Setup")] public DataGame dataGameSession;
 
-		[FoldoutGroup("Setup")] public List<Pluggable> plugables = new List<Pluggable>();
+		[FoldoutGroup("Setup")] public List<Pluggable> pluggables = new List<Pluggable>();
  
 
 		private void Awake()
@@ -42,9 +42,9 @@ namespace Homebrew
 			ProcessingScene.Default = Toolbox.Add<ProcessingScene>();
 
 
-			for (var i = 0; i < plugables.Count; i++)
+			for (var i = 0; i < pluggables.Count; i++)
 			{
-				plugables[i].Plug();
+				pluggables[i].Plug();
 			}
 
  
