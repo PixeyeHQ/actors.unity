@@ -422,8 +422,22 @@ IReceiveGlobal<T> interface is used when you want entity to receive a signal wit
   }
 ```
 ## Toolbox
-Coming soon. Service locator.
-	
+The toolbox is a singleton that contains all processings, global data and everything you want to get from global access.
+Think of toolbox as a "global actor." 
+
+To add a new instance of a class to toolbox use Add method
+Example:
+```csharp
+Toolbox.Add<ProcessingInputConnect>();
+```
+
+To get something from toolbox use Get method
+Example:
+```csharp
+Toolbox.Get<ProcessingInputConnect>();
+```
+
+
 ## Processings
 Docs are coming soon. Global scripts to control groups of actors. Similar to ECS systems.
 Or used like "managers" classes. 
