@@ -477,7 +477,7 @@ public class ProcessingShakeCamera : IDisposable, IMustBeWiped
 			ProcessingSignals.Default.Add(this);
                 }
 
-	public void Dispose()
+	        public void Dispose()
 		{
 			ProcessingSignals.Default.Remove(this);
 			twShakeFromShootCamera.Kill();
@@ -510,8 +510,40 @@ public class ProcessingCameraFollow : ProcessingBase, ITickLate, IMustBeWiped{
 }
 ```
 
+## Framework Processings
+The framework wouldn't work without some predefined processings, and you should know about them as you will use them a lot.
+
+### ProcessingUpdate
+Important processing that controls *all* updates in game. When ProcessingUpdate is created it adds a ComponentUpdate monobehavior inside of [KERNEL] root object to get Unity Update methods. All actors,timers,processings should work from ProcessingUpdate.
+
+While Monobehavior update method can be used only with inherited mono components, you can use ProcessingUpdate with *ANY* script.
+You can do that in 2 steps:
+1. Inherit from interaces you need.
+* ITick for Update
+* ITickFixed for FixedUpdate
+* ITickLate for LateUpdate
+2. Call  *ProcessingUpdate.Default.Add(this);*  in script, somewhere in initializing.
+3. Normally, all updates are killed when scene changes but if you want to kill Update earlier call *ProcessingUpdate.Default.Remove(this);*
 
 
+```csharp
+public class MyCustomClass : ITick{
+
+ public MyCustomClass(){
+   ProcessingUpdate.Default.Add(this);
+ }
+ 
+ public void Tick(){
+			 
+ }
+
+}
+```
+
+## Object pooling
+Docs are coming soon. 
+## Timers
+Docs are coming soon. 
 ## Blueprints
 Docs are coming soon. Scriptable objects that define common resources for similar actors
 ## Tags
