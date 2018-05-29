@@ -425,22 +425,93 @@ IReceiveGlobal<T> interface is used when you want entity to receive a signal wit
 The toolbox is a singleton that contains all processings, global data and everything you want to get from global access.
 Think of toolbox as a "global actor." 
 
-To add a new instance of a class to toolbox use Add method
+To add a new instance of a class to a toolbox use Add method
 Example:
+
 ```csharp
 Toolbox.Add<ProcessingInputConnect>();
 ```
 
-To get something from toolbox use Get method
+To get something from a toolbox use Get method
 Example:
+
 ```csharp
-Toolbox.Get<ProcessingInputConnect>();
+data = Toolbox.Get<DataGameSession>();
+```
+
+## Processings
+Processing more known as "managers," "controllers." Processings are classes that can be used like systems in ECS or to do some global work. For example, camera follow script is a good candidate for processing script.
+
+There are few predefined processings in the framework. You can find them in StarterKernel script. The best place to add your custom processings is Starter scripts or pluggables.
+
+Processings must live only inside of a toolbox.
+
+### ProcessingBase
+Typically, processing should be inherited from ProcessingBase, but it's ok to use them without a base.
+Processing base is required to use the script as an ECS system. Also, it automates routine of subscribing/unsubscribing for signal events.
+
+```csharp
+public class ProcessingGroupEnemies : ProcessingBase
+```
+
+### IMustBeWiped
+The IMustBeWiped interface says to the toolbox that this processing must be destroyed when the scene changed. Usually, you would use it with all "local" processing scripts that are related to one scene only. Sometimes it's better to kill object and recreate it in the new scene.
+
+```csharp
+public class ProcessingGroupEnemies : ProcessingBase, IMustBeWiped
+```
+### IDisposable
+Use IDisposable interface when you want to clean processing object before destroying it. 
+```csharp
+public class ProcessingShakeCamera : IDisposable, IMustBeWiped
+{
+
+	        private Tween twShakeFromShootCamera;
+		private Tween twShakeAverage;
+		private Tween twShakeStrong;
+		private Tween twShakeVeryStrong;
+
+
+		public ProcessingShakeCamera()
+		{
+			ProcessingSignals.Default.Add(this);
+                }
+
+	public void Dispose()
+		{
+			ProcessingSignals.Default.Remove(this);
+			twShakeFromShootCamera.Kill();
+			twShakeAverage.Kill();
+			twShakeStrong.Kill();
+		}
+}
+``` 
+Don't use IDisposable when inheriting from ProcessingBase. It's already included there, and you get virtual method
+OnDispose to make all necessary cleaning.
+
+
+### Updating processings
+Don't forget to use ITick, ITickFixed, and ITickLate interfaces with processings you want to be updated per frame.
+Use ProcessingUpdate.Default.Add to register this object as Tickable.
+```csharp
+ProcessingUpdate.Default.Add(this);
+``` 
+
+```csharp
+// don't forget to mark type of update. Here we use ITickLate
+public class ProcessingCameraFollow : ProcessingBase, ITickLate, IMustBeWiped{
+	public ProcessingCameraFollow()
+		{
+			transformCamera = Camera.main.transform;
+			// use ProcessingUpdate.Default.Add to register this object as Tickable. 
+			// In our example it will be added as TickLate
+			ProcessingUpdate.Default.Add(this);
+		}
+}
 ```
 
 
-## Processings
-Docs are coming soon. Global scripts to control groups of actors. Similar to ECS systems.
-Or used like "managers" classes. 
+
 ## Blueprints
 Docs are coming soon. Scriptable objects that define common resources for similar actors
 ## Tags
