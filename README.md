@@ -9,7 +9,51 @@
 
 ## Actors - The component based pattern for Unity3d
 
-ACTORS  is a small framework explicitly built for Unit3d. It is used to ease the pain of decoupling data from behaviors without tons of boilerplate code. 
+ACTORS is a small framework explicitly built for Unit3d. It is used to ease the pain of decoupling data from behaviors without tons of boilerplate code. It relies on Unity3d scripting monobehavior concept but without unnecessary overhead.
+
+### Game code overivew :
+```csharp
+ public class ActorPlayer : Actor, ITick
+{
+
+	[FoldoutGroup("Setup")] public DataMove dataMove;
+	 
+    	     protected override void Setup()
+		{
+			Add(dataMove);
+			Add<BehaviorInput>();
+		}
+ 
+}
+```
+```csharp
+	[System.Serializable]
+
+	public class DataMove : IData
+	{
+		public float x;
+		public float y;
+
+		public void Dispose()
+		{
+		}
+	}
+```	
+```csharp
+	public class BehaviorInput : Behavior, ITick
+	{
+
+		[Bind] private DataMove dataMove;
+
+
+		public override void OnTick()
+		{
+			dataMove.x = Input.GetAxis("Horizontal");
+			dataMove.y = Input.GetAxis("Vertical");
+		}
+	}
+	
+```
 
 ## Installation
 From Source
@@ -541,9 +585,218 @@ public class MyCustomClass : ITick{
 ```
 
 ## Object pooling
-Docs are coming soon. 
+Every time you create/destroy object memory is allocated. The more complex object is the bigger allocation will be. It's not a big deal to create the object once or several times, but when you need to spawn hundreds of objects, or you want to generate them rapidly, you want to use object pooling. You can find more info about pooling on [Unity3d site](https://unity3d.com/learn/tutorials/topics/scripting/object-pooling).
+
+There are two types of pools in the Framework :
+* For gameobjects - any game related game objects on a scene with monobehavior classes.
+* For c# objects - any plain c# classes. For example timers.
+
+### GameObject pool
+The control of gameobject pool goes through the ProcessingGoPool script and PoolStash script.
+Pools are predefined and included inside monocached objects. 
+There are 4 types of gameobject pools:
+
+* Pool.UI - for any UI related entities
+* Pool.Projectiles - for any fx, small objects such as bullets.
+* Pool.Entities - for gameobjects and actors
+* Pool.Audio - for audiosource gameobjects
+
+You can add more pool types through ProcessingGoPool if you want.
+
+#### Making object poolable
+
+Step one.
+Choose your actor or monocached object in the inspector. Open Mono foldout group. Set pool time you want.
+
+[![https://gyazo.com/1fc7c2a2e77a9aac8544a66712c11f01](https://i.gyazo.com/1fc7c2a2e77a9aac8544a66712c11f01.gif)](https://gyazo.com/1fc7c2a2e77a9aac8544a66712c11f01)
+
+Thats all. For now on when you will try to destroy object it will be deactivated and send to desired pool instead.
+In your scene you may notice [POOLS] object. This object holds all deactivated entities for you.
+
+[![https://gyazo.com/246ca65b49467779f106e4482be4b4e1](https://i.gyazo.com/246ca65b49467779f106e4482be4b4e1.gif)](https://gyazo.com/246ca65b49467779f106e4482be4b4e1)
+
+Step two. ( Optional )
+In case you want to provide some particular logic when object spawned/despawned inherit your class from IPoolable interface.
+It's needed most when you want to reset object states. You don't want your enemy to spawn with zero HP for example.
+
+```csharp
+public class ActorEnemy : Actor, ITick, IPoolable
+```
+
+Then add override methods to behaviors that are used with this Actor:
+
+```csharp
+protected override void OnSpawn(){}
+```
+```csharp
+protected override void OnDespawn(){
+}
+```
+
+If you override from Actor class don't forget to add base.OnSpawn()/OnDespawn()
+You need to do that because of base Actor class loops through behaviors and pass OnSpawn/OnDespawn methods to them.
+```csharp
+protected override void OnSpawn(){
+base.OnSpawn();
+}
+```
+```csharp
+protected override void OnDespawn(){
+base.OnDespawn();
+}
+```
+In this way, if you plan and design carefully, you can do pooling for even very complex objects.
+
+### Pool Register component
+
+If you added objects to the scene via edit mode and you want them to be part of the pooling routine add PoolRegister component.
+I usually attach it to [SETUP] object. That define pool nodes: set pool type, prefab of the object from Project ( not from the scene )
+And a list of all prefab clones on the scene. In future, I plan to automate this routine.
+
+[![https://gyazo.com/51f7661dc970da82aa48faac0feffdfc](https://i.gyazo.com/51f7661dc970da82aa48faac0feffdfc.png)](https://gyazo.com/51f7661dc970da82aa48faac0feffdfc)
+
+### Temporary pool
+You can make a special temporary pool container to work with later. Useful when you need to deactivate/activate specific group of entities in a lazy way.
+
+```csharp
+ProcessingGoPool.AddToTemp(Pool.Entities, gameobject);
+```
+
+```csharp
+ProcessingGoPool.ReleaseTemp(Pool.Entities);
+```
+
+## Creating and destroying new objects
+
+### Creating routine
+
+To get all benefits of the pooling system and to be sure objects will be spawned in the right places I wrote some instantiate shortcuts.
+In ANY script you want just use 
+```csharp
+var pool = Pool.Entities;
+var obj = this.Populate(pool, prefab);
+```
+You can provide extra params as well:
+```csharp
+var pool = Pool.UI;
+var obj = this.Populate(pool, prefab, Vector3.zero, Quaternion.identity, null, WorldParenters.Level);
+```
+You can spawn from Resources by providing string id name.
+
+```csharp
+var pool = Pool.UI;
+var obj = this.Populate(pool, "myObject" , Vector3.zero, Quaternion.identity, null, WorldParenters.UI);
+```
+Parameteres that are used :
+Pool - the type of pool. Use Pool.None if you don't want to spawn from pool.
+Prefab or string id - the object you want to spawn. 
+Position - the initial position. Vector3.Zero by default.
+Rotation - the initial rotation. Quaternion.identity by default.
+Parent - parent transform. Use it if you want to set special parent.
+WorldParenters - WorldParenters.Level by default.  Created object is put inside of particular world container if no other parent is registered. 
+
+By default it's dynamic object inside [SCENE] object.
+[![https://gyazo.com/4d3346f3fe63bb626af6ab6884271146](https://i.gyazo.com/4d3346f3fe63bb626af6ab6884271146.png)](https://gyazo.com/4d3346f3fe63bb626af6ab6884271146) 
+
+When you spawn from string ID ProcessingResources starts to work. It looks inside of Resources/Prefabs folder and tries to find the desired object. Than ProcessingResources caches it and provide it to the spawn logic. Next time it will give this object from the cache instead of looking again inside of ResourcesFolder.
+
+[![https://gyazo.com/025bca594dca7fdd3e35465bff05cb10](https://i.gyazo.com/025bca594dca7fdd3e35465bff05cb10.png)](https://gyazo.com/025bca594dca7fdd3e35465bff05cb10)
+
+### Destroying routine
+
+To destroy an actor or monocached object use HandleDestroyGO() method.
+```csharp
+actor.HandleDestroyGO()
+```
+If the object belongs to pool it will be deactivated for further reuse. If the object doesn't belong to a pool, it will be destroyed.
+You can delay destroy by adding destroy delay time in the Inspector.
+
+[![https://gyazo.com/49613234129a49a1a9a923a863225618](https://i.gyazo.com/49613234129a49a1a9a923a863225618.gif)](https://gyazo.com/49613234129a49a1a9a923a863225618)
+
+### OnBeforeDestroy
+
+Use override of OnBeforeDestroy() method to provide some logic for and Actor before destroying. Useful for adding some effects related stuff. Also OnBeforeDestroy works well to reset data if object is pooled.
+
+```csharp
+protected override void OnBeforeDestroy()
+```	
+
 ## Timers
-Docs are coming soon. 
+
+Timers are great for making delayed actions. I strongly recommend to use them instead of coroutines for example if you need to make single delay or call several delayed actions.
+
+There are two ways of using timers. You can create a new timer each time you need from timer pool or cache timer and reuse it.
+Example of timer:
+```csharp
+Timer.Add(0.1f, actor.HandleDestroyGO); 
+```
+
+Set timer time and action. You can use lambda to define a complex action. The timer will be automatically recycled after playing.
+```csharp
+ Timer.Add(0.1f, ()=>
+    {
+      Debug.Log("Killed");
+      actor.HandleDestroyGO();
+    }); 
+```
+
+### AddID method
+
+You may add ID to the timer. After this you will be able to sort timers and get the list of timers with the same ID. You can use any object for your ID.
+
+```csharp
+  Timer.Add(0.1f, actor.HandleDestroyGO).AddID(actor);
+```
+
+For example you may want find all timers of freezed actor and changed timescale.
+```csharp
+var timers = Timer.FindAllTimers(actor);
+	 
+	if (timers != null)
+	 for (var i = 0; i < timers.Count; i++)
+	    {
+		timers[i].timeScale = 0.5f;
+	    }
+```
+### Restart method
+
+You can cache timer and reuse it in future. 
+```csharp
+ private Timer timerBlink;
+ timerBlink = new Timer(BlinkFinish, 0.15f);
+ 
+ void Blink(){
+ timerBlink.Restart();
+ }
+```
+You can change the time or even action while restarting
+
+```csharp
+ private Timer timerBlink;
+ timerBlink = new Timer(BlinkFinish, 0.15f);
+ 
+ void Blink(){
+ timerBlink.Restart(10f);
+ timerBlink.Restart(10f, AnotherAction );
+ }
+ void AnotherAction(){
+ }
+```
+
+### Kill method
+If you need to destroy a timer use kill method.
+```csharp
+timerBlink.Kill();
+ ```
+ Normally, you want to do it inside OnDispose method.
+ ```csharp
+ protected override void OnDispose()
+  {
+    timerBlink.Kill();
+  }
+ ```
+ OnDispose method provided inside of behaviors by default.
+
 ## Blueprints
 Docs are coming soon. Scriptable objects that define common resources for similar actors
 ## Tags
