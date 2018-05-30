@@ -713,7 +713,7 @@ You can delay destroy by adding destroy delay time in the Inspector.
 
 [![https://gyazo.com/49613234129a49a1a9a923a863225618](https://i.gyazo.com/49613234129a49a1a9a923a863225618.gif)](https://gyazo.com/49613234129a49a1a9a923a863225618)
 
-## OnBeforeDestroy
+### OnBeforeDestroy
 
 Use override of OnBeforeDestroy() method to provide some logic for and Actor before destroying. Useful for adding some effects related stuff. Also OnBeforeDestroy works well to reset data if object is pooled.
 
@@ -722,7 +722,81 @@ protected override void OnBeforeDestroy()
 ```	
 
 ## Timers
-Docs are coming soon. 
+
+Timers are great for making delayed actions. I strongly recommend to use them instead of coroutines for example if you need to make single delay or call several delayed actions.
+
+There are two ways of using timers. You can create a new timer each time you need from timer pool or cache timer and reuse it.
+Example of timer:
+```csharp
+Timer.Add(0.1f, actor.HandleDestroyGO); 
+```
+
+Set timer time and action. You can use lambda to define a complex action. The timer will be automatically recycled after playing.
+```csharp
+ Timer.Add(0.1f, ()=>
+    {
+      Debug.Log("Killed");
+      actor.HandleDestroyGO();
+    }); 
+```
+
+### AddID method
+
+You may add ID to the timer. After this you will be able to sort timers and get the list of timers with the same ID. You can use any object for your ID.
+
+```csharp
+  Timer.Add(0.1f, actor.HandleDestroyGO).AddID(actor);
+```
+
+For example you may want find all timers of freezed actor and changed timescale.
+```csharp
+var timers = Timer.FindAllTimers(actor);
+	 
+	if (timers != null)
+	 for (var i = 0; i < timers.Count; i++)
+	    {
+		timers[i].timeScale = 0.5f;
+	    }
+```
+### Restart method
+
+You can cache timer and reuse it in future. 
+```csharp
+ private Timer timerBlink;
+ timerBlink = new Timer(BlinkFinish, 0.15f);
+ 
+ void Blink(){
+ timerBlink.Restart();
+ }
+```
+You can change the time or even action while restarting
+
+```csharp
+ private Timer timerBlink;
+ timerBlink = new Timer(BlinkFinish, 0.15f);
+ 
+ void Blink(){
+ timerBlink.Restart(10f);
+ timerBlink.Restart(10f, AnotherAction );
+ }
+ void AnotherAction(){
+ }
+```
+
+### Kill method
+If you need to destroy a timer use kill method.
+```csharp
+timerBlink.Kill();
+ ```
+ Normally, you want to do it inside OnDispose method.
+ ```csharp
+ protected override void OnDispose()
+  {
+    timerBlink.Kill();
+  }
+ ```
+ OnDispose method provided inside of behaviors by default.
+
 ## Blueprints
 Docs are coming soon. Scriptable objects that define common resources for similar actors
 ## Tags
