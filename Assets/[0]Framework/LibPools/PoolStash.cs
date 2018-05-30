@@ -79,7 +79,7 @@ namespace Homebrew
 				if (isPosLocal) transform.localPosition = position;
 				else transform.position = position;
 				var poolable = transform.GetComponent<IPoolable>();
-				if (poolable != null) poolable.OnSpawn();
+				if (poolable != null) poolable.Spawn(true);
 				return transform.gameObject;
 			}
 
@@ -99,7 +99,7 @@ namespace Homebrew
 			cachedObjects[cachedIds[go.GetInstanceID()]].Push(go);
 
 			var poolable = go.GetComponent<IPoolable>();
-			if (poolable != null) poolable.OnDespawn();
+			if (poolable != null) poolable.Spawn(false);
 
 			if (parent != null) go.transform.SetParent(parent);
 		}

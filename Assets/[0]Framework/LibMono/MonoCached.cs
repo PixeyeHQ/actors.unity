@@ -59,11 +59,19 @@ namespace Homebrew
 			OnEnable();
 		}
 
+
+		public void Spawn(bool arg)
+		{
+			if (arg) OnSpawn();
+			else OnDespawn();
+		}
+
 		public void HandleTimeScale(float val)
 		{
 			time.timeScale = val;
 			OnTimeScaleChanged();
 		}
+
 
 		public virtual void OnEnable()
 		{
@@ -76,6 +84,14 @@ namespace Homebrew
 		public virtual void OnDisable()
 		{
 			ProcessingUpdate.Default.Remove(this);
+		}
+
+		protected virtual void OnSpawn()
+		{
+		}
+
+		protected virtual void OnDespawn()
+		{
 		}
 
 
@@ -103,10 +119,12 @@ namespace Homebrew
 
 			state &= ~EntityState.Enabled;
 			state &= ~EntityState.OnHold;
-
+			
+			OnBeforeDestroy();
+			
 			if (pool == Pool.None)
 			{
-				OnBeforeDestroy();
+		 
 				Destroy(gameObject, destroyDelayTime == 0 ? Time.DeltaTime : destroyDelayTime);
 				return;
 			}

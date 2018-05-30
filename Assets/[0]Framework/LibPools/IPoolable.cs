@@ -1,7 +1,4 @@
-
 public interface IPoolable
 {
-    void OnSpawn();
-    void OnDespawn();
-    
+	void Spawn(bool arg);
 }

@@ -116,6 +116,8 @@ namespace Homebrew
 
 		#region PROCESSING ACTIVATION
 
+		
+		
 		public override void OnEnable()
 		{
 			if (state.HasState(EntityState.OnHold)) return;
@@ -151,6 +153,25 @@ namespace Homebrew
 				behaviours[i].Enable(false);
 			}
 		}
+		
+		
+		protected override void OnSpawn()
+		{
+			for (var i = 0; i < countBehaviors; i++)
+			{
+				behaviours[i].Spawn(true);
+			}
+		}
+
+		protected override void OnDespawn()
+		{
+			for (var i = 0; i < countBehaviors; i++)
+			{
+				behaviours[i].Spawn(false);
+			}
+		}
+		
+		
 
 		#endregion
 
