@@ -798,7 +798,87 @@ timerBlink.Kill();
  OnDispose method provided inside of behaviors by default.
 
 ## Blueprints
-Docs are coming soon. Scriptable objects that define common resources for similar actors
+Blueprints are scriptable objects that are used for defining common data for similar actors. 
+Their setup is similar to actors setup.
+
+### How to create a blueprint
+Step 1.
+Create a new script and inherit it from Blueprint. 
+Step 2.
+Add [CreateAssetMenu] tag with fileName and menuName.
+Step 3.
+Define data components you want and add them via Setup method to the blueprint container.
+
+ ```csharp
+	[CreateAssetMenu(fileName = "BlueprintCreature", menuName = "Blueprints/BlueprintCreature")]
+	public class BlueprintCreature : Blueprint
+	{
+		[FoldoutGroup("Setup")]
+		public DataCreature dataCreature;
+		
+		[FoldoutGroup("Setup")]
+		public DataDeathAnimations dataDeathAnimations;
+
+
+		public override void Setup()
+		{
+			Add(dataCreature);
+			Add(dataDeathAnimations);
+		}
+	}
+ ```
+Step 4. Create a new blueprint object in Project.
+
+[![https://gyazo.com/13c79e46e32bd94b19b1db89dac43306](https://i.gyazo.com/13c79e46e32bd94b19b1db89dac43306.gif)](https://gyazo.com/13c79e46e32bd94b19b1db89dac43306)
+
+Step 5. Create a blueprint data wrapper for all actors ( you need to do that only once ) and add this data to all actors you need.
+
+```csharp
+	[Serializable]
+	public class DataBlueprint : IData
+	{
+		public Blueprint blueprint;
+ 
+		public void Dispose()
+		{
+ 
+			blueprint = null;
+		}
+
+		public T Get<T>() where T : class
+		{
+			return blueprint.Get<T>();
+		}
+	  
+	}
+  ```
+ Step 6. Assign from the Inspector view a desired blueprint to the actor.
+  
+  [![https://gyazo.com/c6e52a666f9d2b0a6a3c005bcef9d18d](https://i.gyazo.com/c6e52a666f9d2b0a6a3c005bcef9d18d.gif)](https://gyazo.com/c6e52a666f9d2b0a6a3c005bcef9d18d)
+  
+ Step 7. Find Blueprints scriptable object inside of Resources folder and populate it with your new blueprint object.
+You can automate this process by clicking "populate blueprints" in tools menu. In this case your blueprints should be in
+Assets/[2]Content/Blueprints folder
+
+[![https://gyazo.com/7472fbc529e2e2b9f58b8f35b09a7c18](https://i.gyazo.com/7472fbc529e2e2b9f58b8f35b09a7c18.gif)](https://gyazo.com/7472fbc529e2e2b9f58b8f35b09a7c18)
+
+[![https://gyazo.com/35b1b3c0426abe14278afe0fa107c2b8](https://i.gyazo.com/35b1b3c0426abe14278afe0fa107c2b8.gif)](https://gyazo.com/35b1b3c0426abe14278afe0fa107c2b8)
+
+### How to use blueprints in code ?
+It's easy and straightforward : use get method inside your behaviors.
+
+```csharp
+// Get<DataBlueprint>() returns the blueprint wrapper.
+// Get<DataWeapon> returns desired data from the blueprint.
+var weaponData = Get<DataBlueprint>().Get<DataWeapon>();
+```
+  
+### When to use blueprints ? 
+All variables you add to your game objects cost something. For example, creating 1 000 000 objects with one int variable will
+require about 4MB of memory. Scriptable objects are created only once and shared among your actor copies. For example, you want to add an audio sound variable to your monster object. Instead, you can use monster blueprint and define the audio variable there. In this case, no matter how much copies of monsters you have on the scene their audio variable will be created only once.
+
+  
+  
 ## Tags
 Docs are coming soon. Glue to identify actors and work with game logic.
 ## ECS
