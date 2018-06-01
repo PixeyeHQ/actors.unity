@@ -424,10 +424,10 @@ public class DataRender: ISetup, IData
 }
 ```
 
-### IMustBeWiped
-IMstBeWiped interface marks processings that must be cleaned from toolbox when scene changed.
+### IMustBeWipedOut
+IMustBeWipedOut interface marks processings that must be cleaned from toolbox when scene changed.
 ```csharp
-  public class ProcessingShakeCamera : IDisposable, IMustBeWiped 
+  public class ProcessingShakeCamera : IDisposable, IMustBeWipedOut 
   {
   }
 ```
@@ -973,7 +973,7 @@ A tag is a simple const int variable. It's very similar to GameObject tags in Un
 ```
 
 ```csharp
-public class ProcessingCameraFollow : ProcessingBase, ITick, IMustBeWiped{
+public class ProcessingCameraFollow : ProcessingBase, ITick, IMustBeWipedOut{
 [GroupBy(Tag.GroupPlayer)]
 private Group groupPlayers;
 }
@@ -994,7 +994,7 @@ public class ActorPlayer : Actor{
 You can be more specific by adding a GroupExclude filter. If any of group exclude filter match than an actor can be no longer be in the group.
 
 ```csharp
-public class ProcessingCameraFollow : ProcessingBase, ITick, IMustBeWiped{
+public class ProcessingCameraFollow : ProcessingBase, ITick, IMustBeWipedOut{
 [GroupBy(Tag.GroupPlayer)]
 [GroupExclude(Tag.StateDead)]
 private Group groupPlayersAlive;
@@ -1006,7 +1006,7 @@ private Group groupPlayersAlive;
 You can provide extra logic when group is changed ( a new actor is added or removed from the group )
 
  ```csharp
-public class ProcessingCameraFollow : ProcessingBase, ITick, IMustBeWiped{
+public class ProcessingCameraFollow : ProcessingBase, ITick, IMustBeWipedOut{
 [GroupBy(Tag.GroupPlayer)]
 private Group groupPlayers;
 
@@ -1029,7 +1029,7 @@ To update your processing inherit from ITick, ITIckFixed, ITickLate.
 Use group.length to get the container length. Use group.actors[i] - to receive one of the group actors.
 
  ```csharp
-public class ProcessingCameraFollow : ProcessingBase, ITick, IMustBeWiped{
+public class ProcessingCameraFollow : ProcessingBase, ITick, IMustBeWipedOut{
 [GroupBy(Tag.GroupPlayer)]
 private Group groupPlayers;
 
