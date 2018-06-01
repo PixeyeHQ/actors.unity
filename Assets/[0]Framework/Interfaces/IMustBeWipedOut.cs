@@ -7,7 +7,7 @@ Date:       2/9/2018  7:45 AM
 
 namespace Homebrew{
 
-public interface IMustBeWiped
+public interface IMustBeWipedOut
 {
 
 }
