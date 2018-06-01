@@ -21,6 +21,10 @@ namespace Homebrew
 
 		public void Add<T>(T component)
 		{
+			var awakeComponent = component as IAwake;
+			if (awakeComponent != null)
+				awakeComponent.OnAwake();
+			
 			components.Add(component.GetType().GetHashCode(), component);
 		}
 
@@ -46,13 +50,12 @@ namespace Homebrew
 
 		public virtual void Setup()
 		{
-			
 		}
-	 
+
 
 		public void Dispose()
 		{
-		//	initialized = false;
+			//	initialized = false;
 			components.Clear();
 		}
 	}
