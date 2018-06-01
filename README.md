@@ -424,10 +424,10 @@ public class DataRender: ISetup, IData
 }
 ```
 
-### IMustBeWiped
-IMstBeWiped interface marks processings that must be cleaned from toolbox when scene changed.
+### IMustBeWipedOut
+IMustBeWipedOut interface marks processings that must be cleaned from toolbox when scene changed.
 ```csharp
-  public class ProcessingShakeCamera : IDisposable, IMustBeWiped 
+  public class ProcessingShakeCamera : IDisposable, IMustBeWipedOut 
   {
   }
 ```
@@ -798,11 +798,266 @@ timerBlink.Kill();
  OnDispose method provided inside of behaviors by default.
 
 ## Blueprints
-Docs are coming soon. Scriptable objects that define common resources for similar actors
+Blueprints are scriptable objects that are used for defining common data for similar actors. 
+Their setup is similar to actors setup.
+
+### How to create a blueprint
+Step 1.
+Create a new script and inherit it from Blueprint. 
+Step 2.
+Add [CreateAssetMenu] tag with fileName and menuName.
+Step 3.
+Define data components you want and add them via Setup method to the blueprint container.
+
+ ```csharp
+	[CreateAssetMenu(fileName = "BlueprintCreature", menuName = "Blueprints/BlueprintCreature")]
+	public class BlueprintCreature : Blueprint
+	{
+		[FoldoutGroup("Setup")]
+		public DataCreature dataCreature;
+		
+		[FoldoutGroup("Setup")]
+		public DataDeathAnimations dataDeathAnimations;
+
+
+		public override void Setup()
+		{
+			Add(dataCreature);
+			Add(dataDeathAnimations);
+		}
+	}
+ ```
+Step 4. Create a new blueprint object in Project.
+
+[![https://gyazo.com/13c79e46e32bd94b19b1db89dac43306](https://i.gyazo.com/13c79e46e32bd94b19b1db89dac43306.gif)](https://gyazo.com/13c79e46e32bd94b19b1db89dac43306)
+
+Step 5. Create a blueprint data wrapper for all actors ( you need to do that only once ) and add this data to all actors you need.
+
+```csharp
+	[Serializable]
+	public class DataBlueprint : IData
+	{
+		public Blueprint blueprint;
+ 
+		public void Dispose()
+		{
+ 
+			blueprint = null;
+		}
+
+		public T Get<T>() where T : class
+		{
+			return blueprint.Get<T>();
+		}
+	  
+	}
+  ```
+ Step 6. Assign from the Inspector view a desired blueprint to the actor.
+  
+  [![https://gyazo.com/c6e52a666f9d2b0a6a3c005bcef9d18d](https://i.gyazo.com/c6e52a666f9d2b0a6a3c005bcef9d18d.gif)](https://gyazo.com/c6e52a666f9d2b0a6a3c005bcef9d18d)
+  
+ Step 7. Find Blueprints scriptable object inside of Resources folder and populate it with your new blueprint object.
+You can automate this process by clicking "populate blueprints" in tools menu. In this case your blueprints should be in
+Assets/[2]Content/Blueprints folder
+
+[![https://gyazo.com/7472fbc529e2e2b9f58b8f35b09a7c18](https://i.gyazo.com/7472fbc529e2e2b9f58b8f35b09a7c18.gif)](https://gyazo.com/7472fbc529e2e2b9f58b8f35b09a7c18)
+
+[![https://gyazo.com/35b1b3c0426abe14278afe0fa107c2b8](https://i.gyazo.com/35b1b3c0426abe14278afe0fa107c2b8.gif)](https://gyazo.com/35b1b3c0426abe14278afe0fa107c2b8)
+
+### How to use blueprints in code ?
+It's easy and straightforward : use get method inside your behaviors.
+
+```csharp
+// Get<DataBlueprint>() returns the blueprint wrapper.
+// Get<DataWeapon> returns desired data from the blueprint.
+var weaponData = Get<DataBlueprint>().Get<DataWeapon>();
+```
+  
+### When to use blueprints ? 
+All variables you add to your game objects cost something. For example, creating 1 000 000 objects with one int variable will
+require about 4MB of memory. Scriptable objects are created only once and shared among your actor copies. For example, you want to add an audio sound variable to your monster object. Instead, you can use monster blueprint and define the audio variable there. In this case, no matter how much copies of monsters you have on the scene their audio variable will be created only once.
+
+  
+  
 ## Tags
 Docs are coming soon. Glue to identify actors and work with game logic.
 ## ECS
-Docs are coming soon. Simple ECS pattern for working with actors.
+Simple ECS pattern for working with actors. My approach can be used only with actor classes at the current moment and is far less
+powerful than clean ECS approaches and it's used more for structuring than gaining performance boost.
+
+### Processings ( aka systems )
+I call all systems or global "controllers" as Processings.
+
+When you need to activate ECS system inherit your processing from ProcessingBase
+
+```csharp
+public class ProcessingCameraFollow : ProcessingBase, ITick, IMustBeWiped
+```
+To use Processing you need to add it to the Toolbox. I usually add them via Starter scripts.
+
+```csharp
+	public class StarterLv1 : Starter
+	{
+		[FoldoutGroup("Setup"), SerializeField, HideInInspector]
+		private DataLevel dataLevel;
+
+		protected override void Setup()
+		{
+			Toolbox.Get<DataGameSession>().currentLevel = 1;
+
+			Toolbox.Add<ProcessingGroupPlayers>();
+			Toolbox.Add<ProcessingGroupEnemies>();
+
+			Toolbox.Add<ProcessingSortDepth>();
+			Toolbox.Add<ProcessingShakeCamera>();
+			Toolbox.Add<ProcessingCameraFollow>();
+
+			Toolbox.Add<ProcessingInputConnect>();
+			Toolbox.Add<ProcessingMenuHome>();
+
+		}
+	}
+```
+Remember, you can inherit from Starter if needed.
+
+### Processing groups
+When a new Actor entity is added ProcessingEntities script decide in what groups of actors it should be placed.
+The group is a list of actors that share a common filter.
+
+
+```csharp
+public class ProcessingCameraFollow : ProcessingBase, ITick, IMustBeWiped{
+
+private Group groupPlayers;
+
+}
+```
+
+### Filters
+To populate your group you need to provide some filters. Think of a filter as a key lock,  if the key matches this lock - than an actor is added to the group. You can filter actors by Data component types or by int tags.
+
+#### GroupBy filer
+To populate a group add GroupBy attribute above the group variable.
+All your groupby filters must be valid in order to add an actor to a group.
+```csharp
+public class ProcessingCameraFollow : ProcessingBase, ITick, IMustBeWiped{
+[GroupBy(typeof(DataPlayer))]
+private Group groupPlayers;
+}
+```
+You can use several filters as well :
+
+```csharp
+public class ProcessingCameraFollow : ProcessingBase, ITick, IMustBeWiped{
+[GroupBy(typeof(DataPlayer), typeof(DataKnight) )]
+private Group groupPlayersKnights;
+}
+```
+
+##### Using Tags instead of types
+You don't have to use types of data components for filtering. Instead, you can use Tag.
+A tag is a simple const int variable. It's very similar to GameObject tags in Unity3D but more powerful.
+```csharp
+// make a static Tag class and define all your const there.
+	public static partial class Tag
+	{
+		[TagField(categoryName = "Groups")] public const int GroupPlayer = 2001;
+		[TagField(categoryName = "Groups")] public const int GroupEnemy = 2002;
+		[TagField(categoryName = "Groups")] public const int GroupPlayerSpawner = 2003;
+		[TagField(categoryName = "Groups")] public const int GroupDragable = 2004;
+		[TagField(categoryName = "Groups")] public const int GroupPlayerUI = 2005;
+		[TagField(categoryName = "Groups")] public const int GroupBorders = 2006;
+		[TagField(categoryName = "Groups")] public const int GroupCameraStartPosition = 2007;
+		[TagField(categoryName = "Groups")] public const int GroupCounterAttacked = 2008;
+	}
+```
+
+```csharp
+public class ProcessingCameraFollow : ProcessingBase, ITick, IMustBeWipedOut{
+[GroupBy(Tag.GroupPlayer)]
+private Group groupPlayers;
+}
+```
+```csharp
+public class ActorPlayer : Actor{
+	protected override void Setup()
+		{
+			Add(dataAnimationState);
+			Add(dataCurrentWeapon);
+			// always add tags at the end of your Actor setup.
+			tags.Add(Tag.GroupPlayer);
+		}
+}
+```
+#### GroupExclude filter
+
+You can be more specific by adding a GroupExclude filter. If any of group exclude filter match than an actor can be no longer be in the group.
+
+```csharp
+public class ProcessingCameraFollow : ProcessingBase, ITick, IMustBeWipedOut{
+[GroupBy(Tag.GroupPlayer)]
+[GroupExclude(Tag.StateDead)]
+private Group groupPlayersAlive;
+}
+```
+
+
+### OnGroupChanged action
+You can provide extra logic when group is changed ( a new actor is added or removed from the group )
+
+ ```csharp
+public class ProcessingCameraFollow : ProcessingBase, ITick, IMustBeWipedOut{
+[GroupBy(Tag.GroupPlayer)]
+private Group groupPlayers;
+
+	public ProcessingCameraFollow()
+	{
+	   groupPlayers.OnGroupChanged += OnGroupPlayersChanged;
+	}
+
+	void OnGroupPlayersChanged()
+		{	 
+			 for(var i=0;i<group.length;i++){
+			    Debug.Log("Actor: " + group.actors[i]);
+			 } 
+		}
+}
+```
+
+### Updating your processing component
+To update your processing inherit from ITick, ITIckFixed, ITickLate.
+Use group.length to get the container length. Use group.actors[i] - to receive one of the group actors.
+
+ ```csharp
+public class ProcessingCameraFollow : ProcessingBase, ITick, IMustBeWipedOut{
+[GroupBy(Tag.GroupPlayer)]
+private Group groupPlayers;
+
+	public ProcessingCameraFollow()
+	{
+	   groupPlayers.OnGroupChanged += OnGroupPlayersChanged;
+	}
+
+	void OnGroupPlayersChanged()
+		{	 
+			 for(var i=0;i<group.length;i++){
+			    Debug.Log("Actor: " + group.actors[i]);
+			 } 
+		}
+		
+	public void Tick()
+	{
+	      for(var i=0;i<group.length;i++){
+			    DoSomething(group.actors[i]);
+	         } 
+	 }
+	 
+	 void DoSomething(Actor a){
+	 }
+		
+}
+```
+		
 
 
 	
