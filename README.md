@@ -1040,15 +1040,15 @@ private Group groupPlayers;
 
 	void OnGroupPlayersChanged()
 		{	 
-			 for(var i=0;i<group.length;i++){
-			    Debug.Log("Actor: " + group.actors[i]);
+			 for(var i=0;i<groupPlayers.length;i++){
+			    Debug.Log("Actor: " + groupPlayers.actors[i]);
 			 } 
 		}
 		
 	public void Tick()
 	{
-	      for(var i=0;i<group.length;i++){
-			    DoSomething(group.actors[i]);
+	      for(var i=0;i<groupPlayers.length;i++){
+			    DoSomething(groupPlayers.actors[i]);
 	         } 
 	 }
 	 
