@@ -882,7 +882,182 @@ require about 4MB of memory. Scriptable objects are created only once and shared
 ## Tags
 Docs are coming soon. Glue to identify actors and work with game logic.
 ## ECS
-Docs are coming soon. Simple ECS pattern for working with actors.
+Simple ECS pattern for working with actors. My approach can be used only with actor classes at the current moment and is far less
+powerful than clean ECS approaches and it's used more for structuring than gaining performance boost.
+
+### Processings ( aka systems )
+I call all systems or global "controllers" as Processings.
+
+When you need to activate ECS system inherit your processing from ProcessingBase
+
+```csharp
+public class ProcessingCameraFollow : ProcessingBase, ITick, IMustBeWiped
+```
+To use Processing you need to add it to the Toolbox. I usually add them via Starter scripts.
+
+```csharp
+	public class StarterLv1 : Starter
+	{
+		[FoldoutGroup("Setup"), SerializeField, HideInInspector]
+		private DataLevel dataLevel;
+
+		protected override void Setup()
+		{
+			Toolbox.Get<DataGameSession>().currentLevel = 1;
+
+			Toolbox.Add<ProcessingGroupPlayers>();
+			Toolbox.Add<ProcessingGroupEnemies>();
+
+			Toolbox.Add<ProcessingSortDepth>();
+			Toolbox.Add<ProcessingShakeCamera>();
+			Toolbox.Add<ProcessingCameraFollow>();
+
+			Toolbox.Add<ProcessingInputConnect>();
+			Toolbox.Add<ProcessingMenuHome>();
+
+		}
+	}
+```
+Remember, you can inherit from Starter if needed.
+
+### Processing groups
+When a new Actor entity is added ProcessingEntities script decide in what groups of actors it should be placed.
+The group is a list of actors that share a common filter.
+
+
+```csharp
+public class ProcessingCameraFollow : ProcessingBase, ITick, IMustBeWiped{
+
+private Group groupPlayers;
+
+}
+```
+
+### Filters
+To populate your group you need to provide some filters. Think of a filter as a key lock,  if the key matches this lock - than an actor is added to the group. You can filter actors by Data component types or by int tags.
+
+#### GroupBy filer
+To populate a group add GroupBy attribute above the group variable.
+All your groupby filters must be valid in order to add an actor to a group.
+```csharp
+public class ProcessingCameraFollow : ProcessingBase, ITick, IMustBeWiped{
+[GroupBy(typeof(DataPlayer))]
+private Group groupPlayers;
+}
+```
+You can use several filters as well :
+
+```csharp
+public class ProcessingCameraFollow : ProcessingBase, ITick, IMustBeWiped{
+[GroupBy(typeof(DataPlayer), typeof(DataKnight) )]
+private Group groupPlayersKnights;
+}
+```
+
+##### Using Tags instead of types
+You don't have to use types of data components for filtering. Instead, you can use Tag.
+A tag is a simple const int variable. It's very similar to GameObject tags in Unity3D but more powerful.
+```csharp
+// make a static Tag class and define all your const there.
+	public static partial class Tag
+	{
+		[TagField(categoryName = "Groups")] public const int GroupPlayer = 2001;
+		[TagField(categoryName = "Groups")] public const int GroupEnemy = 2002;
+		[TagField(categoryName = "Groups")] public const int GroupPlayerSpawner = 2003;
+		[TagField(categoryName = "Groups")] public const int GroupDragable = 2004;
+		[TagField(categoryName = "Groups")] public const int GroupPlayerUI = 2005;
+		[TagField(categoryName = "Groups")] public const int GroupBorders = 2006;
+		[TagField(categoryName = "Groups")] public const int GroupCameraStartPosition = 2007;
+		[TagField(categoryName = "Groups")] public const int GroupCounterAttacked = 2008;
+	}
+```
+
+```csharp
+public class ProcessingCameraFollow : ProcessingBase, ITick, IMustBeWiped{
+[GroupBy(Tag.GroupPlayer)]
+private Group groupPlayers;
+}
+```
+```csharp
+public class ActorPlayer : Actor{
+	protected override void Setup()
+		{
+			Add(dataAnimationState);
+			Add(dataCurrentWeapon);
+			// always add tags at the end of your Actor setup.
+			tags.Add(Tag.GroupPlayer);
+		}
+}
+```
+#### GroupExclude filter
+
+You can be more specific by adding a GroupExclude filter. If any of group exclude filter match than an actor can be no longer be in the group.
+
+```csharp
+public class ProcessingCameraFollow : ProcessingBase, ITick, IMustBeWiped{
+[GroupBy(Tag.GroupPlayer)]
+[GroupExclude(Tag.StateDead)]
+private Group groupPlayersAlive;
+}
+```
+
+
+### OnGroupChanged action
+You can provide extra logic when group is changed ( a new actor is added or removed from the group )
+
+ ```csharp
+public class ProcessingCameraFollow : ProcessingBase, ITick, IMustBeWiped{
+[GroupBy(Tag.GroupPlayer)]
+private Group groupPlayers;
+
+	public ProcessingCameraFollow()
+	{
+	   groupPlayers.OnGroupChanged += OnGroupPlayersChanged;
+	}
+
+	void OnGroupPlayersChanged()
+		{	 
+			 for(var i=0;i<group.length;i++){
+			    Debug.Log("Actor: " + group.actors[i]);
+			 } 
+		}
+}
+```
+
+### Updating your processing component
+To update your processing inherit from ITick, ITIckFixed, ITickLate.
+Use group.length to get the container length. Use group.actors[i] - to receive one of the group actors.
+
+ ```csharp
+public class ProcessingCameraFollow : ProcessingBase, ITick, IMustBeWiped{
+[GroupBy(Tag.GroupPlayer)]
+private Group groupPlayers;
+
+	public ProcessingCameraFollow()
+	{
+	   groupPlayers.OnGroupChanged += OnGroupPlayersChanged;
+	}
+
+	void OnGroupPlayersChanged()
+		{	 
+			 for(var i=0;i<group.length;i++){
+			    Debug.Log("Actor: " + group.actors[i]);
+			 } 
+		}
+		
+	public void Tick()
+	{
+	      for(var i=0;i<group.length;i++){
+			    DoSomething(group.actors[i]);
+	         } 
+	 }
+	 
+	 void DoSomething(Actor a){
+	 }
+		
+}
+```
+		
 
 
 	
