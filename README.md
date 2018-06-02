@@ -68,7 +68,8 @@ ACTORS is a small framework explicitly built for Unit3d. It is used to ease the 
     * <a href="#Behavior component">Behavior component</a>
     * <a href="#Signals">Signals</a>
     * <a href="#Interfaces overivew">Interfaces overivew</a>
-    * <a href="#Processings">Processings</a>
+    * <a href="#Processings">Processings</a>  
+        * <a href="#ProcessingSceneLoad">How to change scene</a>
     * <a href="#Object pooling">Object pooling</a>
     * <a href="#Creating and destroying new objects">Creating and destroying new objects</a>
     * <a href="#Blueprints">Blueprints</a>
@@ -602,6 +603,14 @@ public class MyCustomClass : ITick{
  }
 
 }
+```
+
+### <a id="ProcessingSceneLoad"></a>ProcessingSceneLoad
+When you want to change scene use ProcessingSceneLoad.To(int level) .
+
+```csharp
+int level = 2;
+ProcessingSceneLoad.To(level)
 ```
 
 ## <a id="Object pooling"></a>Object pooling
