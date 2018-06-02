@@ -6,14 +6,14 @@ Date:       2/9/2018  6:29 AM
 ================================================================*/
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
-using MEC;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace Homebrew
 {
-	public class ProcessingSceneLoad
+		public class ProcessingSceneLoad
 	{
 		private List<string> scenesToKeep = new List<string>();
 		private List<string> sceneDependsOn = new List<string>();
@@ -35,13 +35,11 @@ namespace Homebrew
 		{
 			this.scenesToKeep = scenesToKeep;
 			this.sceneDependsOn = sceneDependsOn;
-        
-			Timing.RunCoroutine(_Setup(starter));
+			Toolbox.Instance.StartCoroutine(_Setup(starter));
 		}
 
-		IEnumerator<float> _Setup(Starter starter)
+		IEnumerator _Setup(Starter starter)
 		{
- 
 			for (var i = 0; i < SceneManager.sceneCount; i++)
 			{
 				var scene = SceneManager.GetSceneAt(i);
@@ -56,31 +54,41 @@ namespace Homebrew
 				var name = sceneDependsOn[i];
 				if (scenes.ContainsKey(name))
 				{
-					yield return Timing.WaitForSeconds(0.1f);
+					yield return new WaitForSeconds(0.1f);
 					continue;
 				}
 
 				var load = SceneManager.LoadSceneAsync(sceneDependsOn[i], LoadSceneMode.Additive);
-				yield return Timing.WaitUntilDone(load);
+				while (!load.isDone)
+				{
+					yield return 0;
+				}
+
 				scenes.Add(name, SceneManager.GetSceneByName(name));
 			}
 
 			sceneLoaded();
-	 
+
 			starter.BindScene();
 		}
 
-		IEnumerator<float> _Load(string name)
+		IEnumerator _Load(string name)
 		{
-		 
 			Toolbox.changingScene = true;
 
 			Toolbox.Instance.ClearSessionData();
 
 			var s = SceneManager.GetActiveScene();
 			var sName = s.name;
+
 			var job = SceneManager.UnloadSceneAsync(s);
-			yield return Timing.WaitUntilDone(job);
+
+			while (!job.isDone)
+			{
+				yield return 0;
+			}
+
+
 			scenes.Remove(sName);
 			foreach (var key in scenes.Keys)
 			{
@@ -88,16 +96,25 @@ namespace Homebrew
 
 				job = SceneManager.UnloadSceneAsync(scenes[key]);
 
-				yield return Timing.WaitUntilDone(job);
+				while (!job.isDone)
+				{
+					yield return 0;
+				}
 			}
 
 			job = Resources.UnloadUnusedAssets();
-			yield return Timing.WaitUntilDone(job);
+			while (!job.isDone)
+			{
+				yield return 0;
+			}
 
 			scenes.Clear();
 
 			job = SceneManager.LoadSceneAsync(name, LoadSceneMode.Additive);
-			yield return Timing.WaitUntilDone(job);
+			while (!job.isDone)
+			{
+				yield return 0;
+			}
 
 			SceneManager.SetActiveScene(SceneManager.GetSceneByName(name));
 			job.allowSceneActivation = true;
@@ -109,17 +126,14 @@ namespace Homebrew
 		{
 			var processing = Toolbox.Get<ProcessingSceneLoad>();
 			var name = processing.GetFromList(id);
-			Timing.KillCoroutines();
 
-			Timing.RunCoroutine(processing._Load(name));
+			Toolbox.Instance.StartCoroutine(processing._Load(name));
 		}
 
 		public static void To(string name)
 		{
 			var processing = Toolbox.Get<ProcessingSceneLoad>();
-			Timing.KillCoroutines();
-
-			Timing.RunCoroutine(processing._Load(name));
+			Toolbox.Instance.StartCoroutine(processing._Load(name));
 		}
 	}
 }
