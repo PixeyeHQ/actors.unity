@@ -55,11 +55,32 @@ ACTORS is a small framework explicitly built for Unit3d. It is used to ease the 
 	
 ```
 
-## Installation
+## Table Of Contents
+
+* Setup
+    * <a href="#Installation">Installation</a>
+    * <a href="#Overview">Project Overview</a>
+    * <a href="#Setup">Project Setup</a>
+    * <a href="#Scenes Setup">Scenes Setup</a>
+* Basic stuff  
+    * <a href="#Actors overview">Actors overview</a>
+    * <a href="#Data component">Data component</a>
+    * <a href="#Behavior component">Behavior component</a>
+    * <a href="#Signals">Signals</a>
+    * <a href="#Interfaces overivew">Interfaces overivew</a>
+    * <a href="#Processings">Processings</a>  
+        * <a href="#ProcessingSceneLoad">How to change scene</a>
+    * <a href="#Object pooling">Object pooling</a>
+    * <a href="#Creating and destroying new objects">Creating and destroying new objects</a>
+    * <a href="#Blueprints">Blueprints</a>
+    * <a href="#Tags">Tags</a>
+    * <a href="#ECS">ECS</a>
+
+##  <a id="Installation"></a>Installation 
 From Source
 * Clone this repo and open it as a new Unity3D project.
 
-## Project Overview
+## <a id="Overview"></a>Project Overview
 The project consists of several folders :
 * [-]Common : for in-house libraries, framework pluggables.
 * [0]Framework : the framework code. You generally don't need to touch here anything.
@@ -68,7 +89,7 @@ The project consists of several folders :
 * [3]ThirdParty : libraries you use from asset store.
 * Plugins : unity3d plugin folder.
 
-## Project Setup
+##  <a id="Setup"></a>Project Setup
 The framework heavily rely on Unity3D additive scenes. To use it in the way it was designed you need to make some preparations.
 
 1. Open sceneKernel scene. You can find it in Assets/[2]Content/Scenes
@@ -84,17 +105,17 @@ StarterKernel has few public variables you can set up:
 
 [![https://gyazo.com/1e79f2d6bf54c3762f35eab153cb0bfe](https://i.gyazo.com/1e79f2d6bf54c3762f35eab153cb0bfe.png)](https://gyazo.com/1e79f2d6bf54c3762f35eab153cb0bfe)
 
-## Scenes Setup
+## <a id="Scenes Setup"></a>Scenes Setup
 
 Add new scenes in game from File->New Scene command. You will notice that scene will be generated differently from normal unity3d scene setup. A scene doesn't have camera or light. It's because you add them additively from other scenes. ( sceneKernel by default )
 
-#### Scene overview 
+### Scene overview 
 All scenes have essential objects that you don't want to change.
 * [SETUP]: this is a root object for starter scripts and any settings related objects.
 * [SCENE]: this is a root object for your game-related game objects in a scene. Put all your level here.
 * [SCENE]/Dynamic: this is an object to hold all game objects that will be created at runtime. It's essential to separate loaded stuff from static to ease the process of debugging in hierarchy view.
 
-#### Starters
+### Starters
 A starter is a monobehavior component that you attach to [SETUP] game object. Starter controls scene loading&setup. You can inherit from starter component to extend it and add your custom logic. For example "startLevelOne."
 
 Starter variables :
@@ -106,7 +127,7 @@ Starter variables :
 [![https://gyazo.com/1285f0b0feb8ecb0495ca536aae25606](https://i.gyazo.com/1285f0b0feb8ecb0495ca536aae25606.png)](https://gyazo.com/1285f0b0feb8ecb0495ca536aae25606)
 
 
-## Creating new objects
+## <a id="Actors overview"></a>Actors overview
 So from this point we are ready to go and add new gameobjects. 
 
 ### Monocached
@@ -197,7 +218,7 @@ labelScore = Get<TextMeshProUGUI>("anchor_left/label_score");
 
 	 
 
-## Data component
+## <a id="Data component"></a>Data component
 Data components are serializable, plain c# classes inherited from IData interface. All game variables are held in data components.
 The same data components may be shared through various of behaviors.
 
@@ -241,7 +262,7 @@ data components. When data component is added to an actor he will check all comp
 	}
  ```
  
-## Behavior component
+## <a id="Behavior component"></a>Behavior component
 Behaviors are plain c# classes that need data components to work and can't live without actors. Behaviors are workhorses of actors and define how actor behaves.
 
 ### Behavior example
@@ -263,7 +284,7 @@ Behaviors are plain c# classes that need data components to work and can't live 
 	}
  ```
 
-## **Signals**
+## <a id="Signals"></a>Signals
 Signals are in-memory publish/subscribe system and effectively replace Unity3d SendMessage.
 There are two layers of signal disptachers : local is implemented inside Actor class. Global can be reached from ProcessingSignals.Default.
 
@@ -280,7 +301,7 @@ public struct SignalCameraShake
 A method HandleSignal(T arg) will be added to your script. It's an entry point for your signal.
  
 ```csharp
-  public class ProcessingShakeCamera : IDisposable, IMustBeWiped, IReceive<SignalCameraShake> 
+  public class ProcessingShakeCamera : IDisposable, IMustBeWipedOut, IReceive<SignalCameraShake> 
   {
 	public void HandleSignal(SignalCameraShake arg)
 		{
@@ -296,7 +317,7 @@ A method HandleSignal(T arg) will be added to your script. It's an entry point f
 
 3. Add subscription to your signal dispatcher.
 ```csharp
-  public class ProcessingShakeCamera : IDisposable, IMustBeWiped, IReceive<SignalCameraShake> 
+  public class ProcessingShakeCamera : IDisposable, IMustBeWipedOut, IReceive<SignalCameraShake> 
   {
 	
 	public ProcessingShakeCamera()
@@ -318,7 +339,7 @@ A method HandleSignal(T arg) will be added to your script. It's an entry point f
 ```
  4. Provide unsubscribe logic
 ```csharp
-  public class ProcessingShakeCamera : IDisposable, IMustBeWiped, IReceive<SignalCameraShake> 
+  public class ProcessingShakeCamera : IDisposable, IMustBeWipedOut, IReceive<SignalCameraShake> 
   {
 	
 	public ProcessingShakeCamera()
@@ -362,7 +383,7 @@ A method HandleSignal(T arg) will be added to your script. It's an entry point f
  ``` 
 
 
-## **Interfaces overivew**
+## <a id="Interfaces overivew"></a>**Interfaces overivew**
 There are several interfaces in the framework to extend entity functionality.
 
 ### ITick
@@ -465,7 +486,7 @@ IReceiveGlobal<T> interface is used when you want entity to receive a signal wit
 		}
   }
 ```
-## Toolbox
+## <a id="Toolbox"></a>Toolbox
 The toolbox is a singleton that contains all processings, global data and everything you want to get from global access.
 Think of toolbox as a "global actor." 
 
@@ -483,7 +504,7 @@ Example:
 data = Toolbox.Get<DataGameSession>();
 ```
 
-## Processings
+## <a id="Processings"></a>Processings
 Processing more known as "managers," "controllers." Processings are classes that can be used like systems in ECS or to do some global work. For example, camera follow script is a good candidate for processing script.
 
 There are few predefined processings in the framework. You can find them in StarterKernel script. The best place to add your custom processings is Starter scripts or pluggables.
@@ -584,7 +605,24 @@ public class MyCustomClass : ITick{
 }
 ```
 
-## Object pooling
+### <a id="ProcessingSceneLoad"></a>ProcessingSceneLoad
+First, add all scenes you want inside of Build Settings window.
+Than, generate scene names:
+
+[![https://gyazo.com/8507135cf74cf0dd1c4b9db90363a6ad](https://i.gyazo.com/8507135cf74cf0dd1c4b9db90363a6ad.gif)](https://gyazo.com/8507135cf74cf0dd1c4b9db90363a6ad)
+
+Now to change scene use ProcessingSceneLoad.To(int level) .
+
+
+```csharp
+// example of level with ID 2
+int level = 2;
+ProcessingSceneLoad.To(level)
+```
+
+
+
+## <a id="Object pooling"></a>Object pooling
 Every time you create/destroy object memory is allocated. The more complex object is the bigger allocation will be. It's not a big deal to create the object once or several times, but when you need to spawn hundreds of objects, or you want to generate them rapidly, you want to use object pooling. You can find more info about pooling on [Unity3d site](https://unity3d.com/learn/tutorials/topics/scripting/object-pooling).
 
 There are two types of pools in the Framework :
@@ -666,7 +704,7 @@ ProcessingGoPool.AddToTemp(Pool.Entities, gameobject);
 ProcessingGoPool.ReleaseTemp(Pool.Entities);
 ```
 
-## Creating and destroying new objects
+## <a id="Creating and destroying new objects"></a>Creating and destroying new objects
 
 ### Creating routine
 
@@ -797,7 +835,7 @@ timerBlink.Kill();
  ```
  OnDispose method provided inside of behaviors by default.
 
-## Blueprints
+## <a id="Blueprints"></a>Blueprints
 Blueprints are scriptable objects that are used for defining common data for similar actors. 
 Their setup is similar to actors setup.
 
@@ -876,12 +914,119 @@ var weaponData = Get<DataBlueprint>().Get<DataWeapon>();
 ### When to use blueprints ? 
 All variables you add to your game objects cost something. For example, creating 1 000 000 objects with one int variable will
 require about 4MB of memory. Scriptable objects are created only once and shared among your actor copies. For example, you want to add an audio sound variable to your monster object. Instead, you can use monster blueprint and define the audio variable there. In this case, no matter how much copies of monsters you have on the scene their audio variable will be created only once.
+ 
+## <a id="Tags"></a>Tags
+Tags are the glue for your game: You can identify your actors with tags or use them as arguments for your signals to check game logic. Tags are simple cont INT variables.
 
-  
-  
-## Tags
-Docs are coming soon. Glue to identify actors and work with game logic.
-## ECS
+### How to add
+Step 1. 
+Create a new static script called Tag or what do you prefer. 
+I prefer to use partial classes to divide my tags to different files.
+Populate your tags with unique int ID. 
+```csharp
+public static partial class Tag
+	{
+		 public const int SignalStasisOn = 10001;
+		 public const int SignalStasisOff = 10002;
+        }
+```	
+
+```csharp
+public static partial class Tag
+	{
+		 public const int WeaponGun = 9000;
+		 public const int WeaponLaser = 9001;
+        }
+```	
+
+[![https://gyazo.com/0eb286e0d8b2712b9b3aee03eaaec9c9](https://i.gyazo.com/0eb286e0d8b2712b9b3aee03eaaec9c9.png)](https://gyazo.com/0eb286e0d8b2712b9b3aee03eaaec9c9)
+
+Step 2.
+Add [TagField(categoryName = "YOURNAME")] before your const int. Use '/' to add tag in child group.
+```csharp
+	public static partial class Tag
+	{
+		[TagField(categoryName = "Weapons")] public const int WeaponGun = 9000;
+		[TagField(categoryName = "Weapons/BigGuns")] public const int WeaponLaser = 9001;
+	}
+```
+Step 3.
+Add your tag to Actor. To do that use tags.Add(YOUR_TAG);
+```csharp
+public class ActorPlayer : Actor{
+	protected override void Setup()
+		{
+			Add(dataAnimationState);
+			Add(dataCurrentWeapon);
+			// always add tags at the end of your Actor setup.
+			tags.Add(Tag.GroupPlayer);
+		}
+}
+```
+Step 4.
+You can edit your tags in the Inspector view. To do that add int variable where you want and attach attribute
+[TagFilter(typeof(TYPE_OF_CLASS_WHERE_TAGS))]
+
+```csharp
+public class ActorPlayer : Actor{
+[TagFilter(typeof(Tag))] public int tag;
+	protected override void Setup()
+		{
+			Add(dataAnimationState);
+			Add(dataCurrentWeapon);
+			// always add tags at the end of your Actor setup.
+			tags.Add(tag);
+		}
+}
+```
+[![https://gyazo.com/e3c0c4d009209b46df72975305a6e936](https://i.gyazo.com/e3c0c4d009209b46df72975305a6e936.gif)](https://gyazo.com/e3c0c4d009209b46df72975305a6e936) 
+ 
+ ### ProcessingTags
+ Actors have special processingTags component. 
+ 
+ ```csharp
+ // add one tag.
+ tags.Add(tag);
+```
+ ```csharp
+ // add as many tags as you want.
+ tags.Add(tag, tag2, tag3);
+```
+ ```csharp
+  // remove one tag.
+ tags.Remove(tag);
+```
+ ```csharp
+   // remove all similar tags.
+ tags.RemovAll(tag);
+```
+ ```csharp
+   // all tags must be included.
+ bool valid = tags.ContainAll(tag,tag2);
+```
+ ```csharp
+   // at least one tag must be included.
+ bool valid = tags.ContainAny(tag,tag2);
+```
+```csharp
+   // tag must be included.
+ bool valid = tags.Contain(tag);
+```
+### How to use
+You can add similar tags to the actor. It's useful in case when you have several actions with the same logic, and you want to validate something. 
+
+ ```csharp
+ // Add stun marker from the mighty hammer of doom.
+ tags.Add(Tag.Stunned);
+ // Add stun marker from falling off the tree.
+ tags.Add(Tag.Stunned);
+// remove effect caused by the mighty hammer of doom. 
+ tags.Remove(Tag.Stunned);
+ bool condition_stunned = tags.Contain(Tag.Stunned);  
+```
+In the example above condition_stunned will be true because we have added the same tag twice but deleted it only once.
+
+## <a id="ECS"></a>ECS
 Simple ECS pattern for working with actors. My approach can be used only with actor classes at the current moment and is far less
 powerful than clean ECS approaches and it's used more for structuring than gaining performance boost.
 
