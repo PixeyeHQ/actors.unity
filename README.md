@@ -898,8 +898,7 @@ All variables you add to your game objects cost something. For example, creating
 require about 4MB of memory. Scriptable objects are created only once and shared among your actor copies. For example, you want to add an audio sound variable to your monster object. Instead, you can use monster blueprint and define the audio variable there. In this case, no matter how much copies of monsters you have on the scene their audio variable will be created only once.
  
 ## <a id="Tags"></a>Tags
-Tags are glue for your game: You can identify your actors with tags or use them as arguments for your signals to check game logic.
-Tags are simple cont INT variables.
+Tags are the glue for your game: You can identify your actors with tags or use them as arguments for your signals to check game logic. Tags are simple cont INT variables.
 
 ### How to add
 Step 1. 
