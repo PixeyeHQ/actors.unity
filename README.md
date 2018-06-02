@@ -280,7 +280,7 @@ public struct SignalCameraShake
 A method HandleSignal(T arg) will be added to your script. It's an entry point for your signal.
  
 ```csharp
-  public class ProcessingShakeCamera : IDisposable, IMustBeWiped, IReceive<SignalCameraShake> 
+  public class ProcessingShakeCamera : IDisposable, IMustBeWipedOut, IReceive<SignalCameraShake> 
   {
 	public void HandleSignal(SignalCameraShake arg)
 		{
@@ -296,7 +296,7 @@ A method HandleSignal(T arg) will be added to your script. It's an entry point f
 
 3. Add subscription to your signal dispatcher.
 ```csharp
-  public class ProcessingShakeCamera : IDisposable, IMustBeWiped, IReceive<SignalCameraShake> 
+  public class ProcessingShakeCamera : IDisposable, IMustBeWipedOut, IReceive<SignalCameraShake> 
   {
 	
 	public ProcessingShakeCamera()
@@ -318,7 +318,7 @@ A method HandleSignal(T arg) will be added to your script. It's an entry point f
 ```
  4. Provide unsubscribe logic
 ```csharp
-  public class ProcessingShakeCamera : IDisposable, IMustBeWiped, IReceive<SignalCameraShake> 
+  public class ProcessingShakeCamera : IDisposable, IMustBeWipedOut, IReceive<SignalCameraShake> 
   {
 	
 	public ProcessingShakeCamera()
@@ -876,11 +876,120 @@ var weaponData = Get<DataBlueprint>().Get<DataWeapon>();
 ### When to use blueprints ? 
 All variables you add to your game objects cost something. For example, creating 1 000 000 objects with one int variable will
 require about 4MB of memory. Scriptable objects are created only once and shared among your actor copies. For example, you want to add an audio sound variable to your monster object. Instead, you can use monster blueprint and define the audio variable there. In this case, no matter how much copies of monsters you have on the scene their audio variable will be created only once.
-
-  
-  
+ 
 ## Tags
-Docs are coming soon. Glue to identify actors and work with game logic.
+Tags are glue for your game: You can identify your actors with tags or use them as arguments for your signals to check game logic.
+Tags are simple cont INT variables.
+
+### How to add
+Step 1. 
+Create a new static script called Tag or what do you prefer. 
+I prefer to use partial classes to divide my tags to different files.
+Populate your tags with unique int ID. 
+```csharp
+public static partial class Tag
+	{
+		 public const int SignalStasisOn = 10001;
+		 public const int SignalStasisOff = 10002;
+        }
+```	
+
+```csharp
+public static partial class Tag
+	{
+		 public const int WeaponGun = 9000;
+		 public const int WeaponLaser = 9001;
+        }
+```	
+
+[![https://gyazo.com/0eb286e0d8b2712b9b3aee03eaaec9c9](https://i.gyazo.com/0eb286e0d8b2712b9b3aee03eaaec9c9.png)](https://gyazo.com/0eb286e0d8b2712b9b3aee03eaaec9c9)
+
+Step 2.
+Add [TagField(categoryName = "YOURNAME")] before your const int. Use '/' to add tag in child group.
+```csharp
+	public static partial class Tag
+	{
+		[TagField(categoryName = "Weapons")] public const int WeaponGun = 9000;
+		[TagField(categoryName = "Weapons/BigGuns")] public const int WeaponLaser = 9001;
+	}
+```
+Step 3.
+Add your tag to Actor. To do that use tags.Add(YOUR_TAG);
+```csharp
+public class ActorPlayer : Actor{
+	protected override void Setup()
+		{
+			Add(dataAnimationState);
+			Add(dataCurrentWeapon);
+			// always add tags at the end of your Actor setup.
+			tags.Add(Tag.GroupPlayer);
+		}
+}
+```
+Step 4.
+You can edit your tags in the Inspector view. To do that add int variable where you want and attach attribute
+[TagFilter(typeof(TYPE_OF_CLASS_WHERE_TAGS))]
+
+```csharp
+public class ActorPlayer : Actor{
+[TagFilter(typeof(Tag))] public int tag;
+	protected override void Setup()
+		{
+			Add(dataAnimationState);
+			Add(dataCurrentWeapon);
+			// always add tags at the end of your Actor setup.
+			tags.Add(tag);
+		}
+}
+```
+[![https://gyazo.com/e3c0c4d009209b46df72975305a6e936](https://i.gyazo.com/e3c0c4d009209b46df72975305a6e936.gif)](https://gyazo.com/e3c0c4d009209b46df72975305a6e936) 
+ 
+ ### ProcessingTags
+ Actors have special processingTags component. 
+ 
+ ```csharp
+ // add one tag.
+ tags.Add(tag);
+```
+ ```csharp
+ // add as many tags as you want.
+ tags.Add(tag, tag2, tag3);
+```
+ ```csharp
+  // remove one tag.
+ tags.Remove(tag);
+```
+ ```csharp
+   // remove all similar tags.
+ tags.RemovAll(tag);
+```
+ ```csharp
+   // all tags must be included.
+ bool valid = tags.ContainAll(tag,tag2);
+```
+ ```csharp
+   // at least one tag must be included.
+ bool valid = tags.ContainAny(tag,tag2);
+```
+```
+ ```csharp
+   // tag must be included.
+ bool valid = tags.Contain(tag);
+```
+### How to use
+You can add similar tags to the actor. It's useful in case when you have several actions with the same logic, and you want to validate something. 
+
+ ```csharp
+ // Add stun marker from the mighty hammer of doom.
+ tags.Add(Tag.Stunned);
+ // Add stun marker from falling off the tree.
+ tags.Add(Tag.Stunned);
+// remove effect caused by the mighty hammer of doom. 
+ tags.Remove(Tag.Stunned);
+ bool condition_stunned = tags.Contain(Tag.Stunned);  
+```
+In example above condition_stunned will be true because we have added same tag twice but deleted it only once.
+
 ## ECS
 Simple ECS pattern for working with actors. My approach can be used only with actor classes at the current moment and is far less
 powerful than clean ECS approaches and it's used more for structuring than gaining performance boost.
