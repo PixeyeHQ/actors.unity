@@ -72,6 +72,8 @@ namespace Homebrew
 
 		IEnumerator<float> _Load(string name)
 		{
+			Timing.KillCoroutines();
+			
 			Toolbox.changingScene = true;
 
 			Toolbox.Instance.ClearSessionData();
@@ -108,7 +110,7 @@ namespace Homebrew
 		{
 			var processing = Toolbox.Get<ProcessingSceneLoad>();
 			var name = processing.GetFromList(id);
-			Timing.KillCoroutines();
+	 
 			Timing.RunCoroutine(processing._Load(name));
 		}
 
