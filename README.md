@@ -55,11 +55,31 @@ ACTORS is a small framework explicitly built for Unit3d. It is used to ease the 
 	
 ```
 
-## Installation
+## Table Of Contents
+
+* Setup
+    * <a href="#Installation">Installation</a>
+    * <a href="#Overview">Project Overview</a>
+    * <a href="#Setup">Project Setup</a>
+    * <a href="#Scenes Setup">Scenes Setup</a>
+* Basic stuff  
+    * <a href="#Actors overview">Actors overview</a>
+    * <a href="#Data component">Data component</a>
+    * <a href="#Behavior component">Behavior component</a>
+    * <a href="#Signals">Signals</a>
+    * <a href="#Interfaces overivew">Interfaces overivew</a>
+    * <a href="#Processings">Processings</a>
+    * <a href="#Object pooling">Object pooling</a>
+    * <a href="#Creating and destroying new objects">Creating and destroying new objects</a>
+    * <a href="#Blueprints">Blueprints</a>
+    * <a href="#Tags">Tags</a>
+    * <a href="#ECS">ECS</a>
+
+##  <a id="Installation"></a>Installation 
 From Source
 * Clone this repo and open it as a new Unity3D project.
 
-## Project Overview
+## <a id="Overview"></a>Project Overview
 The project consists of several folders :
 * [-]Common : for in-house libraries, framework pluggables.
 * [0]Framework : the framework code. You generally don't need to touch here anything.
@@ -68,7 +88,7 @@ The project consists of several folders :
 * [3]ThirdParty : libraries you use from asset store.
 * Plugins : unity3d plugin folder.
 
-## Project Setup
+##  <a id="Setup"></a>Project Setup
 The framework heavily rely on Unity3D additive scenes. To use it in the way it was designed you need to make some preparations.
 
 1. Open sceneKernel scene. You can find it in Assets/[2]Content/Scenes
@@ -84,17 +104,17 @@ StarterKernel has few public variables you can set up:
 
 [![https://gyazo.com/1e79f2d6bf54c3762f35eab153cb0bfe](https://i.gyazo.com/1e79f2d6bf54c3762f35eab153cb0bfe.png)](https://gyazo.com/1e79f2d6bf54c3762f35eab153cb0bfe)
 
-## Scenes Setup
+## <a id="Scenes Setup"></a>Scenes Setup
 
 Add new scenes in game from File->New Scene command. You will notice that scene will be generated differently from normal unity3d scene setup. A scene doesn't have camera or light. It's because you add them additively from other scenes. ( sceneKernel by default )
 
-#### Scene overview 
+### Scene overview 
 All scenes have essential objects that you don't want to change.
 * [SETUP]: this is a root object for starter scripts and any settings related objects.
 * [SCENE]: this is a root object for your game-related game objects in a scene. Put all your level here.
 * [SCENE]/Dynamic: this is an object to hold all game objects that will be created at runtime. It's essential to separate loaded stuff from static to ease the process of debugging in hierarchy view.
 
-#### Starters
+### Starters
 A starter is a monobehavior component that you attach to [SETUP] game object. Starter controls scene loading&setup. You can inherit from starter component to extend it and add your custom logic. For example "startLevelOne."
 
 Starter variables :
@@ -106,7 +126,7 @@ Starter variables :
 [![https://gyazo.com/1285f0b0feb8ecb0495ca536aae25606](https://i.gyazo.com/1285f0b0feb8ecb0495ca536aae25606.png)](https://gyazo.com/1285f0b0feb8ecb0495ca536aae25606)
 
 
-## Creating new objects
+## <a id="Actors overview"></a>Actors overview
 So from this point we are ready to go and add new gameobjects. 
 
 ### Monocached
@@ -197,7 +217,7 @@ labelScore = Get<TextMeshProUGUI>("anchor_left/label_score");
 
 	 
 
-## Data component
+## <a id="Data component"></a>Data component
 Data components are serializable, plain c# classes inherited from IData interface. All game variables are held in data components.
 The same data components may be shared through various of behaviors.
 
@@ -241,7 +261,7 @@ data components. When data component is added to an actor he will check all comp
 	}
  ```
  
-## Behavior component
+## <a id="Behavior component"></a>Behavior component
 Behaviors are plain c# classes that need data components to work and can't live without actors. Behaviors are workhorses of actors and define how actor behaves.
 
 ### Behavior example
@@ -263,7 +283,7 @@ Behaviors are plain c# classes that need data components to work and can't live 
 	}
  ```
 
-## **Signals**
+## <a id="Signals"></a>Signals
 Signals are in-memory publish/subscribe system and effectively replace Unity3d SendMessage.
 There are two layers of signal disptachers : local is implemented inside Actor class. Global can be reached from ProcessingSignals.Default.
 
@@ -362,7 +382,7 @@ A method HandleSignal(T arg) will be added to your script. It's an entry point f
  ``` 
 
 
-## **Interfaces overivew**
+## <a id="Interfaces overivew"></a>**Interfaces overivew**
 There are several interfaces in the framework to extend entity functionality.
 
 ### ITick
@@ -465,7 +485,7 @@ IReceiveGlobal<T> interface is used when you want entity to receive a signal wit
 		}
   }
 ```
-## Toolbox
+## <a id="Toolbox"></a>Toolbox
 The toolbox is a singleton that contains all processings, global data and everything you want to get from global access.
 Think of toolbox as a "global actor." 
 
@@ -483,7 +503,7 @@ Example:
 data = Toolbox.Get<DataGameSession>();
 ```
 
-## Processings
+## <a id="Processings"></a>Processings
 Processing more known as "managers," "controllers." Processings are classes that can be used like systems in ECS or to do some global work. For example, camera follow script is a good candidate for processing script.
 
 There are few predefined processings in the framework. You can find them in StarterKernel script. The best place to add your custom processings is Starter scripts or pluggables.
@@ -584,7 +604,7 @@ public class MyCustomClass : ITick{
 }
 ```
 
-## Object pooling
+## <a id="Object pooling"></a>Object pooling
 Every time you create/destroy object memory is allocated. The more complex object is the bigger allocation will be. It's not a big deal to create the object once or several times, but when you need to spawn hundreds of objects, or you want to generate them rapidly, you want to use object pooling. You can find more info about pooling on [Unity3d site](https://unity3d.com/learn/tutorials/topics/scripting/object-pooling).
 
 There are two types of pools in the Framework :
@@ -666,7 +686,7 @@ ProcessingGoPool.AddToTemp(Pool.Entities, gameobject);
 ProcessingGoPool.ReleaseTemp(Pool.Entities);
 ```
 
-## Creating and destroying new objects
+## <a id="Creating and destroying new objects"></a>Creating and destroying new objects
 
 ### Creating routine
 
@@ -797,7 +817,7 @@ timerBlink.Kill();
  ```
  OnDispose method provided inside of behaviors by default.
 
-## Blueprints
+## <a id="Blueprints"></a>Blueprints
 Blueprints are scriptable objects that are used for defining common data for similar actors. 
 Their setup is similar to actors setup.
 
@@ -877,7 +897,7 @@ var weaponData = Get<DataBlueprint>().Get<DataWeapon>();
 All variables you add to your game objects cost something. For example, creating 1 000 000 objects with one int variable will
 require about 4MB of memory. Scriptable objects are created only once and shared among your actor copies. For example, you want to add an audio sound variable to your monster object. Instead, you can use monster blueprint and define the audio variable there. In this case, no matter how much copies of monsters you have on the scene their audio variable will be created only once.
  
-## Tags
+## <a id="Tags"></a>Tags
 Tags are glue for your game: You can identify your actors with tags or use them as arguments for your signals to check game logic.
 Tags are simple cont INT variables.
 
@@ -988,9 +1008,9 @@ You can add similar tags to the actor. It's useful in case when you have several
  tags.Remove(Tag.Stunned);
  bool condition_stunned = tags.Contain(Tag.Stunned);  
 ```
-In example above condition_stunned will be true because we have added same tag twice but deleted it only once.
+In the example above condition_stunned will be true because we have added the same tag twice but deleted it only once.
 
-## ECS
+## <a id="ECS"></a>ECS
 Simple ECS pattern for working with actors. My approach can be used only with actor classes at the current moment and is far less
 powerful than clean ECS approaches and it's used more for structuring than gaining performance boost.
 
