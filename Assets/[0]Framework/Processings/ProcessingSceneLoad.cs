@@ -22,7 +22,7 @@ namespace Homebrew
 
 
 		public Action sceneLoaded = delegate { };
-		public Action sceneClosed = delegate { };
+		public Action sceneClosing = delegate { };
 
 
 		public string GetFromList(int index)
@@ -46,9 +46,7 @@ namespace Homebrew
 
 				scenes.Add(scene.name, scene);
 			}
-
-			sceneClosed();
-
+ 
 			for (var i = 0; i < sceneDependsOn.Count; i++)
 			{
 				var name = sceneDependsOn[i];
@@ -74,10 +72,11 @@ namespace Homebrew
 
 		IEnumerator _Load(string name)
 		{
+			sceneClosing();
 			Toolbox.changingScene = true;
-
 			Toolbox.Instance.ClearSessionData();
 
+			
 			var s = SceneManager.GetActiveScene();
 			var sName = s.name;
 
