@@ -7,6 +7,10 @@
 [![Twitter Follow](https://img.shields.io/badge/twitter-%40dimmPixeye-blue.svg?style=flat-square&label=Follow)](https://twitter.com/dimmPixeye)
 [![license](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](https://github.com/dimmpixeye/Actors-Unity3d-Framework/blob/master/LICENSE)
 
+## Languages
+* [en](https://github.com/dimmpixeye/Actors-Unity3d-Framework/blob/master/README.md)
+* [ru](https://github.com/dimmpixeye/Actors-Unity3d-Framework/blob/master/README-rus.md)
+
 ## Actors - The component based pattern for Unity3d
 
 ACTORS is a small framework explicitly built for Unit3d. It is used to ease the pain of decoupling data from behaviors without tons of boilerplate code. It relies on Unity3d scripting monobehavior concept but without unnecessary overhead.
