@@ -765,15 +765,21 @@ protected override void OnBeforeDestroy()
 
 ## Timers
 
-Timers are great for making delayed actions. I strongly recommend to use them instead of coroutines for example if you need to make single delay or call several delayed actions.
+Timers are great for making delayed actions. I strongly recommend to use them instead of coroutines if you need to make single delay action.
 
-There are two ways of using timers. You can create a new timer each time you need from timer pool or cache timer and reuse it.
-Example of timer:
+There are two ways of using timers. You can create a new timer each time you need from a pool or cache timer and reuse it.
+Set timer execute time and action when timer executed. The timer will be automatically recycled after playing.
+
+Example of timers:
 ```csharp
+// Create new timer from a pool.
 Timer.Add(0.1f, actor.HandleDestroyGO); 
+// Create and cache timer. In this case timer won't work untill Restart Method.
+var alarm = new Timer(() => { Debug.Log("Alarm"); }, 10f);
+// Set Timer to work.
+alarm.Restart();
 ```
 
-Set timer time and action. You can use lambda to define a complex action. The timer will be automatically recycled after playing.
 ```csharp
  Timer.Add(0.1f, ()=>
     {
