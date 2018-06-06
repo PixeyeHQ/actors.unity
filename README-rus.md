@@ -9,7 +9,7 @@
 
 ## Actors - Компонентно-ориентированный паттерн для Unity3d
 
-ACTORS небольшой фреймворк созданный для Unit3d. Он используется для облегчения разделения данных от поведения без тонн кода. Фреймворк полагается на концепт использования monobehavior'а Unity3d, но без ненужных издержек.
+ACTORS небольшой фреймворк, созданный для Unity3d. Он используется для облегчения разделения данных от поведения без тонн кода. Фреймворк полагается на концепт использования monobehavior'а Unity3d, но без ненужных издержек.
 
 ### Обзор игрового кода :
 ```csharp
@@ -62,14 +62,14 @@ ACTORS небольшой фреймворк созданный для Unit3d. �
     * <a href="#Overview">Обзор проекта</a>
     * <a href="#Setup">Установка проекта</a>
     * <a href="#Scenes Setup">Создание сцен</a>
-* Basic stuff  
+* Базовые понятия  
     * <a href="#Actors overview">Обзор акторов</a>
     * <a href="#Data component">Компонент данных (Data)</a>
     * <a href="#Behavior component">Компонент поведения (Behavior)</a>
     * <a href="#Signals">Сигналы</a>
     * <a href="#Interfaces overivew">Обзор интерфейсов</a>
     * <a href="#Processings">Обработчики (Processings)</a>  
-        * <a href="#ProcessingSceneLoad">Как изменять сцену</a>
+        * <a href="#ProcessingSceneLoad">Как сменить сцену</a>
     * <a href="#Object pooling">Пул объектов (Object pooling)</a>
     * <a href="#Creating and destroying new objects">Создание и удаление новых объектов</a>
     * <a href="#Blueprints">Схемы (Blueprints)</a>
@@ -93,7 +93,7 @@ ACTORS небольшой фреймворк созданный для Unit3d. �
 Фреймворк очень полагается на аддитивные сцены в Unity3D. Что бы использовать его так как было задумано вам нужно сделать немного приготовлений.
 
 1. Откройте сцену sceneKernel. Вы можете найти ее в Assets/[2]Content/Scenes
-там вы найдете один transform в view названном [KERNEL] - это корневой объект всей вашей игры. Для удобства, я прикрепил к ней камеру ( но, если вам это не надо, вы можете так не делать ) 
+там вы найдете один transform в view, названном [KERNEL] - это корневой объект всей вашей игры. Для удобства, я прикрепил к ней камеру ( но, если вам это не надо, вы можете так не делать ) 
 
 2. Взгляните на скрипт StarterKernel, прикрепленный к [KERNEL]. Стратерами я называю скрипты, которые инициализируют вашу игру, библиотеки и сцены. 
 
@@ -138,23 +138,23 @@ Starter это компонент monobehavior, который вы подклю
 Базовый класс для всех ваших акторов в игре. Наследуется от Monocached. Это контейнер для ваших компонентов данных и поведения (data&behaviors). Когда вам нужно добавить новую игровую сущность наследуйте ее от класса Actor. Например: ActorPlayer : Actor. 
 Акторы это единственные компоненты влияющие на игровую логику объектов.
 
-#### Actor Setup example
+#### Пример настойки актора
 
 ```csharp
-// inherit from Actor. Inherit from ITick interface to mark that this object must be updated.
+// Наследуйтесь от Аctor. Так же наследуйтесь от интерфейса ITick чтобы обозначить этот объект обновляемым.
   public class ActorPlayer : Actor, ITick
 {
-    // add serializable data classes to ActorPlayer so we can inspect them in the Inspector
-    // Use [FoldoutGroup("Setup")] to make nice foldable groups of variables in the inspector
+    // добавьте сериализуемые классы данных к ActorPlayer для того чтобы видеть их в инспекторе
+    // Используйте [FoldoutGroup("Setup")] что бы добавить классные вкладки для переменных в инспекторе
 	[FoldoutGroup("Setup")] public DataMove dataMove;
 	
-        // Use protected override void Setup to initialize Actor.
-        // Setup is used to add data into Actor's container and create behavior scripts for an Actor.
+        // Используйте protected override void Setup для инициализации актора.
+        // Setup используется для добавления компонентов данных в контейнер актора и создания скриптов поведения для него.
     	protected override void Setup()
 		{
-            // use Add(object) to add already created object into Actor's container. For example data.
+            // используйте Add<T>() для создания нового объекта и добавления его в контейнер актора. Например компоненты данных ( data ).
 			Add(dataMove);
-            // use Add<T>() to create new object and add into Actor's container. For example behavior.
+            // используйте Add<T>() для создания нового объекта и добавления его в контейнер актора. Например поведения ( behavior ).
 			Add<BehaviorInput>();
 		}
  
@@ -220,10 +220,10 @@ labelScore = Get<TextMeshProUGUI>("anchor_left/label_score");
 Одни и те же компоненты данных могут совместно использоваться различными поведениям.
 
 
-### Data Setup example
+### Пример компонента данных
 
 ```csharp
-// Always put [System.Serializable] to all data components and be sure to inherit from IData
+// Помещайте [System.Serializable] ко всем компонентам данных и проверяйте на наследование от IData
 	[System.Serializable]
     // Inhe
 	public class DataMove : IData
@@ -265,13 +265,13 @@ labelScore = Get<TextMeshProUGUI>("anchor_left/label_score");
 
 ```csharp
 
-// Inherit from ITick to mark this behavior for updates
+// Наследуйтесь от ITick чтобы пометить это поведение обновляемым
 		public class BehaviorInput : Behavior, ITick
 	{
-        // use [Bind] attribute for lazy initialization from Actor
+        // Используйте атрибут [Bind] для ленивой инициализации из актора
 		[Bind] private DataMove dataMove;
 
-        // Update analogue, populating dataMove variables.
+        // Аналог стандартного Update , добавляем переменные dataMove.
 		public override void OnTick()
 		{
 			dataMove.x = Input.GetAxis("Horizontal");
@@ -281,8 +281,8 @@ labelScore = Get<TextMeshProUGUI>("anchor_left/label_score");
  ```
 
 ## <a id="Signals"></a>Сигналы
-Сигналы это система подписки/получаения сообщений, которая эффективно заменяет SendMessage Unity3d.
-Существует 2 урованя диспетчера сигналов : локальный реализован внутри класса Actor. Глобальный можно использовать из ProcessingSignals.Default.
+Сигналы это система подписки/получения сообщений, которая эффективно заменяет SendMessage Unity3d.
+Существует 2 уровня диспетчера сигналов : локальный реализован внутри класса Actor. Глобальный можно использовать из ProcessingSignals.Default.
 
 Как использовать сигналы:
 
@@ -318,7 +318,7 @@ public struct SignalCameraShake
 	
 	public ProcessingShakeCamera()
 		{
-		        // subscribe this object on global signal dispatcher.
+		    // подписка этого объекта на глобальный диспетчер сигналов.
 			ProcessingSignals.Default.Add(this);
 	        }
 		
@@ -340,7 +340,7 @@ public struct SignalCameraShake
 	
 	public ProcessingShakeCamera()
 		{
-		        // subscribe this object on global signal dispatcher.
+		    // подписка этого объекта на глобальный диспетчер сигналов.
 			ProcessingSignals.Default.Add(this);
 	        }
 		
@@ -354,10 +354,10 @@ public struct SignalCameraShake
 				tweenShakeVeryStrong.Restart();
 		}
 		
-		// We don't want object to recieve signals when it's destroyed.
+		// Нам не нужно чтобы объект принимал сигоналы когда он уничтожен.
 			public void Dispose()
 		{
-		        // Unsubscribe 
+		        // Отписка
 			ProcessingSignals.Default.Remove(this);
 		}
 		
@@ -383,8 +383,6 @@ public struct SignalCameraShake
 Фреймворк содержит в себе несколько интерфейсов для расширения функциональности сущностей.
 
 ### ITick
-The framework use single monobehavior update for *ALL* entities. Because of that we don't use any Update methods in actors/behaviors. 
-Instead we mark actors and behaviors with interfaces to define update type. Use ITick if you have code that needs to run per frame.
 Фреймворк использует одно обновление monobehaviour для *ВСЕХ* сущностей. Поэтому мы не используем никаких методов обновления в акторах/поведениях. 
 Вместо этого мы помечаем акторов и поведения интерфейсами для определения типа обновления. Используйте Tick, если у вас есть код, который должен выполняться каждый кадр.
 
@@ -454,7 +452,7 @@ public class DataRender: ISetup, IData
 ### IReceive<T>
 Интерфейс IReceive<T> используется, когда вы хотите, чтобы объект получал сигнал с типом T от локального диспетчера сигналов. IReceive<T> обычно используется внутри акторов для местной связи.
 ```csharp
-  public class ProcessingShakeCamera : IDisposable, IMustBeWiped, IReceive<SignalCameraShake> 
+  public class ProcessingShakeCamera : IDisposable, IMustBeWipedOut, IReceive<SignalCameraShake> 
   {
 	public void HandleSignal(SignalCameraShake arg)
 		{
@@ -471,7 +469,7 @@ public class DataRender: ISetup, IData
 ### IReceiveGlobal<T>
 Интерфейс IReceiveGlobal<T> используется, когда вы хотите, чтобы объект получал сигнал с типом T от глобального диспетчера сигналов.
 ```csharp
-  public class ProcessingShakeCamera : IDisposable, IMustBeWiped, IReceiveGlobal<SignalCameraShake> 
+  public class ProcessingShakeCamera : IDisposable, IMustBeWipedOut, IReceiveGlobal<SignalCameraShake> 
   {
 	public void HandleSignal(SignalCameraShake arg)
 		{
@@ -485,51 +483,51 @@ public class DataRender: ISetup, IData
   }
 ```
 ## <a id="Toolbox"></a>Toolbox
-The toolbox is a singleton that contains all processings, global data and everything you want to get from global access.
-Think of toolbox as a "global actor." 
+Toolbox это синглтон, который содержит все обработчики, глобальные данные и все, что вы хотите получить от глобального доступа.
+Думайте о тулбоксе как о " глобальном акторе."
 
-To add a new instance of a class to a toolbox use Add method
-Example:
+Чтобы добавить новый экземпляр класса в тулбокса, используйте метод Add
+Пример:
 
 ```csharp
 Toolbox.Add<ProcessingInputConnect>();
 ```
 
-To get something from a toolbox use Get method
-Example:
+Чтобы получить что-то из тулбокса, используйте метод Get
+Пример:
 
 ```csharp
 data = Toolbox.Get<DataGameSession>();
 ```
 
-## <a id="Processings"></a>Processings
-Processing more known as "managers," "controllers." Processings are classes that can be used like systems in ECS or to do some global work. For example, camera follow script is a good candidate for processing script.
+## <a id="Processings"></a>Обработчики
+Обработчики более известны как "менеджеры", "контроллеры". Обработчики - это классы, которые могут использоваться как системы в ECS или выполнять некоторую глобальную работу. Например скрипт следования камеры является хорошим кандидатом для обработчика.
 
-There are few predefined processings in the framework. You can find them in StarterKernel script. The best place to add your custom processings is Starter scripts or pluggables.
+Существует несколько готовых обработчиков во фреймворке. Вы можете найти их в StarterKernel. Лучшее место для добавления пользовательских обработчиков это Starter скрипты или pluggables.
 
-Processings must live only inside of a toolbox.
+Обработчики должны жить только внутри тулбокса.
 
 ### ProcessingBase
-Typically, processing should be inherited from ProcessingBase, but it's ok to use them without a base.
-Processing base is required to use the script as an ECS system. Also, it automates routine of subscribing/unsubscribing for signal events.
+Как правило, обработчики должны быть унаследованы от ProcessingBase, но можно использовать их без него.
+ProcessingBase необходим для использования скрипта в качестве ECS системы. Кроме того, он автоматизирует процедуру подписки/отписки на сигналы.
 
 ```csharp
 public class ProcessingGroupEnemies : ProcessingBase
 ```
 
-### IMustBeWiped
-The IMustBeWiped interface says to the toolbox that this processing must be destroyed when the scene changed. Usually, you would use it with all "local" processing scripts that are related to one scene only. Sometimes it's better to kill object and recreate it in the new scene.
+### IMustBeWipedOut
+Интерфейс IMustBeWipedOut говорит тулбоксу, что этот обработчик должен быть уничтожен при изменении сцены. Обычно он используется со всеми "локальными" сценариями обработки, связанными только с одной сценой. Иногда лучше уничтожить объект и воссоздать его на новой сцене.
 
 ```csharp
-public class ProcessingGroupEnemies : ProcessingBase, IMustBeWiped
+public class ProcessingGroupEnemies : ProcessingBase, IMustBeWipedOut
 ```
 ### IDisposable
-Use IDisposable interface when you want to clean processing object before destroying it. 
+Используйте интерфейс IDisposable, если вы хотите очистить объект обработки перед его уничтожением.
 ```csharp
-public class ProcessingShakeCamera : IDisposable, IMustBeWiped
+public class ProcessingShakeCamera : IDisposable, IMustBeWipedOut
 {
 
-	        private Tween twShakeFromShootCamera;
+	    private Tween twShakeFromShootCamera;
 		private Tween twShakeAverage;
 		private Tween twShakeStrong;
 		private Tween twShakeVeryStrong;
@@ -549,44 +547,44 @@ public class ProcessingShakeCamera : IDisposable, IMustBeWiped
 		}
 }
 ``` 
-Don't use IDisposable when inheriting from ProcessingBase. It's already included there, and you get virtual method
-OnDispose to make all necessary cleaning.
+Не используйте IDisposabl при наследовании от ProcessingBase. Он уже включен в него и вы получаете виртуальный метод
+OnDispose для очистки.
 
 
-### Updating processings
-Don't forget to use ITick, ITickFixed, and ITickLate interfaces with processings you want to be updated per frame.
-Use ProcessingUpdate.Default.Add to register this object as Tickable.
+### Обновление Обработчиков
+Не забудьте использовать интерфейсы ITick, ITickFixed, и ITickLate с обработчиками, которые вы хотите обновлять каждый кадр.
+Использовать ProcessingUpdate.Default.Add, чтобы зарегистрировать этот объект как Tickable.
 ```csharp
 ProcessingUpdate.Default.Add(this);
 ``` 
 
 ```csharp
-// don't forget to mark type of update. Here we use ITickLate
-public class ProcessingCameraFollow : ProcessingBase, ITickLate, IMustBeWiped{
+// Не забывайте помечать тип обновлений. Здесь мы используем ITickLate
+public class ProcessingCameraFollow : ProcessingBase, ITickLate, IMustBeWipedOut{
 	public ProcessingCameraFollow()
 		{
 			transformCamera = Camera.main.transform;
-			// use ProcessingUpdate.Default.Add to register this object as Tickable. 
-			// In our example it will be added as TickLate
+			// используйте ProcessingUpdate.Default.Add для регистрации объекта как Tickable. 
+			// В нашем примере он будет добавлен как TickLate
 			ProcessingUpdate.Default.Add(this);
 		}
 }
 ```
 
-## Framework Processings
-The framework wouldn't work without some predefined processings, and you should know about them as you will use them a lot.
+## Обработчики фреймворка
+Фреймворк не может работать без некоторых подготовленных обработчиков и вы должны о них знать.
 
 ### ProcessingUpdate
-Important processing that controls *all* updates in game. When ProcessingUpdate is created it adds a ComponentUpdate monobehavior inside of [KERNEL] root object to get Unity Update methods. All actors,timers,processings should work from ProcessingUpdate.
+Важный обработчик, который контролирует *ВСЕ* обновления в игре. Когда ProcessingUpdate создается он добавляет ComponentUpdate monobehavior внутрть корневого объекта [KERNEL] для получения методов обновления Unity. Все акторы, таймеры, обработчики должны работать от ProcessingUpdate.
 
-While Monobehavior update method can be used only with inherited mono components, you can use ProcessingUpdate with *ANY* script.
-You can do that in 2 steps:
-1. Inherit from interaces you need.
-* ITick for Update
-* ITickFixed for FixedUpdate
-* ITickLate for LateUpdate
-2. Call  *ProcessingUpdate.Default.Add(this);*  in script, somewhere in initializing.
-3. Normally, all updates are killed when scene changes but if you want to kill Update earlier call *ProcessingUpdate.Default.Remove(this);*
+Тогда как обновления Monobehavior могут быть использованы только в наследующих его компонентах, вы можете использовать ProcessingUpdate с *ЛЮБЫМ* скриптом.
+Вы можете сделать это в 2 шага:
+1. Унаследуйтесь от нужных вам интерфейсов.
+* ITick для Update
+* ITickFixed для FixedUpdate
+* ITickLate для LateUpdate
+2. Вызовите *ProcessingUpdate.Default.Add(this);* в любом месте внутри скрипта, чтобы проинициализировать его.
+3. Обычно все обновления уничтожаются при смене сцены, но если вам нужно сделать это раньше вызовите *ProcessingUpdate.Default.Remove(this);*
 
 
 ```csharp
@@ -603,74 +601,75 @@ public class MyCustomClass : ITick{
 }
 ```
 
-### <a id="ProcessingSceneLoad"></a>ProcessingSceneLoad
-First, add all scenes you want inside of Build Settings window.
-Than, generate scene names:
+### <a id="ProcessingSceneLoad"></a>Как сменить сцену
+Для начала добавьте все нужные сцены в окне Build Settings.
+Затем сгенерируйте имена сцен:
 
 [![https://gyazo.com/8507135cf74cf0dd1c4b9db90363a6ad](https://i.gyazo.com/8507135cf74cf0dd1c4b9db90363a6ad.gif)](https://gyazo.com/8507135cf74cf0dd1c4b9db90363a6ad)
 
-Now to change scene use ProcessingSceneLoad.To(int level) .
+Теперь сменяйте сцены используя ProcessingSceneLoad.To(int level).
 
 
 ```csharp
-// example of level with ID 2
+// пример уровная с ID 2
 int level = 2;
 ProcessingSceneLoad.To(level)
 ```
 
 
+## <a id="Object pooling"></a>Пул объектов
+Каждый раз при создании/удалении объекта для этого выделяется память. Чем сложнее объект тем больше памяти выделяется для него. Это не так сложно созда объект один или несколько раз, но когда вам нужно создавать сотни объектов или вам нужно создавать их быстро вам нужно будет использовать пул объектов. Больше информации об этом вы можете найти на [сайте Unity3d](https://unity3d.com/learn/tutorials/topics/scripting/object-pooling).
 
-## <a id="Object pooling"></a>Object pooling
-Every time you create/destroy object memory is allocated. The more complex object is the bigger allocation will be. It's not a big deal to create the object once or several times, but when you need to spawn hundreds of objects, or you want to generate them rapidly, you want to use object pooling. You can find more info about pooling on [Unity3d site](https://unity3d.com/learn/tutorials/topics/scripting/object-pooling).
+Во фреймворке существует два типа пулов :
+* Для GameObject - любые относящиеся к игре объекты с классом monobehavior.
+* Для объектов c# - любые простые классы c#. Например таймеры.
 
-There are two types of pools in the Framework :
-* For gameobjects - any game related game objects on a scene with monobehavior classes.
-* For c# objects - any plain c# classes. For example timers.
+### Пул GameObject
 
-### GameObject pool
-The control of gameobject pool goes through the ProcessingGoPool script and PoolStash script.
-Pools are predefined and included inside monocached objects. 
-There are 4 types of gameobject pools:
+Управляемый пул gameobject'ов создается с помощью скриптов ProcessingGoPool и PoolStash.
+Пулы подготовлены заранее и включают в себя объекты monocached. 
+Всего их существует 4 типа:
 
-* Pool.UI - for any UI related entities
-* Pool.Projectiles - for any fx, small objects such as bullets.
-* Pool.Entities - for gameobjects and actors
-* Pool.Audio - for audiosource gameobjects
+* Pool.UI - для любых относящихся к UI сущностей
+* Pool.Projectiles - для любых спецэффектов и таких мелких объектов как пули.
+* Pool.Entities - для gameobject'ов и акторов
+* Pool.Audio - для звуковых объектов
 
-You can add more pool types through ProcessingGoPool if you want.
+Так же, если вам нужно, вы можете добавить новые типы пулов с помощью ProcessingGoPool.
 
-#### Making object poolable
+#### Как добавить объект в пул
 
-Step one.
-Choose your actor or monocached object in the inspector. Open Mono foldout group. Set pool time you want.
+Шаг первый.
+Выберите вашего актора или monocached объект в инспекторе. Откройте вкладку Mono. Установите задержку перед уничтожением объекта.
 
 [![https://gyazo.com/1fc7c2a2e77a9aac8544a66712c11f01](https://i.gyazo.com/1fc7c2a2e77a9aac8544a66712c11f01.gif)](https://gyazo.com/1fc7c2a2e77a9aac8544a66712c11f01)
 
-Thats all. For now on when you will try to destroy object it will be deactivated and send to desired pool instead.
-In your scene you may notice [POOLS] object. This object holds all deactivated entities for you.
+Все. Теперь при попытке уничтожения объекта он будет деактивировать и отправлен в выбранный пул.
+На сцене вы можете заметить объект [POOLS]. Этот объект содержит все деактивированые сущности.
 
 [![https://gyazo.com/246ca65b49467779f106e4482be4b4e1](https://i.gyazo.com/246ca65b49467779f106e4482be4b4e1.gif)](https://gyazo.com/246ca65b49467779f106e4482be4b4e1)
 
-Step two. ( Optional )
-In case you want to provide some particular logic when object spawned/despawned inherit your class from IPoolable interface.
-It's needed most when you want to reset object states. You don't want your enemy to spawn with zero HP for example.
+Шаг второй. ( Опционально )
+В случае если вам нужно добавить какую-то определенную логику при появлении/уничтожении объекта наследуйтесь от интерфейса IPoolable.
+Это нужно когда вы хотите сбросить состояние объектов. Например вам не нужно что бы ваш враг появлялся с нулевым HP.
 
 ```csharp
 public class ActorEnemy : Actor, ITick, IPoolable
 ```
 
-Then add override methods to behaviors that are used with this Actor:
+Затем добавьте override методы в поведения (behaviour), которые используются с этим актором:
 
 ```csharp
-protected override void OnSpawn(){}
+protected override void OnSpawn(){
+}
 ```
 ```csharp
 protected override void OnDespawn(){
 }
 ```
 
-If you override from Actor class don't forget to add base.OnSpawn()/OnDespawn()
-You need to do that because of base Actor class loops through behaviors and pass OnSpawn/OnDespawn methods to them.
+Когда вы используете override из класса Actor не забудьте добавить base.OnSpawn()/OnDespawn()
+Вам нужно cделать это т.к. базовый класс Actor зациклен через поведения и передает им методы OnSpawn()/OnDespawn().
 ```csharp
 protected override void OnSpawn(){
 base.OnSpawn();
@@ -681,18 +680,16 @@ protected override void OnDespawn(){
 base.OnDespawn();
 }
 ```
-In this way, if you plan and design carefully, you can do pooling for even very complex objects.
+Таким образом, если вы тщательно планируете и проектируете, вы можете использвать пулы даже для очень сложных объектов.
+### Компонент PoolRegister
 
-### Pool Register component
-
-If you added objects to the scene via edit mode and you want them to be part of the pooling routine add PoolRegister component.
-I usually attach it to [Setup] object. That define pool nodes: set pool type, prefab of the object from Project ( not from the scene )
-And a list of all prefab clones on the scene. In future, I plan to automate this routine.
+Если вы добавили объекты в режиме редактирования то объекты не смогут попасть в пулы просто так, их нужно будет зарегистрировать для дальнейшего использования с пулом. Для этого используйте компонент PoolRegister.
+Обычно я прикрепляю его к объекту [Setup]. Он определяет узлы пула: задает тип пула, префаб объекта из проекта ( не со сцены ) и список всех готовых клонов на месте сцене. В будущем я планирую это автоматизировать.
 
 [![https://gyazo.com/51f7661dc970da82aa48faac0feffdfc](https://i.gyazo.com/51f7661dc970da82aa48faac0feffdfc.png)](https://gyazo.com/51f7661dc970da82aa48faac0feffdfc)
 
-### Temporary pool
-You can make a special temporary pool container to work with later. Useful when you need to deactivate/activate specific group of entities in a lazy way.
+### Временный пул
+Вы можете создать специальный временный пул для работы с ним. Это полезно когда вы хотите лениво активировать/деактивировать специфичные группы сущностей.
 
 ```csharp
 ProcessingGoPool.AddToTemp(Pool.Entities, gameobject);
@@ -702,72 +699,81 @@ ProcessingGoPool.AddToTemp(Pool.Entities, gameobject);
 ProcessingGoPool.ReleaseTemp(Pool.Entities);
 ```
 
-## <a id="Creating and destroying new objects"></a>Creating and destroying new objects
+## <a id="Creating and destroying new objects"></a>Создание и уничтожение новых объектов
 
-### Creating routine
-
-To get all benefits of the pooling system and to be sure objects will be spawned in the right places I wrote some instantiate shortcuts.
-In ANY script you want just use 
+### Создание routine
+Чтобы использовать все возможности системы пулов и быть уверенным что объекты появлятся в нужных местах, я написал специальные методы для создания объектов.
+В *ЛЮБОМ* скрипте вы можете просто использовать
 ```csharp
 var pool = Pool.Entities;
 var obj = this.Populate(pool, prefab);
 ```
-You can provide extra params as well:
+Вы также можете добавить дополнительные параметры:
 ```csharp
 var pool = Pool.UI;
 var obj = this.Populate(pool, prefab, Vector3.zero, Quaternion.identity, null, WorldParenters.Level);
 ```
-You can spawn from Resources by providing string id name.
+Вы можете создавать объекты из Resources добавляя string id.
 
 ```csharp
 var pool = Pool.UI;
 var obj = this.Populate(pool, "myObject" , Vector3.zero, Quaternion.identity, null, WorldParenters.UI);
 ```
-Parameteres that are used :
-Pool - the type of pool. Use Pool.None if you don't want to spawn from pool.
-Prefab or string id - the object you want to spawn. 
-Position - the initial position. Vector3.Zero by default.
-Rotation - the initial rotation. Quaternion.identity by default.
-Parent - parent transform. Use it if you want to set special parent.
-WorldParenters - WorldParenters.Level by default.  Created object is put inside of particular world container if no other parent is registered. 
+Используемые параметры :
+Pool - тип пула. Используйте Pool.None если вы не хотите спавнить объект в какой-либо пул.
+Prefab или string id - объект, который вы хотите создать. 
+Position - позиция объека. По умолчанию Vector3.Zero.
+Rotation - поворот объекта. По умолчанию Quaternion.identity.
+Parent - родительский объект. Используйте этот параметр если вы хотите установить родительский объект.
+WorldParenters - По умолчанию WorldParenters.Level. Создаваемый объект будет помещен внутрь этого компонента, если не был задан родительский объект. 
 
-By default it's dynamic object inside [SCENE] object.
+По умолчанию объект Dynamic внутри [SCENE].
 [![https://gyazo.com/4d3346f3fe63bb626af6ab6884271146](https://i.gyazo.com/4d3346f3fe63bb626af6ab6884271146.png)](https://gyazo.com/4d3346f3fe63bb626af6ab6884271146) 
 
-When you spawn from string ID ProcessingResources starts to work. It looks inside of Resources/Prefabs folder and tries to find the desired object. Than ProcessingResources caches it and provide it to the spawn logic. Next time it will give this object from the cache instead of looking again inside of ResourcesFolder.
+Когда вы создаете объект из string ID начинает работать ProcessingResources. Он смотрит внутрь папки Resources/Prefabs и пытается найти нужный объект. После этого ProcessingResources кэширует его и добавляет в логику создания. В следующий раз он выдваст вам этот объект из кеша вместо того чтобы снова смотреть внуть папки Resources.
 
 [![https://gyazo.com/025bca594dca7fdd3e35465bff05cb10](https://i.gyazo.com/025bca594dca7fdd3e35465bff05cb10.png)](https://gyazo.com/025bca594dca7fdd3e35465bff05cb10)
 
-### Destroying routine
+### Уничтожение routine
 
-To destroy an actor or monocached object use HandleDestroyGO() method.
+Что бы уничтожить актора или объект monocached используйте метод HandleDestroyGO().
 ```csharp
 actor.HandleDestroyGO()
 ```
-If the object belongs to pool it will be deactivated for further reuse. If the object doesn't belong to a pool, it will be destroyed.
-You can delay destroy by adding destroy delay time in the Inspector.
+Если объект относится к пулу он будет деактивирован для дальнейшего использования. Если же объект не относится к какому-либо пулу он будет уничтожен.
+Вы можете отсрочить его уничтожение, добавив DestroyDelay Time в инспекторе.
 
 [![https://gyazo.com/49613234129a49a1a9a923a863225618](https://i.gyazo.com/49613234129a49a1a9a923a863225618.gif)](https://gyazo.com/49613234129a49a1a9a923a863225618)
 
 ### OnBeforeDestroy
 
-Use override of OnBeforeDestroy() method to provide some logic for and Actor before destroying. Useful for adding some effects related stuff. Also OnBeforeDestroy works well to reset data if object is pooled.
+Используйте метод override OnBeforeDestroy() для добавления логики актору до его уничтожения. Это полезно использовать для добавления разных эффектов. Так же с помощью OnBeforeDestroy можно сбросить данные если объект добавлен в пул.
 
 ```csharp
 protected override void OnBeforeDestroy()
 ```	
 
-## Timers
 
-Timers are great for making delayed actions. I strongly recommend to use them instead of coroutines for example if you need to make single delay or call several delayed actions.
+## Таймеры
 
-There are two ways of using timers. You can create a new timer each time you need from timer pool or cache timer and reuse it.
-Example of timer:
+Таймеры это отличное решения для отложенных действий. Я очень рекомендую использовать их вместо корутинов ( сопорограммы ) если вам нужно отложить лишь одно действие.
+
+Существует два способа использования таймеров:
+* Вы можете создавать новый Таймер каждый раз, когда вам нужно из пула таймеров
+* Вы можете кэшировать таймер и использовать его повторно.
+
+Установите время через которое таймер выполнит действие и само действие. Таймеры автоматически удаляются после того как они сработают.
+
+Example of timers:
 ```csharp
+// Создайте новый таймер из пула.
 Timer.Add(0.1f, actor.HandleDestroyGO); 
+// Создайте и кешируйте таймер. В этом случает таймер ну будет работать до использования метода Restart.
+var alarm = new Timer(() => { Debug.Log("Alarm"); }, 10f);
+// Включаем таймер.
+alarm.Restart();
 ```
 
-Set timer time and action. You can use lambda to define a complex action. The timer will be automatically recycled after playing.
 ```csharp
  Timer.Add(0.1f, ()=>
     {
@@ -776,15 +782,15 @@ Set timer time and action. You can use lambda to define a complex action. The ti
     }); 
 ```
 
-### AddID method
+### Метод AddID
 
-You may add ID to the timer. After this you will be able to sort timers and get the list of timers with the same ID. You can use any object for your ID.
+Вы можете добавить ID к таймеру. После этого вы сможете сортировать таймеры и получать список таймеров с одинаковым ID. Для ID можно использовать любой объект.
 
 ```csharp
   Timer.Add(0.1f, actor.HandleDestroyGO).AddID(actor);
 ```
 
-For example you may want find all timers of freezed actor and changed timescale.
+Например, вы можете найти все таймеры замороженных акторов и изменить timeScale.
 ```csharp
 var timers = Timer.FindAllTimers(actor);
 	 
@@ -794,9 +800,9 @@ var timers = Timer.FindAllTimers(actor);
 		timers[i].timeScale = 0.5f;
 	    }
 ```
-### Restart method
+### Метод Restart
 
-You can cache timer and reuse it in future. 
+Вы можете кешировать таймер для дальнейшего использования.
 ```csharp
  private Timer timerBlink;
  timerBlink = new Timer(BlinkFinish, 0.15f);
@@ -805,7 +811,7 @@ You can cache timer and reuse it in future.
  timerBlink.Restart();
  }
 ```
-You can change the time or even action while restarting
+Вы можете изменить время или даже действие во время перезапуска
 
 ```csharp
  private Timer timerBlink;
@@ -819,31 +825,32 @@ You can change the time or even action while restarting
  }
 ```
 
-### Kill method
-If you need to destroy a timer use kill method.
+### Метод Kill
+Если вы хотите уничтожить таймер используйте метод Kill.
 ```csharp
 timerBlink.Kill();
  ```
- Normally, you want to do it inside OnDispose method.
+ Обычно вам нужно делать это внутри метода OnDispose.
  ```csharp
  protected override void OnDispose()
   {
     timerBlink.Kill();
   }
  ```
- OnDispose method provided inside of behaviors by default.
+ Метод OnDispose предоставляется в поведениях по умолчанию.
 
-## <a id="Blueprints"></a>Blueprints
-Blueprints are scriptable objects that are used for defining common data for similar actors. 
-Their Setup is similar to actors Setup.
+## <a id="Blueprints"></a>Схемы (Blueprint)
+Схемы это ScriptableObject, который используется для определения схожих данных для акторов. 
+Их Настройка аналогична настройке акторов.
 
-### How to create a blueprint
-Step 1.
-Create a new script and inherit it from Blueprint. 
-Step 2.
-Add [CreateAssetMenu] tag with fileName and menuName.
-Step 3.
-Define data components you want and add them via Setup method to the blueprint container.
+### Как создать схему
+Шаг 1.
+Создайте новый скрипт, наследованный от Вlueprint. 
+Шаг 2.
+Добавтье тег [CreateAssetMenu] с параметрами fileName и menuName.
+Шаг 3.
+Определите нужные вам компоненты данных и добавьте их с помощью метода установки в контейнер схемы.
+
 
  ```csharp
 	[CreateAssetMenu(fileName = "BlueprintCreature", menuName = "Blueprints/BlueprintCreature")]
@@ -863,11 +870,11 @@ Define data components you want and add them via Setup method to the blueprint c
 		}
 	}
  ```
-Step 4. Create a new blueprint object in Project.
+Шаг 4. Создайте новый объект со схемой в проекте.
 
 [![https://gyazo.com/13c79e46e32bd94b19b1db89dac43306](https://i.gyazo.com/13c79e46e32bd94b19b1db89dac43306.gif)](https://gyazo.com/13c79e46e32bd94b19b1db89dac43306)
 
-Step 5. Create a blueprint data wrapper for all actors ( you need to do that only once ) and add this data to all actors you need.
+Шаг 5. Создайте шаблон данных схем для всех ваших акторов ( нужно сделать это всего один раз ) и добавьте этот компонент ко всем нужным акторам.
 
 ```csharp
 	[Serializable]
@@ -888,39 +895,37 @@ Step 5. Create a blueprint data wrapper for all actors ( you need to do that onl
 	  
 	}
   ```
- Step 6. Assign from the Inspector view a desired blueprint to the actor.
+Шаг 6. Назначьте вашему актору нужную схему через инспектор.
   
   [![https://gyazo.com/c6e52a666f9d2b0a6a3c005bcef9d18d](https://i.gyazo.com/c6e52a666f9d2b0a6a3c005bcef9d18d.gif)](https://gyazo.com/c6e52a666f9d2b0a6a3c005bcef9d18d)
   
- Step 7. Find Blueprints scriptable object inside of Resources folder and populate it with your new blueprint object.
-You can automate this process by clicking "populate blueprints" in tools menu. In this case your blueprints should be in
-Assets/[2]Content/Blueprints folder
+Шаг 7. Найдите Blueprints внутри папки Resources изагрузите туда вашу новую схему.
+Вы можете автоматизировать этот процесс нажав на "populate blueprints" на панели инструментов. В этом случае все ваши схемы будут лежать в папке Assets/[2]Content/Blueprints.
 
 [![https://gyazo.com/7472fbc529e2e2b9f58b8f35b09a7c18](https://i.gyazo.com/7472fbc529e2e2b9f58b8f35b09a7c18.gif)](https://gyazo.com/7472fbc529e2e2b9f58b8f35b09a7c18)
 
 [![https://gyazo.com/35b1b3c0426abe14278afe0fa107c2b8](https://i.gyazo.com/35b1b3c0426abe14278afe0fa107c2b8.gif)](https://gyazo.com/35b1b3c0426abe14278afe0fa107c2b8)
 
-### How to use blueprints in code ?
-It's easy and straightforward : use get method inside your behaviors.
+### Как использовать схемы в коде?
+Это легко и просто : используйте метод Get внутри ваших поведений.
 
 ```csharp
-// Get<DataBlueprint>() returns the blueprint wrapper.
-// Get<DataWeapon> returns desired data from the blueprint.
+// Get<DataBlueprint>() возвращает схему.
+// Get<DataWeapon> возвращает нужные данные из схемы.
 var weaponData = Get<DataBlueprint>().Get<DataWeapon>();
 ```
   
-### When to use blueprints ? 
-All variables you add to your game objects cost something. For example, creating 1 000 000 objects with one int variable will
-require about 4MB of memory. Scriptable objects are created only once and shared among your actor copies. For example, you want to add an audio sound variable to your monster object. Instead, you can use monster blueprint and define the audio variable there. In this case, no matter how much copies of monsters you have on the scene their audio variable will be created only once.
+### Когда нужно использовать схемы ? 
+Все переменные, добавляемые вами к gameobject'ам чего-то стоят. Например, создание 1 000 000 объектов с одной целочисленной переменной займет около 4МВ памяти. Схема создается всего 1 раз, после чего её могут использовать все копии ваших акторов. Например вам надо добавить звук для вашего монстра. Вы можете использовать схему монстра и задать звук в ней. В таком случает будет не важно сколько копий монстра вы поместите на сцену, ведь их звуки будут находиться в схеме, а не в каждом из них. 
  
-## <a id="Tags"></a>Tags
-Tags are the glue for your game: You can identify your actors with tags or use them as arguments for your signals to check game logic. Tags are simple cont INT variables.
+## <a id="Tags"></a>Теги
+Теги это связующее звено для вашей игры: Вы можете отличать нужных вам акторов или использовать их как аргументы для ваших сигналов. Теги это простые целочисленные (INT) константы.
 
-### How to add
-Step 1. 
-Create a new static script called Tag or what do you prefer. 
-I prefer to use partial classes to divide my tags to different files.
-Populate your tags with unique int ID. 
+### Как добавлять
+Шаг 1. 
+Создайте новый static скрипт, названный Tag ( или так как вам надо ). 
+Я предпочитаю использовать partial классы для разделения моих тегов по разным файлам.
+Назначьте вашим тегам уникальные ID. 
 ```csharp
 public static partial class Tag
 	{
@@ -939,8 +944,8 @@ public static partial class Tag
 
 [![https://gyazo.com/0eb286e0d8b2712b9b3aee03eaaec9c9](https://i.gyazo.com/0eb286e0d8b2712b9b3aee03eaaec9c9.png)](https://gyazo.com/0eb286e0d8b2712b9b3aee03eaaec9c9)
 
-Step 2.
-Add [TagField(categoryName = "YOURNAME")] before your const int. Use '/' to add tag in child group.
+Шаг 2.
+Добавьте [TagField(categoryName = "ВАШЕИМЯ")] до тега. Используйте '/' для добавления тегов в отдельные группы.
 ```csharp
 	public static partial class Tag
 	{
@@ -948,22 +953,22 @@ Add [TagField(categoryName = "YOURNAME")] before your const int. Use '/' to add 
 		[TagField(categoryName = "Weapons/BigGuns")] public const int WeaponLaser = 9001;
 	}
 ```
-Step 3.
-Add your tag to Actor. To do that use tags.Add(YOUR_TAG);
+Шаг 3.
+Добавьте тег к вашему актору. Для этого используйте tags.Add(ВАШ_ТЕГ);
 ```csharp
 public class ActorPlayer : Actor{
 	protected override void Setup()
 		{
 			Add(dataAnimationState);
 			Add(dataCurrentWeapon);
-			// always add tags at the end of your Actor Setup.
+			// всегда добавляйте теги в конце настроек актора.
 			tags.Add(Tag.GroupPlayer);
 		}
 }
 ```
-Step 4.
-You can edit your tags in the Inspector view. To do that add int variable where you want and attach attribute
-[TagFilter(typeof(TYPE_OF_CLASS_WHERE_TAGS))]
+Шаг 4.
+Вы можете редактировать ваши теги из инспектора. Для этого добавьте int переменную там, где вам надо и прикрепите атрибут
+[TagFilter(typeof(ТИП_КЛАСА_С_ТЕГАМИ))]
 
 ```csharp
 public class ActorPlayer : Actor{
@@ -972,7 +977,7 @@ public class ActorPlayer : Actor{
 		{
 			Add(dataAnimationState);
 			Add(dataCurrentWeapon);
-			// always add tags at the end of your Actor Setup.
+			// всегда добавляйте теги в конце настроек актора.
 			tags.Add(tag);
 		}
 }
@@ -980,63 +985,63 @@ public class ActorPlayer : Actor{
 [![https://gyazo.com/e3c0c4d009209b46df72975305a6e936](https://i.gyazo.com/e3c0c4d009209b46df72975305a6e936.gif)](https://gyazo.com/e3c0c4d009209b46df72975305a6e936) 
  
  ### ProcessingTags
- Actors have special processingTags component. 
+ Акторы содержат специальный компонент processingTags. 
  
  ```csharp
- // add one tag.
+ // Добавление одного тега.
  tags.Add(tag);
 ```
  ```csharp
- // add as many tags as you want.
+ // Добавление нескольких тегов.
  tags.Add(tag, tag2, tag3);
 ```
  ```csharp
-  // remove one tag.
+  // Удаление одного тегда.
  tags.Remove(tag);
 ```
  ```csharp
-   // remove all similar tags.
+   // Удаление всех похожих тегов.
  tags.RemovAll(tag);
 ```
- ```csharp
-   // all tags must be included.
- bool valid = tags.ContainAll(tag,tag2);
-```
- ```csharp
-   // at least one tag must be included.
- bool valid = tags.ContainAny(tag,tag2);
-```
 ```csharp
-   // tag must be included.
+   // должен быть указанный тег.
  bool valid = tags.Contain(tag);
 ```
-### How to use
-You can add similar tags to the actor. It's useful in case when you have several actions with the same logic, and you want to validate something. 
+ ```csharp
+   // должен быть как минимум один тег.
+ bool valid = tags.ContainAny(tag,tag2);
+```
+ ```csharp
+   // должны быть все теги.
+ bool valid = tags.ContainAll(tag,tag2);
+```
+
+### Как использовать
+Вы можете добавлять одни и те же теги актору. Это полезно в случае, когда у вас есть несколько действий с одинаковой логикой, и вы хотите проверить что-то. 
 
  ```csharp
- // Add stun marker from the mighty hammer of doom.
+ // Добавление тега stun от могучего молота судьбы.
  tags.Add(Tag.Stunned);
- // Add stun marker from falling off the tree.
+ // Добавление тег stun от упавшего дерева.
  tags.Add(Tag.Stunned);
-// remove effect caused by the mighty hammer of doom. 
+// Удаление тега, вызванного могучим молотом судьбы. 
  tags.Remove(Tag.Stunned);
  bool condition_stunned = tags.Contain(Tag.Stunned);  
 ```
-In the example above condition_stunned will be true because we have added the same tag twice but deleted it only once.
+В примере выше condition_stunned будет истинным, т.к. нужный тег был дважды добавлен, но удален только один раз.
 
 ## <a id="ECS"></a>ECS
-Simple ECS pattern for working with actors. My approach can be used only with actor classes at the current moment and is far less
-powerful than clean ECS approaches and it's used more for structuring than gaining performance boost.
+Простой ECS паттерн для работы с акторами. В данный момент мой подход может быть использован только с классами акторов и он далеко не так хорош как чистый ECS подход и он использует больше структурирования для увеличения производительности.
 
-### Processings ( aka systems )
-I call all systems or global "controllers" as Processings.
+### Обработчики ( aka системы )
+Обработчиками я называю все системы или глобальные "контролеры".
 
-When you need to activate ECS system inherit your processing from ProcessingBase
+Когда вам надо активировать ECS наследуйте ваши обработчики от ProcessingBase
 
 ```csharp
-public class ProcessingCameraFollow : ProcessingBase, ITick, IMustBeWiped
+public class ProcessingCameraFollow : ProcessingBase, ITick, IMustBeWipedOut
 ```
-To use Processing you need to add it to the Toolbox. I usually add them via Starter scripts.
+Для использования ваших обработчиков вам нужно добавить их в тулбокс. Обычно я делаю это в starter скриптах.
 
 ```csharp
 	public class StarterLv1 : Starter
@@ -1061,47 +1066,47 @@ To use Processing you need to add it to the Toolbox. I usually add them via Star
 		}
 	}
 ```
-Remember, you can inherit from Starter if needed.
+Запомните что если вам надо вы можете наследоваться от класса Starter.
 
-### Processing groups
-When a new Actor entity is added ProcessingEntities script decide in what groups of actors it should be placed.
-The group is a list of actors that share a common filter.
+### Обработчики групп
+Когда новая сущность актора добавляется в ProcessingEntities скрипт решает в какую группу актеров он должен быть помещен.
+Группы это листы с акторами, имеющими общий фильтр.
 
 
 ```csharp
-public class ProcessingCameraFollow : ProcessingBase, ITick, IMustBeWiped{
+public class ProcessingCameraFollow : ProcessingBase, ITick, IMustBeWipedOut{
 
 private Group groupPlayers;
 
 }
 ```
 
-### Filters
-To populate your group you need to provide some filters. Think of a filter as a key lock,  if the key matches this lock - than an actor is added to the group. You can filter actors by Data component types or by int tags.
+### Фильтры
+Для заполнения вашей группы вам нужно добавить фильтры. Думайте о фильтре как о замке. Если ваш ключи подходит к замку - актор добавляется в группу. Вы можете фильтровать акторов по типу компонентов данных или по тегам.
 
-#### GroupBy filer
-To populate a group add GroupBy attribute above the group variable.
-All your groupby filters must be valid in order to add an actor to a group.
+#### Фильтр GroupBy
+Для заполнения группы добавьте атрибут GroupBy на переменной в которой вы будете хранить эту группу.
+Все ваши GrouBy фильтры должны быть действительными для добавления акторов в группы.
 ```csharp
-public class ProcessingCameraFollow : ProcessingBase, ITick, IMustBeWiped{
+public class ProcessingCameraFollow : ProcessingBase, ITick, IMustBeWipedOut{
 [GroupBy(typeof(DataPlayer))]
 private Group groupPlayers;
 }
 ```
-You can use several filters as well :
+Вы можете использовать несколько фильтров :
 
 ```csharp
-public class ProcessingCameraFollow : ProcessingBase, ITick, IMustBeWiped{
+public class ProcessingCameraFollow : ProcessingBase, ITick, IMustBeWipedOut{
 [GroupBy(typeof(DataPlayer), typeof(DataKnight) )]
 private Group groupPlayersKnights;
 }
 ```
 
-##### Using Tags instead of types
-You don't have to use types of data components for filtering. Instead, you can use Tag.
-A tag is a simple const int variable. It's very similar to GameObject tags in Unity3D but more powerful.
+##### Использование тегов вместо типов
+Вам не обязательно использовать типы компонентов данных для фильтрации. Вместо них вы можете использовать теги.
+Тег это простая целочисленная (int) константа. Он очень поход на теги для GameObject'ов из Unity3D, но он более мощный.
 ```csharp
-// make a static Tag class and define all your const there.
+// создайте static класс Tag и добавьте все ваши константы сюда.
 	public static partial class Tag
 	{
 		[TagField(categoryName = "Groups")] public const int GroupPlayer = 2001;
@@ -1127,14 +1132,14 @@ public class ActorPlayer : Actor{
 		{
 			Add(dataAnimationState);
 			Add(dataCurrentWeapon);
-			// always add tags at the end of your Actor Setup.
+			// обычно теги добавляются в конце настройки вашего актора.
 			tags.Add(Tag.GroupPlayer);
 		}
 }
 ```
-#### GroupExclude filter
+#### Фильтр GroupExclude
 
-You can be more specific by adding a GroupExclude filter. If any of group exclude filter match than an actor can be no longer be in the group.
+Вы можете конкретизировать, добавив фильтр GroupExclude. Если какой-то актор из группы будет содержать указанный тег то он будет из нее исключен.
 
 ```csharp
 public class ProcessingCameraFollow : ProcessingBase, ITick, IMustBeWipedOut{
@@ -1145,8 +1150,8 @@ private Group groupPlayersAlive;
 ```
 
 
-### OnGroupChanged action
-You can provide extra logic when group is changed ( a new actor is added or removed from the group )
+### Событие OnGroupChanged
+Вы можете добавить дополнительную логику при смене группы( когда актор добавляется в группу или удаляется из грпуппы )
 
  ```csharp
 public class ProcessingCameraFollow : ProcessingBase, ITick, IMustBeWipedOut{
@@ -1167,9 +1172,9 @@ private Group groupPlayers;
 }
 ```
 
-### Updating your processing component
-To update your processing inherit from ITick, ITIckFixed, ITickLate.
-Use group.length to get the container length. Use group.actors[i] - to receive one of the group actors.
+### Обновление обработчиков
+Для добавления обновлений в ваши обработчики наследуйте их от интерфейсов ITick, ITIckFixed, ITickLate.
+Ипользуйте group.length для получения длины контейнера. Используйте group.actors[i] для получения одного из акторов группы.
 
  ```csharp
 public class ProcessingCameraFollow : ProcessingBase, ITick, IMustBeWipedOut{
@@ -1200,4 +1205,3 @@ private Group groupPlayers;
 		
 }
 ```
-		
