@@ -48,7 +48,7 @@ namespace Homebrew
 			actors.Remove(actor);
 			actorsHashSet.Remove(actor.hashCode);
 
-			if (length != cachedAmount && length > 0)
+			if (length != cachedAmount)
 			{
 				OnGroupChanged();
 			}
