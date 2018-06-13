@@ -271,7 +271,7 @@ namespace Homebrew
 				return (T) obj;
 			}
 
-			return  GetComponentInChildren<T>() : null;
+			return  GetComponentInChildren<T>();
 		}
 
 		public T Get<T>(string path = default(string)) where T : Object
