@@ -271,7 +271,7 @@ namespace Homebrew
 				return (T) obj;
 			}
 
-			return  GetComponentInChildren<T>();
+			return typeof(T).IsSubclassOf(typeof(Object)) ? GetComponentInChildren<T>() : null;
 		}
 
 		public T Get<T>(string path = default(string)) where T : Object
