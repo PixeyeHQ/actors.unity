@@ -276,9 +276,9 @@ namespace Homebrew
 
 		public T Get<T>(string path = default(string)) where T : Object
 		{
+			if (path == string.Empty) return GetComponentInChildren<T>();
 			var o = selfTransform.Find(path);
-			if (o == null) return default(T);
-			return path == string.Empty ? GetComponentInChildren<T>() : selfTransform.Find(path).GetComponent<T>();
+			return o == null ? default(T) : o.GetComponent<T>();
 		}
 
 		public object GetObject(Type t)
