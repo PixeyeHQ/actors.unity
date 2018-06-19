@@ -31,17 +31,16 @@ namespace Homebrew
 
 		public static Timer Add(float finishTime, Action action = null)
 		{
-			if (Toolbox.applicationIsQuitting) return null;
-			var timer = ProcessingPools.Default.Spawn<Timer>();
-
+			var timer = new Timer(); 
+				
+			//	ProcessingPools.Default.Spawn<Timer>();
+			timer.isAutoKill = true;
 			timer.finishTime = finishTime;
 			if (action != null)
 			{
 				timer.callBackAction = action;
-
 				timer.Play();
 			}
-
 
 			return timer;
 		}
@@ -77,6 +76,7 @@ namespace Homebrew
 		public static void Kill(Timer obj)
 		{
 			if (obj == null) return;
+			if (Toolbox.applicationIsQuitting) return;
 
 			obj.Stop();
 			Toolbox.Get<ProcessingPools>().Despawn(obj);
@@ -85,7 +85,7 @@ namespace Homebrew
 		public void Stop()
 		{
 			ProcessingUpdate.Default.Remove(this);
-
+			ProcessingTimer.Default.allWorkingTimers.Remove(this);
 			IsRunning = false;
 			timer = 0.0f;
 		}
@@ -111,12 +111,10 @@ namespace Homebrew
 			if (finishTime != 0.0f)
 				this.finishTime = finishTime;
 
-
 			if (timer > 0)
 			{
 				timer = 0.0f;
 				IsRunning = true;
-
 				return this;
 			}
 
@@ -130,34 +128,12 @@ namespace Homebrew
 		public Timer Restart(Action callBackAction, float finishTime = 0.0f)
 		{
 			this.callBackAction = callBackAction;
-
-			if (finishTime != 0.0f)
-				this.finishTime = finishTime;
-
-			if (timer > 0)
-			{
-				timer = 0.0f;
-				IsRunning = true;
-				return this;
-			}
-
-			timer = 0.0f;
-			IsRunning = true;
-			ProcessingTimer.Default.allWorkingTimers.Add(this);
-			ProcessingUpdate.Default.Add(this);
-			return this;
+			return Restart(finishTime);
 		}
 
 
 		public void Tick()
 		{
-			if (timer == 0 && !IsRunning)
-			{
-				ProcessingUpdate.Default.Remove(this);
-				ProcessingTimer.Default.allWorkingTimers.Remove(this);
-			}
-
-			if (!IsRunning) return;
 			Execute();
 		}
 
@@ -180,15 +156,16 @@ namespace Homebrew
 		public void Kill()
 		{
 			if (Toolbox.applicationIsQuitting) return;
+			callBackAction = delegate { };
+		//	ProcessingPools.Default.Despawn(this);
 			Stop();
-			ProcessingPools.Default.Despawn(this);
+			
 		}
 
 
 		public void Dispose()
 		{
 			timer = 0.0f;
-
 			IsRunning = false;
 			isAutoKill = true;
 			id = null;
