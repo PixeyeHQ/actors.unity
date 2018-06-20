@@ -47,6 +47,7 @@ namespace Homebrew
 		public void Add(Actor actor)
 		{
 			listActors.Add(actor);
+			Changed(actor);
 		}
 
 		public void Remove(Actor actor)
