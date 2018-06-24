@@ -1,4 +1,5 @@
 ﻿using Homebrew;
+using UnityEngine;
 
 
 public class ActorPlayer : Actor, ITick
@@ -8,5 +9,14 @@ public class ActorPlayer : Actor, ITick
 	{
 		Add(dataMove);         
 		Add<BehaviorInput>();      
-	}                                  
+	}
+
+	protected override void OnTick()
+	{
+		base.OnTick();
+		if (Input.GetKeyDown(KeyCode.A))
+			ProcessingSceneLoad.To(Scenes.sceneTest);
+		if (Input.GetKeyDown(KeyCode.Q))
+			ProcessingSceneLoad.To(Scenes.sceneTest);
+	}
 }                           

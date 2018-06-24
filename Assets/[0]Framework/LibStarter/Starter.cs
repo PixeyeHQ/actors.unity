@@ -8,6 +8,7 @@ Date:       12/09/2017 16:10
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+
 #if ODIN_INSPECTOR
 using Sirenix.OdinInspector;
 #endif
@@ -22,13 +23,11 @@ namespace Homebrew
 		public static List<MonoCached> objs = new List<MonoCached>();
 
 		[FoldoutGroup("Setup")] public List<Factory> factories;
-		[FoldoutGroup("Setup")] public List<string> ScenesToKeep = new List<string>();
-		[FoldoutGroup("Setup")] public List<string> SceneDependsOn = new List<string>();
-
+		[FoldoutGroup("Setup")] public List<DataScene> ScenesToKeep = new List<DataScene>();
+		[FoldoutGroup("Setup")] public List<DataScene> SceneDependsOn = new List<DataScene>();
 
 		void Awake()
 		{
-		 
 			for (var i = 0; i < factories.Count; i++)
 			{
 				Toolbox.Add(factories[i]);
@@ -44,7 +43,7 @@ namespace Homebrew
 			var poolReg = GetComponent<PoolRegister>();
 			if (poolReg) poolReg.Reigster();
 			Setup();
-		 
+
 			initialized = true;
 			for (int i = 0; i < objs.Count; i++)
 			{
@@ -64,12 +63,5 @@ namespace Homebrew
 		{
 			initialized = false;
 		}
-	}
-
-	[Serializable]
-	public class CacheObj
-	{
-		public string valueKey;
-		public Transform valueObject;
 	}
 }

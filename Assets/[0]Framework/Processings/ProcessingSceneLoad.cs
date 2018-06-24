@@ -13,10 +13,10 @@ using UnityEngine.SceneManagement;
 
 namespace Homebrew
 {
-		public class ProcessingSceneLoad
+	public class ProcessingSceneLoad
 	{
-		private List<string> scenesToKeep = new List<string>();
-		private List<string> sceneDependsOn = new List<string>();
+		private List<Scenes> scenesToKeep = new List<Scenes>();
+		private List<Scenes> sceneDependsOn = new List<Scenes>();
 		private Dictionary<string, Scene> scenes = new Dictionary<string, Scene>();
 		private ScenesList _scenesList;
 
@@ -25,16 +25,24 @@ namespace Homebrew
 		public Action sceneClosing = delegate { };
 
 
-		public string GetFromList(int index)
+		public void Setup(List<DataScene> scenesToKeep, List<DataScene> sceneDependsOn, Starter starter)
 		{
-			if (_scenesList == null) _scenesList = Resources.Load<ScenesList>("ScenesList");
-			return _scenesList.scenesNames[index];
-		}
-
-		public void Setup(List<string> scenesToKeep, List<string> sceneDependsOn, Starter starter)
-		{
-			this.scenesToKeep = scenesToKeep;
-			this.sceneDependsOn = sceneDependsOn;
+		
+			this.scenesToKeep.Clear();
+			this.sceneDependsOn.Clear();
+			
+			for (int i = 0; i < scenesToKeep.Count; i++)
+			{
+				var name = (Scenes) Enum.Parse(typeof(Scenes), scenesToKeep[i].sceneName);
+				this.scenesToKeep.Add(name);
+			}
+			
+			for (int i = 0; i < sceneDependsOn.Count; i++)
+			{
+				var name = (Scenes) Enum.Parse(typeof(Scenes), sceneDependsOn[i].sceneName);
+				this.sceneDependsOn.Add(name);
+			}
+		 
 			Toolbox.Instance.StartCoroutine(_Setup(starter));
 		}
 
@@ -46,17 +54,17 @@ namespace Homebrew
 
 				scenes.Add(scene.name, scene);
 			}
- 
+
 			for (var i = 0; i < sceneDependsOn.Count; i++)
 			{
-				var name = sceneDependsOn[i];
+				var name = sceneDependsOn[i].ToString();
 				if (scenes.ContainsKey(name))
 				{
 					yield return new WaitForSeconds(0.1f);
 					continue;
 				}
 
-				var load = SceneManager.LoadSceneAsync(sceneDependsOn[i], LoadSceneMode.Additive);
+				var load = SceneManager.LoadSceneAsync(sceneDependsOn[i].ToString(), LoadSceneMode.Additive);
 				while (!load.isDone)
 				{
 					yield return 0;
@@ -76,7 +84,7 @@ namespace Homebrew
 			Toolbox.changingScene = true;
 			Toolbox.Instance.ClearSessionData();
 
-			
+
 			var s = SceneManager.GetActiveScene();
 			var sName = s.name;
 
@@ -91,7 +99,8 @@ namespace Homebrew
 			scenes.Remove(sName);
 			foreach (var key in scenes.Keys)
 			{
-				if (scenesToKeep.Contains(key)) continue;
+				var p = (Scenes) Enum.Parse(typeof(Scenes), key);
+				if (scenesToKeep.Contains(p)) continue;
 
 				job = SceneManager.UnloadSceneAsync(scenes[key]);
 
@@ -120,13 +129,70 @@ namespace Homebrew
 			Toolbox.changingScene = false;
 		}
 
+		IEnumerator _Load(int id)
+		{
+			sceneClosing();
+			Toolbox.changingScene = true;
+			Toolbox.Instance.ClearSessionData();
+
+
+			var s = SceneManager.GetActiveScene();
+			var sName = s.name;
+
+			var job = SceneManager.UnloadSceneAsync(s);
+
+			while (!job.isDone)
+			{
+				yield return 0;
+			}
+
+
+			scenes.Remove(sName);
+			foreach (var key in scenes.Keys)
+			{
+				var p = (Scenes) Enum.Parse(typeof(Scenes), key);
+				if (scenesToKeep.Contains(p)) continue;
+
+				job = SceneManager.UnloadSceneAsync(scenes[key]);
+
+				while (!job.isDone)
+				{
+					yield return 0;
+				}
+			}
+
+			job = Resources.UnloadUnusedAssets();
+			while (!job.isDone)
+			{
+				yield return 0;
+			}
+
+			scenes.Clear();
+
+			job = SceneManager.LoadSceneAsync(id, LoadSceneMode.Additive);
+			while (!job.isDone)
+			{
+				yield return 0;
+			}
+
+			SceneManager.SetActiveScene(SceneManager.GetSceneByBuildIndex(id));
+			job.allowSceneActivation = true;
+			Toolbox.changingScene = false;
+		}
+
+		public static void To(Scenes id)
+		{
+			var processing = Toolbox.Get<ProcessingSceneLoad>();
+
+			Toolbox.Instance.StartCoroutine(processing._Load((int) id));
+		}
+
 
 		public static void To(int id)
 		{
 			var processing = Toolbox.Get<ProcessingSceneLoad>();
-			var name = processing.GetFromList(id);
 
-			Toolbox.Instance.StartCoroutine(processing._Load(name));
+			Toolbox.Instance.StartCoroutine(processing._Load(id));
 		}
 
 		public static void To(string name)
