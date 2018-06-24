@@ -22,14 +22,20 @@ namespace Homebrew
 		[MenuItem("Scenes Names/Save Scenes Names %Q")]
 		public static void SaveScenesName()
 		{
-			string filePath = Path.GetFullPath(@"Assets/[0]Framework/LibStarter/Scenes.cs");
-
+			string filePath = Path.GetFullPath(@"Assets/[-]Common/Scenes.cs");
+			var assetPath = AssetDatabase.GenerateUniqueAssetPath("Assets/[-]Common/Scenes.cs");
+		 
+//			string assetPathAndName = AssetDatabase.GenerateUniqueAssetPath("Assets/" + p + "/" + n + ".asset");
+			if (assetPath == String.Empty)
+			{
+				Directory.CreateDirectory(Application.dataPath + "/[-]Common");
+		 
+			}
+			
 			UTF8Encoding encoding = new UTF8Encoding(true, false);
 			Regex regex = new Regex(@"([^/]*/)*([\w\d\-]*)\.unity");
 			EditorBuildSettingsScene[] scenes = EditorBuildSettings.scenes;
 
-	 
-		 
 
 			using (var tc = new StreamWriter(filePath, false, encoding))
 			{
@@ -46,21 +52,21 @@ namespace Homebrew
 				}
 
 				tc.WriteLine("}");
+				tc.Write(
+					"public static class ExtScenes	{	public static void To(this Scenes s)	{	ProcessingSceneLoad.To((int) s);	}}");
 				tc.WriteLine("}");
 			}
-			
+
 			AssetDatabase.SaveAssets();
 			AssetDatabase.Refresh();
-				 
+
 
 			for (int i = 0; i < scenes.Length; i++)
 			{
 				var name = regex.Replace(scenes[i].path, "$2");
-				var v = ScriptableObjectUtility.CreateOrGetAsset<DataScene>("[2]Content/Scenes", "data_"+name);
+				var v = ScriptableObjectUtility.CreateOrGetAsset<DataScene>("[2]Content/Scenes", "data_" + name);
 				EditorUtility.SetDirty(v);
 				v.sceneName = name;
-  
-
 			}
 
 			AssetDatabase.SaveAssets();

@@ -15,8 +15,8 @@ namespace Homebrew
 {
 	public class ProcessingSceneLoad
 	{
-		private List<Scenes> scenesToKeep = new List<Scenes>();
-		private List<Scenes> sceneDependsOn = new List<Scenes>();
+		private List<string> scenesToKeep = new List<string>();
+		private List<string> sceneDependsOn = new List<string>();
 		private Dictionary<string, Scene> scenes = new Dictionary<string, Scene>();
 		private ScenesList _scenesList;
 
@@ -33,14 +33,14 @@ namespace Homebrew
 			
 			for (int i = 0; i < scenesToKeep.Count; i++)
 			{
-				var name = (Scenes) Enum.Parse(typeof(Scenes), scenesToKeep[i].sceneName);
-				this.scenesToKeep.Add(name);
+			 
+				this.scenesToKeep.Add(scenesToKeep[i].sceneName);
 			}
 			
 			for (int i = 0; i < sceneDependsOn.Count; i++)
 			{
-				var name = (Scenes) Enum.Parse(typeof(Scenes), sceneDependsOn[i].sceneName);
-				this.sceneDependsOn.Add(name);
+		 
+				this.sceneDependsOn.Add(sceneDependsOn[i].sceneName);
 			}
 		 
 			Toolbox.Instance.StartCoroutine(_Setup(starter));
@@ -57,14 +57,14 @@ namespace Homebrew
 
 			for (var i = 0; i < sceneDependsOn.Count; i++)
 			{
-				var name = sceneDependsOn[i].ToString();
+				var name = sceneDependsOn[i];
 				if (scenes.ContainsKey(name))
 				{
 					yield return new WaitForSeconds(0.1f);
 					continue;
 				}
 
-				var load = SceneManager.LoadSceneAsync(sceneDependsOn[i].ToString(), LoadSceneMode.Additive);
+				var load = SceneManager.LoadSceneAsync(sceneDependsOn[i], LoadSceneMode.Additive);
 				while (!load.isDone)
 				{
 					yield return 0;
@@ -99,8 +99,8 @@ namespace Homebrew
 			scenes.Remove(sName);
 			foreach (var key in scenes.Keys)
 			{
-				var p = (Scenes) Enum.Parse(typeof(Scenes), key);
-				if (scenesToKeep.Contains(p)) continue;
+			 
+				if (scenesToKeep.Contains(key)) continue;
 
 				job = SceneManager.UnloadSceneAsync(scenes[key]);
 
@@ -150,8 +150,8 @@ namespace Homebrew
 			scenes.Remove(sName);
 			foreach (var key in scenes.Keys)
 			{
-				var p = (Scenes) Enum.Parse(typeof(Scenes), key);
-				if (scenesToKeep.Contains(p)) continue;
+	 
+				if (scenesToKeep.Contains(key)) continue;
 
 				job = SceneManager.UnloadSceneAsync(scenes[key]);
 
@@ -180,14 +180,7 @@ namespace Homebrew
 			Toolbox.changingScene = false;
 		}
 
-		public static void To(Scenes id)
-		{
-			var processing = Toolbox.Get<ProcessingSceneLoad>();
-
-			Toolbox.Instance.StartCoroutine(processing._Load((int) id));
-		}
-
-
+ 
 		public static void To(int id)
 		{
 			var processing = Toolbox.Get<ProcessingSceneLoad>();

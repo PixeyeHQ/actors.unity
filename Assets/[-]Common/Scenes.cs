@@ -8,4 +8,4 @@ sceneTest = 1,
 sceneUI = 2,
 test = 3
 }
-}
+public static class ExtScenes	{	public static void To(this Scenes s)	{	ProcessingSceneLoad.To((int) s);	}}}
