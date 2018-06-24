@@ -9,9 +9,9 @@ namespace Homebrew
 {
 	public interface IAction
 	{
-		int Priority { get; }
-		bool Finish { get; set; }
-		bool IsActing { get; set; }
+		int priority { get; }
+		bool finish { get; set; }
+		bool isActing { get; set; }
 		void Handle();
 		void HandleInterrupt();
 	 
