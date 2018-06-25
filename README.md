@@ -626,23 +626,6 @@ public class MyCustomClass : ITick{
 }
 ```
 
-### <a id="ProcessingSceneLoad"></a>ProcessingSceneLoad
-First, add all scenes you want inside of Build Settings window.
-Than, generate scene names:
-
-[![https://gyazo.com/8507135cf74cf0dd1c4b9db90363a6ad](https://i.gyazo.com/8507135cf74cf0dd1c4b9db90363a6ad.gif)](https://gyazo.com/8507135cf74cf0dd1c4b9db90363a6ad)
-
-Now to change scene use ProcessingSceneLoad.To(int level) .
-
-
-```csharp
-// example of level with ID 2
-int level = 2;
-ProcessingSceneLoad.To(level)
-```
-
-
-
 ## <a id="Object pooling"></a>Object pooling
 Every time you create/destroy object memory is allocated. The more complex object is the bigger allocation will be. It's not a big deal to create the object once or several times, but when you need to spawn hundreds of objects, or you want to generate them rapidly, you want to use object pooling. You can find more info about pooling on [Unity3d site](https://unity3d.com/learn/tutorials/topics/scripting/object-pooling).
 
