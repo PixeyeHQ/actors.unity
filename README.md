@@ -73,7 +73,6 @@ ACTORS is a small framework explicitly built for Unity3d. It is used to ease the
     * <a href="#Signals">Signals</a>
     * <a href="#Interfaces overivew">Interfaces overivew</a>
     * <a href="#Processings">Processings</a>  
-        * <a href="#ProcessingSceneLoad">How to change scene</a>
     * <a href="#Object pooling">Object pooling</a>
     * <a href="#Creating and destroying new objects">Creating and destroying new objects</a>
     * <a href="#Blueprints">Blueprints</a>
