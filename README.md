@@ -137,17 +137,18 @@ choose scenes in code with ease without typing the string name or knowing index.
 
 #### Manual scenes update
 To manually generate data_scenes and refresh scenes.cs click on Scenes Names->Save Scenes Names in options.
+
 [![https://gyazo.com/8507135cf74cf0dd1c4b9db90363a6ad](https://i.gyazo.com/8507135cf74cf0dd1c4b9db90363a6ad.gif)](https://gyazo.com/8507135cf74cf0dd1c4b9db90363a6ad)
 
 #### Navigating around scenes
+
 It's super simple. Use extension method TO after scene name that you get from Scenes.cs
 ```csharp
   Scenes.sceneLevel1.To();
 ```
 
-[![https://gyazo.com/1285f0b0feb8ecb0495ca536aae25606](https://i.gyazo.com/1285f0b0feb8ecb0495ca536aae25606.png)](https://gyazo.com/1285f0b0feb8ecb0495ca536aae25606)
-
-
+[![https://gyazo.com/9153497f3e4f7a45ce1fd7532cb520aa](https://i.gyazo.com/9153497f3e4f7a45ce1fd7532cb520aa.png)](https://gyazo.com/9153497f3e4f7a45ce1fd7532cb520aa)
+ 
 ## <a id="Actors overview"></a>Actors overview
 So from this point we are ready to go and add new gameobjects. 
 
