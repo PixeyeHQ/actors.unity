@@ -2,7 +2,7 @@
 home: true
 heroImage: http://raw.pixeye.games/logo_framework.png
 actionText: Начать →
-actionLink: /guide/
+actionLink: /ru/guide/
 features:
 - title: Небольшой
   details: ACTORS небольшой фреймворк, созданный для Unity3d.
@@ -19,15 +19,3 @@ footer: Developed by @dimmPixeye
 [![license](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](https://github.com/dimmpixeye/Actors-Unity3d-Framework/blob/master/LICENSE)
 
 </div>
-
-<style>
-.shields-io{
-    text-align:center;
-}
-.shields-io a{
-    margin:0 5px;
-}
-.shields-io .icon{
-    display:none;
-}
-</style>

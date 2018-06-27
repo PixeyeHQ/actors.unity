@@ -1,13 +1,13 @@
-# Introduction
+# Введение
 
-ACTORS is a small framework explicitly built for Unity3d. It is used to ease the pain of decoupling data from behaviors without tons of boilerplate code. It relies on Unity3d scripting monobehavior concept but without unnecessary overhead.
+ACTORS небольшой фреймворк, созданный для Unity3d. Он используется для облегчения разделения данных от поведения без тонн кода. Фреймворк полагается на концепт использования monobehavior'а Unity3d, но без ненужных издержек.
 
 ```csharp
 public class ActorPlayer : Actor, ITick
 {
 	[FoldoutGroup("Setup")] public DataMove dataMove;
-
-    protected override void Setup()
+ 
+	protected override void Setup()
 	{
 		Add(dataMove);
 		Add<BehaviorInput>();
@@ -25,17 +25,15 @@ public class DataMove : IData
 	{
 	}
 }
-```
+```	
 ```csharp
 public class BehaviorInput : Behavior, ITick
 {
 	[Bind] private DataMove dataMove;
-
 	public override void OnTick()
 	{
 		dataMove.x = Input.GetAxis("Horizontal");
 		dataMove.y = Input.GetAxis("Vertical");
 	}
-}
-
+}	
 ```

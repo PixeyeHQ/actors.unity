@@ -15,7 +15,8 @@ module.exports = {
     themeConfig: {
         repo: 'dimmpixeye/Actors-Unity3d-Framework',
         editLinks: true,
-        docsDir: '../dist',
+        docsDir: 'docs/src/',
+        lastUpdated: 'Last Updated',
         locales: {
             '/': {
                 selectText: 'Languages',
@@ -42,7 +43,7 @@ module.exports = {
                     link: '/guide/'
                 }],
                 sidebar: {
-                    '/guide/': genSidebarConfig('Руководство')
+                    '/ru/guide/': genSidebarConfig('Руководство')
                 }
             },
         }
@@ -60,7 +61,9 @@ function genSidebarConfig(title) {
         title,
         collapsable: false,
         children: [
-            'index'
+            '',
+            'setup',
+            'basic-stuff'
         ]
     }]
 }
