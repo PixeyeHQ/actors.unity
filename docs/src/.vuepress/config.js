@@ -1,5 +1,6 @@
 module.exports = {
     dest: './dist',
+    base: 'Actors-Unity3d-Framework',
     locales: {
         '/': {
             lang: 'en-US',
