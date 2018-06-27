@@ -1,6 +1,6 @@
 module.exports = {
     dest: './dist',
-    base: '/',
+    base: '/Actors-Unity3d-Framework/',
     locales: {
         '/': {
             lang: 'en-US',
@@ -25,10 +25,8 @@ module.exports = {
                 editLinkText: 'Edit this page on GitHub',
                 algolia: {},
                 nav: [
-                    {
-                        text: 'Guide',
-                        link: '/guide/'
-                    }
+                    { text: 'Guide', link: '/guide/' },
+                    { text: 'Youtube Channel', link: 'https://www.youtube.com/channel/UC0jx4_kcQAHsifu1zH4U1qw' }
                 ],
                 sidebar: {
                     '/guide/': genSidebarConfig('Guide')
@@ -39,10 +37,10 @@ module.exports = {
                 label: 'Русский',
                 editLinkText: 'Редактировать эту страницу на GitHub',
                 algolia: {},
-                nav: [{
-                    text: 'Руководство',
-                    link: '/guide/'
-                }],
+                nav: [
+                    { text: 'Руководство', link: '/guide/' },
+                    { text: 'Youtube Канал', link: 'https://www.youtube.com/channel/UC0jx4_kcQAHsifu1zH4U1qw' }
+                ],
                 sidebar: {
                     '/ru/guide/': genSidebarConfig('Руководство')
                 }

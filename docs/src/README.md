@@ -5,7 +5,7 @@ actionText: Get Started →
 actionLink: /guide/
 features:
 - title: Small
-  details: ACTORS is a small framework explicitly built for Unity3d.
+  details: Actors - is a small framework explicitly built for Unity3d.
 - title: Ease
   details: It is used to ease the pain of decoupling data from behaviors without tons of boilerplate code.
 footer: Developed by @dimmPixeye
