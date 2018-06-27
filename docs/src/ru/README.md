@@ -5,7 +5,7 @@ actionText: Начать →
 actionLink: /ru/guide/
 features:
 - title: Небольшой
-  details: ACTORS небольшой фреймворк, созданный для Unity3d.
+  details: Actors - небольшой фреймворк, созданный для Unity3d.
 - title: Легкий
   details: Используется для облегчения разделения данных от поведения без тонн кода.
 footer: Developed by @dimmPixeye
