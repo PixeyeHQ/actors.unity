@@ -44,8 +44,11 @@ public class SceneGenerator
 	{
 		if (Camera.main == null) return;
 		var camGO = Camera.main.gameObject;
-		var lightGO = GameObject.Find("Directional Light").gameObject;
-		GameObject.DestroyImmediate(lightGO);
+		var light = GameObject.Find("Directional Light");
+		if (light != null)
+		{
+			GameObject.DestroyImmediate(light.gameObject);
+		}
 		GameObject.DestroyImmediate(camGO);
 		new GameObject("[SETUP]");
 		var s = new GameObject("[SCENE]");
