@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if UNITY_EDITOR_WIN
+using System;
 using System.Runtime.InteropServices;
 using UnityEditor;
 
@@ -34,3 +35,4 @@ public class FileModDialogCloser
     EditorApplication.update+=Check;
   }
 }
+#endif
