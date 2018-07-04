@@ -1,0 +1,15 @@
+{
+  "name": "actors-framework-docs",
+  "version": "1.0.0",
+  "description": "Actors documentation",
+  "scripts": {
+    "docs:dev": "./node_modules/.bin/vuepress dev src",
+    "docs:build": "./node_modules/.bin/vuepress build src"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "vuepress": "^0.10.2"
+  }
+}
