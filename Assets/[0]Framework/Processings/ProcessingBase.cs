@@ -16,13 +16,16 @@ namespace Homebrew
 		{
 			ProcessingAttributes.Default.Setup(this);
 			ProcessingSignals.Default.Add(this);
+			ProcessingUpdate.Default.Add(this);
 		}
 
 
 		public void Dispose()
 		{
+ 
 			Toolbox.Get<ProcessingSignals>().Remove(this);
-
+			ProcessingUpdate.Default.Remove(this);
+ 
 			OnDispose();
 		}
 

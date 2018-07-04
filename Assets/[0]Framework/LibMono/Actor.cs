@@ -214,7 +214,8 @@ namespace Homebrew
 		T HandleAdd<T>(T component, bool enabled = true, Type desiredType = null)
 		{
 			var hash = desiredType == null ? typeof(T).GetHashCode() : desiredType.GetHashCode();
-
+			components.Add(hash, component);
+			
 			var behavior = component as Behavior;
 			if (behavior != null)
 			{
@@ -222,15 +223,13 @@ namespace Homebrew
 			}
 			else
 			{
-				tags.Add(hash);
+			 
 
 				var setupable = component as ISetup;
 				if (setupable != null) setupable.Setup(this);
+				tags.Add(hash);
 			}
-
-			components.Add(hash, component);
-
-
+ 
 			return component;
 		}
 
