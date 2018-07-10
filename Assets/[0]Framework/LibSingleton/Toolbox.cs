@@ -117,5 +117,17 @@ namespace Homebrew
 				data.Remove(toWipe[i]);
 			}
 		}
+		
+		public static void DisposeObject(object obj)
+		{
+			if (isQuittingOrChangingScene()) return;
+
+			var disposable = obj as IDisposable;
+			if (disposable != null)
+			{
+				disposable.Dispose();
+			}
+		}
+		
 	}
 }
