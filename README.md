@@ -15,6 +15,9 @@
 
 ACTORS is a small framework explicitly built for Unity3d. It is used to ease the pain of decoupling data from behaviors without tons of boilerplate code. It relies on Unity3d scripting monobehavior concept but without unnecessary overhead.
 
+WARNING : README is outdated.
+
+
 ### Game code overivew :
 ```csharp
  public class ActorPlayer : Actor, ITick
