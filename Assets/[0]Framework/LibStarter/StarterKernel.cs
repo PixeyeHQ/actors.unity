@@ -16,11 +16,11 @@ namespace Homebrew
 {
 	public class StarterKernel : MonoBehaviour
 	{
-		[FoldoutGroup("Setup")] public Blueprints blueprints;
-		[FoldoutGroup("Setup")] public DataGame dataGameSettings;
-		[FoldoutGroup("Setup")] public DataGame dataGameSession;
+		[FoldoutGroup("SetupData")] public Blueprints blueprints;
+		[FoldoutGroup("SetupData")] public DataGame dataGameSettings;
+		[FoldoutGroup("SetupData")] public DataGame dataGameSession;
 
-		[FoldoutGroup("Setup")] public List<Pluggable> pluggables = new List<Pluggable>();
+		[FoldoutGroup("SetupData")] public List<Pluggable> pluggables = new List<Pluggable>();
  
 
 		private void Awake()
@@ -37,7 +37,7 @@ namespace Homebrew
 			ProcessingGoPool.Default = Toolbox.Add<ProcessingGoPool>();
 			ProcessingResources.Default = Toolbox.Add<ProcessingResources>();
 			ProcessingEntities.Default = Toolbox.Add<ProcessingEntities>();
-			ProcessingAttributes.Default = Toolbox.Add<ProcessingAttributes>();
+			ProcessingGroupAttributes.Default = Toolbox.Add<ProcessingGroupAttributes>();
 			ProcessingBehaviorAttributes.Default = Toolbox.Add<ProcessingBehaviorAttributes>();
 			ProcessingScene.Default = Toolbox.Add<ProcessingScene>();
 

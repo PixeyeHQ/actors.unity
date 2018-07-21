@@ -8,12 +8,13 @@ Date:       01/07/2017 14:59
 
 using System;
 using System.Collections.Generic;
- 
 using UnityEngine;
 
 
 namespace Homebrew
 {
+	
+ 
 	public class ProcessingUpdate : IDisposable
 	{
 		private List<ITick> ticks = new List<ITick>();
@@ -38,36 +39,48 @@ namespace Homebrew
 
 		public void Add(object updateble)
 		{
-			if (updateble is ITick)
-				ticks.Add(updateble as ITick);
+			var tickable = updateble as ITick;
+			if (tickable != null)
+			{
+				ticks.Add(tickable);
+				countTicks++;
+			}
 
-			if (updateble is ITickFixed)
-				ticksFixed.Add(updateble as ITickFixed);
+			var tickableFixed = updateble as ITickFixed;
+			if (tickableFixed != null)
+			{
+				ticksFixed.Add(tickableFixed);
+				countTicksFixed++;
+			}
 
-			if (updateble is ITickLate)
-				ticksLate.Add(updateble as ITickLate);
-
-			countTicks = ticks.Count;
-			countTicksFixed = ticksFixed.Count;
-			countTicksLate = ticksLate.Count;
+			var tickableLate = updateble as ITickLate;
+			if (tickableLate != null)
+			{
+				ticksLate.Add(tickableLate);
+				countTicksLate++;
+			}
+ 
+			
 		}
 
 		public void Remove(object updateble)
 		{
 			if (Toolbox.applicationIsQuitting) return;
 
-			if (updateble is ITick)
-				ticks.Remove(updateble as ITick);
+			if (ticks.Remove(updateble as ITick))
+			{
+				countTicks--;
+			}
 
-			if (updateble is ITickFixed)
-				ticksFixed.Remove(updateble as ITickFixed);
+			if (ticksFixed.Remove(updateble as ITickFixed))
+			{
+				countTicksFixed--;
+			}
 
-			if (updateble is ITickLate)
-				ticksLate.Remove(updateble as ITickLate);
-
-			countTicks = ticks.Count;
-			countTicksFixed = ticksFixed.Count;
-			countTicksLate = ticksLate.Count;
+			if (ticksLate.Remove(updateble as ITickLate))
+			{
+				countTicksLate--;
+			}
 		}
 
 		public void Tick()
@@ -103,9 +116,6 @@ namespace Homebrew
 			ticksLate.Clear();
 
 			countTicks = ticks.Count;
-		
 		}
-
-		 
 	}
 }

@@ -17,7 +17,7 @@ namespace Homebrew
 
 		public static readonly Dictionary<Type, CachedType> cached = new Dictionary<Type, CachedType>();
 
-		public void Setup(Behavior b, Actor a)
+		public void Setup(ActorBehavior b, IEntity a)
 		{
 			var type = b.GetType();
 			CachedType o;
@@ -44,7 +44,7 @@ namespace Homebrew
 						{
 							case 0:
 
-								myFieldInfo.SetValue(b, a.GetObject(fieldType));
+								myFieldInfo.SetValue(b, a.Get(fieldType));
 								o.cachedBindFields.Add(myFieldInfo);
 								break;
 
@@ -54,7 +54,8 @@ namespace Homebrew
 								break;
 
 							case 2:
-								myFieldInfo.SetValue(b, a.GetComponentInChildren(fieldType));
+								var actor = a as Actor;
+								myFieldInfo.SetValue(b, actor != null ? actor.GetComponentInChildren(fieldType) : a.GetTransform().GetComponentInChildren(fieldType));
 								o.cachedFromObjFields.Add(myFieldInfo);
 								break;
 
@@ -85,19 +86,19 @@ namespace Homebrew
 			public readonly List<FieldInfo> cachedFromObjFields = new List<FieldInfo>();
 			public readonly List<FieldInfo> cachedFromBlueprintFields = new List<FieldInfo>();
 
-			public void Bind(Behavior behavior, Actor a)
+			public void Bind(ActorBehavior behavior, IEntity a)
 			{
 				for (var i = 0; i < cachedBindFields.Count; i++)
 				{
 					var myFieldInfo = cachedBindFields[i];
 					var fieldType = myFieldInfo.FieldType;
 
-					myFieldInfo.SetValue(behavior, a.GetObject(fieldType));
+					myFieldInfo.SetValue(behavior, a.Get(fieldType));
 				}
 			}
 
 
-			public void GetFromToolbox(Behavior behavior)
+			public void GetFromToolbox(ActorBehavior behavior)
 			{
 				for (var i = 0; i < cachedToolboxFields.Count; i++)
 				{
@@ -107,17 +108,19 @@ namespace Homebrew
 				}
 			}
 
-			public void GetFromObject(Behavior behavior, Actor a)
+			public void GetFromObject(ActorBehavior behavior, IEntity a)
 			{
 				for (var i = 0; i < cachedFromObjFields.Count; i++)
 				{
 					var myFieldInfo = cachedFromObjFields[i];
 					var fieldType = myFieldInfo.FieldType;
-					myFieldInfo.SetValue(behavior, a.GetComponentInChildren(fieldType));
+					var actor = a as Actor;
+
+					myFieldInfo.SetValue(behavior, actor!=null ? actor.GetComponentInChildren(fieldType) : a.GetTransform().GetComponentInChildren(fieldType));
 				}
 			}
 
-			public void GetFromBlueprint(Behavior behavior, Actor a)
+			public void GetFromBlueprint(ActorBehavior behavior, IEntity a)
 			{
 				for (var i = 0; i < cachedFromBlueprintFields.Count; i++)
 				{

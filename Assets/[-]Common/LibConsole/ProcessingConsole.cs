@@ -163,7 +163,7 @@ namespace Homebrew
 		{
 			if (console == null)
 			{
-				console = this.Populate<ComponentConsole>(Pool.None, "prefab_console", "[UI]/Screen");
+				console = this.Populate<ComponentConsole>(Pool.None, "prefab_console");
 				console.name = "ui_console";
 				console.gameObject.SetActive(false);
 			}

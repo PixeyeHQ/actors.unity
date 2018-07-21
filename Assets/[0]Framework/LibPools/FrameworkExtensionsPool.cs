@@ -55,7 +55,7 @@ namespace Homebrew
 			WorldParenters parenters = WorldParenters.Level) where T : class
 		{
 			var tr = o.Populate(poolID, prefabID, startPosition, startRotation, parent, parenters);
-			return tr.GetComponent<T>();
+			return tr.GetComponentInChildren<T>();
 		}
 
 		public static T Populate<T>(this object o, Pool poolID, GameObject prefabID, string parentID,

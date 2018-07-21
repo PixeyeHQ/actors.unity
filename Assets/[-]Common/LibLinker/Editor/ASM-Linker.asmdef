@@ -1,0 +1,12 @@
+{
+    "name": "ASM-Linker",
+    "references": [
+        "ASM-Common"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false
+}

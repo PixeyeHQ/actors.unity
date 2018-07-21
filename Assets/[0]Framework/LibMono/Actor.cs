@@ -6,83 +6,52 @@ Date:       12/09/2017 19:06
 ================================================================*/
 
 using System;
-using System.Collections;
 using UnityEngine;
 using System.Collections.Generic;
-using Object = UnityEngine.Object;
+
 
 namespace Homebrew
 {
- 
-	public abstract class Actor : MonoCached
+	/// <summary>
+	/// Base class for any game logic / complex entities 
+	/// </summary>
+	public abstract class Actor : MonoCached, IEntity
 	{
 		[HideInInspector] public int hashCode;
 		[HideInInspector] public ProcessingTags tags;
 
 
-		private List<Behavior> behaviours = new List<Behavior>(EngineSettings.ActorElementsCount);
-
-		private List<ITick> ticks = new List<ITick>();
-		private List<ITickLate> ticksLate = new List<ITickLate>();
-		private List<ITickFixed> ticksFixed = new List<ITickFixed>();
-		private Queue<Behavior> behaviorsToAdd = new Queue<Behavior>(8);
 		private Dictionary<int, object> components = new Dictionary<int, object>(EngineSettings.ActorElementsCount);
-
-		private int countTicks;
-		private int countTicksLate;
-		private int countTicksFixed;
-
+		private List<ActorBehavior> behaviours = new List<ActorBehavior>(EngineSettings.ActorElementsCount);
 		private int countBehaviors;
 
 
-		protected abstract void Setup();
+		public Time GetTime => time;
+		public ProcessingSignals GetSignals => signals;
+		public ProcessingTags GetTags => tags;
 
+
+		/// <summary>
+		/// A method to add all Data Components to Actor's container.
+		/// </summary>
+		protected abstract void SetupData();
+
+		/// <summary>
+		/// A method to add all Behavior Components to Actor's container.
+		/// This method invokes with one frame delay after SetupData method.
+		/// </summary>
+		protected abstract void SetupBehaviors();
+
+		
 		protected override void OnAwake()
 		{
 			hashCode = GetHashCode();
-			tags.SetActor(this);
+
+			tags.Initialize(HandleTagsChanged);
 			tags.Add(hashCode);
-			Setup();
-			StartCoroutine(_AddBehavior());
-		}
 
-		IEnumerator _AddBehavior()
-		{
-			yield return 0;
-			var amount = behaviorsToAdd.Count;
-			for (int i = 0; i < amount; i++)
-			{
-				var behavior = behaviorsToAdd.Dequeue();
-				behavior.SetActor(this);
-				behavior.Awake();
-
-
-				var tick = behavior as ITick;
-				var tickFixed = behavior as ITickFixed;
-				var tickLate = behavior as ITickLate;
-
-				if (tick != null)
-				{
-					ticks.Add(tick);
-					countTicks++;
-				}
-
-				if (tickFixed != null)
-				{
-					ticksFixed.Add(tickFixed);
-					countTicksFixed++;
-				}
-
-				if (tickLate != null)
-				{
-					ticksLate.Add(tickLate);
-					countTicksLate++;
-				}
-
-
-				behaviours.Add(behavior);
-				countBehaviors++;
-			}
+			SetupData();
+			Timer.Add(Time.DeltaTime, SetupBehaviors);
 		}
 
 
@@ -97,7 +66,6 @@ namespace Homebrew
 		public void HandleTagsChanged()
 		{
 			if (Toolbox.isQuittingOrChangingScene()) return;
-
 			ProcessingEntities.Default.Changed(this);
 			for (var i = 0; i < countBehaviors; i++)
 			{
@@ -105,40 +73,12 @@ namespace Homebrew
 			}
 		}
 
-		public override void Tick()
-		{
-			for (var i = 0; i < countTicks; i++)
-			{
-				ticks[i].Tick();
-			}
-
-			OnTick();
-		}
-
-		public void TickLate()
-		{
-			for (var i = 0; i < countTicksLate; i++)
-			{
-				ticksLate[i].TickLate();
-			}
-		}
-
-		public void TickFixed()
-		{
-			for (var i = 0; i < countTicksFixed; i++)
-			{
-				ticksFixed[i].TickFixed();
-			}
-		}
-
-		protected virtual void OnTick()
-		{
-		}
-
 		#endregion
 
 		#region PROCESSING ACTIVATION
 
+	 
+		
 		public override void OnEnable()
 		{
 			if (state.HasState(EntityState.OnHold)) return;
@@ -155,6 +95,9 @@ namespace Homebrew
 			{
 				behaviours[i].Enable(true);
 			}
+			
+			HandleEnable();
+			
 		}
 
 		public override void OnDisable()
@@ -166,54 +109,39 @@ namespace Homebrew
 
 			signals.Remove(this);
 
-			ProcessingEntities.Default.Remove(this);
 			ProcessingUpdate.Default.Remove(this);
+			ProcessingEntities.Default.Remove(this);
+
 
 			for (var i = 0; i < countBehaviors; i++)
 			{
 				behaviours[i].Enable(false);
 			}
-		}
-
-
-		protected override void OnSpawn()
-		{
-			for (var i = 0; i < countBehaviors; i++)
-			{
-				behaviours[i].Spawn(true);
-			}
-		}
-
-		protected override void OnDespawn()
-		{
-			for (var i = 0; i < countBehaviors; i++)
-			{
-				behaviours[i].Spawn(false);
-			}
+			
+			HandleDisable();
+			 
 		}
 
 		#endregion
 
 		#region PROCESSING ADD / REMOVE
 
-		public void ForceAdd()
+		void AddBehavior(ActorBehavior behavior, bool enabled = true)
 		{
-			StartCoroutine(_AddBehavior());
-		}
-
-		void AddBehavior(Behavior behavior, bool enabled = true)
-		{
-			behaviorsToAdd.Enqueue(behavior);
-			behavior.Activate(enabled);
+			behavior.Awake(this);
+			behavior.Enable(enabled);
+			behaviours.Add(behavior);
+			countBehaviors++;
 		}
 
 
 		T HandleAdd<T>(T component, bool enabled = true, Type desiredType = null)
 		{
 			var hash = desiredType == null ? typeof(T).GetHashCode() : desiredType.GetHashCode();
+
 			components.Add(hash, component);
 
-			var behavior = component as Behavior;
+			var behavior = component as ActorBehavior;
 			if (behavior != null)
 			{
 				AddBehavior(behavior, enabled);
@@ -239,62 +167,39 @@ namespace Homebrew
 			return HandleAdd(component, enabled, desiredType);
 		}
 
-		public T AddForce<T>(bool enabled = true, Type desiredType = null) where T : new()
-		{
-			var component = new T();
-			var o = HandleAdd(component, enabled, desiredType);
 
-			return o;
-		}
-
-		public void RemoveData<T>() where T : IData
+		public void Remove<T>()
 		{
 			var hash = typeof(T).GetHashCode();
 			object obj;
+
 			if (components.TryGetValue(hash, out obj))
 			{
+				components.Remove(hash);
 				var data = obj as IData;
-				data.Dispose();
-				components.Remove(hash);
-				tags.Remove(hash);
-			}
-		}
 
-		public void RemoveBehavior<T>() where T : Behavior
-		{
-			var hash = typeof(T).GetHashCode();
-			object obj;
-			if (components.TryGetValue(hash, out obj))
-			{
-				countBehaviors--;
-				var b = obj as Behavior;
-				components.Remove(hash);
-				behaviours.Remove(b);
 
-				signals.Remove(b);
-
-				var tickable = b as ITick;
-				if (tickable != null)
+				if (data != null)
 				{
-					ticks.Remove(tickable);
-					countTicks--;
+					data.Dispose();
+					tags.Remove(hash);
 				}
-
-				var tickableFixed = b as ITickFixed;
-				if (tickableFixed != null)
+				else
 				{
-					ticksFixed.Remove(tickableFixed);
-					countTicksFixed--;
-				}
+					var behavior = obj as ActorBehavior;
+					if (behavior != null)
+					{
+						countBehaviors--;
 
-				var tickableLate = b as ITickLate;
-				if (tickableLate != null)
-				{
-					ticksLate.Remove(tickableLate);
-					countTicksLate--;
-				}
 
-				b.Dispose();
+						ProcessingUpdate
+							.Default.Remove(behavior);
+
+						signals.Remove(behavior);
+						behaviours.Remove(behavior);
+						behavior.Dispose();
+					}
+				}
 			}
 		}
 
@@ -302,13 +207,13 @@ namespace Homebrew
 
 		#region PROCESSING GET
 
-		public T Get<T>(int index = 0) where T : class
+		public T Get<T>(int hash)
 		{
-			return components[index] as T;
+			return (T) components[hash];
 		}
 
 
-		public T Get<T>() where T : class
+		public T Get<T>()
 		{
 			object obj;
 			if (components.TryGetValue(typeof(T).GetHashCode(), out obj))
@@ -316,21 +221,20 @@ namespace Homebrew
 				return (T) obj;
 			}
 
-			return typeof(T).IsSubclassOf(typeof(Object)) ? GetComponentInChildren<T>() : null;
+			return typeof(T).IsSubclassOf(typeof(UnityEngine.Object)) ? GetComponentInChildren<T>() : default(T);
 		}
 
-		public T Get<T>(string path = default(string)) where T : Object
+		public T Get<T>(string path)
 		{
 			if (path == string.Empty) return GetComponentInChildren<T>();
 			var o = selfTransform.Find(path);
 			return o == null ? default(T) : o.GetComponent<T>();
 		}
 
-		public object GetObject(Type t)
+		public object Get(Type t)
 		{
 			object obj;
 			components.TryGetValue(t.GetHashCode(), out obj);
-
 
 			if (obj == null)
 				if (t == typeof(Component))
@@ -343,9 +247,19 @@ namespace Homebrew
 
 		#region PROCESSING SEARCH
 
+		public bool HasState(EntityState possibleState)
+		{
+			return state.HasState(possibleState);
+		}
+
 		public bool Contains<T>()
 		{
 			return components.ContainsKey(typeof(T).GetHashCode());
+		}
+
+		public bool Contains(int hash)
+		{
+			return components.ContainsKey(hash);
 		}
 
 		#endregion
@@ -354,17 +268,14 @@ namespace Homebrew
 
 		private void OnDestroy()
 		{
-			countTicks = 0;
-			countTicksFixed = 0;
-			countTicksLate = 0;
-			countBehaviors = 0;
-
 			foreach (var value in components.Values)
 			{
 				var disposable = value as IDisposable;
 
-				if (disposable == null) continue;
-				disposable.Dispose();
+				if (disposable != null)
+				{
+					disposable.Dispose();
+				}
 			}
 
 			if (!Toolbox.isQuittingOrChangingScene())
@@ -373,12 +284,16 @@ namespace Homebrew
 				ProcessingUpdate.Default.Remove(this);
 			}
 
-			ticks.Clear();
-			ticksFixed.Clear();
-			ticksLate.Clear();
 
 			behaviours.Clear();
 			components.Clear();
+
+			countBehaviors = 0;
+		}
+
+		public void HandleDestroy()
+		{
+			HandleDestroyGO();
 		}
 
 		#endregion

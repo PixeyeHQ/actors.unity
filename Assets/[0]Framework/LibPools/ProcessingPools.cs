@@ -71,6 +71,7 @@ namespace Homebrew
 			poolsComponents.Clear();
 		}
 	}
+
 	public class ProcessingFastPool : IDisposable
 	{
 		Stack<IComponent> pool = new Stack<IComponent>();
@@ -88,7 +89,9 @@ namespace Homebrew
 
 		public void Despawn<T>(T component) where T : IComponent
 		{
-			component.Dispose();
+			var disposable = component as IDisposable;
+			if (disposable != null) disposable.Dispose();
+			//component.Dispose();
 			AddToPool(component);
 		}
 
@@ -97,7 +100,10 @@ namespace Homebrew
 		{
 			foreach (var poolValue in pool)
 			{
-				poolValue.Dispose();
+				var disposable = poolValue as IDisposable;
+				if (disposable != null) disposable.Dispose();
+
+				//poolValue.Dispose();
 			}
 		}
 

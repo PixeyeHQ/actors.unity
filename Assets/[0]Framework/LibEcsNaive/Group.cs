@@ -57,8 +57,8 @@ namespace Homebrew
 
 		void TryAddToGroup(Actor actor)
 		{
-			if (actor.tags.ContainAny(mask.groupFilterExclude)) return;
-			if (!actor.tags.ContainAll(mask.groupFilter)) return;
+			if (actor.GetTags.ContainAny(mask.groupFilterExclude)) return;
+			if (!actor.GetTags.ContainAll(mask.groupFilter)) return;
 
 			actors.Add(actor);
 			actorsHashSet.Add(actor.hashCode);
@@ -68,7 +68,7 @@ namespace Homebrew
 
 		void TryRemoveFromGroup(Actor actor)
 		{
-			if (!actor.tags.ContainAll(mask.groupFilter) || actor.tags.ContainAny(mask.groupFilterExclude))
+			if (!actor.GetTags.ContainAll(mask.groupFilter) || actor.GetTags.ContainAny(mask.groupFilterExclude))
 			{
 				actors.Remove(actor);
 				actorsHashSet.Remove(actor.hashCode);

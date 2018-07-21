@@ -58,7 +58,7 @@ namespace Homebrew
 
 		private void Start()
 		{
-			transform.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, 0);
+			transform.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -5);
 			AddMessage(
 				"Welcome back, commander\nType <color=#00cc66>?</color> or <color=#00cc66>Help</color> to get list of commands");
 		}

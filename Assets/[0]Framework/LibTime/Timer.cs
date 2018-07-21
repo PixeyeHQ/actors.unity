@@ -29,6 +29,12 @@ namespace Homebrew
 			return ProcessingTimer.Default.allWorkingTimers.FindAll(t => t.id != null && t.id == possibleHolder);
 		}
 
+		/// <summary>
+		/// Create a new timer and pass it to the processor. Timers a great for adding delayed actions.
+		/// </summary>
+		/// <param name="finishTime"></param>
+		/// <param name="action"></param>
+		/// <returns></returns>
 		public static Timer Add(float finishTime, Action action = null)
 		{
 			var timer = new Timer(); 

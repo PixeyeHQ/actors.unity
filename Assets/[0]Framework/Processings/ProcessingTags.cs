@@ -6,22 +6,23 @@ Date:       19/12/2017 19:44
 ================================================================*/
 
 
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 
 namespace Homebrew
 {
-	[System.Serializable]
+	[Serializable]
 	public class ProcessingTags : IComponent
 	{
 		private Dictionary<int, int> tags = new Dictionary<int, int>();
+		private Action actionChanged;
 
-		private Actor actor;
 
-		public void SetActor(Actor actor)
+		public void Initialize(Action actionChanged)
 		{
-			this.actor = actor;
+			this.actionChanged = actionChanged;
 		}
 
 
@@ -63,7 +64,6 @@ namespace Homebrew
 
 					if (val == 0)
 					{
-				 
 						tags.Remove(index);
 						tagsChanged = true;
 					}
@@ -72,7 +72,7 @@ namespace Homebrew
 			}
 
 			if (tagsChanged == false) return;
-			actor.HandleTagsChanged();
+			actionChanged();
 		}
 
 		public void Remove(int id)
@@ -84,9 +84,8 @@ namespace Homebrew
 
 				if (val == 0)
 				{
-				 
 					tags.Remove(id);
-					actor.HandleTagsChanged();
+					actionChanged();
 				}
 				else tags[id] = val;
 			}
@@ -96,8 +95,8 @@ namespace Homebrew
 		{
 			if (tags.ContainsKey(id))
 				tags.Remove(id);
-	 
-			actor.HandleTagsChanged();
+
+			actionChanged();
 		}
 
 		public void Add(params int[] ids)
@@ -111,13 +110,13 @@ namespace Homebrew
 					continue;
 				}
 
- 
+
 				tags.Add(index, 1);
 				c = true;
 			}
 
 			if (!c) return;
-			actor.HandleTagsChanged();
+			actionChanged();
 		}
 
 		public void Add(int id)
@@ -128,16 +127,15 @@ namespace Homebrew
 
 				return;
 			}
- 
+
 			tags.Add(id, 1);
-			actor.HandleTagsChanged();
+			actionChanged();
 		}
 
 		public void Dispose()
 		{
- 
 			tags.Clear();
-			actor = null;
+			actionChanged = null;
 		}
 	}
 }

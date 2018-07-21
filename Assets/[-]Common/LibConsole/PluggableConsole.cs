@@ -16,7 +16,7 @@ namespace Homebrew
 	[CreateAssetMenu(menuName = "Plugables/Console", fileName = "Console")]
 	public class PluggableConsole : Pluggable
 	{
-		[FoldoutGroup("Setup")] public CommandsConsole commandsDebug;
+		[FoldoutGroup("SetupData")] public CommandsConsole commandsDebug;
 		public override void Plug()
 		{
 			Toolbox.Add<ProcessingConsole>().Setup(commandsDebug);	 

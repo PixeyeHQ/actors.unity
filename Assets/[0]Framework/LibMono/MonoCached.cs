@@ -37,13 +37,7 @@ namespace Homebrew
 
 		#endregion
 
-		#region UPDATES
-
-		public virtual void Tick()
-		{
-		}
-
-		#endregion
+	 
 
 		# region EXTENDED MONOBEHAVIOR
 
@@ -89,14 +83,27 @@ namespace Homebrew
 			state &= ~EntityState.Released;
 			signals.Add(this);
 			ProcessingUpdate.Default.Add(this);
+			HandleEnable();
 		}
 
 		public virtual void OnDisable()
 		{
+			if (Toolbox.isQuittingOrChangingScene()) return;
 			signals.Remove(this);
 			ProcessingUpdate.Default.Remove(this);
+			HandleDisable();
 		}
 
+		protected virtual void HandleEnable()
+		{
+			
+		}
+
+		protected virtual void HandleDisable()
+		{
+			
+		}
+		
 		protected virtual void OnSpawn()
 		{
 		}
@@ -127,7 +134,6 @@ namespace Homebrew
 			if (state.HasState(EntityState.Released)) return;
 
 			state |= EntityState.Released;
-
 			state &= ~EntityState.Enabled;
 			state &= ~EntityState.OnHold;
 

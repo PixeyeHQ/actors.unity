@@ -22,9 +22,9 @@ namespace Homebrew
 		public static bool initialized;
 		public static List<MonoCached> objs = new List<MonoCached>();
 
-		[FoldoutGroup("Setup")] public List<Factory> factories;
-		[FoldoutGroup("Setup")] public List<DataScene> ScenesToKeep = new List<DataScene>();
-		[FoldoutGroup("Setup")] public List<DataScene> SceneDependsOn = new List<DataScene>();
+		[FoldoutGroup("SetupData")] public List<Factory> factories;
+		[FoldoutGroup("SetupData")] public List<DataScene> ScenesToKeep = new List<DataScene>();
+		[FoldoutGroup("SetupData")] public List<DataScene> SceneDependsOn = new List<DataScene>();
 
 		void Awake()
 		{

@@ -17,6 +17,12 @@ namespace Homebrew
 	{
 		private static System.Random _r = new System.Random();
 
+	 
+		
+		public static Transform GetTransform(this IEntity e)
+		{
+			return e.Get<DataGameObject>().selfTransform;
+		}
 
 		#region OLD
 
@@ -299,7 +305,6 @@ namespace Homebrew
 			return v;
 		}
 
-  
 
 		public static T[] Increase<T>(this T[] values, int increment)
 		{
@@ -323,27 +328,34 @@ namespace Homebrew
 			array[length] = val;
 			return array;
 		}
+
 		public static T[] Add<T>(this T[] array, T val)
 		{
 			var length = array.Length;
- 
+
 			array = array.Increase(1);
 			array[length] = val;
 			return array;
 		}
 
 
-		public static T[] Remove<T>(this T[] source, object obj)
+		public static T[] Remove<T>(this T[] source, object obj, ref int amount)
 		{
+			var index = Array.FindIndex(source, o => o != null && o.Equals(obj));
+			if (index == -1)
+			{
+				return source;
+			}
+
 			T[] dest = new T[source.Length - 1];
-			var index = Array.FindIndex(source, o => o.Equals(obj));
+
 
 			if (index > 0)
 				Array.Copy(source, 0, dest, 0, index);
 
 			if (index < source.Length - 1)
 				Array.Copy(source, index + 1, dest, index, source.Length - index - 1);
-
+			amount--;
 			return dest;
 		}
 
@@ -359,17 +371,11 @@ namespace Homebrew
 			return dest;
 		}
 
- 
 		#endregion
 
- 
-
-	 
- 
 
 		#region TRANSFORMS
 
-	 
 		public static Vector3 AppendZ(this Transform obj, float zVal = 0.0f)
 		{
 			return new Vector3(obj.position.x, obj.position.y, zVal);

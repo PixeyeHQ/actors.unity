@@ -24,8 +24,8 @@ namespace Homebrew
 //		public bool HandleAddToGroup(Actor actor)
 //		{
 //			if (!actorsHashSet.Contains(actor))
-//				if (actor.tags.DontHave(groupFilterExclude))
-//					if (actor.tags.Contain(groupFilter))
+//				if (entity.GetTags.DontHave(groupFilterExclude))
+//					if (entity.GetTags.Contain(groupFilter))
 //					{
 //						actors.Add(actor);
 //						actorsHashSet.Add(actor);
@@ -41,10 +41,10 @@ namespace Homebrew
 //		{
 //			if (actorsHashSet.Contains(actor) == false) return;
 //		
-//			if (actor.tags.Contain(Tag.GroupEnemy))
+//			if (entity.GetTags.Contain(Tag.GroupEnemy))
 //           
-//				Debug.Log(actor.tags.Contain(groupFilter)+"_"+actor.tags.CheckExclude(groupFilterExclude));
-//			if (!actor.tags.Contain(groupFilter) || actor.tags.CheckExclude(groupFilterExclude))
+//				Debug.Log(entity.GetTags.Contain(groupFilter)+"_"+entity.GetTags.CheckExclude(groupFilterExclude));
+//			if (!entity.GetTags.Contain(groupFilter) || entity.GetTags.CheckExclude(groupFilterExclude))
 //			{
 //				actors.Remove(actor);
 //				actorsHashSet.Remove(actor);

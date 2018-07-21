@@ -11,4 +11,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e02230d3367c4765a718894307b6b018, type: 3}
   m_Name: Console
   m_EditorClassIdentifier: 
-  commandsDebug: {fileID: 11400000, guid: 3196a925d04b22c40b7382fa82d29958, type: 2}
+  commandsDebug: {fileID: 11400000, guid: c90ce9e672c4a7c4bb062422d85cbe60, type: 2}

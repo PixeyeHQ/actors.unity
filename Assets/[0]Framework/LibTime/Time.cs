@@ -28,6 +28,8 @@ namespace Homebrew
 
 		public static float DeltaTimeFixed => Default._deltaTimeFixed * Default.timeScale;
 
+		public float timeScaleCached;
+
 
 		public Time()
 		{

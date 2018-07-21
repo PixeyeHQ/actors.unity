@@ -3,9 +3,7 @@ namespace Homebrew
 {
 public enum Scenes
 {
-sceneKernel = 0,
-sceneTest = 1,
-sceneUI = 2,
-test = 3
+sceneGame = 0,
+sceneKernel = 1
 }
 public static class ExtScenes	{	public static void To(this Scenes s)	{	ProcessingSceneLoad.To((int) s);	}}}
