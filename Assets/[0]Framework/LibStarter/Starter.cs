@@ -53,11 +53,18 @@ namespace Homebrew
 
 
 			objs.Clear();
+
+			Timer.Add(Time.DeltaTime, PostSetup);
 		}
 
 		protected virtual void Setup()
 		{
 		}
+
+		protected virtual void PostSetup()
+		{
+		}
+
 
 		private void OnDestroy()
 		{
