@@ -84,7 +84,7 @@ namespace Homebrew
 			{
 				if (state.HasState(EntityState.Enabled)) return;
 				state |= EntityState.Enabled;
-				actor.GetSignals.Add(this);
+				actor.signals.Add(this);
 				ProcessingUpdate.Default.Add(this);
 				OnEnable();
 			}
@@ -92,7 +92,7 @@ namespace Homebrew
 			{
 				if (!state.HasState(EntityState.Enabled)) return;
 				state &= ~EntityState.Enabled;
-				actor.GetSignals.Remove(this);
+				actor.signals.Remove(this);
 				ProcessingUpdate.Default.Remove(this);
 				OnDisable();
 			}
@@ -103,6 +103,7 @@ namespace Homebrew
 		{
 			if (Toolbox.isQuittingOrChangingScene()) return;
 			ProcessingUpdate.Default.Remove(this);
+			actor.signals.Remove(this);
 			OnDispose();
 			actor = null;
 		}
