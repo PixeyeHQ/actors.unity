@@ -8,13 +8,12 @@ Date:       01/07/2017 14:59
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 
 namespace Homebrew
 {
-	
- 
 	public class ProcessingUpdate : IDisposable
 	{
 		private List<ITick> ticks = new List<ITick>();
@@ -59,8 +58,6 @@ namespace Homebrew
 				ticksLate.Add(tickableLate);
 				countTicksLate++;
 			}
- 
-			
 		}
 
 		public void Remove(object updateble)
@@ -111,7 +108,10 @@ namespace Homebrew
 			countTicks = 0;
 			countTicksFixed = 0;
 			countTicksLate = 0;
+
 			ticks.RemoveAll(t => t is IKernel == false);
+
+
 			ticksFixed.Clear();
 			ticksLate.Clear();
 

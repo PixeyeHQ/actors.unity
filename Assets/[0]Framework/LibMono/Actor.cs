@@ -22,8 +22,8 @@ namespace Homebrew
 
 
 		private Dictionary<int, object> components = new Dictionary<int, object>(EngineSettings.ActorElementsCount);
-		private List<ActorBehavior> behaviours = new List<ActorBehavior>(EngineSettings.ActorElementsCount);
-		private int countBehaviors;
+		private List<IRecieveTags> componentsTagRecievers = new List<IRecieveTags>(EngineSettings.ActorElementsCount);
+		private List<IEnable> componentsEnableRecieves = new List<IEnable>();
 
 
 		public Time GetTime => time;
@@ -42,7 +42,7 @@ namespace Homebrew
 		/// </summary>
 		protected abstract void SetupBehaviors();
 
-		
+
 		protected override void OnAwake()
 		{
 			hashCode = GetHashCode();
@@ -67,9 +67,11 @@ namespace Homebrew
 		{
 			if (Toolbox.isQuittingOrChangingScene()) return;
 			ProcessingEntities.Default.Changed(this);
-			for (var i = 0; i < countBehaviors; i++)
+
+			var amount = componentsTagRecievers.Count;
+			for (int i = 0; i < amount; i++)
 			{
-				behaviours[i].OnTagsChanged();
+				componentsTagRecievers[i].OnTagsChanged();
 			}
 		}
 
@@ -77,8 +79,6 @@ namespace Homebrew
 
 		#region PROCESSING ACTIVATION
 
-	 
-		
 		public override void OnEnable()
 		{
 			if (state.HasState(EntityState.OnHold)) return;
@@ -91,13 +91,14 @@ namespace Homebrew
 			ProcessingUpdate.Default.Add(this);
 			ProcessingEntities.Default.Add(this);
 
-			for (var i = 0; i < countBehaviors; i++)
+			var count = componentsEnableRecieves.Count;
+
+			for (int i = 0; i < count; i++)
 			{
-				behaviours[i].Enable(true);
+				componentsEnableRecieves[i].Enable(true);
 			}
-			
+
 			HandleEnable();
-			
 		}
 
 		public override void OnDisable()
@@ -112,14 +113,14 @@ namespace Homebrew
 			ProcessingUpdate.Default.Remove(this);
 			ProcessingEntities.Default.Remove(this);
 
+			var count = componentsEnableRecieves.Count;
 
-			for (var i = 0; i < countBehaviors; i++)
+			for (int i = 0; i < count; i++)
 			{
-				behaviours[i].Enable(false);
+				componentsEnableRecieves[i].Enable(false);
 			}
-			
+
 			HandleDisable();
-			 
 		}
 
 		#endregion
@@ -130,8 +131,6 @@ namespace Homebrew
 		{
 			behavior.Awake(this);
 			behavior.Enable(enabled);
-			behaviours.Add(behavior);
-			countBehaviors++;
 		}
 
 
@@ -142,16 +141,19 @@ namespace Homebrew
 			components.Add(hash, component);
 
 			var behavior = component as ActorBehavior;
-			if (behavior != null)
-			{
-				AddBehavior(behavior, enabled);
-			}
+			if (behavior != null) AddBehavior(behavior, enabled);
 			else
 			{
 				var setupable = component as ISetup;
 				if (setupable != null) setupable.Setup(this);
 				tags.Add(hash);
 			}
+
+			var e =   component as IEnable;
+			if (e != null) componentsEnableRecieves.Add(e);
+			var t =   component as IRecieveTags;
+			if (t != null) componentsTagRecievers.Add(t);
+
 
 			return component;
 		}
@@ -176,30 +178,12 @@ namespace Homebrew
 			if (components.TryGetValue(hash, out obj))
 			{
 				components.Remove(hash);
-				var data = obj as IData;
+				var disposable = obj as IDisposable;
+				disposable.Dispose();
+				tags.Remove(hash);
 
-
-				if (data != null)
-				{
-					data.Dispose();
-					tags.Remove(hash);
-				}
-				else
-				{
-					var behavior = obj as ActorBehavior;
-					if (behavior != null)
-					{
-						countBehaviors--;
-
-
-						ProcessingUpdate
-							.Default.Remove(behavior);
-
-						signals.Remove(behavior);
-						behaviours.Remove(behavior);
-						behavior.Dispose();
-					}
-				}
+				componentsEnableRecieves.Remove(obj as IEnable);
+				componentsTagRecievers.Remove(obj as IRecieveTags);
 			}
 		}
 
@@ -284,11 +268,16 @@ namespace Homebrew
 				ProcessingUpdate.Default.Remove(this);
 			}
 
+			var timers = ProcessingTimer.Default.allWorkingTimers.FindAll(t => t.id == this);
+			for (int i = 0; i < timers.Count; i++)
+			{
+				timers[i].Dispose();
+			}
 
-			behaviours.Clear();
+
 			components.Clear();
-
-			countBehaviors = 0;
+			componentsTagRecievers.Clear();
+			componentsEnableRecieves.Clear();
 		}
 
 		public void HandleDestroy()

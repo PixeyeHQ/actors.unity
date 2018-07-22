@@ -12,7 +12,7 @@ namespace Homebrew
 	/// Base class for all Actor related behaviors. Behaviors process data.
 	/// Use [Bind] attribute to link behavior with data poiniters.
 	/// </summary>
-	public abstract class ActorBehavior : IComponent
+	public abstract class ActorBehavior : IComponent, IEnable
 	{
 		protected Actor actor;
 		protected EntityState state;
@@ -49,9 +49,9 @@ namespace Homebrew
 		}
 
 
-		public virtual void OnTagsChanged()
-		{
-		}
+//		public virtual void OnTagsChanged()
+//		{
+//		}
 
 		/// <summary>
 		/// Behavior initialize method for extra binds and caching. Works only once.
@@ -78,9 +78,9 @@ namespace Homebrew
 			return actor.Get<T>(path);
 		}
 
-		public void Enable(bool isEnabled)
+		public void Enable(bool arg)
 		{
-			if (isEnabled)
+			if (arg)
 			{
 				if (state.HasState(EntityState.Enabled)) return;
 				state |= EntityState.Enabled;
@@ -111,5 +111,7 @@ namespace Homebrew
 		protected virtual void OnDispose()
 		{
 		}
+
+	 
 	}
 }
