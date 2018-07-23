@@ -17,7 +17,7 @@ namespace Homebrew
 
 		public static readonly Dictionary<Type, CachedType> cached = new Dictionary<Type, CachedType>();
 
-		public void Setup(ActorBehavior b, IEntity a)
+		public void Setup(IComponent b, IEntity a)
 		{
 			var type = b.GetType();
 			CachedType o;
@@ -86,7 +86,7 @@ namespace Homebrew
 			public readonly List<FieldInfo> cachedFromObjFields = new List<FieldInfo>();
 			public readonly List<FieldInfo> cachedFromBlueprintFields = new List<FieldInfo>();
 
-			public void Bind(ActorBehavior behavior, IEntity a)
+			public void Bind(IComponent behavior, IEntity a)
 			{
 				for (var i = 0; i < cachedBindFields.Count; i++)
 				{
@@ -98,7 +98,7 @@ namespace Homebrew
 			}
 
 
-			public void GetFromToolbox(ActorBehavior behavior)
+			public void GetFromToolbox(IComponent behavior)
 			{
 				for (var i = 0; i < cachedToolboxFields.Count; i++)
 				{
@@ -108,7 +108,7 @@ namespace Homebrew
 				}
 			}
 
-			public void GetFromObject(ActorBehavior behavior, IEntity a)
+			public void GetFromObject(IComponent behavior, IEntity a)
 			{
 				for (var i = 0; i < cachedFromObjFields.Count; i++)
 				{
@@ -120,7 +120,7 @@ namespace Homebrew
 				}
 			}
 
-			public void GetFromBlueprint(ActorBehavior behavior, IEntity a)
+			public void GetFromBlueprint(IComponent behavior, IEntity a)
 			{
 				for (var i = 0; i < cachedFromBlueprintFields.Count; i++)
 				{

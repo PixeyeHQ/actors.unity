@@ -15,9 +15,9 @@ namespace Homebrew
 	/// </summary>
 	public interface IEntity
 	{
-		ProcessingSignals GetSignals { get; }
-		ProcessingTags GetTags { get; }
-		Time GetTime { get; }
+		ProcessingSignals Signals { get; }
+		ProcessingTags Tags { get; }
+		Time Time { get; }
 		object Get(Type t);
 		T Get<T>();
 		T Get<T>(int hash);
@@ -26,5 +26,6 @@ namespace Homebrew
 		bool Contains(int hash);
 		bool HasState(EntityState possibleState);
 		void HandleDestroy();	
+		int HashCode { get; }
 	}
 }

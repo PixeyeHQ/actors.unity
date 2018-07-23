@@ -18,18 +18,18 @@ namespace Homebrew
 	public abstract class Actor : MonoCached, IEntity
 	{
 		[HideInInspector] public int hashCode;
-		[HideInInspector] public ProcessingTags tags;
-
+		[HideInInspector] public ProcessingTags tags = new ProcessingTags();
+		 
 
 		private Dictionary<int, object> components = new Dictionary<int, object>(EngineSettings.ActorElementsCount);
 		private List<IRecieveTags> componentsTagRecievers = new List<IRecieveTags>(EngineSettings.ActorElementsCount);
 		private List<IEnable> componentsEnableRecieves = new List<IEnable>();
 
 
-		public Time GetTime => time;
-		public ProcessingSignals GetSignals => signals;
-		public ProcessingTags GetTags => tags;
-
+		public Time Time => time;
+		public ProcessingSignals Signals => signals;
+		public ProcessingTags Tags => tags;
+		public int HashCode => hashCode;
 
 		/// <summary>
 		/// A method to add all Data Components to Actor's container.
@@ -268,12 +268,12 @@ namespace Homebrew
 				ProcessingUpdate.Default.Remove(this);
 			}
 
-			var timers = ProcessingTimer.Default.allWorkingTimers.FindAll(t => t.id == this);
+		                                                                     
+			var timers = ProcessingTimer.Default.allWorkingTimers.FindAll(t =>  ReferenceEquals(t.id, this));
 			for (int i = 0; i < timers.Count; i++)
 			{
 				timers[i].Dispose();
-			}
-
+			}           
 
 			components.Clear();
 			componentsTagRecievers.Clear();
@@ -284,6 +284,8 @@ namespace Homebrew
 		{
 			HandleDestroyGO();
 		}
+
+	 
 
 		#endregion
 	}

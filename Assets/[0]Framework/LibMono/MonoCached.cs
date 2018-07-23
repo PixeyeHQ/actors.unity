@@ -20,25 +20,14 @@ namespace Homebrew
 
 		[FoldoutGroup("Mono")] public Pool pool;
 		[FoldoutGroup("Mono")] public float destroyDelayTime;
+		[FoldoutGroup("Mono"), EnumFlag] public EntityState state;
 
-		[HideInInspector] public Time time;
+		[HideInInspector] public Time time = new Time();
 		[HideInInspector] public Transform selfTransform;
-		[HideInInspector] public ProcessingSignals signals;
-		[HideInInspector, EnumFlag] public EntityState state;
+		[HideInInspector] public ProcessingSignals signals = new ProcessingSignals();
 
 		#endregion
-
-		#region PROCESSING SIGNALS
-
-		public void SignalDispatch<T>(T val = default(T))
-		{
-			signals.Send(val);
-		}
-
-		#endregion
-
-	 
-
+ 
 		# region EXTENDED MONOBEHAVIOR
 
 		void Awake()
@@ -96,14 +85,12 @@ namespace Homebrew
 
 		protected virtual void HandleEnable()
 		{
-			
 		}
 
 		protected virtual void HandleDisable()
 		{
-			
 		}
-		
+
 		protected virtual void OnSpawn()
 		{
 		}

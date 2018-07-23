@@ -1,29 +1,25 @@
 /*===============================================================
-Product:    Battlecruiser
-Developer:  Dimitry Pixeye - pixeye@hbrew.store
-Company:    Homebrew - http://hbrew.store
-Date:       06/10/2017 21:47
+Product:    Unity-Framework
+Developer:  Dimitry Pixeye - info@pixeye,games
+Company:    Homebrew
+Date:       7/23/2018 1:57 PM
 ================================================================*/
 
 
 namespace Homebrew
 {
-	/// <summary>
-	/// Base class for all Actor related behaviors. Behaviors process data.
-	/// Use [Bind] attribute to link behavior with data poiniters.
-	/// </summary>
-	public abstract class ActorBehavior : IComponent, IEnable
+	public class Behavior : IComponent, IEnable
 	{
-		protected Actor actor;
+		protected IEntity entity;
 		protected EntityState state;
 
 
-		public void Awake(Actor actor)
+		public void Awake(IEntity entity)
 		{
-			this.actor = actor;
+			this.entity = entity;
 			state |= EntityState.Visible;
 			state |= EntityState.Active;
-			ProcessingBehaviorAttributes.Default.Setup(this, actor);
+			ProcessingBehaviorAttributes.Default.Setup(this, entity);
 			Setup();
 		}
 
@@ -70,12 +66,12 @@ namespace Homebrew
 
 		protected T Get<T>()
 		{
-			return actor.Get<T>();
+			return entity.Get<T>();
 		}
 
 		protected T Get<T>(string path)
 		{
-			return actor.Get<T>(path);
+			return entity.Get<T>(path);
 		}
 
 		public void Enable(bool arg)
@@ -84,7 +80,7 @@ namespace Homebrew
 			{
 				if (state.HasState(EntityState.Enabled)) return;
 				state |= EntityState.Enabled;
-				actor.signals.Add(this);
+				entity.Signals.Add(this);
 				ProcessingUpdate.Default.Add(this);
 				HandleEnable();
 			}
@@ -92,7 +88,7 @@ namespace Homebrew
 			{
 				if (!state.HasState(EntityState.Enabled)) return;
 				state &= ~EntityState.Enabled;
-				actor.signals.Remove(this);
+				entity.Signals.Remove(this);
 				ProcessingUpdate.Default.Remove(this);
 				HandleDisable();
 			}
@@ -103,15 +99,13 @@ namespace Homebrew
 		{
 			if (Toolbox.isQuittingOrChangingScene()) return;
 			ProcessingUpdate.Default.Remove(this);
-			actor.signals.Remove(this);
+			entity.Signals.Remove(this);
 			OnDispose();
-			actor = null;
+			entity = null;
 		}
 
 		protected virtual void OnDispose()
 		{
 		}
-
-	 
 	}
 }

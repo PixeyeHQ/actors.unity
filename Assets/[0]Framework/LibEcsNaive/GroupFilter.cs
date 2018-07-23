@@ -21,14 +21,14 @@ namespace Homebrew
 //		public Action OnActorsChanged = delegate {  };
 //		protected int length;
 //
-//		public bool HandleAddToGroup(Actor actor)
+//		public bool HandleAddToGroup(Actor entity)
 //		{
-//			if (!actorsHashSet.Contains(actor))
-//				if (entity.GetTags.DontHave(groupFilterExclude))
-//					if (entity.GetTags.Contain(groupFilter))
+//			if (!actorsHashSet.Contains(entity))
+//				if (entity.Tags.DontHave(groupFilterExclude))
+//					if (entity.Tags.Contain(groupFilter))
 //					{
-//						actors.Add(actor);
-//						actorsHashSet.Add(actor);
+//						actors.Add(entity);
+//						actorsHashSet.Add(entity);
 //
 //						length++;
 //						return true;
@@ -37,39 +37,39 @@ namespace Homebrew
 //			return false;
 //		}
 //
-//		public void HandleRemoveFromGroup(Actor actor)
+//		public void HandleRemoveFromGroup(Actor entity)
 //		{
-//			if (actorsHashSet.Contains(actor) == false) return;
+//			if (actorsHashSet.Contains(entity) == false) return;
 //		
-//			if (entity.GetTags.Contain(Tag.GroupEnemy))
+//			if (entity.Tags.Contain(Tag.GroupEnemy))
 //           
-//				Debug.Log(entity.GetTags.Contain(groupFilter)+"_"+entity.GetTags.CheckExclude(groupFilterExclude));
-//			if (!entity.GetTags.Contain(groupFilter) || entity.GetTags.CheckExclude(groupFilterExclude))
+//				Debug.Log(entity.Tags.Contain(groupFilter)+"_"+entity.Tags.CheckExclude(groupFilterExclude));
+//			if (!entity.Tags.Contain(groupFilter) || entity.Tags.CheckExclude(groupFilterExclude))
 //			{
-//				actors.Remove(actor);
-//				actorsHashSet.Remove(actor);
+//				actors.Remove(entity);
+//				actorsHashSet.Remove(entity);
 //
 //				length--;
 //			}
 //		}
 //
-//		public void HandleActor(Actor actor, int type)
+//		public void HandleActor(Actor entity, int type)
 //		{
-//			var signalActor = actor;
+//			var signalActor = entity;
 //			//	var hash = signalActor.GetType().GetHashCode();
 //			var cachedAmount = length;
 //			switch (type)
 //
 //			{
-//				case 0: // actor added
+//				case 0: // entity added
 //					HandleAddToGroup(signalActor);
 //					break;
 //
-//				case 1: // actor removed
+//				case 1: // entity removed
 //					HandleRemoveFromGroup(signalActor);
 //					break;
 //
-//				case 2: // actor changed
+//				case 2: // entity changed
 //
 //
 //					if (!HandleAddToGroup(signalActor))
