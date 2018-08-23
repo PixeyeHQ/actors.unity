@@ -8,67 +8,67 @@ Date:       12/09/2017 16:10
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-
 #if ODIN_INSPECTOR
 using Sirenix.OdinInspector;
+
 #endif
 
 
 namespace Homebrew
 {
 // Start any game    
-	public class Starter : MonoBehaviour
-	{
-		public static bool initialized;
-		public static List<MonoCached> objs = new List<MonoCached>();
+    public class Starter : MonoBehaviour
+    {
+        public static bool initialized;
+        // public static List<MonoCached> objs = new List<MonoCached>();
 
-		[FoldoutGroup("SetupData")] public List<Factory> factories;
-		[FoldoutGroup("SetupData")] public List<DataScene> ScenesToKeep = new List<DataScene>();
-		[FoldoutGroup("SetupData")] public List<DataScene> SceneDependsOn = new List<DataScene>();
+        [FoldoutGroup("SetupData")] public List<Factory> factories;
+        [FoldoutGroup("SetupData")] public List<Scenes> ScenesToKeep;
+        [FoldoutGroup("SetupData")] public List<Scenes> SceneDependsOn;
 
-		void Awake()
-		{
-			for (var i = 0; i < factories.Count; i++)
-			{
-				Toolbox.Add(factories[i]);
-			}
+        void Awake()
+        {
+            for (var i = 0; i < factories.Count; i++)
+            {
+                Toolbox.Add(factories[i]);
+            }
+ 
 
-
-			Toolbox.Add<ProcessingSceneLoad>().Setup(ScenesToKeep, SceneDependsOn, this);
-		}
-
-
-		public void BindScene()
-		{
-			var poolReg = GetComponent<PoolRegister>();
-			if (poolReg) poolReg.Reigster();
-			Setup();
-
-			initialized = true;
-			for (int i = 0; i < objs.Count; i++)
-			{
-				objs[i].state &= ~EntityState.OnHold;
-				objs[i].Initialize();
-			}
+            Toolbox.Add<ProcessingSceneLoad>().Setup(ScenesToKeep, SceneDependsOn, this);
+        }
 
 
-			objs.Clear();
+        public void BindScene()
+        {
+            var poolReg = GetComponent<PoolRegister>();
+            if (poolReg) poolReg.Reigster();
+            Setup();
 
-			Timer.Add(Time.DeltaTime, PostSetup);
-		}
+            initialized = true;
 
-		protected virtual void Setup()
-		{
-		}
+            var objs = FindObjectsOfType<MonoCached>();
 
-		protected virtual void PostSetup()
-		{
-		}
+            for (var i = 0; i < objs.Length; i++)
+            {
+                if (objs[i].state.Contain(EntityState.RequireStarter))
+                    objs[i].SetupAfterStarter();
+            }
+
+            Timer.Add(Time.DeltaTimeFixed*4, () => PostSetup());
+        }
+
+        protected virtual void Setup()
+        {
+        }
+
+        protected virtual void PostSetup()
+        {
+        }
 
 
-		private void OnDestroy()
-		{
-			initialized = false;
-		}
-	}
+        private void OnDestroy()
+        {
+            initialized = false;
+        }
+    }
 }

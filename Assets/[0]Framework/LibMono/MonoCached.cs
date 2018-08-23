@@ -6,6 +6,7 @@ Date:       24/06/2017 20:56
 ================================================================*/
 
 
+using System;
 #if ODIN_INSPECTOR
 using Sirenix.OdinInspector;
 #endif
@@ -14,131 +15,178 @@ using UnityEngine;
 
 namespace Homebrew
 {
-	public class MonoCached : MonoBehaviour
-	{
-		#region MEMBERS
+    public class MonoCached : MonoBehaviour
+    {
+        #region FIELDS
 
-		[FoldoutGroup("Mono")] public Pool pool;
-		[FoldoutGroup("Mono")] public float destroyDelayTime;
-		[FoldoutGroup("Mono"), EnumFlag] public EntityState state;
+        [FoldoutGroup("Mono")] public Pool pool;
+        [FoldoutGroup("Mono")] public EntityState state;
+        [FoldoutGroup("Mono")] public float timeDestroyDelay;
+        [FoldoutGroup("Mono")] public float timeScale = 1;
+        [FoldoutGroup("Mono")] public Actor actorParent;
 
-		[HideInInspector] public Time time = new Time();
-		[HideInInspector] public Transform selfTransform;
-		[HideInInspector] public ProcessingSignals signals = new ProcessingSignals();
+        [HideInInspector] public ProcessingSignals signals;
+        [HideInInspector] public Transform selfTransform;
 
-		#endregion
- 
-		# region EXTENDED MONOBEHAVIOR
+        #endregion
 
-		void Awake()
-		{
-			selfTransform = transform;
-			if (Starter.initialized == false)
-			{
-				state |= EntityState.OnHold;
-				Starter.objs.Add(this);
-			}
-			else OnAwake();
-		}
+        #region MONO
 
-		protected virtual void OnAwake()
-		{
-		}
+        protected virtual void Awake()
+        {
+            selfTransform = transform;
+            state &= ~EntityState.Enabled;
+            state &= ~EntityState.Initialized;
+
+            if (state.Contain(EntityState.RequireActorParent))
+                return;
 
 
-		public void Initialize()
-		{
-			OnAwake();
-			OnEnable();
-		}
+            if (Starter.initialized == false)
+            {
+                state |= EntityState.RequireStarter;
+                return;
+            }
 
 
-		public void Spawn(bool arg)
-		{
-			if (arg) OnSpawn();
-			else OnDespawn();
-		}
+            Setup();
 
-		public void HandleTimeScale(float val)
-		{
-			time.timeScale = val;
-			OnTimeScaleChanged();
-		}
+            Timer.Add(Time.DeltaTimeFixed, () =>
+            {
+                state |= EntityState.Initialized;
+                PostSetup();
+            });
+        }
 
+        public virtual void OnEnable()
+        {
+            if (state.Contain(EntityState.Enabled) || state.Contain(EntityState.RequireStarter) ||
+                state.Contain(EntityState.RequireActorParent)) return;
 
-		public virtual void OnEnable()
-		{
-			if (state.HasState(EntityState.OnHold)) return;
-			state &= ~EntityState.Released;
-			signals.Add(this);
-			ProcessingUpdate.Default.Add(this);
-			HandleEnable();
-		}
-
-		public virtual void OnDisable()
-		{
-			if (Toolbox.isQuittingOrChangingScene()) return;
-			signals.Remove(this);
-			ProcessingUpdate.Default.Remove(this);
-			HandleDisable();
-		}
-
-		protected virtual void HandleEnable()
-		{
-		}
-
-		protected virtual void HandleDisable()
-		{
-		}
-
-		protected virtual void OnSpawn()
-		{
-		}
-
-		protected virtual void OnDespawn()
-		{
-		}
+            state &= ~EntityState.Released;
+            state |= EntityState.Enabled;
 
 
-		protected virtual void OnTimeScaleChanged()
-		{
-		}
+            if (ProcessingSignals.TryAddToGlobal(this))
+            {
+                if (signals == null)
+                {
+                    signals = new ProcessingSignals();
+                }
 
-		#endregion
+                signals.Add(this);
+            }
 
-		#region DESTROY AND POOL
 
-		public void HandleReturnToPool()
-		{
-			var processingPool = Toolbox.Get<ProcessingGoPool>();
-			if (destroyDelayTime > 0)
-				Timer.Add(destroyDelayTime, () => processingPool.Despawn(pool, gameObject));
-			else processingPool.Despawn(pool, gameObject);
-		}
+            ProcessingUpdate.Default.Add(this);
 
-		public void HandleDestroyGO()
-		{
-			if (state.HasState(EntityState.Released)) return;
+            HandleEnable();
+        }
 
-			state |= EntityState.Released;
-			state &= ~EntityState.Enabled;
-			state &= ~EntityState.OnHold;
 
-			OnBeforeDestroy();
+        public virtual void OnDisable()
+        {
+            if (Toolbox.isQuittingOrChangingScene() || !state.Contain(EntityState.Enabled)) return;
 
-			if (pool == Pool.None)
-			{
-				Destroy(gameObject, destroyDelayTime == 0 ? Time.DeltaTime : destroyDelayTime);
-				return;
-			}
+            state &= ~EntityState.Enabled;
 
-			HandleReturnToPool();
-		}
 
-		protected virtual void OnBeforeDestroy()
-		{
-		}
+            if (ProcessingSignals.TryRemoveGlobal(this))
+            {
+                signals?.Remove(this);
+            }
 
-		#endregion
-	}
+
+            ProcessingUpdate.Default.Remove(this);
+
+            HandleDisable();
+        }
+
+        #endregion
+
+        #region SETUPS
+
+        public virtual void SetupAfterStarter()
+        {
+            state &= ~EntityState.RequireStarter;
+            Setup();
+            OnEnable();
+
+            Timer.Add(Time.DeltaTimeFixed, () =>
+            {
+                state |= EntityState.Initialized;
+                PostSetup();
+            });
+        }
+
+        public void SetupAfterActor()
+        {
+            if (!state.Contain(EntityState.RequireActorParent)) return;
+            state &= ~EntityState.RequireActorParent;
+            Setup();
+            OnEnable();
+
+            Timer.Add(Time.DeltaTimeFixed, () =>
+            {
+                state |= EntityState.Initialized;
+                PostSetup();
+            });
+        }
+
+        #endregion
+
+        #region METHODS
+
+        protected void BindSignals()
+        {
+            signals = new ProcessingSignals();
+        }
+
+        protected virtual void Setup()
+        {
+        }
+
+        protected virtual void PostSetup()
+        {
+        }
+
+        protected virtual void HandleEnable()
+        {
+        }
+
+        protected virtual void HandleDisable()
+        {
+        }
+
+        #endregion
+
+        #region DESTROY
+
+        public void HandleDestroy()
+        {
+            if (state.Contain(EntityState.Released)) return;
+
+            state |= EntityState.Released;
+            state &= ~EntityState.Enabled;
+            state &= ~EntityState.Initialized;
+
+            if (pool == Pool.None)
+            {
+                Destroy(gameObject, timeDestroyDelay);
+                return;
+            }
+
+            HandleReturnToPool();
+        }
+
+        private void HandleReturnToPool()
+        {
+            var processingPool = Toolbox.Get<ProcessingGoPool>();
+            if (timeDestroyDelay > 0)
+                Timer.Add(timeDestroyDelay, () => processingPool.Despawn(pool, gameObject));
+            else processingPool.Despawn(pool, gameObject);
+        }
+
+        #endregion
+    }
 }

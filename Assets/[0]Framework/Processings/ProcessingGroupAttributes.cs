@@ -7,55 +7,59 @@ Date:       5/14/2018  6:42 PM
 
 
 using System;
+using System.Collections.Generic;
 using System.Reflection;
- 
+using UnityEngine;
+
 
 namespace Homebrew
 {
-	public class ProcessingGroupAttributes
-	{
-		public static ProcessingGroupAttributes Default;
+    public class ProcessingGroupAttributes
+    {
 
+     
+        public static void Setup(object b)
+        {
+            var type = b.GetType();
+            var objectFields = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            var length = objectFields.Length;
 
-		public void Setup(object b)
-		{
-		 
-			var type = b.GetType();
-			var objectFields = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-			var length = objectFields.Length;
-			FilterMask mask;
-			var hasAtr = false;
-			for (var i = 0; i < length; i++)
-			{
-				var myFieldInfo = objectFields[i];
+            var groupType = typeof(GroupBase);
 
-				var groupByAttribute = Attribute.GetCustomAttribute(objectFields[i], typeof(GroupByAttribute)) as GroupByAttribute;
+      
+            for (var i = 0; i < length; i++)
+            {
+                var myFieldInfo = objectFields[i];
 
-				mask = new FilterMask();
+                var groupByAttribute =
+                    Attribute.GetCustomAttribute(myFieldInfo, typeof(GroupByAttribute)) as GroupByAttribute;
+                var groupExcludeAttribute =
+                    Attribute.GetCustomAttribute(myFieldInfo, typeof(GroupExcludeAttribute)) as
+                        GroupExcludeAttribute;
 
-				if (groupByAttribute != null)
-				{
-					hasAtr = true;
-					mask.groupFilter = groupByAttribute.filter;
-				}
+ 
+ 
+                if (!myFieldInfo.FieldType.IsSubclassOf(groupType) || myFieldInfo.IsStatic) continue;
+                
+                
+                
+                var excludeFilter = new int[0];
+                if (groupExcludeAttribute!=null)
+                excludeFilter = groupExcludeAttribute.filter;
 
-				var groupExcludeAttribute =
-					Attribute.GetCustomAttribute(objectFields[i], typeof(GroupExcludeAttribute)) as GroupExcludeAttribute;
-				if (groupExcludeAttribute != null)
-				{
-					hasAtr = true;
-					mask.groupFilterExclude = groupExcludeAttribute.filter;
-				}
-
-
-				if (hasAtr)
-				{
-					Group g = ProcessingEntities.Default.AddGetgroup(mask);
-					myFieldInfo.SetValue(b, g);
-				}
-
-				hasAtr = false;
-			}
-		}
-	}
+                var includeFilter   = new int[0];
+                if (groupByAttribute!=null)
+                includeFilter = groupByAttribute.filter;
+ 
+                
+                
+                var filter = new Composition();
+                filter.exclude = excludeFilter;
+                filter.include = includeFilter;
+              
+                myFieldInfo.SetValue(b,
+                    ProcessingEntities.Default.AddGetGroup(myFieldInfo.FieldType,filter));
+            }
+        }
+    }
 }

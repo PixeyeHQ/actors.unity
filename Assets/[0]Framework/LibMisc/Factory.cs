@@ -11,7 +11,7 @@ using UnityEngine;
 namespace Homebrew{
 
 
-public abstract class Factory : ScriptableObject, IMustBeWipedOut
+public abstract class Factory : ScriptableObject
 {
 	public virtual T Spawn<T>(Vector3 pos, Quaternion rot) where T : class
 	{

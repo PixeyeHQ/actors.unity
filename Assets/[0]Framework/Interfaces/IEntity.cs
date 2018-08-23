@@ -11,7 +11,7 @@ using System;
 namespace Homebrew
 {
 	/// <summary>
-	/// Basic interface for any entity
+	/// Basic interface for any actor
 	/// </summary>
 	public interface IEntity
 	{

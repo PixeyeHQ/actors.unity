@@ -6,7 +6,9 @@ Date:       2/14/2018  12:07 PM
 ================================================================*/
 
 
+using System;
 using System.Collections.Generic;
+using System.IO;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -15,64 +17,91 @@ using UnityEngine.Experimental.UIElements;
 
 namespace Homebrew
 {
-	[CreateAssetMenu(fileName = "Blueprints", menuName = "Data/Blueprints")]
-	[System.Serializable]
-	public class Blueprints : Pluggable, IAwake
-	{
-		public List<Blueprint> blueprints = new List<Blueprint>();
-
-	 
-
-//		[Button(ButtonSizes.Large)]
-//		public void Populate()
-//		{
-//#if UNITY_EDITOR
-//			var guids = AssetDatabase.FindAssets("bp_", new[] {"Assets/[2]Content/Blueprints"});
-//			blueprints.Clear();
-//			foreach (string guid in guids)
-//			{
-//				AssetDatabase.GUIDToAssetPath(guid);
-//				Blueprint b = (Blueprint) AssetDatabase.LoadAssetAtPath(AssetDatabase.GUIDToAssetPath(guid), typeof(Blueprint));
-//				blueprints.Add(b);
-//			}
-//
-//			EditorBinder.actionGenerateBluePrintKeys.Invoke();
-//			EditorUtility.SetDirty(this);
-//#endif
-//		}
-
- 
-		
-#if UNITY_EDITOR
-		[MenuItem("Tools/PopulateBlueprints")]
-		public static void Generate()
-		{
-			var bl = Resources.Load<Blueprints>("Blueprints");
-			var guids = AssetDatabase.FindAssets("bp_", new[] {"Assets/[2]Content/Blueprints"});
-			bl.blueprints.Clear();
-			foreach (string guid in guids)
-			{
-				AssetDatabase.GUIDToAssetPath(guid);
-				Blueprint b = (Blueprint) AssetDatabase.LoadAssetAtPath(AssetDatabase.GUIDToAssetPath(guid), typeof(Blueprint));
-				bl.blueprints.Add(b);
-			}
+    
+    [System.Serializable]
+    public class Blueprints : Pluggable, IAwake
+    {
+        public List<Blueprint> blueprints = new List<Blueprint>();
 
 
-			EditorUtility.SetDirty(bl);
-		}
-#endif
+        #if UNITY_EDITOR
+        [MenuItem("Tools/Actors/PopulateBlueprints", priority = 200)]
+        public static void Generate()
+        {
+            var bl = CreateOrGetAsset<Blueprints>("[2]Content/Resources/Data/Blueprints","blueprints");
+                //Resources.Load<Blueprints>("Data/Blueprints/blueprints");
+            var guids = AssetDatabase.FindAssets("bp_", new[] {"Assets/[2]Content/Resources/Data/Blueprints"});
+            bl.blueprints.Clear();
+            foreach (var guid in guids)
+            {
+                AssetDatabase.GUIDToAssetPath(guid);
+                var b = (Blueprint) AssetDatabase.LoadAssetAtPath(AssetDatabase.GUIDToAssetPath(guid),
+                    typeof(Blueprint));
+                bl.blueprints.Add(b);
+            }
 
-		public void OnAwake()
-		{
-			for (var i = 0; i < blueprints.Count; i++)
-			{
-				blueprints[i].Setup();
-			}
-		}
 
-		public override void Plug()
-		{
-			Toolbox.Add(this);
-		}
-	}
+            EditorUtility.SetDirty(bl);
+        }
+//        [MenuItem("Tools/Actors/CreateDataBlueprints", priority = 210)]
+//        public static void CreateOrReturnBlueprints()
+//        {
+//            var bl = 
+//                Resources.Load<Blueprints>("Data/Blueprints/blueprints");
+//            if (bl==null)
+//                bl = ScriptableObjectUtility
+//            Debug.Log(bl);
+////            var guids = AssetDatabase.FindAssets("bp_", new[] {"Assets/[2]Content/Resources/BluePrints"});
+////            bl.blueprints.Clear();
+////            foreach (var guid in guids)
+////            {
+////                AssetDatabase.GUIDToAssetPath(guid);
+////                var b = (Blueprint) AssetDatabase.LoadAssetAtPath(AssetDatabase.GUIDToAssetPath(guid),
+////                    typeof(Blueprint));
+////                bl.blueprints.Add(b);
+////            }
+////
+////
+////            EditorUtility.SetDirty(bl);
+//        }
+        
+        public static T CreateOrGetAsset<T>(string p, string n) where T : ScriptableObject
+        {
+            var asset = AssetDatabase.LoadAssetAtPath<T>("Assets/" + p + "/" + n + ".asset");
+
+            var assetPathAndName = AssetDatabase.GenerateUniqueAssetPath("Assets/" + p + "/" + n + ".asset");
+            if (asset != null) return asset;
+            asset = ScriptableObject.CreateInstance<T>();
+
+
+            if (assetPathAndName == string.Empty)
+            {
+                Directory.CreateDirectory(Application.dataPath + "/" + p);
+                assetPathAndName = AssetDatabase.GenerateUniqueAssetPath("Assets/" + p + "/" + n + ".asset");
+            }
+
+
+            AssetDatabase.CreateAsset(asset, assetPathAndName);
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+
+            return asset;
+        }
+        
+        #endif
+
+        public void OnAwake()
+        {
+            for (var i = 0; i < blueprints.Count; i++)
+            {
+                blueprints[i].Setup();
+                 
+            }
+        }
+
+        public override void Plug()
+        {
+            Toolbox.Add(this);
+        }
+    }
 }

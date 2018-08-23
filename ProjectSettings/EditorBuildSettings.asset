@@ -7,8 +7,11 @@ EditorBuildSettings:
   m_Scenes:
   - enabled: 1
     path: Assets/[2]Content/Scenes/sceneGame.unity
-    guid: a0758c8ce1678dd4a90d18ea8bf37245
+    guid: 9e8147f3e64bc464cb57571d4e9df016
+  - enabled: 1
+    path: Assets/[2]Content/Scenes/sceneCamera.unity
+    guid: fce5528dda5bddf46852f2e4033c2744
   - enabled: 1
     path: Assets/[2]Content/Scenes/sceneKernel.unity
-    guid: c93ad83496fb4e14e9d01b64fb5f2166
+    guid: 2642f792712675d40a8d87889fdfee7a
   m_configObjects: {}

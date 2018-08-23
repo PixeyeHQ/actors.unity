@@ -1,0 +1,9 @@
+ using Homebrew;
+using UnityEngine;
+namespace Homebrew{
+[CreateAssetMenu(fileName = "sample_&NAME&", menuName = "Actors/Samples/##NAME##")]
+public class ##NAME## : Sample
+{
+     
+}
+}

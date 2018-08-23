@@ -1,292 +1,485 @@
 /*===============================================================
-Product:    Battlecruiser
-Developer:  Dimitry Pixeye - pixeye@hbrew.store
-Company:    Homebrew - http://hbrew.store
-Date:       12/09/2017 19:06
+Product:    EntityEngine
+Developer:  Dimitry Pixeye - info@pixeye,games
+Company:    Homebrew
+Date:       7/25/2018 11:32 AM
 ================================================================*/
 
+
 using System;
-using UnityEngine;
 using System.Collections.Generic;
+#if ODIN_INSPECTOR
+using Sirenix.OdinInspector;
+#endif
+using UnityEngine;
 
 
 namespace Homebrew
 {
-	/// <summary>
-	/// Base class for any game logic / complex entities 
-	/// </summary>
-	public abstract class Actor : MonoCached, IEntity
-	{
-		[HideInInspector] public int hashCode;
-		[HideInInspector] public ProcessingTags tags = new ProcessingTags();
-		 
+    public class Actor : MonoCached, IPoolable
+    {
+        public static Actor[] entites = new Actor[EngineSettings.MinEntities];
+        public static int prevID = -1;
+        public static int lastID;
 
-		private Dictionary<int, object> components = new Dictionary<int, object>(EngineSettings.ActorElementsCount);
-		private List<IRecieveTags> componentsTagRecievers = new List<IRecieveTags>(EngineSettings.ActorElementsCount);
-		private List<IEnable> componentsEnableRecieves = new List<IEnable>();
+        #region FIELDS
 
+        [FoldoutGroup("Actor")] public int id;
+        [FoldoutGroup("Actor")] public Blueprint blueprint;
+
+        public Dictionary<int, int> tags;
 
-		public Time Time => time;
-		public ProcessingSignals Signals => signals;
-		public ProcessingTags Tags => tags;
-		public int HashCode => hashCode;
+        protected List<Composition> compositions;
+        protected List<int> compositionNoTags = new List<int>();
+
+        #endregion
+
+        #region MONO
+
+        protected override void Awake()
+        {
+            var len = entites.Length;
+            if (lastID == len)
+            {
+                Array.Resize(ref entites, Mathf.Clamp(lastID << 1, 0, 1000000));
+            }
 
-		/// <summary>
-		/// A method to add all Data Components to Actor's container.
-		/// </summary>
-		protected abstract void SetupData();
+            if (prevID != -1)
+            {
+                id = prevID;
+                prevID = -1;
+                entites[id] = this;
+            }
+            else
+            {
+                id = lastID;
+                entites[lastID++] = this;
+            }
 
-		/// <summary>
-		/// A method to add all Behavior Components to Actor's container.
-		/// This method invokes with one frame delay after SetupData method.
-		/// </summary>
-		protected abstract void SetupBehaviors();
 
+            base.Awake();
+        }
 
-		protected override void OnAwake()
-		{
-			hashCode = GetHashCode();
+        public override void OnEnable()
+        {
+            if (state.Contain(EntityState.Enabled) || state.Contain(EntityState.RequireStarter) ||
+                state.Contain(EntityState.RequireActorParent)) return;
 
-			tags.Initialize(HandleTagsChanged);
-			tags.Add(hashCode);
 
-			SetupData();
-			Timer.Add(Time.DeltaTime, SetupBehaviors);
-		}
+            if (state.Contain(EntityState.Disabled))
+                ProcessingEntities.Default.CheckGroups(id, true);
+            state &= ~EntityState.Disabled;
+            state &= ~EntityState.Released;
+            state |= EntityState.Enabled;
 
+            if (ProcessingSignals.TryAddToGlobal(this))
+            {
+                if (signals == null)
+                {
+                    signals = new ProcessingSignals();
+                }
 
-		protected override void OnTimeScaleChanged()
-		{
-			signals.Send(new SignalTimeScaleChanged());
-		}
+                signals.Add(this);
+            }
 
 
-		#region PROCESSING
+            if (compositions != null)
+                foreach (var composition in compositions)
+                {
+                    if (composition.changed || !composition.Equals(this)) continue;
+                    composition.changed = true;
+                    foreach (var i in composition.ids)
+                    {
+                        AddToBehavior(i);
+                    }
+                }
 
-		public void HandleTagsChanged()
-		{
-			if (Toolbox.isQuittingOrChangingScene()) return;
-			ProcessingEntities.Default.Changed(this);
 
-			var amount = componentsTagRecievers.Count;
-			for (int i = 0; i < amount; i++)
-			{
-				componentsTagRecievers[i].OnTagsChanged();
-			}
-		}
+            foreach (var i in compositionNoTags)
+            {
+                AddToBehavior(i);
+            }
 
-		#endregion
+            ProcessingUpdate.Default.Add(this);
 
-		#region PROCESSING ACTIVATION
+            HandleEnable();
 
-		public override void OnEnable()
-		{
-			if (state.HasState(EntityState.OnHold)) return;
-			if (state.HasState(EntityState.Enabled)) return;
-			state &= ~EntityState.Released;
-			state |= EntityState.Enabled;
+            //     
+        }
 
-			signals.Add(this);
+        public override void OnDisable()
+        {
+            if (Toolbox.isQuittingOrChangingScene() || !state.Contain(EntityState.Enabled)) return;
 
-			ProcessingUpdate.Default.Add(this);
-			ProcessingEntities.Default.Add(this);
 
-			var count = componentsEnableRecieves.Count;
+            state &= ~EntityState.Enabled;
+            state |= EntityState.Disabled;
+            ProcessingEntities.Default.CheckGroups(id, false);
 
-			for (int i = 0; i < count; i++)
-			{
-				componentsEnableRecieves[i].Enable(true);
-			}
 
-			HandleEnable();
-		}
-
-		public override void OnDisable()
-		{
-			if (Toolbox.isQuittingOrChangingScene()) return;
-			if (state.HasState(EntityState.Released)) return;
-			if (!state.HasState(EntityState.Enabled)) return;
-			state &= ~EntityState.Enabled;
-
-			signals.Remove(this);
-
-			ProcessingUpdate.Default.Remove(this);
-			ProcessingEntities.Default.Remove(this);
-
-			var count = componentsEnableRecieves.Count;
-
-			for (int i = 0; i < count; i++)
-			{
-				componentsEnableRecieves[i].Enable(false);
-			}
-
-			HandleDisable();
-		}
-
-		#endregion
-
-		#region PROCESSING ADD / REMOVE
-
-		void AddBehavior(ActorBehavior behavior, bool enabled = true)
-		{
-			behavior.Awake(this);
-			behavior.Enable(enabled);
-		}
-
-
-		T HandleAdd<T>(T component, bool enabled = true, Type desiredType = null)
-		{
-			var hash = desiredType == null ? typeof(T).GetHashCode() : desiredType.GetHashCode();
-
-			components.Add(hash, component);
-
-			var behavior = component as ActorBehavior;
-			if (behavior != null) AddBehavior(behavior, enabled);
-			else
-			{
-				var setupable = component as ISetup;
-				if (setupable != null) setupable.Setup(this);
-				tags.Add(hash);
-			}
-
-			var e =   component as IEnable;
-			if (e != null) componentsEnableRecieves.Add(e);
-			var t =   component as IRecieveTags;
-			if (t != null) componentsTagRecievers.Add(t);
-
-
-			return component;
-		}
-
-		public void Add<T>(T component, Type desiredType = null)
-		{
-			HandleAdd(component, true, desiredType);
-		}
-
-		public T Add<T>(bool enabled = true, Type desiredType = null) where T : new()
-		{
-			var component = new T();
-			return HandleAdd(component, enabled, desiredType);
-		}
-
-
-		public void Remove<T>()
-		{
-			var hash = typeof(T).GetHashCode();
-			object obj;
-
-			if (components.TryGetValue(hash, out obj))
-			{
-				components.Remove(hash);
-				var disposable = obj as IDisposable;
-				disposable.Dispose();
-				tags.Remove(hash);
-
-				componentsEnableRecieves.Remove(obj as IEnable);
-				componentsTagRecievers.Remove(obj as IRecieveTags);
-			}
-		}
-
-		#endregion
-
-		#region PROCESSING GET
-
-		public T Get<T>(int hash)
-		{
-			return (T) components[hash];
-		}
-
-
-		public T Get<T>()
-		{
-			object obj;
-			if (components.TryGetValue(typeof(T).GetHashCode(), out obj))
-			{
-				return (T) obj;
-			}
-
-			return typeof(T).IsSubclassOf(typeof(UnityEngine.Object)) ? GetComponentInChildren<T>() : default(T);
-		}
-
-		public T Get<T>(string path)
-		{
-			if (path == string.Empty) return GetComponentInChildren<T>();
-			var o = selfTransform.Find(path);
-			return o == null ? default(T) : o.GetComponent<T>();
-		}
-
-		public object Get(Type t)
-		{
-			object obj;
-			components.TryGetValue(t.GetHashCode(), out obj);
-
-			if (obj == null)
-				if (t == typeof(Component))
-					return GetComponentInChildren(t);
-
-			return obj;
-		}
-
-		#endregion
-
-		#region PROCESSING SEARCH
-
-		public bool HasState(EntityState possibleState)
-		{
-			return state.HasState(possibleState);
-		}
-
-		public bool Contains<T>()
-		{
-			return components.ContainsKey(typeof(T).GetHashCode());
-		}
-
-		public bool Contains(int hash)
-		{
-			return components.ContainsKey(hash);
-		}
-
-		#endregion
-
-		#region PROCESSING DEACTIVATION
-
-		private void OnDestroy()
-		{
-			foreach (var value in components.Values)
-			{
-				var disposable = value as IDisposable;
-
-				if (disposable != null)
-				{
-					disposable.Dispose();
-				}
-			}
-
-			if (!Toolbox.isQuittingOrChangingScene())
-			{
-				ProcessingEntities.Default.Remove(this);
-				ProcessingUpdate.Default.Remove(this);
-			}
-
-		                                                                     
-			var timers = ProcessingTimer.Default.allWorkingTimers.FindAll(t =>  ReferenceEquals(t.id, this));
-			for (int i = 0; i < timers.Count; i++)
-			{
-				timers[i].Dispose();
-			}           
-
-			components.Clear();
-			componentsTagRecievers.Clear();
-			componentsEnableRecieves.Clear();
-		}
-
-		public void HandleDestroy()
-		{
-			HandleDestroyGO();
-		}
-
-	 
-
-		#endregion
-	}
+            if (compositions != null)
+                foreach (var composition in compositions)
+                {
+                    if (!composition.changed) continue;
+                    composition.changed = false;
+                    foreach (var i in composition.ids)
+                    {
+                        RemoveFromBehavior(i);
+                    }
+                }
+
+            foreach (var i in compositionNoTags)
+            {
+                RemoveFromBehavior(i);
+            }
+
+            if (ProcessingSignals.TryRemoveGlobal(this))
+            {
+                signals?.Remove(this);
+            }
+
+
+            ProcessingUpdate.Default.Remove(this);
+
+            HandleDisable();
+        }
+
+        protected virtual void OnDestroy()
+        {
+            if (Toolbox.isQuittingOrChangingScene()) return;
+
+            ProcessingEntities.Default.CheckGroups(id, false);
+
+            ProcessingUpdate.Default.Remove(this);
+            signals?.Remove(this);
+
+            prevID = id;
+            state |= EntityState.Released;
+
+            foreach (var i in compositionNoTags)
+            {
+                RemoveFromBehavior(i);
+            }
+
+            if (compositions != null)
+                foreach (var composition in compositions)
+                {
+                    foreach (var i in composition.ids)
+                    {
+                        RemoveFromBehavior(i);
+                    }
+                }
+
+
+            tags?.Clear();
+            signals?.Dispose();
+            signals = null;
+        }
+
+        #endregion
+
+        #region ADD/REMOVE
+
+        public Composition BindComposiiton()
+        {
+            var compo = new Composition();
+            if (compositions == null) compositions = new List<Composition>();
+            compositions.Add(compo);
+            return compo;
+        }
+
+
+        public T Add<T>(T component) where T : new()
+        {
+            component = Storage<T>.Instance.Add(component, id);
+            var setupable = component as ISetup;
+            if (setupable != null)
+            {
+                setupable.Setup(this);
+            }
+
+            return component;
+        }
+
+
+        private void AddToBehavior(int key)
+        {
+            Behavior.behaviors[key].AddElement(id);
+        }
+
+        private void RemoveFromBehavior(int key)
+        {
+            Behavior.behaviors[key].RemoveElement(id);
+        }
+
+        public T Add<T>() where T : new()
+        {
+            if (typeof(T).IsSubclassOf(typeof(Behavior)))
+            {
+                var key = typeof(T).GetHashCode();
+                Behavior behavior;
+                if (Behavior.behaviors.TryGetValue(key, out behavior))
+                {
+                    behavior.AddElement(id);
+                }
+                else
+                {
+                    compositionNoTags.Add(key);
+                    behavior = new T() as Behavior;
+                    Behavior.behaviors.Add(key, behavior);
+                }
+
+                return default(T);
+            }
+
+            var component = Storage<T>.Instance.TryAdd(id);
+            var setupable = component as ISetup;
+            if (setupable != null)
+            {
+                setupable.Setup(this);
+            }
+
+            return component;
+        }
+
+        public void Remove<T>() where T : new()
+        {
+            if (typeof(T).IsSubclassOf(typeof(Behavior)))
+            {
+                Behavior behavior;
+                var key = typeof(T).GetHashCode();
+                if (Behavior.behaviors.TryGetValue(key, out behavior))
+                {
+                    behavior.RemoveElement(id);
+                    compositionNoTags.Remove(key);
+                }
+
+                return;
+            }
+
+            Storage<T>.Instance.Remove(id);
+        }
+
+        #endregion
+
+        #region  GET
+
+        public T Get<T>() where T : new()
+        {
+            var obj = Storage<T>.Instance.TryGet(id);
+            return obj != null
+                ? obj
+                : typeof(T).IsSubclassOf(typeof(UnityEngine.Object))
+                    ? GetComponentInChildren<T>()
+                    : default(T);
+        }
+
+        public T Get<T>(string path)
+        {
+            if (path == string.Empty) return GetComponentInChildren<T>();
+            var o = selfTransform.Find(path);
+            return o == null ? default(T) : o.GetComponent<T>();
+        }
+
+        public object Get(Type t)
+        {
+            object obj;
+
+            if (t == typeof(Component))
+                return selfTransform.GetComponentInChildren(t);
+
+            var len = ProcessingEntities.storageTypes.Count;
+            for (var i = 0; i < len; i++)
+            {
+                obj = ProcessingEntities.storageTypes[i].TryGet(t, id);
+                if (obj != null)
+                    return obj;
+            }
+
+
+            return null;
+        }
+
+        #endregion
+
+
+        #region METHODS
+
+        public void BindTags()
+        {
+            tags = new Dictionary<int, int>(new FastDict());
+        }
+
+        public override void SetupAfterStarter()
+        {
+            base.SetupAfterStarter();
+
+            var childs = GetComponentsInChildren<MonoCached>();
+
+            for (var i = 1; i < childs.Length; i++)
+            {
+                childs[i].actorParent = this;
+                childs[i].SetupAfterActor();
+            }
+        }
+
+        void HandleTagsChanged()
+        {
+            if (Toolbox.isQuittingOrChangingScene()) return;
+
+
+            var len = compositions != null ? compositions.Count : 0;
+
+            for (var i = 0; i < len; i++)
+            {
+                var composition = compositions[i];
+
+                if (composition.Equals(this))
+                {
+                    if (composition.changed) continue;
+
+                    var count = composition.ids.Count;
+                    composition.changed = true;
+                    for (var j = 0; j < count; j++)
+                    {
+                        AddToBehavior(composition.ids[j]);
+                    }
+                }
+                else
+                {
+                    if (!composition.changed) continue;
+                    composition.changed = false;
+                    var count = composition.ids.Count;
+                    for (var j = 0; j < count; j++)
+                    {
+                        RemoveFromBehavior(composition.ids[j]);
+                    }
+                }
+            }
+
+            var groups = ProcessingEntities.Default.GroupsBase;
+            len = ProcessingEntities.Default.groupCount;
+
+
+            for (var i = 0; i < len; i++)
+            {
+                groups[i].ChangeTags(id);
+            }
+
+            groups = ProcessingEntities.Default.GroupsActors;
+            len = ProcessingEntities.Default.groupCountActors;
+            for (var i = 0; i < len; i++)
+            {
+                groups[i].ChangeTags(id);
+            }
+        }
+
+        public virtual void Spawn(bool arg)
+        {
+        }
+
+        #endregion
+
+
+        #region TAGS
+
+        public bool HasTagAny(params int[] filter)
+        {
+            for (var i = 0; i < filter.Length; i++)
+            {
+                if (tags.ContainsKey(filter[i])) return true;
+            }
+
+            return false;
+        }
+
+        public bool HasTags(params int[] filter)
+        {
+            for (var i = 0; i < filter.Length; i++)
+            {
+                if (!tags.ContainsKey(filter[i])) return false;
+            }
+
+            return true;
+        }
+
+        public bool HasTag(int val)
+        {
+            return tags.ContainsKey(val);
+        }
+
+
+        public void RemoveTags(params int[] ids)
+        {
+            var tagsChanged = false;
+            foreach (var index in ids)
+            {
+                int val;
+                if (!tags.TryGetValue(index, out val)) continue;
+                val = Mathf.Max(0, val - 1);
+
+                if (val == 0)
+                {
+                    tags.Remove(index);
+                    tagsChanged = true;
+                }
+                else tags[index] = val;
+            }
+
+            if (tagsChanged == false) return;
+            HandleTagsChanged();
+        }
+
+        public void RemoveTags(int id, bool all = false)
+        {
+            int val;
+            if (!tags.TryGetValue(id, out val)) return;
+            val = all ? 0 : Mathf.Max(0, val - 1);
+
+            if (val == 0)
+            {
+                tags.Remove(id);
+                HandleTagsChanged();
+            }
+            else tags[id] = val;
+        }
+
+
+        public void AddTags(params int[] ids)
+        {
+            var c = false;
+            foreach (var index in ids)
+            {
+                if (tags.ContainsKey(index))
+                {
+                    tags[index] += 1;
+                    continue;
+                }
+
+
+                tags.Add(index, 1);
+                c = true;
+            }
+
+            if (!c) return;
+
+            HandleTagsChanged();
+        }
+
+        public void AddTag(int id)
+        {
+            if (tags.ContainsKey(id))
+            {
+                tags[id] += 1;
+
+                return;
+            }
+
+            tags.Add(id, 1);
+
+            HandleTagsChanged();
+        }
+
+        #endregion
+    }
 }

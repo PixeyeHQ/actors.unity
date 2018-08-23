@@ -11,12 +11,12 @@ namespace Homebrew{
 
 public abstract class BaseStateMachineBehavior : StateMachineBehaviour
 {
-	protected Actor actor;
+	protected Actor Actor;
 
 	public void Setup(Actor actor)
 	{
 
-		this.actor = actor;
+		this.Actor = actor;
 		OnSetup();
 	}
 
@@ -43,12 +43,12 @@ public abstract class BaseStateMachineBehavior : StateMachineBehaviour
 			}
 		}
 		
-		public static void Initialize(this Animator animator,  Actor actor)
+		public static void Initialize(this Animator animator,  Actor actorDepr)
 		{
 		 var behaviors = animator.GetBehaviours<BaseStateMachineBehavior>().ToList();
 			for (var i = 0; i < behaviors.Count; i++)
 			{
-				 behaviors[i].Setup(actor);
+				 behaviors[i].Setup(actorDepr);
 			}
 		}
 	}

@@ -13,27 +13,13 @@ namespace Homebrew
 	{
 		public int[] filter;
 
+	 
+		
 		public GroupByAttribute(params int[] filter)
 		{
 			this.filter = filter;
 		}
-
-		public GroupByAttribute(params object[] f)
-		{
-			filter = new int[f.Length];
-			for (var i = 0; i < f.Length; i++)
-			{
-				if (f[i] is int)
-				{
-					filter[i] = (int) f[i];
-				}
-
-				else
-				{
-					filter[i] = f[i].GetHashCode();
-				}
-			}
-		}
+ 
 
  
 	}

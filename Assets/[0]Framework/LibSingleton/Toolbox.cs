@@ -103,8 +103,8 @@ namespace Homebrew
 
 			foreach (var pair in data)
 			{
-				var needToBeWiped = pair.Value as IMustBeWipedOut;
-				if (needToBeWiped != null) toWipe.Add(pair.Key);
+				var isKernel = pair.Value as IKernel;
+				if (isKernel == null) toWipe.Add(pair.Key);
 
 				var needToBeCleaned = pair.Value as IDisposable;
 				if (needToBeCleaned == null) continue;

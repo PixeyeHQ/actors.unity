@@ -10,7 +10,7 @@ namespace Homebrew{
 public interface IEnable
 {
 
-	void  Enable(bool arg);
+	void  OnEnable(bool arg);
 
 }
 }

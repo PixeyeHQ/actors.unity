@@ -1,111 +1,131 @@
-/*===============================================================
-Product:    Unity-Framework
-Developer:  Dimitry Pixeye - info@pixeye,games
-Company:    Homebrew
-Date:       7/23/2018 1:57 PM
-================================================================*/
+//   Project : Battlecruiser3.0
+//  Contacts : Pixeye - info@pixeye.games 
+//      Date : 8/19/2018
+
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using Homebrew;
 
 
-namespace Homebrew
+public class Behavior : IEnumerable
 {
-	public class Behavior : IComponent, IEnable
-	{
-		protected IEntity entity;
-		protected EntityState state;
+    public static Dictionary<int, Behavior> behaviors = new Dictionary<int, Behavior>(EngineSettings.MinBehaviors, new FastDict());
+   // public static List<Behavior> BehaviorsList = new List<Behavior>(EngineSettings.MinBehaviors);
+
+    public int[] actor_ids = new int[12];
+    public int length;
 
 
-		public void Awake(IEntity entity)
-		{
-			this.entity = entity;
-			state |= EntityState.Visible;
-			state |= EntityState.Active;
-			ProcessingBehaviorAttributes.Default.Setup(this, entity);
-			Setup();
-		}
+    public Behavior()
+    {
+        ProcessingSystemAttributes.Setup(this);
+        ProcessingUpdate.Default.Add(this);
+        ProcessingSignals.TryAddToGlobal(this);
 
-		/// <summary>
-		/// Inactive behaviors will recieve signals but won't be updated
-		/// </summary>
-		/// <param name="arg"></param>
-		public void Activate(bool arg)
-		{
-			if (!state.HasState(EntityState.Enabled)) return;
+    }
+
+    public static Actor GetEntity(int id)
+    {
+        return Actor.entites[id];
+    }
 
 
-			if (!arg && state.HasState(EntityState.Active))
-			{
-				state &= ~EntityState.Active;
-				ProcessingUpdate.Default.Remove(this);
-			}
-			else if (arg && !state.HasState(EntityState.Active))
-			{
-				state |= EntityState.Active;
-				ProcessingUpdate.Default.Add(this);
-			}
-		}
+    public void AddElement(int id)
+    {
+
+        if (actor_ids.Length <= length)
+        {
+            var len = length == 0 ? EngineSettings.MinComponents : length << 1;
+            Array.Resize(ref actor_ids, len);
+        }
 
 
-//		public virtual void OnTagsChanged()
-//		{
-//		}
+        actor_ids[length++] = id;
+        OnEnable(Actor.entites[id]);
+    }
 
-		/// <summary>
-		/// Behavior initialize method for extra binds and caching. Works only once.
-		/// </summary>
-		protected virtual void Setup()
-		{
-		}
+    public void RemoveElement(int id)
+    {
+        for (var i = 0; i < length; i++)
+        {
+            if (actor_ids[i] != id) continue;
+            length--;
+            Array.Copy(actor_ids, i + 1, actor_ids, i, length - i);
+            OnDisable(Actor.entites[id]);
+            break;
+        }
+    }
 
-		protected virtual void HandleEnable()
-		{
-		}
+    protected virtual void OnEnable(Actor actor)
+    {
+    }
 
-		protected virtual void HandleDisable()
-		{
-		}
+    protected virtual void OnDisable(Actor actor)
+    {
+    }
 
-		protected T Get<T>()
-		{
-			return entity.Get<T>();
-		}
+    protected virtual void OnTick(Actor actor)
+    {
+    }
 
-		protected T Get<T>(string path)
-		{
-			return entity.Get<T>(path);
-		}
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
+    }
 
-		public void Enable(bool arg)
-		{
-			if (arg)
-			{
-				if (state.HasState(EntityState.Enabled)) return;
-				state |= EntityState.Enabled;
-				entity.Signals.Add(this);
-				ProcessingUpdate.Default.Add(this);
-				HandleEnable();
-			}
-			else
-			{
-				if (!state.HasState(EntityState.Enabled)) return;
-				state &= ~EntityState.Enabled;
-				entity.Signals.Remove(this);
-				ProcessingUpdate.Default.Remove(this);
-				HandleDisable();
-			}
-		}
+    public ActorEnum GetEnumerator()
+    {
+        return new ActorEnum(actor_ids, length);
+    }
 
 
-		public void Dispose()
-		{
-			if (Toolbox.isQuittingOrChangingScene()) return;
-			ProcessingUpdate.Default.Remove(this);
-			entity.Signals.Remove(this);
-			OnDispose();
-			entity = null;
-		}
+    public void Tick()
+    {
+        foreach (var e in this)
+        {
+            OnTick(e);
+        }
+    }
 
-		protected virtual void OnDispose()
-		{
-		}
-	}
+
+    public void Dispose()
+    {
+    }
+}
+
+
+public struct ActorEnum : IEnumerator
+{
+    public int[] actors;
+
+
+    int position;
+    private int length;
+
+    public ActorEnum(int[] list, int length)
+    {
+        actors = list;
+        position = -1;
+        this.length = length;
+    }
+
+    public bool MoveNext()
+    {
+        position++;
+        return position < length;
+    }
+
+    public void Reset()
+    {
+        position = -1;
+    }
+
+    object IEnumerator.Current => Current;
+
+    public Actor Current => Actor.entites[actors[position]];
+}
+
+public interface IBehavior : IDisposable
+{
 }

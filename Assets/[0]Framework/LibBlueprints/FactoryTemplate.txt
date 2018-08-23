@@ -1,0 +1,9 @@
+ using Homebrew;
+using UnityEngine;
+namespace Homebrew{
+[CreateAssetMenu(fileName = "factory_&NAME&", menuName = "Actors/Factories/##NAME##")]
+public class ##NAME## : Factory
+{
+     
+}
+}

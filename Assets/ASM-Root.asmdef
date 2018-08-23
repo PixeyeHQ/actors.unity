@@ -1,3 +1,8 @@
-﻿{
-	"name": "ASM-Root"
+{
+    "name": "ASM-Root",
+    "references": [],
+    "optionalUnityReferences": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false
 }

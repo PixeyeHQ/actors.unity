@@ -24,9 +24,12 @@ namespace Homebrew
 
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
+			if (property.serializedObject.isEditingMultipleObjects)
+				return;
+			
 			EditorGUI.BeginProperty(position, label, property);
 			EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), label);
-
+           
 			var tagFilter = attribute as TagFilterAttribute;
 			var tagType = tagFilter.Type;
 
@@ -34,7 +37,7 @@ namespace Homebrew
 
 			var listNames = new List<string>();
 			fields.Clear();
-
+			 
 			var vv = property.intValue;
 
 			for (var i = 0; i < objectFields.Length; i++)
@@ -70,22 +73,22 @@ namespace Homebrew
 		}
 
 
-		FieldInfo[] ReturnConst(Type t)
+		static FieldInfo[] ReturnConst(Type t)
 		{
-			ArrayList constants = new ArrayList();
+			var constants = new ArrayList();
 
-			FieldInfo[] fieldInfos = t.GetFields(
+			var fieldInfos = t.GetFields(
 				BindingFlags.Public | BindingFlags.Static |
 				BindingFlags.FlattenHierarchy);
 
 
-			foreach (FieldInfo fi in fieldInfos)
+			foreach (var fi in fieldInfos)
 
 				if (fi.IsLiteral && !fi.IsInitOnly)
 					constants.Add(fi);
 
 
-			return (FieldInfo[]) constants.ToArray(typeof(FieldInfo));
+			return constants.ToArray(typeof(FieldInfo)) as FieldInfo[];
 		}
 	}
 }

@@ -8,129 +8,210 @@ Date:       18/01/2018 10:57
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using UnityEngine;
 
 namespace Homebrew
 {
-	public class ProcessingBehaviorAttributes
-	{
-		public static ProcessingBehaviorAttributes Default;
+    public class ProcessingBehaviorAttributes
+    {
+        public static ProcessingBehaviorAttributes Default;
 
-		public static readonly Dictionary<Type, CachedType> cached = new Dictionary<Type, CachedType>();
+        public static readonly Dictionary<Type, CachedType> cached = new Dictionary<Type, CachedType>();
 
-		public void Setup(IComponent b, IEntity a)
-		{
-			var type = b.GetType();
-			CachedType o;
-			var isCached = cached.TryGetValue(type, out o);
+        public static void Setup(IComponent b, Actor a)
+        {
+            var type = b.GetType();
+            CachedType o;
+            var isCached = cached.TryGetValue(type, out o);
 
-			if (!isCached)
-			{
-				o = new CachedType();
+            if (!isCached)
+            {
+                o = new CachedType();
 
-				var objectFields = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-				var length = objectFields.Length;
-				cached.Add(type, o);
-				for (var i = 0; i < length; i++)
-				{
-					var myFieldInfo = objectFields[i];
-					var attribute = Attribute.GetCustomAttribute(objectFields[i], typeof(BindAttribute)) as BindAttribute;
+                var objectFields = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                var length = objectFields.Length;
+                cached.Add(type, o);
+                for (var i = 0; i < length; i++)
+                {
+                    var myFieldInfo = objectFields[i];
+                    var attribute =
+                        Attribute.GetCustomAttribute(objectFields[i], typeof(BindAttribute)) as BindAttribute;
 
-					if (attribute != null)
-					{
-						var fieldType = myFieldInfo.FieldType;
-
-
-						switch (attribute.bindType)
-						{
-							case 0:
-
-								myFieldInfo.SetValue(b, a.Get(fieldType));
-								o.cachedBindFields.Add(myFieldInfo);
-								break;
-
-							case 1:
-								myFieldInfo.SetValue(b, Toolbox.Get(fieldType));
-								o.cachedToolboxFields.Add(myFieldInfo);
-								break;
-
-							case 2:
-								var actor = a as Actor;
-								myFieldInfo.SetValue(b, actor != null ? actor.GetComponentInChildren(fieldType) : a.GetTransform().GetComponentInChildren(fieldType));
-								o.cachedFromObjFields.Add(myFieldInfo);
-								break;
-
-							case 3:
-								var blueprint = a.Get<DataBlueprint>().blueprint;
-								myFieldInfo.SetValue(b, blueprint.Get(fieldType));
-								o.cachedFromBlueprintFields.Add(myFieldInfo);
-								break;
-						}
-					}
-				}
-			}
-			else
-			{
-				o.Bind(b, a);
-
-				o.GetFromToolbox(b);
-				o.GetFromObject(b, a);
-				o.GetFromBlueprint(b, a);
-			}
-		}
-
-		public class CachedType
-		{
-			public readonly List<FieldInfo> cachedBindFields = new List<FieldInfo>();
-
-			public readonly List<FieldInfo> cachedToolboxFields = new List<FieldInfo>();
-			public readonly List<FieldInfo> cachedFromObjFields = new List<FieldInfo>();
-			public readonly List<FieldInfo> cachedFromBlueprintFields = new List<FieldInfo>();
-
-			public void Bind(IComponent behavior, IEntity a)
-			{
-				for (var i = 0; i < cachedBindFields.Count; i++)
-				{
-					var myFieldInfo = cachedBindFields[i];
-					var fieldType = myFieldInfo.FieldType;
-
-					myFieldInfo.SetValue(behavior, a.Get(fieldType));
-				}
-			}
+                    if (attribute == null) continue;
+                    var fieldType = myFieldInfo.FieldType;
 
 
-			public void GetFromToolbox(IComponent behavior)
-			{
-				for (var i = 0; i < cachedToolboxFields.Count; i++)
-				{
-					var myFieldInfo = cachedToolboxFields[i];
-					var fieldType = myFieldInfo.FieldType;
-					myFieldInfo.SetValue(behavior, Toolbox.Get(fieldType));
-				}
-			}
+                    switch (attribute.bindType)
+                    {
+                        case 0:
 
-			public void GetFromObject(IComponent behavior, IEntity a)
-			{
-				for (var i = 0; i < cachedFromObjFields.Count; i++)
-				{
-					var myFieldInfo = cachedFromObjFields[i];
-					var fieldType = myFieldInfo.FieldType;
-					var actor = a as Actor;
 
-					myFieldInfo.SetValue(behavior, actor!=null ? actor.GetComponentInChildren(fieldType) : a.GetTransform().GetComponentInChildren(fieldType));
-				}
-			}
+                            //var isStorage =	typeof(IStorage).IsAssignableFrom(fieldType);
+                            //isStorage ? ComponentType.STORAGE : ComponentType.LOCAL)
+                            myFieldInfo.SetValue(b, a.Get(fieldType));
+                            o.cachedBindFields.Add(myFieldInfo);
+                            break;
 
-			public void GetFromBlueprint(IComponent behavior, IEntity a)
-			{
-				for (var i = 0; i < cachedFromBlueprintFields.Count; i++)
-				{
-					var myFieldInfo = cachedFromBlueprintFields[i];
-					var fieldType = myFieldInfo.FieldType;
-					var blueprint = a.Get<DataBlueprint>().blueprint;
+                        case 1:
+                            myFieldInfo.SetValue(b, Toolbox.Get(fieldType));
+                            o.cachedToolboxFields.Add(myFieldInfo);
+                            break;
 
-					myFieldInfo.SetValue(behavior, blueprint.Get(fieldType));
-				}
-			}
-		}
-	}
+                        case 2:
+
+                            myFieldInfo.SetValue(b, a.selfTransform.GetComponentInChildren(fieldType));
+                            o.cachedFromObjFields.Add(myFieldInfo);
+                            break;
+
+                        case 3:
+                            var blueprint = a.Get<DataBlueprint>().blueprint;
+                            myFieldInfo.SetValue(b, blueprint.Get(fieldType));
+                            o.cachedFromBlueprintFields.Add(myFieldInfo);
+                            break;
+                    }
+                }
+            }
+            else
+            {
+                o.Bind(b, a);
+
+                o.GetFromToolbox(b);
+                o.GetFromObject(b, a);
+                o.GetFromBlueprint(b, a);
+            }
+        }
+
+        public class CachedType
+        {
+            public readonly List<FieldInfo> cachedBindFields = new List<FieldInfo>();
+
+            public readonly List<FieldInfo> cachedToolboxFields = new List<FieldInfo>();
+            public readonly List<FieldInfo> cachedFromObjFields = new List<FieldInfo>();
+            public readonly List<FieldInfo> cachedFromBlueprintFields = new List<FieldInfo>();
+
+            public void Bind(IComponent behavior, Actor a)
+            {
+                for (var i = 0; i < cachedBindFields.Count; i++)
+                {
+                    var myFieldInfo = cachedBindFields[i];
+                    var fieldType = myFieldInfo.FieldType;
+
+                    //	var isStorage =	typeof(IStorage).IsAssignableFrom(fieldType);
+
+                    //myFieldInfo.SetValue(b, a.Get(fieldType, isStorage ? ComponentType.STORAGE : ComponentType.LOCAL));
+                    //, isStorage ? ComponentType.STORAGE : ComponentType.LOCAL)
+                    myFieldInfo.SetValue(behavior, a.Get(fieldType));
+                }
+            }
+
+
+            public void GetFromToolbox(IComponent behavior)
+            {
+                for (var i = 0; i < cachedToolboxFields.Count; i++)
+                {
+                    var myFieldInfo = cachedToolboxFields[i];
+                    var fieldType = myFieldInfo.FieldType;
+                    myFieldInfo.SetValue(behavior, Toolbox.Get(fieldType));
+                }
+            }
+
+            public void GetFromObject(IComponent behavior, Actor a)
+            {
+                for (var i = 0; i < cachedFromObjFields.Count; i++)
+                {
+                    var myFieldInfo = cachedFromObjFields[i];
+                    var fieldType = myFieldInfo.FieldType;
+
+
+                    myFieldInfo.SetValue(behavior, a.selfTransform.GetComponentInChildren(fieldType));
+                }
+            }
+
+            public void GetFromBlueprint(IComponent behavior, Actor a)
+            {
+                for (var i = 0; i < cachedFromBlueprintFields.Count; i++)
+                {
+                    var myFieldInfo = cachedFromBlueprintFields[i];
+                    var fieldType = myFieldInfo.FieldType;
+                    var blueprint = a.Get<DataBlueprint>().blueprint;
+
+                    myFieldInfo.SetValue(behavior, blueprint.Get(fieldType));
+                }
+            }
+        }
+    }
+
+    public class ProcessingSystemAttributes
+    {
+        public static readonly Dictionary<Type, CachedType> cached = new Dictionary<Type, CachedType>();
+
+        public static void Setup(object b)
+        {
+            var type = b.GetType();
+            CachedType o;
+            var isCached = cached.TryGetValue(type, out o);
+
+            if (!isCached)
+            {
+                o = new CachedType();
+
+                var objectFields = type.GetFields(BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public |
+                                                  BindingFlags.NonPublic);
+                var length = objectFields.Length;
+                cached.Add(type, o);
+                for (var i = 0; i < length; i++)
+                {
+                    var myFieldInfo = objectFields[i];
+                    var attribute =
+                        Attribute.GetCustomAttribute(objectFields[i], typeof(BindAttribute)) as BindAttribute;
+
+                    if (attribute == null) continue;
+                    var fieldType = myFieldInfo.FieldType;
+
+
+                    switch (attribute.bindType)
+                    {
+                        case 0:
+
+
+                            break;
+
+                        case 1:
+                            myFieldInfo.SetValue(b, Toolbox.Get(fieldType));
+                            o.cachedToolboxFields.Add(myFieldInfo);
+                            break;
+
+                        case 2:
+
+
+                            break;
+
+                        case 3:
+
+                            break;
+                    }
+                }
+            }
+            else
+            {
+                o.GetFromToolbox(b);
+            }
+        }
+
+        public class CachedType
+        {
+            public readonly List<FieldInfo> cachedToolboxFields = new List<FieldInfo>();
+
+
+            public void GetFromToolbox(object behavior)
+            {
+                for (var i = 0; i < cachedToolboxFields.Count; i++)
+                {
+                    var myFieldInfo = cachedToolboxFields[i];
+                    var fieldType = myFieldInfo.FieldType;
+                    myFieldInfo.SetValue(behavior, Toolbox.Get(fieldType));
+                }
+            }
+        }
+    }
 }

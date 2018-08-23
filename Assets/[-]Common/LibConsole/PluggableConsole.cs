@@ -13,7 +13,7 @@ using UnityEngine;
 
 namespace Homebrew
 {
-	[CreateAssetMenu(menuName = "Plugables/Console", fileName = "Console")]
+	[CreateAssetMenu(menuName = "Actors/Plugables/Console", fileName = "Console")]
 	public class PluggableConsole : Pluggable
 	{
 		[FoldoutGroup("SetupData")] public CommandsConsole commandsDebug;

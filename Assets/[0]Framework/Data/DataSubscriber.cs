@@ -10,12 +10,12 @@ namespace Homebrew{
 [System.Serializable]
 public class DataSubscriber : IData
 {
-	public Actor actor;
+	public Actor Actor;
   
 
 	public void Dispose()
 	{
-		actor = null;
+		Actor = null;
 	}
 }
 

@@ -1,0 +1,8 @@
+{
+    "name": "ASM-ThirdParty",
+    "references": [],
+    "optionalUnityReferences": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false
+}

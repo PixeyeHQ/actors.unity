@@ -8,7 +8,6 @@ Date:       27/01/2018 13:14
 using System;
 using System.Collections;
 using System.Text;
- 
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -32,8 +31,7 @@ namespace Homebrew
 		private string commandCached = string.Empty;
 
 		private StringBuilder fStr = new StringBuilder(256);
-
-
+ 
 		public void ActivateConsole(bool activating)
 		{
 			if (activating)
@@ -58,7 +56,7 @@ namespace Homebrew
 
 		private void Start()
 		{
-			transform.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -5);
+			transform.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, 0);
 			AddMessage(
 				"Welcome back, commander\nType <color=#00cc66>?</color> or <color=#00cc66>Help</color> to get list of commands");
 		}
@@ -89,7 +87,7 @@ namespace Homebrew
 					Profiler.GetTotalAllocatedMemoryLong() / 1048576,
 					Profiler.GetTotalReservedMemoryLong() / 1048576,
 					Profiler.GetTotalUnusedReservedMemoryLong() / 1048576)
-				.AppendFormat("Actors : {0}	Ticks : {1}", Toolbox.Get<ProcessingEntities>().listActors.Count,
+				.AppendFormat("Actors : {0}	Ticks : {1}", Actor.lastID,
 					Toolbox.Get<ProcessingUpdate>().GetTicksCount());
 			labelDebug.text = fStr.ToString();
 		}
@@ -97,7 +95,7 @@ namespace Homebrew
 
 		private IEnumerator _ColorLine()
 		{
-			TMP_TextInfo textInfo = fieldInput.textComponent.textInfo;
+			var textInfo = fieldInput.textComponent.textInfo;
 			fieldInput.textComponent.ForceMeshUpdate();
 
 
@@ -107,7 +105,7 @@ namespace Homebrew
 			yield return new WaitForSeconds(0.1f);
 			while (true)
 			{
-				int characterCount = textInfo.characterCount;
+				var characterCount = textInfo.characterCount;
 
 				// If No Characters then just yield and wait for some text to be added
 				if (characterCount == 0)
@@ -124,7 +122,7 @@ namespace Homebrew
 					var vertexIndex = textInfo.characterInfo[i].vertexIndex;
 					if (i >= size.x && i <= size.y)
 					{
-						c0 = new Color32((byte) 0, (byte) 205, (byte) 100, 255);
+						c0 = new Color32(0, 205, 100, 255);
 					}
 					else c0 = new Color32(255, 255, 255, 255);
 
@@ -158,7 +156,7 @@ namespace Homebrew
 
 		private void AddMessage(string line)
 		{
-			if (line == String.Empty) return;
+			if (line == string.Empty) return;
 			fieldOutput.text += "-> " + line + "\n";
 		}
 

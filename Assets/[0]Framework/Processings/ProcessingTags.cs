@@ -8,13 +8,13 @@ Date:       19/12/2017 19:44
 
 using System;
 using System.Collections.Generic;
+ 
 using UnityEngine;
 
 
 namespace Homebrew
 {
-	[Serializable]
-	public class ProcessingTags : IComponent
+	public class ProcessingTags : IDisposable
 	{
 		private Dictionary<int, int> tags = new Dictionary<int, int>();
 		private Action actionChanged;
@@ -38,6 +38,7 @@ namespace Homebrew
 
 		public bool ContainAll(params int[] filter)
 		{
+			
 			for (var i = 0; i < filter.Length; i++)
 			{
 				if (!tags.ContainsKey(filter[i])) return false;
@@ -75,12 +76,12 @@ namespace Homebrew
 			actionChanged();
 		}
 
-		public void Remove(int id)
+		public void Remove(int id, bool all = false)
 		{
 			int val;
 			if (tags.TryGetValue(id, out val))
 			{
-				val = Mathf.Max(0, val - 1);
+				val = all ? 0 : Mathf.Max(0, val - 1);
 
 				if (val == 0)
 				{
@@ -91,13 +92,7 @@ namespace Homebrew
 			}
 		}
 
-		public void RemovAll(int id)
-		{
-			if (tags.ContainsKey(id))
-				tags.Remove(id);
-
-			actionChanged();
-		}
+		
 
 		public void Add(params int[] ids)
 		{
@@ -114,8 +109,9 @@ namespace Homebrew
 				tags.Add(index, 1);
 				c = true;
 			}
-
+		 
 			if (!c) return;
+ 
 			actionChanged();
 		}
 

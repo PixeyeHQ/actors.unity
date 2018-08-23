@@ -1,0 +1,12 @@
+ using Homebrew;
+using UnityEngine;
+namespace Homebrew{
+[CreateAssetMenu(fileName = "bp_&NAME&", menuName = "Actors/Blueprints/##NAME##")]
+public class ##NAME## : Blueprint
+{
+     public override void Setup()
+        {
+            // use add mathod to define data inside blueprint
+        }
+}
+}

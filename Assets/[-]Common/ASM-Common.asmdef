@@ -1,7 +1,8 @@
 {
     "name": "ASM-Common",
     "references": [
-        "ASM-Framework"
+        "ASM-Framework",
+        "Unity.TextMeshPro"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [],

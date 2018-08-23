@@ -14,9 +14,9 @@ namespace Homebrew
 	{
 		protected ProcessingBase()
 		{
-			ProcessingGroupAttributes.Default.Setup(this);
-			ProcessingSignals.Default.Add(this);
-			ProcessingUpdate.Default.Add(this);
+			ProcessingSystemAttributes.Setup(this);
+			ProcessingGroupAttributes.Setup(this);
+			ProcessingSignals.TryAddToGlobal(this);
 		}
 
 

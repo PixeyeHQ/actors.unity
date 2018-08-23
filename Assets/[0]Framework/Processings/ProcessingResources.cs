@@ -15,31 +15,35 @@ namespace Homebrew
 	{
 		public static ProcessingResources Default;
 
-		private Dictionary<string, Object> entities = new Dictionary<string, Object>();
+		private Dictionary<string, Object> items = new Dictionary<string, Object>();
 
 
 		public static T Get<T>(string id) where T : Object
 		{
-			Object obj;
-			var hasValue = Default.entities.TryGetValue(id, out obj);
+#if HOMEBREW_EDIT
+			return Resources.Load<T>(id);
+#else
+	Object obj;
+			var hasValue = Default.items.TryGetValue(id, out obj);
 			if (hasValue == false)
 			{
 				obj = Resources.Load<T>(id);
-				Default.entities.Add(id, obj);
+				Default.items.Add(id, obj);
 			}
 
 			return obj as T;
+#endif
 		}
 
 		public static T GetPrefab<T>(string id) where T : Object
 		{
 			Object obj;
-			var hasValue = Default.entities.TryGetValue(id, out obj);
+			var hasValue = Default.items.TryGetValue(id, out obj);
 
 			if (hasValue == false)
 			{
 				obj = Resources.Load("Prefabs/" + id) as GameObject;
-				Default.entities.Add(id, obj);
+				Default.items.Add(id, obj);
 			}
 
 			return obj as T;

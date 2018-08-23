@@ -20,13 +20,11 @@ namespace Homebrew
 			{
 				pool = new PoolStash();
 				pools.Add((int) id, pool);
-				if (reparent)
-				{
-					var poolsGO = GameObject.Find("[POOLS]") ?? new GameObject("[POOLS]");
-					var poolGO = new GameObject("Pool_" + id);
-					poolGO.transform.SetParent(poolsGO.transform);
-					pool.SetPoolParent(poolGO.transform);
-				}
+				if (!reparent) return;
+				var poolsGO = GameObject.Find("[POOLS]") ?? new GameObject("[POOLS]");
+				var poolGO = new GameObject("Pool_" + id);
+				poolGO.transform.SetParent(poolsGO.transform);
+				pool.SetPoolParent(poolGO.transform);
 			}
 		}
 

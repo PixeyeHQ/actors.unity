@@ -8,17 +8,19 @@ Date:       1/31/2018  8:17 PM
 
 namespace Homebrew
 {
-	[System.Serializable]
+
 	public class Time : ITick, IKernel, IComponent
 	{
 		public static Time Default;
-
 		protected const float fps = 30;
+	
+		public float isActive = 1.0f;
+		public float timeScale = 1.0f;
+
+		
 		protected float _deltaTimeFixed;
 		protected float _deltaTime;
 		protected float _lastFrame;
-		public float isActive = 1.0f;
-		public float timeScale = 1.0f;
  
 		public float deltaTime => Default._deltaTime * timeScale;
 
@@ -28,7 +30,7 @@ namespace Homebrew
 
 		public static float DeltaTimeFixed => Default._deltaTimeFixed * Default.timeScale;
 
-		public float timeScaleCached;
+		public float timeScaleCached = 1;
 
 
 		public Time()
@@ -43,14 +45,11 @@ namespace Homebrew
 
 		public void Tick()
 		{
-			var timeSinceStart = UnityEngine.Time.realtimeSinceStartup;
-			_deltaTime = (timeSinceStart - _lastFrame) * isActive;
+		 
+			var timeSinceStart = UnityEngine.Time.unscaledTime;
+			_deltaTime = UnityEngine.Time.unscaledDeltaTime;  // (timeSinceStart - _lastFrame) * isActive;
 			_lastFrame = timeSinceStart;
 		}
 
-		public void Dispose()
-		{
-			 
-		}
 	}
 }

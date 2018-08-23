@@ -18,29 +18,28 @@ namespace Homebrew
 		private List<string> scenesToKeep = new List<string>();
 		private List<string> sceneDependsOn = new List<string>();
 		private Dictionary<string, Scene> scenes = new Dictionary<string, Scene>();
-		private ScenesList _scenesList;
-
+	 
 
 		public Action sceneLoaded = delegate { };
 		public Action sceneClosing = delegate { };
 
 
-		public void Setup(List<DataScene> scenesToKeep, List<DataScene> sceneDependsOn, Starter starter)
+		public void Setup(List<Scenes> scenesToKeep, List<Scenes> sceneDependsOn, Starter starter)
 		{
 		
 			this.scenesToKeep.Clear();
 			this.sceneDependsOn.Clear();
 			
-			for (int i = 0; i < scenesToKeep.Count; i++)
+			for (var i = 0; i < scenesToKeep.Count; i++)
 			{
 			 
-				this.scenesToKeep.Add(scenesToKeep[i].sceneName);
+				this.scenesToKeep.Add(scenesToKeep[i].ToString());
 			}
 			
-			for (int i = 0; i < sceneDependsOn.Count; i++)
+			for (var i = 0; i < sceneDependsOn.Count; i++)
 			{
 		 
-				this.sceneDependsOn.Add(sceneDependsOn[i].sceneName);
+				this.sceneDependsOn.Add(sceneDependsOn[i].ToString());
 			}
 		 
 			Toolbox.Instance.StartCoroutine(_Setup(starter));

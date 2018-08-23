@@ -10,107 +10,59 @@ using System.Collections.Generic;
 
 namespace Homebrew
 {
-	public class ProcessingPools : IDisposable
-	{
-		public static ProcessingPools Default;
+ 
+    public class ProcessingFastPool<T> : IDisposable where T : new()
+    {
+        public static readonly ProcessingFastPool<T> Instance = new ProcessingFastPool<T>();
+        public Stack<T> pool = new Stack<T>();
 
-		public readonly Dictionary<int, ProcessingFastPool> poolsComponents = new Dictionary<int, ProcessingFastPool>();
+        public T Spawn()
+        {
+            if (pool.Count > 0)
+            {
+                return pool.Pop();
+            }
 
+            var obj = new T();
+            return obj;
+        }
 
-		public T Spawn<T>() where T : new()
-		{
-			return GetPool(typeof(T).GetHashCode()).Spawn<T>();
-		}
-
-		public void Despawn<T>(T component, int Hashcode) where T : IComponent
-		{
-			GetPool(Hashcode).Despawn(component);
-		}
-
-		public void Despawn<T>(T component) where T : IComponent
-		{
-			GetPool(typeof(T).GetHashCode()).Despawn(component);
-		}
-
-		public void Populate<T>(int amount) where T : IComponent, new()
-		{
-			var chunk = new T[amount];
-			var pool = GetPool(typeof(T).GetHashCode());
-			for (int i = 0; i < amount; i++)
-			{
-				chunk[i] = pool.Spawn<T>();
-			}
-
-			for (int i = 0; i < amount; i++)
-			{
-				pool.Despawn(chunk[i]);
-			}
-		}
-
-		ProcessingFastPool GetPool(int id)
-		{
-			ProcessingFastPool p;
-			if (poolsComponents.TryGetValue(id, out p))
-			{
-				return p;
-			}
-
-			p = new ProcessingFastPool();
-			poolsComponents.Add(id, p);
-			return p;
-		}
+        public void Despawn(T component)
+        {
+            var disposable = component as IDisposable;
+            if (disposable != null) disposable.Dispose();
+            AddToPool(component);
+        }
 
 
-		public void Dispose()
-		{
-			foreach (var value in poolsComponents.Values)
-			{
-				value.Dispose();
-			}
+        public void Dispose()
+        {
+            foreach (var poolValue in pool)
+            {
+                var disposable = poolValue as IDisposable;
+                if (disposable != null) disposable.Dispose();
+            }
+        }
 
-			poolsComponents.Clear();
-		}
-	}
+        public void Populate(int amount)
+        {
+            var chunk = new T[amount];
 
-	public class ProcessingFastPool : IDisposable
-	{
-		Stack<IComponent> pool = new Stack<IComponent>();
+            for (var i = 0; i < amount; i++)
+            {
+                chunk[i] = Spawn();
+            }
 
-		public T Spawn<T>() where T : new()
-		{
-			if (pool.Count > 0)
-			{
-				return (T) pool.Pop();
-			}
-
-			var obj = new T();
-			return obj;
-		}
-
-		public void Despawn<T>(T component) where T : IComponent
-		{
-			var disposable = component as IDisposable;
-			if (disposable != null) disposable.Dispose();
-			//component.Dispose();
-			AddToPool(component);
-		}
+            for (var i = 0; i < amount; i++)
+            {
+                Despawn(chunk[i]);
+            }
+        }
 
 
-		public void Dispose()
-		{
-			foreach (var poolValue in pool)
-			{
-				var disposable = poolValue as IDisposable;
-				if (disposable != null) disposable.Dispose();
-
-				//poolValue.Dispose();
-			}
-		}
-
-
-		void AddToPool<T>(T obj) where T : IComponent
-		{
-			pool.Push(obj);
-		}
-	}
+        void AddToPool(T obj)
+        {
+            pool.Push(obj);
+        }
+    }
 }
