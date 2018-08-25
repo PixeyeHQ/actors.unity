@@ -47,8 +47,7 @@ namespace Homebrew
 
             var behavior = new T() as Behavior;
             Behavior.behaviors.Add(key, behavior);
-            ProcessingUpdate.Default.Add(behavior);
-
+     
             return this;
         }
 

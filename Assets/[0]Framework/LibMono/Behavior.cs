@@ -10,7 +10,8 @@ using Homebrew;
 
 public abstract class Behavior : IEnumerable
 {
-    public static Dictionary<int, Behavior> behaviors = new Dictionary<int, Behavior>(EngineSettings.MinBehaviors, new FastDict());
+    public static Dictionary<int, Behavior> behaviors =
+        new Dictionary<int, Behavior>(EngineSettings.MinBehaviors, new FastDict());
 
     public int[] actor_ids = new int[12];
     public int length;
@@ -18,10 +19,10 @@ public abstract class Behavior : IEnumerable
 
     public Behavior()
     {
+        ProcessingUpdate.Default.Add(this);
         ProcessingSystemAttributes.Setup(this);
         ProcessingGroupAttributes.Setup(this);
         ProcessingSignals.TryAddToGlobal(this);
-
     }
 
     public static Actor GetEntity(int id)
@@ -32,12 +33,12 @@ public abstract class Behavior : IEnumerable
 
     public void AddElement(int id)
     {
-
         if (actor_ids.Length <= length)
         {
             var len = length == 0 ? EngineSettings.MinComponents : length << 1;
             Array.Resize(ref actor_ids, len);
         }
+
         actor_ids[length++] = id;
         OnEnable(Actor.entites[id]);
     }
