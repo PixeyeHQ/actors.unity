@@ -4,8 +4,9 @@ namespace Homebrew
 [System.Flags]
 public enum Scenes
 {
-sceneGame = 0,
+sceneGameMono = 0,
 sceneCamera = 1,
-sceneKernel = 2
+sceneKernel = 2,
+sceneGame = 3
 }
 public static class ExtScenes	{	public static void To(this Scenes s)	{	ProcessingSceneLoad.To((int) s);	}}}

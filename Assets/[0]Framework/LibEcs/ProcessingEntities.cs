@@ -8,7 +8,8 @@
 
 using System;
 using System.Collections.Generic;
- 
+using UnityEngine;
+
 namespace Homebrew
 {
     public class ProcessingEntities : IDisposable
@@ -20,8 +21,59 @@ namespace Homebrew
         public int groupCount;
 
 
-        public GroupBase[] GroupsActors = new GroupBase[32];
+        public Group[] GroupsActors = new Group[32];
         public int groupCountActors;
+
+
+        public static void KillEntity(int index)
+        {
+            Actor.prevID = index;
+        }
+
+        public static void Remove<T>(int index) where T : new()
+        {
+           
+            Storage<T>.Instance.Remove(index);
+        }
+
+        public static void AddEntity(Actor monoActor)
+        {
+            var len = Actor.entites.Length;
+
+            if (Actor.lastID == len)
+            {
+                Array.Resize(ref Actor.entites, Mathf.Clamp(Actor.lastID << 1, 0, 1000000));
+            }
+
+            if (Actor.prevID != -1)
+            {
+                monoActor.id = Actor.prevID;
+                Actor.prevID = -1;
+                Actor.entites[monoActor.id] = monoActor;
+            }
+            else
+            {
+                monoActor.id = Actor.lastID;
+                Actor.entites[Actor.lastID++] = monoActor;
+            }
+        }
+
+        public static int AddEntity()
+        {
+            int id;
+            if (Actor.prevID != -1)
+            {
+                id = Actor.prevID;
+                Actor.prevID = -1;
+            }
+            else
+            {
+                id = Actor.lastID++;
+            }
+
+            return id;
+        }
+
 
         public GroupBase AddGetGroupActors(Type groupType, Composition filter)
         {
@@ -34,12 +86,11 @@ namespace Homebrew
                     break;
                 }
             }
-
+ 
             if (i != -1) return GroupsActors[i];
-          
-            i = groupCount;
 
-            var group_ = Activator.CreateInstance(groupType, true) as GroupBase;
+      
+            var group_ = Activator.CreateInstance(groupType, true) as Group;
 
             group_.Composition = filter;
             group_.Populate();
@@ -51,7 +102,7 @@ namespace Homebrew
 
             GroupsActors[groupCountActors++] = group_;
 
-            return GroupsActors[i];
+            return group_;
         }
 
         public GroupBase AddGetGroup(Type groupType, Composition filter)
@@ -70,10 +121,9 @@ namespace Homebrew
                     break;
                 }
             }
-
-
+          
             if (i != -1) return GroupsBase[i];
-
+            
             i = groupCount;
 
             var group_ = Activator.CreateInstance(groupType, true) as GroupBase;
@@ -96,6 +146,7 @@ namespace Homebrew
 
         public void CheckGroups(int entityID, bool active)
         {
+       
             if (active)
             {
                 for (var i = 0; i < groupCountActors; i++)
@@ -121,8 +172,9 @@ namespace Homebrew
                     GroupsActors[i].TryRemoveEntity(entityID);
                 }
             }
+       
         }
- 
+
         public void Dispose()
         {
         }

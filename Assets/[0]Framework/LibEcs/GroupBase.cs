@@ -54,11 +54,18 @@ namespace Homebrew
             }
         }
 
+        public int FromVirtual(int id)
+        {
+            return entities[id];
+        }
+
+
         public Actor From(int id)
         {
             return Actor.entites[entities[id]];
         }
 
+        public abstract void TryAddVirtually(int entityID);
         public abstract void TryAddEntity(int entityID, bool tagsChecked = false);
         public abstract void TryRemoveEntity(int entityID);
 
@@ -81,6 +88,10 @@ namespace Homebrew
 
     public class Group : GroupBase
     {
+        public override void TryAddVirtually(int entityID)
+        {
+        }
+
         public override void TryAddEntity(int entityID, bool tagsChecked = false)
         {
             var entity = Actor.entites[entityID];
@@ -104,9 +115,7 @@ namespace Homebrew
 
             entities[length++] = entityID;
             if (OnAdded != null)
-            {
-                Timer.Add(Time.DeltaTime, () => OnAdded.Invoke(length - 1));
-            }
+                OnAdded(length-1);
         }
 
         public override void TryRemoveEntity(int entityID)
@@ -115,10 +124,9 @@ namespace Homebrew
             {
                 if (entities[i] == entityID)
                 {
-                    OnRemoved?.Invoke(i);
                     length--;
                     Array.Copy(entities, i + 1, entities, i, length - i);
-
+                    OnRemoved?.Invoke(i);
                     break;
                 }
             }
@@ -130,7 +138,9 @@ namespace Homebrew
             for (var i = 0; i < Actor.lastID; i++)
             {
                 var e = Actor.entites[i];
-                if (e.isActiveAndEnabled == false) continue;
+ 
+                if (e==null||e.isActiveAndEnabled == false) continue;
+                if (e.tags == null) continue;
                 if (Composition.include.Length > 0)
                     if (!e.HasTags(Composition.include))
                         continue;
@@ -164,6 +174,25 @@ namespace Homebrew
         public T[] component = new T[EngineSettings.MinComponents];
 
 
+        public override void TryAddVirtually(int entityID)
+        {
+            var storage = Storage<T>.Instance;
+            if (storage.HasComponent(entityID) == false) return;
+            if (entities.Length <= length)
+            {
+                var len = entityID == 0 ? EngineSettings.MinComponents : entityID << 1;
+                Array.Resize(ref entities, len);
+                Array.Resize(ref component, len);
+            }
+
+
+            entities[length] = entityID;
+            component[length++] = storage.components[entityID];
+
+            if (OnAdded != null)
+                OnAdded(length-1);
+        }
+
         public override void TryAddEntity(int entityID, bool tagsChecked = false)
         {
             var storage = Storage<T>.Instance;
@@ -187,23 +216,17 @@ namespace Homebrew
 
             if (entities.Length <= length)
             {
-            
                 var len = entityID == 0 ? EngineSettings.MinComponents : entityID << 1;
                 Array.Resize(ref entities, len);
                 Array.Resize(ref component, len);
             }
 
-          
+
             entities[length] = entityID;
             component[length++] = storage.components[entityID];
-            
+
             if (OnAdded != null)
-            {
-                var id = length - 1;
-                var time = Time.DeltaTime > Time.DeltaTimeFixed ? Time.DeltaTimeFixed : Time.DeltaTime;
-                Timer.Add(time, () => OnAdded.Invoke(id));
- 
-            }
+                OnAdded(length-1);
         }
 
         public override void TryRemoveEntity(int entityID)
@@ -211,12 +234,13 @@ namespace Homebrew
             for (var i = 0; i < length; i++)
             {
                 if (entities[i] != entityID) continue;
-                OnRemoved?.Invoke(i);
+
 
                 length--;
 
                 Array.Copy(entities, i + 1, entities, i, length - i);
                 Array.Copy(component, i + 1, component, i, length - i);
+                OnRemoved?.Invoke(i);
 
                 break;
             }
@@ -234,7 +258,7 @@ namespace Homebrew
             for (var i = 0; i < Actor.lastID; i++)
             {
                 var e = Actor.entites[i];
-                if (e.isActiveAndEnabled == false) continue;
+                if (e!=null&&e.isActiveAndEnabled == false) continue;
 
                 if (Composition.include.Length > 0)
                     if (!e.HasTags(Composition.include))
@@ -283,6 +307,29 @@ namespace Homebrew
         public Y[] component2 = new Y[EngineSettings.MinComponents];
 
 
+        public override void TryAddVirtually(int entityID)
+        {
+            var storage = Storage<T>.Instance;
+            var storage2 = Storage<Y>.Instance;
+
+            if (storage.HasComponent(entityID) == false) return;
+            if (storage2.HasComponent(entityID) == false) return;
+            if (entities.Length <= length)
+            {
+                var len = entityID == 0 ? EngineSettings.MinComponents : entityID << 1;
+                Array.Resize(ref entities, len);
+                Array.Resize(ref component, len);
+                Array.Resize(ref component2, len);
+            }
+
+
+            entities[length] = entityID;
+            component2[length] = storage2.components[entityID];
+            component[length++] = storage.components[entityID];
+            if (OnAdded != null)
+                OnAdded(length-1);
+        }
+
         public override void TryAddEntity(int entityID, bool tagsChecked = false)
         {
             var storage = Storage<T>.Instance;
@@ -290,10 +337,9 @@ namespace Homebrew
 
 
             if (storage.HasComponent(entityID) == false) return;
-
             if (storage2.HasComponent(entityID) == false) return;
             var entity = Actor.entites[entityID];
-            if (entity.isActiveAndEnabled == false) return;
+            if (entity!=null&&entity.isActiveAndEnabled == false) return;
             if (!tagsChecked)
             {
                 if (Composition.include.Length > 0)
@@ -319,9 +365,7 @@ namespace Homebrew
             component2[length] = storage2.components[entityID];
             component[length++] = storage.components[entityID];
             if (OnAdded != null)
-            {
-                Timer.Add(Time.DeltaTime, () => OnAdded.Invoke(length - 1));
-            }
+                OnAdded(length-1);
         }
 
         public override void TryRemoveEntity(int entityID)
@@ -418,6 +462,35 @@ namespace Homebrew
             length--;
         }
 
+        public override void TryAddVirtually(int entityID)
+        {
+            var storage = Storage<T>.Instance;
+            var storage2 = Storage<Y>.Instance;
+            var storage3 = Storage<U>.Instance;
+
+
+            if (storage.HasComponent(entityID) == false) return;
+            if (storage2.HasComponent(entityID) == false) return;
+            if (storage3.HasComponent(entityID) == false) return;
+
+
+            if (entities.Length <= length)
+            {
+                var len = entityID == 0 ? EngineSettings.MinComponents : entityID << 1;
+                Array.Resize(ref entities, len);
+                Array.Resize(ref component, len);
+                Array.Resize(ref component2, len);
+                Array.Resize(ref component3, len);
+            }
+
+            entities[length] = entityID;
+            component3[length] = storage3.components[entityID];
+            component2[length] = storage2.components[entityID];
+            component[length++] = storage.components[entityID];
+            if (OnAdded != null)
+                OnAdded(length-1);
+        }
+
         public override void TryAddEntity(int entityID, bool tagsChecked = false)
         {
             var storage = Storage<T>.Instance;
@@ -459,9 +532,7 @@ namespace Homebrew
             component2[length] = storage2.components[entityID];
             component[length++] = storage.components[entityID];
             if (OnAdded != null)
-            {
-                Timer.Add(Time.DeltaTime, () => OnAdded.Invoke(length - 1));
-            }
+                OnAdded(length-1);
         }
 
         public override void TryRemoveEntity(int entityID)
@@ -496,7 +567,7 @@ namespace Homebrew
             for (var i = 0; i < Actor.lastID; i++)
             {
                 var e = Actor.entites[i];
-                if (e.isActiveAndEnabled == false) continue;
+                if (e!=null&&e.isActiveAndEnabled == false) continue;
                 if (Composition.include.Length > 0)
                     if (!e.HasTags(Composition.include))
                         continue;
@@ -558,6 +629,38 @@ namespace Homebrew
             length--;
         }
 
+        public override void TryAddVirtually(int entityID)
+        {
+            var storage = Storage<T>.Instance;
+            var storage2 = Storage<Y>.Instance;
+            var storage3 = Storage<U>.Instance;
+            var storage4 = Storage<I>.Instance;
+
+
+            if (storage.HasComponent(entityID) == false) return;
+            if (storage2.HasComponent(entityID) == false) return;
+            if (storage3.HasComponent(entityID) == false) return;
+            if (storage4.HasComponent(entityID) == false) return;
+
+            if (entities.Length <= length)
+            {
+                var len = entityID == 0 ? EngineSettings.MinComponents : entityID << 1;
+                Array.Resize(ref entities, len);
+                Array.Resize(ref component, len);
+                Array.Resize(ref component2, len);
+                Array.Resize(ref component3, len);
+                Array.Resize(ref component4, len);
+            }
+
+            entities[length] = entityID;
+            component4[length] = storage4.components[entityID];
+            component3[length] = storage3.components[entityID];
+            component2[length] = storage2.components[entityID];
+            component[length++] = storage.components[entityID];
+            if (OnAdded != null)
+                OnAdded(length-1);
+        }
+
         public override void TryAddEntity(int entityID, bool tagsChecked = false)
         {
             var storage = Storage<T>.Instance;
@@ -603,9 +706,7 @@ namespace Homebrew
             component2[length] = storage2.components[entityID];
             component[length++] = storage.components[entityID];
             if (OnAdded != null)
-            {
-                Timer.Add(Time.DeltaTime, () => OnAdded.Invoke(length - 1));
-            }
+                OnAdded(length-1);
         }
 
         public override void TryRemoveEntity(int entityID)
@@ -640,7 +741,7 @@ namespace Homebrew
             for (var i = 0; i < Actor.lastID; i++)
             {
                 var e = Actor.entites[i];
-                if (e.isActiveAndEnabled == false) continue;
+                if (e!=null&&e.isActiveAndEnabled == false) continue;
                 if (Composition.include.Length > 0)
                     if (!e.HasTags(Composition.include))
                         continue;
@@ -696,6 +797,44 @@ namespace Homebrew
         public O[] component5 = new O[EngineSettings.MinComponents];
 
 
+        public override void TryAddVirtually(int entityID)
+        {
+            var storage = Storage<T>.Instance;
+            var storage2 = Storage<Y>.Instance;
+            var storage3 = Storage<U>.Instance;
+            var storage4 = Storage<I>.Instance;
+            var storage5 = Storage<O>.Instance;
+
+
+            if (storage.HasComponent(entityID) == false) return;
+            if (storage2.HasComponent(entityID) == false) return;
+            if (storage3.HasComponent(entityID) == false) return;
+            if (storage4.HasComponent(entityID) == false) return;
+            if (storage5.HasComponent(entityID) == false) return;
+
+
+            if (entities.Length <= length)
+            {
+                var len = entityID == 0 ? EngineSettings.MinComponents : entityID << 1;
+                Array.Resize(ref entities, len);
+                Array.Resize(ref component, len);
+                Array.Resize(ref component2, len);
+                Array.Resize(ref component3, len);
+                Array.Resize(ref component4, len);
+                Array.Resize(ref component5, len);
+            }
+
+            entities[length] = entityID;
+            component5[length] = storage5.components[entityID];
+            component4[length] = storage4.components[entityID];
+            component3[length] = storage3.components[entityID];
+            component2[length] = storage2.components[entityID];
+            component[length++] = storage.components[entityID];
+
+            if (OnAdded != null)
+                OnAdded(length-1);
+        }
+
         public override void TryAddEntity(int entityID, bool tagsChecked = false)
         {
             var storage = Storage<T>.Instance;
@@ -746,9 +885,7 @@ namespace Homebrew
             component[length++] = storage.components[entityID];
 
             if (OnAdded != null)
-            {
-                Timer.Add(Time.DeltaTime, () => OnAdded.Invoke(length - 1));
-            }
+                OnAdded(length-1);
         }
 
         public override void TryRemoveEntity(int entityID)
@@ -788,7 +925,7 @@ namespace Homebrew
             {
                 var e = Actor.entites[i];
 
-                if (e.isActiveAndEnabled == false) continue;
+                if (e!=null&&e.isActiveAndEnabled == false) continue;
                 if (Composition.include.Length > 0)
                     if (!e.HasTags(Composition.include))
                         continue;

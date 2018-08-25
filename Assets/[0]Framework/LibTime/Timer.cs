@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace Homebrew
 {
-    public class Timer : ITick, IComponent
+    public class Timer : ITick, IComponent, IDisposable
     {
         public object id;
         public float timer;
@@ -156,16 +156,21 @@ namespace Homebrew
             timer = 0.0f;
             IsRunning = false;
 
-            ProcessingUpdate.Default.Remove(this);
-            ProcessingTimer.Default.allWorkingTimers.Remove(this);
+      
             callBackAction();
-
+ 
             if (isAutoKill) Kill();
+            else
+            {
+                 ProcessingUpdate.Default.Remove(this);
+                 ProcessingTimer.Default.allWorkingTimers.Remove(this);
+            }
         }
 
         public void Kill()
         {
             if (Toolbox.applicationIsQuitting) return;
+  
           //  ProcessingPools.Default.Despawn(this);
             //callBackAction = null;
             ProcessingFastPool<Timer>.Instance.Despawn(this);
@@ -175,6 +180,7 @@ namespace Homebrew
 
         public void Dispose()
         {
+     
             ProcessingUpdate.Default.Remove(this);
             ProcessingTimer.Default.allWorkingTimers.Remove(this);
             timer = 0.0f;

@@ -57,6 +57,8 @@ namespace Homebrew
                 filter.exclude = excludeFilter;
                 filter.include = includeFilter;
               
+          
+                
                 myFieldInfo.SetValue(b,
                     ProcessingEntities.Default.AddGetGroup(myFieldInfo.FieldType,filter));
             }

@@ -47,7 +47,7 @@ namespace Homebrew
 		{
 		 
 			var timeSinceStart = UnityEngine.Time.unscaledTime;
-			_deltaTime = UnityEngine.Time.unscaledDeltaTime;  // (timeSinceStart - _lastFrame) * isActive;
+			_deltaTime = UnityEngine.Time.unscaledDeltaTime * isActive;// (timeSinceStart - _lastFrame) * isActive;
 			_lastFrame = timeSinceStart;
 		}
 

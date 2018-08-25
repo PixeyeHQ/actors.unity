@@ -24,6 +24,18 @@ namespace Homebrew
 		[MenuItem("Tools/Actors/SaveScenes %Q",priority=190)]
 		public static void SaveScenesName()
 		{
+			
+			var scene = EditorSceneManager.GetActiveScene();
+			
+			var original = EditorBuildSettings.scenes;
+
+			foreach (var settingsScene in original)
+			{
+				if (settingsScene.path == scene.path) return;
+			}
+
+
+			
 			var filePath = Path.GetFullPath(@"Assets/[0]Framework/LibStarter/Scenes.cs");
 			var assetPath = AssetDatabase.GenerateUniqueAssetPath("Assets/[0]Framework/LibStarter/Scenes.cs");
  
@@ -32,6 +44,8 @@ namespace Homebrew
 				Directory.CreateDirectory(Application.dataPath + "/[0]Framework");
 		 
 			}
+			
+			
 			
 			var encoding = new UTF8Encoding(true, false);
 			var regex = new Regex(@"([^/]*/)*([\w\d\-]*)\.unity");
@@ -59,25 +73,16 @@ namespace Homebrew
 				tc.WriteLine("}");
 			}
 
-			AssetDatabase.SaveAssets();
-
-			var scene = EditorSceneManager.GetActiveScene();
-			
-			var original = EditorBuildSettings.scenes;
-
-			foreach (var settingsScene in original)
-			{
-				if (settingsScene.path == scene.path) return;
-			}
-		 
- 
+	 
+			 
 			var newSettings = new EditorBuildSettingsScene[original.Length + 1];
 			Array.Copy(original, newSettings, original.Length);
 			var sceneToAdd = new EditorBuildSettingsScene(scene.path, true);
 			newSettings[newSettings.Length - 1] = sceneToAdd;
 			EditorBuildSettings.scenes = newSettings;
 
-		 
+			AssetDatabase.SaveAssets();
+			AssetDatabase.Refresh();
 			
 			
 		}

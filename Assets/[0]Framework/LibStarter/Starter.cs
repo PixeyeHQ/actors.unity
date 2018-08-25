@@ -20,8 +20,7 @@ namespace Homebrew
     public class Starter : MonoBehaviour
     {
         public static bool initialized;
-        // public static List<MonoCached> objs = new List<MonoCached>();
-
+ 
         [FoldoutGroup("SetupData")] public List<Factory> factories;
         [FoldoutGroup("SetupData")] public List<Scenes> ScenesToKeep;
         [FoldoutGroup("SetupData")] public List<Scenes> SceneDependsOn;
@@ -42,18 +41,19 @@ namespace Homebrew
         {
             var poolReg = GetComponent<PoolRegister>();
             if (poolReg) poolReg.Reigster();
+            
             Setup();
-
             initialized = true;
-
+      
             var objs = FindObjectsOfType<MonoCached>();
 
             for (var i = 0; i < objs.Length; i++)
             {
-                if (objs[i].state.Contain(EntityState.RequireStarter))
+                if (objs[i].state.requireStarter)
                     objs[i].SetupAfterStarter();
             }
-
+            
+        
             Timer.Add(Time.DeltaTimeFixed*4, () => PostSetup());
         }
 

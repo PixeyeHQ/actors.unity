@@ -7,6 +7,7 @@ Date:       5/2/2018  9:47 AM
 
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Homebrew
 {
@@ -14,7 +15,7 @@ namespace Homebrew
     public class ProcessingFastPool<T> : IDisposable where T : new()
     {
         public static readonly ProcessingFastPool<T> Instance = new ProcessingFastPool<T>();
-        public Stack<T> pool = new Stack<T>();
+        public Stack<T> pool = new Stack<T>(200);
 
         public T Spawn()
         {
@@ -30,6 +31,7 @@ namespace Homebrew
         public void Despawn(T component)
         {
             var disposable = component as IDisposable;
+ 
             if (disposable != null) disposable.Dispose();
             AddToPool(component);
         }

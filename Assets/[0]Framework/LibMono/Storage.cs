@@ -32,6 +32,30 @@ namespace Homebrew
             ProcessingEntities.storageTypes.Add(this);
         }
 
+        public T AddVirtual(T component, int entityID)
+        {
+            if (entityID >= length)
+            {
+                length = entityID << 1;
+
+                Array.Resize(ref components, length);
+                Array.Resize(ref entityHasComponent, length);
+            }
+
+
+            components[entityID] = component;
+            entityHasComponent[entityID] = true;
+
+            var len = groups.Count;
+            for (var i = 0; i < len; i++)
+            {
+                groups[i].TryAddVirtually(entityID);
+            }
+
+
+            return component;
+        }
+
         public T Add(T component, int entityID)
         {
             if (entityID >= length)
@@ -85,7 +109,7 @@ namespace Homebrew
         public void Remove(int entityID)
         {
             if (!entityHasComponent[entityID]) return;
-
+      
             entityHasComponent[entityID] = false;
 
             var len = groups.Count;
@@ -116,8 +140,7 @@ namespace Homebrew
         public static readonly StorageSingle<T> Instance = new StorageSingle<T>();
         public T component;
 
-        
-        
+
         public object TryGet(Type t, int id)
         {
             return component;

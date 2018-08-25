@@ -35,16 +35,17 @@ namespace Homebrew
         protected virtual void Awake()
         {
             selfTransform = transform;
-            state &= ~EntityState.Enabled;
-            state &= ~EntityState.Initialized;
+            state.enabled = false;
+            state.initialized = false;
 
-            if (state.Contain(EntityState.RequireActorParent))
+            if (state.requireActorParent)
                 return;
 
 
             if (Starter.initialized == false)
             {
-                state |= EntityState.RequireStarter;
+                state.requireStarter = true;
+
                 return;
             }
 
@@ -53,18 +54,19 @@ namespace Homebrew
 
             Timer.Add(Time.DeltaTimeFixed, () =>
             {
-                state |= EntityState.Initialized;
+                state.initialized = true;
+
                 PostSetup();
             });
         }
 
         public virtual void OnEnable()
         {
-            if (state.Contain(EntityState.Enabled) || state.Contain(EntityState.RequireStarter) ||
-                state.Contain(EntityState.RequireActorParent)) return;
-
-            state &= ~EntityState.Released;
-            state |= EntityState.Enabled;
+            if (state.enabled || state.requireStarter ||
+                state.requireActorParent) return;
+           
+            state.released = false;
+            state.enabled = true;
 
 
             if (ProcessingSignals.TryAddToGlobal(this))
@@ -86,9 +88,9 @@ namespace Homebrew
 
         public virtual void OnDisable()
         {
-            if (Toolbox.isQuittingOrChangingScene() || !state.Contain(EntityState.Enabled)) return;
+            if (Toolbox.isQuittingOrChangingScene() || !state.enabled) return;
 
-            state &= ~EntityState.Enabled;
+            state.enabled = false;
 
 
             if (ProcessingSignals.TryRemoveGlobal(this))
@@ -108,27 +110,27 @@ namespace Homebrew
 
         public virtual void SetupAfterStarter()
         {
-            state &= ~EntityState.RequireStarter;
+            state.requireStarter = false;
             Setup();
             OnEnable();
 
             Timer.Add(Time.DeltaTimeFixed, () =>
             {
-                state |= EntityState.Initialized;
+                state.initialized = true;
                 PostSetup();
             });
         }
 
         public void SetupAfterActor()
         {
-            if (!state.Contain(EntityState.RequireActorParent)) return;
-            state &= ~EntityState.RequireActorParent;
+            if (!state.requireActorParent) return;
+            state.requireActorParent = false;
             Setup();
             OnEnable();
 
             Timer.Add(Time.DeltaTimeFixed, () =>
             {
-                state |= EntityState.Initialized;
+                state.initialized = true;
                 PostSetup();
             });
         }
@@ -164,14 +166,13 @@ namespace Homebrew
 
         public void HandleDestroy()
         {
-            if (state.Contain(EntityState.Released)) return;
-
-            state |= EntityState.Released;
-            state &= ~EntityState.Enabled;
-            state &= ~EntityState.Initialized;
-
+       
+            if (state.released) return;
+            state.released = true;
+            state.enabled = false;
             if (pool == Pool.None)
             {
+              
                 Destroy(gameObject, timeDestroyDelay);
                 return;
             }
@@ -179,7 +180,7 @@ namespace Homebrew
             HandleReturnToPool();
         }
 
-        private void HandleReturnToPool()
+        protected virtual void HandleReturnToPool()
         {
             var processingPool = Toolbox.Get<ProcessingGoPool>();
             if (timeDestroyDelay > 0)

@@ -8,10 +8,9 @@ using System.Collections.Generic;
 using Homebrew;
 
 
-public class Behavior : IEnumerable
+public abstract class Behavior : IEnumerable
 {
     public static Dictionary<int, Behavior> behaviors = new Dictionary<int, Behavior>(EngineSettings.MinBehaviors, new FastDict());
-   // public static List<Behavior> BehaviorsList = new List<Behavior>(EngineSettings.MinBehaviors);
 
     public int[] actor_ids = new int[12];
     public int length;
@@ -20,7 +19,7 @@ public class Behavior : IEnumerable
     public Behavior()
     {
         ProcessingSystemAttributes.Setup(this);
-        ProcessingUpdate.Default.Add(this);
+        ProcessingGroupAttributes.Setup(this);
         ProcessingSignals.TryAddToGlobal(this);
 
     }
@@ -39,8 +38,6 @@ public class Behavior : IEnumerable
             var len = length == 0 ? EngineSettings.MinComponents : length << 1;
             Array.Resize(ref actor_ids, len);
         }
-
-
         actor_ids[length++] = id;
         OnEnable(Actor.entites[id]);
     }

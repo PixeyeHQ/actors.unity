@@ -16,7 +16,7 @@ using UnityEngine;
 
 namespace Homebrew
 {
-    public class Actor : MonoCached, IPoolable
+    public class Actor : MonoCached
     {
         public static Actor[] entites = new Actor[EngineSettings.MinEntities];
         public static int prevID = -1;
@@ -38,39 +38,25 @@ namespace Homebrew
 
         protected override void Awake()
         {
-            var len = entites.Length;
-            if (lastID == len)
-            {
-                Array.Resize(ref entites, Mathf.Clamp(lastID << 1, 0, 1000000));
-            }
-
-            if (prevID != -1)
-            {
-                id = prevID;
-                prevID = -1;
-                entites[id] = this;
-            }
-            else
-            {
-                id = lastID;
-                entites[lastID++] = this;
-            }
-
-
+            ProcessingEntities.AddEntity(this);
             base.Awake();
         }
 
+
         public override void OnEnable()
         {
-            if (state.Contain(EntityState.Enabled) || state.Contain(EntityState.RequireStarter) ||
-                state.Contain(EntityState.RequireActorParent)) return;
+            if (state.enabled || state.requireStarter ||
+                state.requireActorParent) return;
 
 
-            if (state.Contain(EntityState.Disabled))
+            if (state.disabled)
                 ProcessingEntities.Default.CheckGroups(id, true);
-            state &= ~EntityState.Disabled;
-            state &= ~EntityState.Released;
-            state |= EntityState.Enabled;
+
+
+            HandleEnable();
+            state.released = false;
+            state.disabled = false;
+            state.enabled = true;
 
             if (ProcessingSignals.TryAddToGlobal(this))
             {
@@ -83,55 +69,80 @@ namespace Homebrew
             }
 
 
-            if (compositions != null)
-                foreach (var composition in compositions)
-                {
-                    if (composition.changed || !composition.Equals(this)) continue;
-                    composition.changed = true;
-                    foreach (var i in composition.ids)
-                    {
-                        AddToBehavior(i);
-                    }
-                }
+            var len = compositionNoTags.Count;
+            int i;
 
-
-            foreach (var i in compositionNoTags)
+            for (i = 0; i < len; i++)
             {
-                AddToBehavior(i);
+                Behavior.behaviors[compositionNoTags[i]].AddElement(id);
             }
 
+
+            len = compositions != null ? compositions.Count : -1;
+
+            for (i = 0; i < len; i++)
+            {
+                var composition = compositions[i];
+
+                if (composition.changed || !composition.Contain(tags)) continue;
+                composition.changed = true;
+                var l = composition.ids.Count;
+
+                for (var j = 0; j < l; j++)
+                {
+                    Behavior.behaviors[composition.ids[j]].AddElement(id);
+                }
+
+                l = composition.delegates.Count;
+                for (var j = 0; j < l; j++)
+                {
+                    composition.delegates[j](true);
+                }
+            }
+
+
             ProcessingUpdate.Default.Add(this);
-
-            HandleEnable();
-
-            //     
         }
+//TODO: refactor
 
         public override void OnDisable()
         {
-            if (Toolbox.isQuittingOrChangingScene() || !state.Contain(EntityState.Enabled)) return;
+            if (Toolbox.isQuittingOrChangingScene() || state.released ||
+                !state.enabled) return;
 
-
-            state &= ~EntityState.Enabled;
-            state |= EntityState.Disabled;
+            state.enabled = false;
+            state.disabled = true;
             ProcessingEntities.Default.CheckGroups(id, false);
 
+            var len = compositionNoTags.Count;
+            int i;
 
-            if (compositions != null)
-                foreach (var composition in compositions)
+            for (i = 0; i < len; i++)
+            {
+                Behavior.behaviors[compositionNoTags[i]].RemoveElement(id);
+            }
+
+
+            len = compositions != null ? compositions.Count : -1;
+
+            for (i = 0; i < len; i++)
+            {
+                var composition = compositions[i];
+                if (composition.changed || !composition.Contain(tags)) continue;
+                composition.changed = true;
+                var l = composition.ids.Count;
+                for (var j = 0; j < l; j++)
                 {
-                    if (!composition.changed) continue;
-                    composition.changed = false;
-                    foreach (var i in composition.ids)
-                    {
-                        RemoveFromBehavior(i);
-                    }
+                    Behavior.behaviors[composition.ids[j]].RemoveElement(id);
                 }
 
-            foreach (var i in compositionNoTags)
-            {
-                RemoveFromBehavior(i);
+                l = composition.delegates.Count;
+                for (var j = 0; j < l; j++)
+                {
+                    composition.delegates[j](false);
+                }
             }
+
 
             if (ProcessingSignals.TryRemoveGlobal(this))
             {
@@ -144,33 +155,104 @@ namespace Homebrew
             HandleDisable();
         }
 
-        protected virtual void OnDestroy()
+        protected override void HandleReturnToPool()
         {
-            if (Toolbox.isQuittingOrChangingScene()) return;
+            ClearTagsAll();
 
             ProcessingEntities.Default.CheckGroups(id, false);
 
-            ProcessingUpdate.Default.Remove(this);
-            signals?.Remove(this);
+            var len = compositionNoTags.Count;
+            int i;
 
-            prevID = id;
-            state |= EntityState.Released;
-
-            foreach (var i in compositionNoTags)
+            for (i = 0; i < len; i++)
             {
-                RemoveFromBehavior(i);
+                Behavior.behaviors[compositionNoTags[i]].RemoveElement(id);
             }
 
-            if (compositions != null)
-                foreach (var composition in compositions)
+
+            len = compositions != null ? compositions.Count : -1;
+
+            for (i = 0; i < len; i++)
+            {
+                var composition = compositions[i];
+          
+                composition.changed = false;
+                var l = composition.ids.Count;
+                for (var j = 0; j < l; j++)
                 {
-                    foreach (var i in composition.ids)
-                    {
-                        RemoveFromBehavior(i);
-                    }
+                    Behavior.behaviors[composition.ids[j]].RemoveElement(id);
                 }
 
+                l = composition.delegates.Count;
+                for (var j = 0; j < l; j++)
+                {
+                    composition.delegates[j](false);
+                }
+            }
 
+
+            if (ProcessingSignals.TryRemoveGlobal(this))
+            {
+                signals?.Remove(this);
+            }
+
+
+            ProcessingUpdate.Default.Remove(this);
+
+//            len = compositions != null ? compositions.Count : -1;
+//
+//            for (i = 0; i < len; i++)
+//            {
+//                compositions[i].changed = false;
+//            }
+
+            base.HandleReturnToPool();
+        }
+
+        protected void OnDestroy()
+        {
+            if (Toolbox.isQuittingOrChangingScene()) return;
+            prevID = id;
+
+
+            ProcessingEntities.Default.CheckGroups(id, false);
+
+            var len = compositionNoTags.Count;
+            int i;
+
+            for (i = 0; i < len; i++)
+            {
+                Behavior.behaviors[compositionNoTags[i]].RemoveElement(id);
+            }
+
+
+            len = compositions != null ? compositions.Count : -1;
+
+            for (i = 0; i < len; i++)
+            {
+                var composition = compositions[i];
+
+                var l = composition.ids.Count;
+                for (var j = 0; j < l; j++)
+                {
+                    Behavior.behaviors[composition.ids[j]].RemoveElement(id);
+                }
+
+                composition.delegates.Clear();
+            }
+
+
+            if (ProcessingSignals.TryRemoveGlobal(this))
+            {
+                signals?.Remove(this);
+            }
+
+
+            ProcessingUpdate.Default.Remove(this);
+
+
+            compositionNoTags.Clear();
+            compositions.Clear();
             tags?.Clear();
             signals?.Dispose();
             signals = null;
@@ -201,16 +283,6 @@ namespace Homebrew
             return component;
         }
 
-
-        private void AddToBehavior(int key)
-        {
-            Behavior.behaviors[key].AddElement(id);
-        }
-
-        private void RemoveFromBehavior(int key)
-        {
-            Behavior.behaviors[key].RemoveElement(id);
-        }
 
         public T Add<T>() where T : new()
         {
@@ -326,7 +398,7 @@ namespace Homebrew
         void HandleTagsChanged()
         {
             if (Toolbox.isQuittingOrChangingScene()) return;
-
+            if (state.disabled) return;
 
             var len = compositions != null ? compositions.Count : 0;
 
@@ -334,15 +406,22 @@ namespace Homebrew
             {
                 var composition = compositions[i];
 
-                if (composition.Equals(this))
+                if (composition.Contain(tags))
                 {
+                    //  Debug.Log(composition.changed + "_" + composition);
                     if (composition.changed) continue;
 
                     var count = composition.ids.Count;
                     composition.changed = true;
                     for (var j = 0; j < count; j++)
                     {
-                        AddToBehavior(composition.ids[j]);
+                        Behavior.behaviors[composition.ids[j]].AddElement(id);
+                    }
+
+                    var l = composition.delegates.Count;
+                    for (var j = 0; j < l; j++)
+                    {
+                        composition.delegates[j](true);
                     }
                 }
                 else
@@ -352,7 +431,13 @@ namespace Homebrew
                     var count = composition.ids.Count;
                     for (var j = 0; j < count; j++)
                     {
-                        RemoveFromBehavior(composition.ids[j]);
+                        Behavior.behaviors[composition.ids[j]].RemoveElement(id);
+                    }
+
+                    var l = composition.delegates.Count;
+                    for (var j = 0; j < l; j++)
+                    {
+                        composition.delegates[j](false);
                     }
                 }
             }
@@ -372,10 +457,6 @@ namespace Homebrew
             {
                 groups[i].ChangeTags(id);
             }
-        }
-
-        public virtual void Spawn(bool arg)
-        {
         }
 
         #endregion
@@ -428,6 +509,11 @@ namespace Homebrew
 
             if (tagsChanged == false) return;
             HandleTagsChanged();
+        }
+
+        public void ClearTagsAll()
+        {
+            tags.Clear();
         }
 
         public void RemoveTags(int id, bool all = false)

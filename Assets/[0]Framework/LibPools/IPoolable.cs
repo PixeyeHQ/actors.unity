@@ -1,4 +1,4 @@
 public interface IPoolable
 {
-	void Spawn(bool arg);
+	void Spawn(bool condition_spawned);
 }
