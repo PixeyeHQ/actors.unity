@@ -19,7 +19,7 @@ namespace Homebrew
     public class Actor : MonoCached
     {
         public static Actor[] entites = new Actor[EngineSettings.MinEntities];
-        public static int prevID = -1;
+        public static Stack<int> prevID = new Stack<int>(100);
         public static int lastID;
 
         #region FIELDS
@@ -212,7 +212,7 @@ namespace Homebrew
         protected void OnDestroy()
         {
             if (Toolbox.isQuittingOrChangingScene()) return;
-            prevID = id;
+            prevID.Push(id);
 
 
             ProcessingEntities.Default.CheckGroups(id, false);

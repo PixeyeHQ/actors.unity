@@ -27,7 +27,7 @@ namespace Homebrew
 
         public static void KillEntity(int index)
         {
-            Actor.prevID = index;
+            Actor.prevID.Push(index);
         }
 
         public static void Remove<T>(int index) where T : new()
@@ -44,11 +44,13 @@ namespace Homebrew
             {
                 Array.Resize(ref Actor.entites, Mathf.Clamp(Actor.lastID << 1, 0, 1000000));
             }
-
-            if (Actor.prevID != -1)
+ 
+            if (Actor.prevID.Count>0)
             {
-                monoActor.id = Actor.prevID;
-                Actor.prevID = -1;
+                monoActor.id = Actor.prevID.Pop();
+                  //  Actor.prevID;
+                //Actor.prevID = -1;
+              //  Debug.Log(monoActor.id + "_" + Actor.entites.Length);
                 Actor.entites[monoActor.id] = monoActor;
             }
             else
@@ -61,10 +63,10 @@ namespace Homebrew
         public static int AddEntity()
         {
             int id;
-            if (Actor.prevID != -1)
+            if (Actor.prevID.Count>0)
             {
-                id = Actor.prevID;
-                Actor.prevID = -1;
+                id = Actor.prevID.Pop();
+              
             }
             else
             {
