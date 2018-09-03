@@ -12,12 +12,15 @@ using UnityEngine;
 
 namespace Homebrew
 {
-    public interface IStorageType
+  
+
+    public enum StorageType
     {
-        object TryGet(Type t, int id);
+        Local = 0,
+        Global = 1,
     }
 
-    public class Storage<T> : IStorageType where T : new()
+    public class Storage<T>  where T : new()
     {
         public static readonly Storage<T> Instance = new Storage<T>();
         public T[] components = new T[EngineSettings.MinComponents];
@@ -27,11 +30,7 @@ namespace Homebrew
 
         public List<GroupBase> groups = new List<GroupBase>();
 
-        Storage()
-        {
-            ProcessingEntities.storageTypes.Add(this);
-        }
-
+ 
         public T AddVirtual(T component, int entityID)
         {
             if (entityID >= length)
@@ -41,15 +40,14 @@ namespace Homebrew
                 Array.Resize(ref components, length);
                 Array.Resize(ref entityHasComponent, length);
             }
-
-
+ 
             components[entityID] = component;
             entityHasComponent[entityID] = true;
 
-            var len = groups.Count;
-            for (var i = 0; i < len; i++)
+            int len = groups.Count;
+            for (int i = 0; i < len; i++)
             {
-                groups[i].TryAddVirtually(entityID);
+                groups[i].AddVirtually(entityID);
             }
 
 
@@ -70,17 +68,18 @@ namespace Homebrew
             components[entityID] = component;
             entityHasComponent[entityID] = true;
 
-            var len = groups.Count;
-            for (var i = 0; i < len; i++)
+            int len = groups.Count;
+        
+            for (int i = 0; i < len; i++)
             {
-                groups[i].TryAddEntity(entityID);
+                groups[i].Add(entityID);
             }
 
 
             return component;
         }
 
-        public T TryAdd(int entityID)
+        public T Add(int entityID)
         {
             if (entityHasComponent[entityID]) return components[entityID];
 
@@ -97,10 +96,11 @@ namespace Homebrew
 
             entityHasComponent[entityID] = true;
 
-            var len = groups.Count;
-            for (var i = 0; i < len; i++)
+            int len = groups.Count;
+ 
+            for (int i = 0; i < len; i++)
             {
-                groups[i].TryAddEntity(entityID);
+                groups[i].Add(entityID);
             }
 
             return components[entityID];
@@ -109,13 +109,13 @@ namespace Homebrew
         public void Remove(int entityID)
         {
             if (!entityHasComponent[entityID]) return;
-      
+
             entityHasComponent[entityID] = false;
 
-            var len = groups.Count;
-            for (var i = 0; i < len; i++)
+            int len = groups.Count;
+            for (int i = 0; i < len; i++)
             {
-                groups[i].TryRemoveEntity(entityID);
+                groups[i].Remove(entityID);
             }
         }
 
@@ -129,21 +129,8 @@ namespace Homebrew
             return entityID >= length ? default(T) : components[entityID];
         }
 
-        public object TryGet(Type t, int id)
-        {
-            return TryGet(id);
-        }
+   
     }
 
-    public class StorageSingle<T> : IStorageType
-    {
-        public static readonly StorageSingle<T> Instance = new StorageSingle<T>();
-        public T component;
-
-
-        public object TryGet(Type t, int id)
-        {
-            return component;
-        }
-    }
+    
 }

@@ -15,7 +15,7 @@ namespace Homebrew
     [Serializable]
     public class Blueprint : ScriptableObject, IComponent
     {
-        protected Dictionary<int, object> components = new Dictionary<int, object>(2, new FastDict());
+        protected Dictionary<int, object> components = new Dictionary<int, object>(2, new FastComparable());
 
         public void Add<T>(T component)
         {

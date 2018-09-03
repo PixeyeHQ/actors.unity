@@ -12,8 +12,8 @@ namespace Homebrew
         public List<GameObject> activeObjs = new List<GameObject>(100);
 
         protected Transform parent;
-        protected Dictionary<int, Stack<GameObject>> cachedObjects = new Dictionary<int, Stack<GameObject>>(100,new FastDict());
-        protected Dictionary<int, int> cachedIds = new Dictionary<int, int>(100,new FastDict());
+        protected Dictionary<int, Stack<GameObject>> cachedObjects = new Dictionary<int, Stack<GameObject>>(100,new FastComparable());
+        protected Dictionary<int, int> cachedIds = new Dictionary<int, int>(100,new FastComparable());
 
         public void SetPoolParent(Transform parent)
         {

@@ -22,12 +22,12 @@ namespace Homebrew
         {
             var type = b.GetType();
             var objectFields = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-            var length = objectFields.Length;
+            int length = objectFields.Length;
 
             var groupType = typeof(GroupBase);
 
       
-            for (var i = 0; i < length; i++)
+            for (int i = 0; i < length; i++)
             {
                 var myFieldInfo = objectFields[i];
 
@@ -60,7 +60,7 @@ namespace Homebrew
           
                 
                 myFieldInfo.SetValue(b,
-                    ProcessingEntities.Default.AddGetGroup(myFieldInfo.FieldType,filter));
+                    ProcessingEntities.Default.SetupGroup(myFieldInfo.FieldType,filter));
             }
         }
     }

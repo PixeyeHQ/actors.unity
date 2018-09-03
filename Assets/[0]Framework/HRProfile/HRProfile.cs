@@ -60,7 +60,7 @@ public class Profile
             UnityEngine.Debug.LogError("Can only end profiling for a tag which has already been started (tag was " + tag + ")");
             return;
         }
-        ProfilePoint point = profiles[tag];
+        var point = profiles[tag];
         point.totalTime += UtcNow - point.lastRecorded;
         ++point.totalCalls;
         profiles[tag] = point;
@@ -74,10 +74,10 @@ public class Profile
  
     public static void PrintResults()
     {
-        TimeSpan endTime = DateTime.UtcNow - startTime;
-        System.Text.StringBuilder output = new System.Text.StringBuilder();
+        var endTime = DateTime.UtcNow - startTime;
+        var output = new System.Text.StringBuilder();
         output.Append("============================\n\t\t\t\tProfile results:\n============================\n");
-        foreach (KeyValuePair<string, ProfilePoint> pair in profiles)
+        foreach (var pair in profiles)
         {
             double totalTime = pair.Value.totalTime.TotalSeconds;
             int totalCalls = pair.Value.totalCalls;

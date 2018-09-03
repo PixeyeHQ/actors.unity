@@ -20,7 +20,7 @@ namespace Homebrew
     public class Starter : MonoBehaviour
     {
         public static bool initialized;
- 
+
         [FoldoutGroup("SetupData")] public List<Factory> factories;
         [FoldoutGroup("SetupData")] public List<Scenes> ScenesToKeep;
         [FoldoutGroup("SetupData")] public List<Scenes> SceneDependsOn;
@@ -31,7 +31,7 @@ namespace Homebrew
             {
                 Toolbox.Add(factories[i]);
             }
- 
+
 
             Toolbox.Add<ProcessingSceneLoad>().Setup(ScenesToKeep, SceneDependsOn, this);
         }
@@ -41,10 +41,10 @@ namespace Homebrew
         {
             var poolReg = GetComponent<PoolRegister>();
             if (poolReg) poolReg.Reigster();
-            
+
             Setup();
             initialized = true;
-      
+
             var objs = FindObjectsOfType<MonoCached>();
 
             for (var i = 0; i < objs.Length; i++)
@@ -52,9 +52,9 @@ namespace Homebrew
                 if (objs[i].state.requireStarter)
                     objs[i].SetupAfterStarter();
             }
-            
-        
-            Timer.Add(Time.DeltaTimeFixed*4, () => PostSetup());
+
+
+            Timer.Add(Time.DeltaTimeFixed * 4, () => PostSetup());
         }
 
         protected virtual void Setup()
@@ -66,9 +66,5 @@ namespace Homebrew
         }
 
 
-        private void OnDestroy()
-        {
-            initialized = false;
-        }
     }
 }

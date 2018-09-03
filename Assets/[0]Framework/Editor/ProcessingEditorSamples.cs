@@ -53,13 +53,13 @@ public class ProcessingEditorSamples : EndNameEditAction
 
         n = ToLowerInvariant(n[0]) + n.Substring(1);
 
-        templateContents = templateContents.Replace("&NAME&", n);
+        n = templateContents.Replace("&NAME&", n);
 
         var encoding = new UTF8Encoding(true, false);
 
         using (var tc = new StreamWriter(filePath, false, encoding))
         {
-            tc.Write(templateContents);
+            tc.Write(n);
         }
 
 

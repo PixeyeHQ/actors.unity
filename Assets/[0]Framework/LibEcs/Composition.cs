@@ -32,16 +32,14 @@ namespace Homebrew
             return this;
         }
 
-
         public Composition Add(CompositionDelegate del)
         {
             delegates.Add(del);
             return this;
         }
-
         public Composition Add<T>() where T : new()
         {
-            var key = typeof(T).GetHashCode();
+            int key = typeof(T).GetHashCode();
             ids.Add(key);
             if (Behavior.behaviors.ContainsKey(key)) return this;
 
@@ -64,19 +62,19 @@ namespace Homebrew
 
         public override int GetHashCode()
         {
-            var hc = include.Length;
-            var len1 = include.Length;
-            var len2 = exclude.Length;
+            int hc = include.Length;
+            int len1 = include.Length;
+            int len2 = exclude.Length;
 
             unchecked
             {
-                for (var i = 0; i < len1; ++i)
+                for (int i = 0; i < len1; ++i)
                 {
                     hc = unchecked(hc * 17 + include[i]);
                 }
 
                 hc += exclude.Length;
-                for (var i = 0; i < len2; ++i)
+                for (int i = 0; i < len2; ++i)
                 {
                     hc = unchecked(hc * 31 + exclude[i]);
                 }
@@ -88,55 +86,34 @@ namespace Homebrew
     
         public bool Contain(IReadOnlyDictionary<int, int> tags)
         {
-            for (var i = 0; i < include.Length; i++)
+            for (int i = 0; i < include.Length; i++)
             {
                 if (!tags.ContainsKey(include[i])) return false;
             }
 
-            for (var i = 0; i < exclude.Length; i++)
+            for (int i = 0; i < exclude.Length; i++)
             {
                 if (tags.ContainsKey(exclude[i])) return false;
             }
 
             return true;
         }
-
-        private static bool HasTags(IReadOnlyDictionary<int, int> tags, params int[] filter)
-        {
-            for (var i = 0; i < filter.Length; i++)
-            {
-                if (!tags.ContainsKey(filter[i])) return false;
-            }
-
-            return true;
-        }
-
-        public static bool HasTagAny(IReadOnlyDictionary<int, int> tags, params int[] filter)
-        {
-            for (var i = 0; i < filter.Length; i++)
-            {
-                if (tags.ContainsKey(filter[i])) return true;
-            }
-
-            return false;
-        }
-
-
+ 
         public bool Equals(Composition other)
         {
             if (include.Length != other.include.Length) return false;
 
-            var len1 = include.Length;
-            var len2 = exclude.Length;
+            int len1 = include.Length;
+            int len2 = exclude.Length;
 
-            for (var i = 0; i < len1; i++)
+            for (int i = 0; i < len1; i++)
             {
                 if (include[i] != other.include[i]) return false;
             }
 
             if (exclude.Length != other.exclude.Length) return false;
 
-            for (var i = 0; i < len2; i++)
+            for (int i = 0; i < len2; i++)
             {
                 if (exclude[i] != other.exclude[i]) return false;
             }

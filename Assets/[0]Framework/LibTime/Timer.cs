@@ -38,11 +38,12 @@ namespace Homebrew
         /// <returns></returns>
         public static Timer Add(float finishTime, Action action = null)
         {
-            var timer = ProcessingFastPool<Timer>.Instance.Spawn();
-                
-                //Toolbox.Get<ProcessingPools>().Spawn<Timer>();
-            timer.isAutoKill = true;
-            timer.finishTime = finishTime;
+            var timer = new Timer();
+              
+//            timer.isAutoKill = true;
+             timer.finishTime = finishTime;
+//            timer.callBackAction = null;
+//            timer.id = null;
             if (action == null) return timer;
             timer.callBackAction = action;
             timer.Play();
@@ -89,8 +90,10 @@ namespace Homebrew
             if (obj == null) return;
             if (Toolbox.applicationIsQuitting) return;
 
-           //  obj.Stop();
-            ProcessingFastPool<Timer>.Instance.Despawn(obj);
+    
+            obj.Dispose();
+          
+            // ProcessingFastPool<Timer>.Instance.Despawn(obj);
         }
 
         public void Stop()
@@ -173,8 +176,9 @@ namespace Homebrew
   
           //  ProcessingPools.Default.Despawn(this);
             //callBackAction = null;
-            ProcessingFastPool<Timer>.Instance.Despawn(this);
-        //   Stop();
+          //  ProcessingFastPool<Timer>.Instance.Despawn(this);
+      
+            Dispose();
         }
 
 

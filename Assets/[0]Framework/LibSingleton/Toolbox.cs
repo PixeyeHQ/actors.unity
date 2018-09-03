@@ -13,13 +13,15 @@ namespace Homebrew
 {
 	public class Toolbox : Singleton<Toolbox>
 	{
-		[SerializeField] private Dictionary<int, object> data = new Dictionary<int, object>();
+		[SerializeField] private Dictionary<int, object> data = new Dictionary<int, object>(5, new FastComparable());
 
 
 		public static bool Contains<T>()
 		{
 			return Instance.data.ContainsKey(typeof(T).GetHashCode());
+		 
 		}
+		
 
 
 		public static T Add<T>(Type type = null) where T : new()

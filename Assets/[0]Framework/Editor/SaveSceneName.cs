@@ -29,10 +29,14 @@ namespace Homebrew
 			
 			var original = EditorBuildSettings.scenes;
 
-			foreach (var settingsScene in original)
-			{
-				if (settingsScene.path == scene.path) return;
-			}
+//			foreach (var settingsScene in original)
+//			{
+//				if (settingsScene.path == scene.path)
+//				{
+//					Debug.Log(settingsScene.path);
+//					return;
+//				}
+//			}
 
 
 			

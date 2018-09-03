@@ -34,9 +34,9 @@ namespace Homebrew
             ProcessingTimer.Default = Toolbox.Add<ProcessingTimer>();
             ProcessingSignals.Default = Toolbox.Add<ProcessingSignals>();
             ProcessingGoPool.Default = Toolbox.Add<ProcessingGoPool>();
-            ProcessingResources.Default = Toolbox.Add<ProcessingResources>();
+            Box.Default = Toolbox.Add<Box>();
             ProcessingEntities.Default = Toolbox.Add<ProcessingEntities>();
-            ProcessingBehaviorAttributes.Default = Toolbox.Add<ProcessingBehaviorAttributes>();
+           // ProcessingBehaviorAttributes.Default = Toolbox.Add<ProcessingBehaviorAttributes>();
             ProcessingScene.Default = Toolbox.Add<ProcessingScene>();
 
 

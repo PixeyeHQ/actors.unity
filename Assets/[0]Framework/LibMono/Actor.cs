@@ -25,12 +25,16 @@ namespace Homebrew
         #region FIELDS
 
         [FoldoutGroup("Actor")] public int id;
-        [FoldoutGroup("Actor")] public Blueprint blueprint;
 
-        public Dictionary<int, int> tags;
 
-        protected List<Composition> compositions;
-        protected List<int> compositionNoTags = new List<int>();
+        private List<Composition> compositions;
+        private List<int> compositionNoTags = new List<int>();
+
+        private Dictionary<int, int> tags = new Dictionary<int, int>(new FastComparable());
+        private Dictionary<int, IData> cachedData;
+
+        private Dictionary<int, Transform> cachedTransforms;
+        private Action OnTagsChanged;
 
         #endregion
 
@@ -38,7 +42,8 @@ namespace Homebrew
 
         protected override void Awake()
         {
-            ProcessingEntities.AddEntity(this);
+            OnTagsChanged = HandleTagsChanged;
+            ProcessingEntities.Add(this);
             base.Awake();
         }
 
@@ -69,7 +74,7 @@ namespace Homebrew
             }
 
 
-            var len = compositionNoTags.Count;
+            int len = compositionNoTags.Count;
             int i;
 
             for (i = 0; i < len; i++)
@@ -86,15 +91,15 @@ namespace Homebrew
 
                 if (composition.changed || !composition.Contain(tags)) continue;
                 composition.changed = true;
-                var l = composition.ids.Count;
+                int l = composition.ids.Count;
 
-                for (var j = 0; j < l; j++)
+                for (int j = 0; j < l; j++)
                 {
                     Behavior.behaviors[composition.ids[j]].AddElement(id);
                 }
 
                 l = composition.delegates.Count;
-                for (var j = 0; j < l; j++)
+                for (int j = 0; j < l; j++)
                 {
                     composition.delegates[j](true);
                 }
@@ -112,9 +117,10 @@ namespace Homebrew
 
             state.enabled = false;
             state.disabled = true;
+
             ProcessingEntities.Default.CheckGroups(id, false);
 
-            var len = compositionNoTags.Count;
+            int len = compositionNoTags.Count;
             int i;
 
             for (i = 0; i < len; i++)
@@ -130,14 +136,14 @@ namespace Homebrew
                 var composition = compositions[i];
                 if (composition.changed || !composition.Contain(tags)) continue;
                 composition.changed = true;
-                var l = composition.ids.Count;
-                for (var j = 0; j < l; j++)
+                int l = composition.ids.Count;
+                for (int j = 0; j < l; j++)
                 {
                     Behavior.behaviors[composition.ids[j]].RemoveElement(id);
                 }
 
                 l = composition.delegates.Count;
-                for (var j = 0; j < l; j++)
+                for (int j = 0; j < l; j++)
                 {
                     composition.delegates[j](false);
                 }
@@ -157,11 +163,11 @@ namespace Homebrew
 
         protected override void HandleReturnToPool()
         {
-            ClearTagsAll();
+            TagsClearAll();
 
             ProcessingEntities.Default.CheckGroups(id, false);
 
-            var len = compositionNoTags.Count;
+            int len = compositionNoTags.Count;
             int i;
 
             for (i = 0; i < len; i++)
@@ -175,16 +181,16 @@ namespace Homebrew
             for (i = 0; i < len; i++)
             {
                 var composition = compositions[i];
-          
+
                 composition.changed = false;
-                var l = composition.ids.Count;
-                for (var j = 0; j < l; j++)
+                int l = composition.ids.Count;
+                for (int j = 0; j < l; j++)
                 {
                     Behavior.behaviors[composition.ids[j]].RemoveElement(id);
                 }
 
                 l = composition.delegates.Count;
-                for (var j = 0; j < l; j++)
+                for (int j = 0; j < l; j++)
                 {
                     composition.delegates[j](false);
                 }
@@ -199,12 +205,6 @@ namespace Homebrew
 
             ProcessingUpdate.Default.Remove(this);
 
-//            len = compositions != null ? compositions.Count : -1;
-//
-//            for (i = 0; i < len; i++)
-//            {
-//                compositions[i].changed = false;
-//            }
 
             base.HandleReturnToPool();
         }
@@ -217,7 +217,7 @@ namespace Homebrew
 
             ProcessingEntities.Default.CheckGroups(id, false);
 
-            var len = compositionNoTags.Count;
+            int len = compositionNoTags.Count;
             int i;
 
             for (i = 0; i < len; i++)
@@ -232,8 +232,8 @@ namespace Homebrew
             {
                 var composition = compositions[i];
 
-                var l = composition.ids.Count;
-                for (var j = 0; j < l; j++)
+                int l = composition.ids.Count;
+                for (int j = 0; j < l; j++)
                 {
                     Behavior.behaviors[composition.ids[j]].RemoveElement(id);
                 }
@@ -251,60 +251,104 @@ namespace Homebrew
             ProcessingUpdate.Default.Remove(this);
 
 
-            compositionNoTags.Clear();
-            compositions.Clear();
+            compositionNoTags?.Clear();
+            compositions?.Clear();
             tags?.Clear();
             signals?.Dispose();
             signals = null;
+
+            if (cachedData == null) return;
+
+            foreach (var valuePair in cachedData)
+            {
+                var data = valuePair.Value as IDisposable;
+                if (data != null) data.Dispose();
+            }
+
+            cachedData.Clear();
         }
 
         #endregion
 
         #region ADD/REMOVE
 
+        public void AddCache(int key, string path)
+        {
+            if (cachedTransforms == null) cachedTransforms = new Dictionary<int, Transform>(2, new FastComparable());
+            cachedTransforms.Add(key, Get<Transform>(path));
+        }
+
         public Composition BindComposiiton()
         {
             var compo = new Composition();
-            if (compositions == null) compositions = new List<Composition>();
+            if (compositions == null)
+            {
+                compositions = new List<Composition>();
+                OnTagsChanged = HandleTagsChangedComposition;
+            }
+
             compositions.Add(compo);
             return compo;
         }
 
 
-        public T Add<T>(T component) where T : new()
+        public void Add<T>(T component, StorageType storageType = StorageType.Global) where T : IData, new()
         {
-            component = Storage<T>.Instance.Add(component, id);
+            if (storageType == StorageType.Global)
+                Storage<T>.Instance.Add(component, id);
+            else
+            {
+                if (cachedData == null)
+                {
+                    cachedData = new Dictionary<int, IData>(3, new FastComparable());
+                    cachedData.Add(typeof(T).GetHashCode(), component);
+                }
+                else
+                {
+                    cachedData.Add(typeof(T).GetHashCode(), component);
+                }
+            }
+
             var setupable = component as ISetup;
             if (setupable != null)
             {
                 setupable.Setup(this);
             }
-
-            return component;
         }
 
-
-        public T Add<T>() where T : new()
+        public T Add<T>(StorageType storageType = StorageType.Global) where T : class, new()
         {
             if (typeof(T).IsSubclassOf(typeof(Behavior)))
             {
-                var key = typeof(T).GetHashCode();
+                int key = typeof(T).GetHashCode();
                 Behavior behavior;
-                if (Behavior.behaviors.TryGetValue(key, out behavior))
+                if (!Behavior.behaviors.TryGetValue(key, out behavior))
                 {
-                    behavior.AddElement(id);
-                }
-                else
-                {
-                    compositionNoTags.Add(key);
                     behavior = new T() as Behavior;
                     Behavior.behaviors.Add(key, behavior);
                 }
 
-                return default(T);
+                compositionNoTags.Add(key);
+                return behavior as T;
             }
 
-            var component = Storage<T>.Instance.TryAdd(id);
+            T component;
+            if (storageType == StorageType.Global)
+                component = Storage<T>.Instance.Add(id);
+            else
+            {
+                component = new T();
+                if (cachedData == null)
+                {
+                    cachedData = new Dictionary<int, IData>(3, new FastComparable());
+                    cachedData.Add(typeof(T).GetHashCode(), component as IData);
+                }
+                else
+                {
+                    cachedData.Add(typeof(T).GetHashCode(), component as IData);
+                }
+            }
+
             var setupable = component as ISetup;
             if (setupable != null)
             {
@@ -314,31 +358,49 @@ namespace Homebrew
             return component;
         }
 
+
+        public void Bind<T>() where T : new()
+        {
+            Storage<T>.Instance.Add(id);
+        }
+
+        public void Unbind<T>() where T : new()
+        {
+            Storage<T>.Instance.Remove(id);
+        }
+
+
         public void Remove<T>() where T : new()
         {
+            int key = typeof(T).GetHashCode();
             if (typeof(T).IsSubclassOf(typeof(Behavior)))
             {
                 Behavior behavior;
-                var key = typeof(T).GetHashCode();
-                if (Behavior.behaviors.TryGetValue(key, out behavior))
-                {
-                    behavior.RemoveElement(id);
-                    compositionNoTags.Remove(key);
-                }
 
+                if (!Behavior.behaviors.TryGetValue(key, out behavior)) return;
+                behavior.RemoveElement(id);
+                compositionNoTags.Remove(key);
                 return;
             }
 
-            Storage<T>.Instance.Remove(id);
+
+            IData data;
+            if (!cachedData.TryGetValue(key, out data)) return;
+            var disposable = data as IDisposable;
+            if (disposable != null) disposable.Dispose();
+            cachedData.Remove(key);
         }
 
         #endregion
 
         #region  GET
 
-        public T Get<T>() where T : new()
+        public T Get<T>(StorageType stype = StorageType.Global) where T : new()
         {
-            var obj = Storage<T>.Instance.TryGet(id);
+            var obj = stype == StorageType.Global
+                ? Storage<T>.Instance.TryGet(id)
+                : (T) cachedData[typeof(T).GetHashCode()];
+
             return obj != null
                 ? obj
                 : typeof(T).IsSubclassOf(typeof(UnityEngine.Object))
@@ -346,30 +408,15 @@ namespace Homebrew
                     : default(T);
         }
 
-        public T Get<T>(string path)
+        public T Get<T>(int hash)
         {
-            if (path == string.Empty) return GetComponentInChildren<T>();
-            var o = selfTransform.Find(path);
-            return o == null ? default(T) : o.GetComponent<T>();
+            return cachedTransforms[hash].GetComponent<T>();
         }
 
-        public object Get(Type t)
+        public T Get<T>(string path)
         {
-            object obj;
-
-            if (t == typeof(Component))
-                return selfTransform.GetComponentInChildren(t);
-
-            var len = ProcessingEntities.storageTypes.Count;
-            for (var i = 0; i < len; i++)
-            {
-                obj = ProcessingEntities.storageTypes[i].TryGet(t, id);
-                if (obj != null)
-                    return obj;
-            }
-
-
-            return null;
+            var o = selfTransform.Find(path);
+            return o.GetComponent<T>();
         }
 
         #endregion
@@ -377,49 +424,44 @@ namespace Homebrew
 
         #region METHODS
 
-        public void BindTags()
-        {
-            tags = new Dictionary<int, int>(new FastDict());
-        }
-
         public override void SetupAfterStarter()
         {
             base.SetupAfterStarter();
 
             var childs = GetComponentsInChildren<MonoCached>();
 
-            for (var i = 1; i < childs.Length; i++)
+            for (int i = 1; i < childs.Length; i++)
             {
                 childs[i].actorParent = this;
                 childs[i].SetupAfterActor();
             }
         }
 
-        void HandleTagsChanged()
+        void HandleTagsChangedComposition()
         {
             if (Toolbox.isQuittingOrChangingScene()) return;
             if (state.disabled) return;
 
-            var len = compositions != null ? compositions.Count : 0;
 
-            for (var i = 0; i < len; i++)
+            int len = compositions.Count;
+
+            for (int i = 0; i < len; i++)
             {
                 var composition = compositions[i];
 
                 if (composition.Contain(tags))
                 {
-                    //  Debug.Log(composition.changed + "_" + composition);
                     if (composition.changed) continue;
 
-                    var count = composition.ids.Count;
+                    int count = composition.ids.Count;
                     composition.changed = true;
-                    for (var j = 0; j < count; j++)
+                    for (int j = 0; j < count; j++)
                     {
                         Behavior.behaviors[composition.ids[j]].AddElement(id);
                     }
 
-                    var l = composition.delegates.Count;
-                    for (var j = 0; j < l; j++)
+                    int l = composition.delegates.Count;
+                    for (int j = 0; j < l; j++)
                     {
                         composition.delegates[j](true);
                     }
@@ -428,14 +470,14 @@ namespace Homebrew
                 {
                     if (!composition.changed) continue;
                     composition.changed = false;
-                    var count = composition.ids.Count;
-                    for (var j = 0; j < count; j++)
+                    int count = composition.ids.Count;
+                    for (int j = 0; j < count; j++)
                     {
                         Behavior.behaviors[composition.ids[j]].RemoveElement(id);
                     }
 
-                    var l = composition.delegates.Count;
-                    for (var j = 0; j < l; j++)
+                    int l = composition.delegates.Count;
+                    for (int j = 0; j < l; j++)
                     {
                         composition.delegates[j](false);
                     }
@@ -443,20 +485,43 @@ namespace Homebrew
             }
 
             var groups = ProcessingEntities.Default.GroupsBase;
-            len = ProcessingEntities.Default.groupCount;
+            len = ProcessingEntities.Default.groupLength;
 
-
-            for (var i = 0; i < len; i++)
+            for (int i = 0; i < len; i++)
             {
-                groups[i].ChangeTags(id);
+                groups[i].TagsChanged(id);
             }
 
             groups = ProcessingEntities.Default.GroupsActors;
-            len = ProcessingEntities.Default.groupCountActors;
-            for (var i = 0; i < len; i++)
+            len = ProcessingEntities.Default.groupLengthActors;
+            for (int i = 0; i < len; i++)
             {
-                groups[i].ChangeTags(id);
+                groups[i].TagsChanged(id);
             }
+        }
+
+        void HandleTagsChanged()
+        {
+            if (Toolbox.isQuittingOrChangingScene()) return;
+            if (state.disabled) return;
+
+
+            
+                var groups = ProcessingEntities.Default.GroupsBase;
+                int len = ProcessingEntities.Default.groupLength;
+
+                for (int i = 0; i < len; i++)
+                {
+                    groups[i].TagsChanged(id);
+                }
+
+                groups = ProcessingEntities.Default.GroupsActors;
+                len = ProcessingEntities.Default.groupLengthActors;
+                for (int i = 0; i < len; i++)
+                {
+                    groups[i].TagsChanged(id);
+                } 
+     
         }
 
         #endregion
@@ -464,9 +529,9 @@ namespace Homebrew
 
         #region TAGS
 
-        public bool HasTagAny(params int[] filter)
+        public bool TagsHaveAny(params int[] filter)
         {
-            for (var i = 0; i < filter.Length; i++)
+            for (int i = 0; i < filter.Length; i++)
             {
                 if (tags.ContainsKey(filter[i])) return true;
             }
@@ -474,9 +539,9 @@ namespace Homebrew
             return false;
         }
 
-        public bool HasTags(params int[] filter)
+        public bool TagsHave(params int[] filter)
         {
-            for (var i = 0; i < filter.Length; i++)
+            for (int i = 0; i < filter.Length; i++)
             {
                 if (!tags.ContainsKey(filter[i])) return false;
             }
@@ -484,16 +549,16 @@ namespace Homebrew
             return true;
         }
 
-        public bool HasTag(int val)
+        public bool TagsHave(int val)
         {
             return tags.ContainsKey(val);
         }
 
 
-        public void RemoveTags(params int[] ids)
+        public void TagsRemove(params int[] ids)
         {
-            var tagsChanged = false;
-            foreach (var index in ids)
+            bool tagsChanged = false;
+            foreach (int index in ids)
             {
                 int val;
                 if (!tags.TryGetValue(index, out val)) continue;
@@ -508,15 +573,15 @@ namespace Homebrew
             }
 
             if (tagsChanged == false) return;
-            HandleTagsChanged();
+            OnTagsChanged();
         }
 
-        public void ClearTagsAll()
+        public void TagsClearAll()
         {
             tags.Clear();
         }
 
-        public void RemoveTags(int id, bool all = false)
+        public void TagsRemove(int id, bool all = false)
         {
             int val;
             if (!tags.TryGetValue(id, out val)) return;
@@ -525,16 +590,16 @@ namespace Homebrew
             if (val == 0)
             {
                 tags.Remove(id);
-                HandleTagsChanged();
+                OnTagsChanged();
             }
             else tags[id] = val;
         }
 
 
-        public void AddTags(params int[] ids)
+        public void TagsAdd(params int[] ids)
         {
-            var c = false;
-            foreach (var index in ids)
+            bool c = false;
+            foreach (int index in ids)
             {
                 if (tags.ContainsKey(index))
                 {
@@ -549,10 +614,10 @@ namespace Homebrew
 
             if (!c) return;
 
-            HandleTagsChanged();
+            OnTagsChanged();
         }
 
-        public void AddTag(int id)
+        public void TagsAdd(int id)
         {
             if (tags.ContainsKey(id))
             {
@@ -563,7 +628,7 @@ namespace Homebrew
 
             tags.Add(id, 1);
 
-            HandleTagsChanged();
+            OnTagsChanged();
         }
 
         #endregion

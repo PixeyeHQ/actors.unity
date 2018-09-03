@@ -14,43 +14,34 @@ namespace Homebrew
 {
     public class ProcessingEntities : IDisposable
     {
-        public static List<IStorageType> storageTypes = new List<IStorageType>();
+        //  public static List<IStorageType> storageTypes = new List<IStorageType>();
         public static ProcessingEntities Default;
 
         public GroupBase[] GroupsBase = new GroupBase[64];
-        public int groupCount;
-
-
+        public int groupLength;
         public Group[] GroupsActors = new Group[32];
-        public int groupCountActors;
+        public int groupLengthActors;
 
 
-        public static void KillEntity(int index)
+        public static void Kill(int index)
         {
             Actor.prevID.Push(index);
         }
 
-        public static void Remove<T>(int index) where T : new()
+        public static void Unbind<T>(int index) where T : new()
         {
-           
             Storage<T>.Instance.Remove(index);
         }
 
-        public static void AddEntity(Actor monoActor)
+        public static void Add(Actor monoActor)
         {
-            var len = Actor.entites.Length;
-
+            int len = Actor.entites.Length;
             if (Actor.lastID == len)
-            {
-                Array.Resize(ref Actor.entites, Mathf.Clamp(Actor.lastID << 1, 0, 1000000));
-            }
- 
-            if (Actor.prevID.Count>0)
+                Array.Resize(ref Actor.entites, Actor.lastID << 1);
+
+            if (Actor.prevID.Count > 0)
             {
                 monoActor.id = Actor.prevID.Pop();
-                  //  Actor.prevID;
-                //Actor.prevID = -1;
-              //  Debug.Log(monoActor.id + "_" + Actor.entites.Length);
                 Actor.entites[monoActor.id] = monoActor;
             }
             else
@@ -60,87 +51,85 @@ namespace Homebrew
             }
         }
 
-        public static int AddEntity()
+        public static int Add()
         {
             int id;
-            if (Actor.prevID.Count>0)
+            if (Actor.prevID.Count > 0)
             {
                 id = Actor.prevID.Pop();
-              
             }
             else
-            {
+
                 id = Actor.lastID++;
-            }
 
             return id;
         }
 
 
-        public GroupBase AddGetGroupActors(Type groupType, Composition filter)
+        public GroupBase SetupGroupActors(Type groupType, Composition filter)
         {
-            var i = groupCountActors - 1;
+            int i = groupLengthActors - 1;
 
             for (; i >= 0; i--)
             {
-                if (GroupsActors[i].Composition.Equals(filter))
+                if (GroupsActors[i].composition.Equals(filter))
                 {
                     break;
                 }
             }
- 
+
             if (i != -1) return GroupsActors[i];
 
-      
+
             var group_ = Activator.CreateInstance(groupType, true) as Group;
 
-            group_.Composition = filter;
+            group_.composition = filter;
             group_.Populate();
 
-            if (groupCountActors == GroupsActors.Length)
+            if (groupLengthActors == GroupsActors.Length)
             {
-                Array.Resize(ref GroupsActors, groupCountActors << 1);
+                Array.Resize(ref GroupsActors, groupLengthActors << 1);
             }
 
-            GroupsActors[groupCountActors++] = group_;
+            GroupsActors[groupLengthActors++] = group_;
 
             return group_;
         }
 
-        public GroupBase AddGetGroup(Type groupType, Composition filter)
+        public GroupBase SetupGroup(Type groupType, Composition filter)
         {
             if (groupType == typeof(Group))
             {
-                return AddGetGroupActors(groupType, filter);
+                return SetupGroupActors(groupType, filter);
             }
 
-            var i = groupCount - 1;
+            int i = groupLength - 1;
             for (; i >= 0; i--)
             {
                 if (GroupsBase[i].GetType() != groupType) continue;
-                if (GroupsBase[i].Composition.Equals(filter))
+                if (GroupsBase[i].composition.Equals(filter))
                 {
                     break;
                 }
             }
-          
+
             if (i != -1) return GroupsBase[i];
-            
-            i = groupCount;
 
-            var group_ = Activator.CreateInstance(groupType, true) as GroupBase;
+            i = groupLength;
 
-            group_.Composition = filter;
+            var group = Activator.CreateInstance(groupType, true) as GroupBase;
 
-            group_.Populate();
+            group.composition = filter;
+
+            group.Populate();
 
 
-            if (groupCount == GroupsBase.Length)
+            if (groupLength == GroupsBase.Length)
             {
-                Array.Resize(ref GroupsBase, groupCount << 1);
+                Array.Resize(ref GroupsBase, groupLength << 1);
             }
 
-            GroupsBase[groupCount++] = group_;
+            GroupsBase[groupLength++] = group;
 
             return GroupsBase[i];
         }
@@ -148,33 +137,24 @@ namespace Homebrew
 
         public void CheckGroups(int entityID, bool active)
         {
-       
             if (active)
             {
-                for (var i = 0; i < groupCountActors; i++)
-                {
-                    GroupsActors[i].TryAddEntity(entityID);
-                }
+                for (int i = 0; i < groupLengthActors; i++)
+                    GroupsActors[i].Add(entityID);
 
-                for (var i = 0; i < groupCount; i++)
-                {
-                    GroupsBase[i].TryAddEntity(entityID);
-                }
+
+                for (int i = 0; i < groupLength; i++)
+                    GroupsBase[i].Add(entityID);
             }
             else
             {
-                for (var i = 0; i < groupCount; i++)
-                {
-                    GroupsBase[i].TryRemoveEntity(entityID);
-                }
+                for (int i = 0; i < groupLength; i++)
+                    GroupsBase[i].Remove(entityID);
 
 
-                for (var i = 0; i < groupCountActors; i++)
-                {
-                    GroupsActors[i].TryRemoveEntity(entityID);
-                }
+                for (int i = 0; i < groupLengthActors; i++)
+                    GroupsActors[i].Remove(entityID);
             }
-       
         }
 
         public void Dispose()

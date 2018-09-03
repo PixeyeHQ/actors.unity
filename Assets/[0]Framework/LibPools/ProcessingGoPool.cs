@@ -9,7 +9,7 @@ namespace Homebrew
 
 		public static ProcessingGoPool Default;
 		
-		public readonly Dictionary<int, PoolStash> pools = new Dictionary<int, PoolStash>(4,new FastDict());
+		public readonly Dictionary<int, PoolStash> pools = new Dictionary<int, PoolStash>(4,new FastComparable());
 
  
 

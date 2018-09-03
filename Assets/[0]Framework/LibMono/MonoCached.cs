@@ -35,11 +35,9 @@ namespace Homebrew
         protected virtual void Awake()
         {
             selfTransform = transform;
+            
             state.enabled = false;
             state.initialized = false;
-
-            if (state.requireActorParent)
-                return;
 
 
             if (Starter.initialized == false)
@@ -47,6 +45,12 @@ namespace Homebrew
                 state.requireStarter = true;
 
                 return;
+            }
+
+
+            if (state.requireActorParent)
+            {
+                actorParent = GetComponentInParent<Actor>();
             }
 
 
@@ -64,7 +68,7 @@ namespace Homebrew
         {
             if (state.enabled || state.requireStarter ||
                 state.requireActorParent) return;
-           
+
             state.released = false;
             state.enabled = true;
 
@@ -164,15 +168,18 @@ namespace Homebrew
 
         #region DESTROY
 
+        protected virtual void OnHandleDestroy()
+        {
+        }
+
         public void HandleDestroy()
         {
-       
             if (state.released) return;
             state.released = true;
             state.enabled = false;
+            OnHandleDestroy();
             if (pool == Pool.None)
             {
-              
                 Destroy(gameObject, timeDestroyDelay);
                 return;
             }

@@ -5,7 +5,7 @@
 using Homebrew;
 using UnityEngine;
 
-public class DataObject : IData, IStorage
+public class DataObject : IData
 {
     public Transform transform;
 }

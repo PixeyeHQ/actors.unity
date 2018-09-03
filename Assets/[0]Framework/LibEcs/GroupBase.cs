@@ -6,7 +6,7 @@ Date:       5/14/2018  6:32 PM
 ================================================================*/
 
 using System;
-using UnityEngine;
+ 
 
 namespace Homebrew
 {
@@ -14,45 +14,49 @@ namespace Homebrew
     {
         public int length;
         public int[] entities = new int[EngineSettings.MinEntities];
-        public Composition Composition;
+      
+        public Composition composition;
 
 
         public Action<int> OnAdded;
         public Action<int> OnRemoved;
 
+        protected int indexLast;
 
-        public void ChangeTags(int entityID)
+        public void TagsChanged(int entityID)
         {
-            var inGroup = false;
-
-
-            for (var i = 0; i < length; i++)
-            {
-                if (entities[i] != entityID) continue;
-
-                inGroup = true;
-                break;
-            }
-
-
+            int index = GetIndex(entityID);
             var actor = Actor.entites[entityID];
 
-
-            if (!inGroup)
+            if (index == -1)
             {
-                if (actor.HasTags(Composition.include) && !actor.HasTagAny(Composition.exclude))
-                {
-                    TryAddEntity(entityID, true);
-                }
+                if (composition.include.Length > 0 && !actor.TagsHave(composition.include)) return;
+                if (actor.TagsHaveAny(composition.exclude)) return;
+
+                AddChecked(entityID);
             }
             else
             {
-                if (!actor.HasTags(Composition.include) || actor.HasTagAny(Composition.exclude))
+                if (composition.include.Length > 0 && !actor.TagsHave(composition.include) ||
+                    actor.TagsHaveAny(composition.exclude))
                 {
-                    TryRemoveEntity(entityID);
+                    RemoveAt(index);
                 }
             }
         }
+
+
+        public int GetIndex(int id)
+        {
+            for (int i = 0; i < length; i++)
+            {
+                if (entities[i] != id) continue;
+                return i;
+            }
+
+            return -1;
+        }
+ 
 
         public int FromVirtual(int id)
         {
@@ -65,13 +69,20 @@ namespace Homebrew
             return Actor.entites[entities[id]];
         }
 
-        public abstract void TryAddVirtually(int entityID);
-        public abstract void TryAddEntity(int entityID, bool tagsChecked = false);
-        public abstract void TryRemoveEntity(int entityID);
+        public abstract void AddVirtually(int entityID);
+        public abstract void Add(int entityID);
+        public abstract void AddChecked(int entityID);
+
+        public void Remove(int entityID)
+        {
+            int i = GetIndex(entityID);
+            RemoveAt(i);
+        }
 
 
         public abstract void Populate();
         protected abstract void RemoveAt(int i);
+
 
         public void Dispose()
         {
@@ -88,80 +99,83 @@ namespace Homebrew
 
     public class Group : GroupBase
     {
-        public override void TryAddVirtually(int entityID)
+        public override void AddVirtually(int entityID)
         {
         }
 
-        public override void TryAddEntity(int entityID, bool tagsChecked = false)
+        public override void Add(int entityID)
         {
             var entity = Actor.entites[entityID];
-            if (entity.isActiveAndEnabled == false) return;
 
-            if (!tagsChecked)
-            {
-                if (!entity.HasTags(Composition.include))
-                    return;
-
-
-                if (entity.HasTagAny(Composition.exclude))
-                    return;
-            }
-
+            if (composition.include.Length > 0 && !entity.TagsHave(composition.include))
+                return;
+            if (composition.exclude.Length > 0 && entity.TagsHaveAny(composition.exclude)) return;
             if (entities.Length <= length)
             {
-                var len = entityID == 0 ? EngineSettings.MinComponents : entityID << 1;
+                int len = entityID == 0 ? EngineSettings.MinComponents : entityID << 1;
+                len += 1;
                 Array.Resize(ref entities, len);
             }
 
-            entities[length++] = entityID;
+            indexLast = length++;
+ 
+
+            entities[indexLast] = entityID;
+
+
             if (OnAdded != null)
-                OnAdded(length-1);
+                OnAdded(indexLast);
         }
 
-        public override void TryRemoveEntity(int entityID)
+        public override void AddChecked(int entityID)
         {
-            for (var i = 0; i < length; i++)
+            if (entities.Length <= length)
             {
-                if (entities[i] == entityID)
-                {
-                    length--;
-                    Array.Copy(entities, i + 1, entities, i, length - i);
-                    OnRemoved?.Invoke(i);
-                    break;
-                }
+                int len = entityID == 0 ? EngineSettings.MinComponents : entityID << 1;
+                len += 1;
+                Array.Resize(ref entities, len);
             }
+
+            indexLast = length++;
+ 
+            entities[indexLast] = entityID;
+ 
+            if (OnAdded != null)
+                OnAdded(indexLast);
         }
 
 
         public override void Populate()
         {
-            for (var i = 0; i < Actor.lastID; i++)
+            for (int i = 0; i < Actor.lastID; i++)
             {
                 var e = Actor.entites[i];
- 
-                if (e==null||e.isActiveAndEnabled == false) continue;
-                if (e.tags == null) continue;
-                if (Composition.include.Length > 0)
-                    if (!e.HasTags(Composition.include))
+
+                if (e == null || !e.state.enabled) continue;
+
+                if (composition.include.Length > 0)
+                    if (!e.TagsHave(composition.include))
                         continue;
 
-                if (Composition.exclude.Length > 0)
-                    if (e.HasTagAny(Composition.exclude))
+                if (composition.exclude.Length > 0)
+                    if (e.TagsHaveAny(composition.exclude))
                         continue;
-
 
                 if (length == entities.Length)
                     Array.Resize(ref entities, length << 1);
 
 
-                entities[length++] = e.id;
+                entities.InsertCheck(e.id, ref length, ref indexLast);
+                Array.Copy(entities, indexLast, entities, indexLast + 1, length - indexLast - 1);
+                entities[indexLast] = e.id;
             }
         }
 
         protected override void RemoveAt(int i)
         {
-            Array.Copy(entities, i + 1, entities, i, length - i);
-            length--;
+            OnRemoved?.Invoke(i);
+            Array.Copy(entities, i + 1, entities, i, length-- - i);
+        
         }
 
         protected override void OnDispose()
@@ -172,126 +186,134 @@ namespace Homebrew
     public class Group<T> : GroupBase where T : IComponent, new()
     {
         public T[] component = new T[EngineSettings.MinComponents];
+        private Storage<T> storage = Storage<T>.Instance;
 
-
-        public override void TryAddVirtually(int entityID)
+        public override void AddVirtually(int entityID)
         {
-            var storage = Storage<T>.Instance;
-            if (storage.HasComponent(entityID) == false) return;
+            if (!storage.HasComponent(entityID)) return;
+
             if (entities.Length <= length)
             {
-                var len = entityID == 0 ? EngineSettings.MinComponents : entityID << 1;
+                int len = entityID == 0 ? EngineSettings.MinComponents : entityID << 1;
+                len += 1;
                 Array.Resize(ref entities, len);
                 Array.Resize(ref component, len);
             }
 
+            indexLast = length++;
+            
+     
+            entities[indexLast] = entityID;
+            component[indexLast] = storage.components[entityID];
 
-            entities[length] = entityID;
-            component[length++] = storage.components[entityID];
 
             if (OnAdded != null)
-                OnAdded(length-1);
+                OnAdded(indexLast);
         }
 
-        public override void TryAddEntity(int entityID, bool tagsChecked = false)
+        public override void Add(int entityID)
         {
-            var storage = Storage<T>.Instance;
+            if (!storage.HasComponent(entityID)) return;
 
-
-            if (storage.HasComponent(entityID) == false) return;
             var entity = Actor.entites[entityID];
-            if (entity.isActiveAndEnabled == false) return;
+            if (composition.include.Length > 0 && !entity.TagsHave(composition.include))
+                return;
+            if (composition.exclude.Length > 0 && entity.TagsHaveAny(composition.exclude))
+                return;
 
-            if (!tagsChecked)
-            {
-                if (Composition.include.Length > 0)
-                    if (!entity.HasTags(Composition.include))
-                        return;
-
-
-                if (Composition.exclude.Length > 0)
-                    if (entity.HasTagAny(Composition.exclude))
-                        return;
-            }
 
             if (entities.Length <= length)
             {
-                var len = entityID == 0 ? EngineSettings.MinComponents : entityID << 1;
+                int len = entityID == 0 ? EngineSettings.MinComponents : entityID << 1;
+                len += 1;
+                Array.Resize(ref entities, len);
+                Array.Resize(ref component, len);
+            }
+
+            indexLast = length++;
+ 
+            entities[indexLast] = entityID;
+            component[indexLast] = storage.components[entityID];
+ 
+
+            if (OnAdded != null)
+                OnAdded(indexLast);
+        }
+
+        public override void AddChecked(int entityID)
+        {
+            if (!storage.HasComponent(entityID)) return;
+
+            if (entities.Length <= length)
+            {
+                int len = entityID == 0 ? EngineSettings.MinComponents : entityID << 1;
+                len += 1;
                 Array.Resize(ref entities, len);
                 Array.Resize(ref component, len);
             }
 
 
-            entities[length] = entityID;
-            component[length++] = storage.components[entityID];
+            indexLast = length++;
+ 
+            entities[indexLast] = entityID;
+            component[indexLast] = storage.components[entityID];
+            
+ 
 
             if (OnAdded != null)
-                OnAdded(length-1);
-        }
-
-        public override void TryRemoveEntity(int entityID)
-        {
-            for (var i = 0; i < length; i++)
-            {
-                if (entities[i] != entityID) continue;
-
-
-                length--;
-
-                Array.Copy(entities, i + 1, entities, i, length - i);
-                Array.Copy(component, i + 1, component, i, length - i);
-                OnRemoved?.Invoke(i);
-
-                break;
-            }
+                OnAdded(indexLast);
         }
 
 
         public override void Populate()
         {
-            var storage = Storage<T>.Instance;
-
-
             storage.groups.Add(this);
 
 
-            for (var i = 0; i < Actor.lastID; i++)
+            for (int i = 0; i < Actor.lastID; i++)
             {
                 var e = Actor.entites[i];
-                if (e!=null&&e.isActiveAndEnabled == false) continue;
+                if (e == null || !e.state.enabled) continue;
 
-                if (Composition.include.Length > 0)
-                    if (!e.HasTags(Composition.include))
+                if (composition.include.Length > 0)
+                    if (!e.TagsHave(composition.include))
                         continue;
 
-                if (Composition.exclude.Length > 0)
-                    if (e.HasTagAny(Composition.exclude))
+                if (composition.exclude.Length > 0)
+                    if (e.TagsHaveAny(composition.exclude))
                         continue;
 
 
-                if (storage.HasComponent(e.id) == false) continue;
+                if (!storage.HasComponent(e.id)) continue;
 
 
                 if (length == entities.Length)
-                    Array.Resize(ref entities, length << 1);
-
-                if (length == component.Length)
                 {
-                    var len = length << 1;
+                    int len = (length << 1) + 1;
+                    Array.Resize(ref entities, len);
                     Array.Resize(ref component, len);
                 }
 
-                entities[length] = e.id;
+                int entityID = e.id;
+                indexLast = length++;
+      
+                entities[indexLast] = entityID;
+                component[indexLast] = storage.components[entityID];
 
-                component[length++] = storage.components[e.id];
+
+                if (OnAdded != null)
+                    OnAdded(indexLast);
             }
         }
 
         protected override void RemoveAt(int i)
         {
-            Array.Copy(entities, i + 1, entities, i, length - i);
-            Array.Copy(component, i + 1, component, i, length - i);
-            length--;
+            int next = i + 1;
+            int size = length-- - i;
+            OnRemoved?.Invoke(i);
+            Array.Copy(entities, next, entities, i, size);
+            Array.Copy(component, next, component, i, size);
+          
         }
 
 
@@ -305,94 +327,98 @@ namespace Homebrew
     {
         public T[] component = new T[EngineSettings.MinComponents];
         public Y[] component2 = new Y[EngineSettings.MinComponents];
+        Storage<T> storage = Storage<T>.Instance;
+        Storage<Y> storage2 = Storage<Y>.Instance;
 
 
-        public override void TryAddVirtually(int entityID)
+        public override void AddVirtually(int entityID)
         {
-            var storage = Storage<T>.Instance;
-            var storage2 = Storage<Y>.Instance;
+            if (!storage.HasComponent(entityID) ||
+                !storage2.HasComponent(entityID))
+                return;
 
-            if (storage.HasComponent(entityID) == false) return;
-            if (storage2.HasComponent(entityID) == false) return;
             if (entities.Length <= length)
             {
-                var len = entityID == 0 ? EngineSettings.MinComponents : entityID << 1;
+                int len = entityID == 0 ? EngineSettings.MinComponents : entityID << 1;
+                len += 1;
                 Array.Resize(ref entities, len);
                 Array.Resize(ref component, len);
                 Array.Resize(ref component2, len);
             }
 
+            indexLast = length++;
+ 
+            entities[indexLast] = entityID;
+            component[indexLast] = storage.components[entityID];
+            component2[indexLast] = storage2.components[entityID];
 
-            entities[length] = entityID;
-            component2[length] = storage2.components[entityID];
-            component[length++] = storage.components[entityID];
+
             if (OnAdded != null)
-                OnAdded(length-1);
+                OnAdded(indexLast);
         }
 
-        public override void TryAddEntity(int entityID, bool tagsChecked = false)
+        public override void Add(int entityID)
         {
-            var storage = Storage<T>.Instance;
-            var storage2 = Storage<Y>.Instance;
+            if (!storage.HasComponent(entityID) || !storage2.HasComponent(entityID)) return;
 
 
-            if (storage.HasComponent(entityID) == false) return;
-            if (storage2.HasComponent(entityID) == false) return;
             var entity = Actor.entites[entityID];
-            if (entity!=null&&entity.isActiveAndEnabled == false) return;
-            if (!tagsChecked)
-            {
-                if (Composition.include.Length > 0)
-                    if (!entity.HasTags(Composition.include))
-                        return;
+            if (composition.include.Length > 0 && !entity.TagsHave(composition.include))
+                return;
 
-                if (Composition.exclude.Length > 0)
-                    if (entity.HasTagAny(Composition.exclude))
-                        return;
-            }
+
+            if (composition.exclude.Length > 0 && entity.TagsHaveAny(composition.exclude))
+                return;
 
 
             if (entities.Length <= length)
             {
-                var len = entityID == 0 ? EngineSettings.MinComponents : entityID << 1;
+                int len = entityID == 0 ? EngineSettings.MinComponents : entityID << 1;
+                len += 1;
                 Array.Resize(ref entities, len);
                 Array.Resize(ref component, len);
                 Array.Resize(ref component2, len);
             }
 
-
-            entities[length] = entityID;
-            component2[length] = storage2.components[entityID];
-            component[length++] = storage.components[entityID];
+            indexLast = length++;
+ 
+            entities[indexLast] = entityID;
+            component[indexLast] = storage.components[entityID];
+            component2[indexLast] = storage2.components[entityID];
+ 
             if (OnAdded != null)
-                OnAdded(length-1);
+                OnAdded(indexLast);
         }
 
-        public override void TryRemoveEntity(int entityID)
+        public override void AddChecked(int entityID)
         {
-            for (var i = 0; i < length; i++)
+            if (!storage.HasComponent(entityID)
+                || !storage2.HasComponent(entityID)) return;
+
+
+            if (entities.Length <= length)
             {
-                if (entities[i] == entityID)
-                {
-                    OnRemoved?.Invoke(i);
-                    length--;
-                    Array.Copy(entities, i + 1, entities, i, length - i);
-                    Array.Copy(component, i + 1, component, i, length - i);
-                    Array.Copy(component2, i + 1, component2, i, length - i);
-
-
-                    break;
-                }
+                int len = entityID == 0 ? EngineSettings.MinComponents : entityID << 1;
+                len += 1;
+                Array.Resize(ref entities, len);
+                Array.Resize(ref component, len);
+                Array.Resize(ref component2, len);
             }
+
+            indexLast = length++;
+           
+            entities[indexLast] = entityID;
+            component[indexLast] = storage.components[entityID];
+            component2[indexLast] = storage2.components[entityID];
+        
+
+            if (OnAdded != null)
+                OnAdded(indexLast);
         }
 
 
         public override void Populate()
         {
-            var storage = Storage<T>.Instance;
-            var storage2 = Storage<Y>.Instance;
-
-
             storage.groups.Add(this);
             storage2.groups.Add(this);
 
@@ -400,44 +426,46 @@ namespace Homebrew
             for (int i = 0; i < Actor.lastID; i++)
             {
                 var e = Actor.entites[i];
-                if (e.isActiveAndEnabled == false) continue;
-                if (Composition.include.Length > 0)
-                    if (!e.HasTags(Composition.include))
+                if (e == null || !e.state.enabled) continue;
+                if (composition.include.Length > 0)
+                    if (!e.TagsHave(composition.include))
                         continue;
 
-                if (Composition.exclude.Length > 0)
-                    if (e.HasTagAny(Composition.exclude))
+                if (composition.exclude.Length > 0)
+                    if (e.TagsHaveAny(composition.exclude))
                         continue;
 
 
-                if (storage.HasComponent(e.id) == false) continue;
-                if (storage2.HasComponent(e.id) == false) continue;
+                if (!storage.HasComponent(e.id) || !storage2.HasComponent(e.id)) continue;
 
 
                 if (length == entities.Length)
-                    Array.Resize(ref entities, length << 1);
-
-                if (length == component.Length)
                 {
-                    var len = length << 1;
+                    int len = length << 1;
+                    len += 1;
+                    Array.Resize(ref entities, len);
                     Array.Resize(ref component, len);
                     Array.Resize(ref component2, len);
                 }
 
-
-                entities[length] = e.id;
-
-                component2[length] = storage2.components[e.id];
-                component[length++] = storage.components[e.id];
+                int entityID = e.id;
+                indexLast = length++;
+  
+                entities[indexLast] = entityID;
+                component[indexLast] = storage.components[entityID];
+                component2[indexLast] = storage2.components[entityID];
             }
         }
 
         protected override void RemoveAt(int i)
         {
-            Array.Copy(entities, i + 1, entities, i, length - i);
-            Array.Copy(component, i + 1, component, i, length - i);
-            Array.Copy(component2, i + 1, component2, i, length - i);
-            length--;
+            int next = i + 1;
+            int size = length-- - i;
+            OnRemoved?.Invoke(i);
+            Array.Copy(entities, next, entities, i, size);
+            Array.Copy(component, next, component, i, size);
+            Array.Copy(component2, next, component2, i, size);
+         
         }
 
 
@@ -452,153 +480,164 @@ namespace Homebrew
         public T[] component = new T[EngineSettings.MinComponents];
         public Y[] component2 = new Y[EngineSettings.MinComponents];
         public U[] component3 = new U[EngineSettings.MinComponents];
+        Storage<T> storage = Storage<T>.Instance;
+        Storage<Y> storage2 = Storage<Y>.Instance;
+        Storage<U> storage3 = Storage<U>.Instance;
 
         protected override void RemoveAt(int i)
         {
-            Array.Copy(entities, i + 1, entities, i, length - i);
-            Array.Copy(component, i + 1, component, i, length - i);
-            Array.Copy(component2, i + 1, component2, i, length - i);
-            Array.Copy(component3, i + 1, component3, i, length - i);
-            length--;
+            int next = i + 1;
+            int size = length-- - i;
+            OnRemoved?.Invoke(i);
+            Array.Copy(entities, next, entities, i, size);
+            Array.Copy(component, next, component, i, size);
+            Array.Copy(component2, next, component2, i, size);
+            Array.Copy(component3, next, component3, i, size);
+             
         }
 
-        public override void TryAddVirtually(int entityID)
+        public override void AddVirtually(int entityID)
         {
-            var storage = Storage<T>.Instance;
-            var storage2 = Storage<Y>.Instance;
-            var storage3 = Storage<U>.Instance;
-
-
-            if (storage.HasComponent(entityID) == false) return;
-            if (storage2.HasComponent(entityID) == false) return;
-            if (storage3.HasComponent(entityID) == false) return;
+            if (!storage.HasComponent(entityID) ||
+                !storage2.HasComponent(entityID) ||
+                !storage3.HasComponent(entityID)
+            ) return;
 
 
             if (entities.Length <= length)
             {
-                var len = entityID == 0 ? EngineSettings.MinComponents : entityID << 1;
+                int len = entityID == 0 ? EngineSettings.MinComponents : entityID << 1;
+                len += 1;
                 Array.Resize(ref entities, len);
                 Array.Resize(ref component, len);
                 Array.Resize(ref component2, len);
                 Array.Resize(ref component3, len);
             }
 
-            entities[length] = entityID;
-            component3[length] = storage3.components[entityID];
-            component2[length] = storage2.components[entityID];
-            component[length++] = storage.components[entityID];
+            indexLast = length++;
+        
+            entities[indexLast] = entityID;
+            component[indexLast] = storage.components[entityID];
+            component2[indexLast] = storage2.components[entityID];
+            component3[indexLast] = storage3.components[entityID];
+
+
             if (OnAdded != null)
-                OnAdded(length-1);
+                OnAdded(indexLast);
         }
 
-        public override void TryAddEntity(int entityID, bool tagsChecked = false)
+        public override void Add(int entityID)
         {
-            var storage = Storage<T>.Instance;
-            var storage2 = Storage<Y>.Instance;
-            var storage3 = Storage<U>.Instance;
+            if (!storage.HasComponent(entityID) ||
+                !storage2.HasComponent(entityID) ||
+                !storage3.HasComponent(entityID)
+            ) return;
 
-
-            if (storage.HasComponent(entityID) == false) return;
-
-            if (storage2.HasComponent(entityID) == false) return;
-
-            if (storage3.HasComponent(entityID) == false) return;
             var entity = Actor.entites[entityID];
-            if (entity.isActiveAndEnabled == false) return;
+            if (composition.include.Length > 0)
+                if (!entity.TagsHave(composition.include))
+                    return;
 
-            if (!tagsChecked)
-            {
-                if (Composition.include.Length > 0)
-                    if (!entity.HasTags(Composition.include))
-                        return;
 
-                if (Composition.exclude.Length > 0)
-                    if (entity.HasTagAny(Composition.exclude))
-                        return;
-            }
-
+            if (composition.exclude.Length > 0)
+                if (entity.TagsHaveAny(composition.exclude))
+                    return;
 
             if (entities.Length <= length)
             {
-                var len = entityID == 0 ? EngineSettings.MinComponents : entityID << 1;
-                Array.Resize(ref entities, len);
-                Array.Resize(ref component, len);
-                Array.Resize(ref component2, len);
-                Array.Resize(ref component3, len);
+                int len = entityID == 0 ? EngineSettings.MinComponents : entityID << 1;
+                Array.Resize(ref entities, len + 1);
+                Array.Resize(ref component, len + 1);
+                Array.Resize(ref component2, len + 1);
+                Array.Resize(ref component3, len + 1);
             }
 
-            entities[length] = entityID;
-            component3[length] = storage3.components[entityID];
-            component2[length] = storage2.components[entityID];
-            component[length++] = storage.components[entityID];
+            indexLast = length++;
+ 
+            entities[indexLast] = entityID;
+            component[indexLast] = storage.components[entityID];
+            component2[indexLast] = storage2.components[entityID];
+            component3[indexLast] = storage3.components[entityID];
+       
+           
+
             if (OnAdded != null)
-                OnAdded(length-1);
+                OnAdded(indexLast);
         }
 
-        public override void TryRemoveEntity(int entityID)
+        public override void AddChecked(int entityID)
         {
-            for (var i = 0; i < length; i++)
-            {
-                if (entities[i] != entityID) continue;
-                OnRemoved?.Invoke(i);
-                length--;
-                Array.Copy(entities, i + 1, entities, i, length - i);
-                Array.Copy(component, i + 1, component, i, length - i);
-                Array.Copy(component2, i + 1, component2, i, length - i);
-                Array.Copy(component3, i + 1, component3, i, length - i);
+            if (!storage.HasComponent(entityID) ||
+                !storage2.HasComponent(entityID) ||
+                !storage3.HasComponent(entityID)
+            ) return;
 
-                break;
+            if (entities.Length <= length)
+            {
+                int len = entityID == 0 ? EngineSettings.MinComponents : entityID << 1;
+                Array.Resize(ref entities, len + 1);
+                Array.Resize(ref component, len + 1);
+                Array.Resize(ref component2, len + 1);
+                Array.Resize(ref component3, len + 1);
             }
+
+            indexLast = length++;
+     
+            entities[indexLast] = entityID;
+            component[indexLast] = storage.components[entityID];
+            component2[indexLast] = storage2.components[entityID];
+            component3[indexLast] = storage3.components[entityID];
+           
+
+            if (OnAdded != null)
+                OnAdded(indexLast);
         }
 
 
         public override void Populate()
         {
-            var storage = Storage<T>.Instance;
-            var storage2 = Storage<Y>.Instance;
-            var storage3 = Storage<U>.Instance;
-
-
             storage.groups.Add(this);
             storage2.groups.Add(this);
             storage3.groups.Add(this);
 
 
-            for (var i = 0; i < Actor.lastID; i++)
+            for (int i = 0; i < Actor.lastID; i++)
             {
                 var e = Actor.entites[i];
-                if (e!=null&&e.isActiveAndEnabled == false) continue;
-                if (Composition.include.Length > 0)
-                    if (!e.HasTags(Composition.include))
+                if (e == null || !e.state.enabled) continue;
+
+                if (composition.include.Length > 0)
+                    if (!e.TagsHave(composition.include))
                         continue;
 
-                if (Composition.exclude.Length > 0)
-                    if (e.HasTagAny(Composition.exclude))
+                if (composition.exclude.Length > 0)
+                    if (e.TagsHaveAny(composition.exclude))
                         continue;
 
+                int entityID = e.id;
 
-                if (storage.HasComponent(e.id) == false) continue;
-                if (storage2.HasComponent(e.id) == false) continue;
-                if (storage3.HasComponent(e.id) == false) continue;
+                if (!storage.HasComponent(entityID) ||
+                    !storage2.HasComponent(entityID) ||
+                    !storage3.HasComponent(entityID)
+                ) continue;
 
 
                 if (length == entities.Length)
-                    Array.Resize(ref entities, length << 1);
-
-                if (length == component.Length)
                 {
-                    var len = length << 1;
+                    int len = length << 1;
+                    len += 1;
+                    Array.Resize(ref entities, len);
                     Array.Resize(ref component, len);
                     Array.Resize(ref component2, len);
                     Array.Resize(ref component3, len);
                 }
 
-                entities[length] = e.id;
-
-
-                component3[length] = storage3.components[e.id];
-                component2[length] = storage2.components[e.id];
-                component[length++] = storage.components[e.id];
+                indexLast = length++;
+    
+                entities[indexLast] = entityID;
+                component[indexLast] = storage.components[entityID];
+                component2[indexLast] = storage2.components[entityID];
+                component3[indexLast] = storage3.components[entityID];
             }
         }
 
@@ -619,32 +658,37 @@ namespace Homebrew
         public U[] component3 = new U[EngineSettings.MinComponents];
         public I[] component4 = new I[EngineSettings.MinComponents];
 
+        Storage<T> storage = Storage<T>.Instance;
+        Storage<Y> storage2 = Storage<Y>.Instance;
+        Storage<U> storage3 = Storage<U>.Instance;
+        Storage<I> storage4 = Storage<I>.Instance;
+
         protected override void RemoveAt(int i)
         {
-            Array.Copy(entities, i + 1, entities, i, length - i);
-            Array.Copy(component, i + 1, component, i, length - i);
-            Array.Copy(component2, i + 1, component2, i, length - i);
-            Array.Copy(component3, i + 1, component3, i, length - i);
-            Array.Copy(component4, i + 1, component4, i, length - i);
-            length--;
+            int next = i + 1;
+            int size = length-- - i;
+            OnRemoved?.Invoke(i);
+            Array.Copy(entities, next, entities, i, size);
+            Array.Copy(component, next, component, i, size);
+            Array.Copy(component2, next, component2, i, size);
+            Array.Copy(component3, next, component3, i, size);
+            Array.Copy(component4, next, component4, i, size);
+             
         }
 
-        public override void TryAddVirtually(int entityID)
+        public override void AddVirtually(int entityID)
         {
-            var storage = Storage<T>.Instance;
-            var storage2 = Storage<Y>.Instance;
-            var storage3 = Storage<U>.Instance;
-            var storage4 = Storage<I>.Instance;
+            if (!storage.HasComponent(entityID) ||
+                !storage2.HasComponent(entityID) ||
+                !storage3.HasComponent(entityID) ||
+                !storage4.HasComponent(entityID)
+            ) return;
 
-
-            if (storage.HasComponent(entityID) == false) return;
-            if (storage2.HasComponent(entityID) == false) return;
-            if (storage3.HasComponent(entityID) == false) return;
-            if (storage4.HasComponent(entityID) == false) return;
 
             if (entities.Length <= length)
             {
-                var len = entityID == 0 ? EngineSettings.MinComponents : entityID << 1;
+                int len = entityID == 0 ? EngineSettings.MinComponents : entityID << 1;
+                len += 1;
                 Array.Resize(ref entities, len);
                 Array.Resize(ref component, len);
                 Array.Resize(ref component2, len);
@@ -652,47 +696,41 @@ namespace Homebrew
                 Array.Resize(ref component4, len);
             }
 
-            entities[length] = entityID;
-            component4[length] = storage4.components[entityID];
-            component3[length] = storage3.components[entityID];
-            component2[length] = storage2.components[entityID];
-            component[length++] = storage.components[entityID];
+            indexLast = length++;
+ 
+            entities[indexLast] = entityID;
+            component[indexLast] = storage.components[entityID];
+            component2[indexLast] = storage2.components[entityID];
+            component3[indexLast] = storage3.components[entityID];
+            component4[indexLast] = storage4.components[entityID];
+
+
             if (OnAdded != null)
-                OnAdded(length-1);
+                OnAdded(indexLast);
         }
 
-        public override void TryAddEntity(int entityID, bool tagsChecked = false)
+        public override void Add(int entityID)
         {
-            var storage = Storage<T>.Instance;
-            var storage2 = Storage<Y>.Instance;
-            var storage3 = Storage<U>.Instance;
-            var storage4 = Storage<I>.Instance;
+            if (!storage.HasComponent(entityID) ||
+                !storage2.HasComponent(entityID) ||
+                !storage3.HasComponent(entityID) ||
+                !storage4.HasComponent(entityID)
+            ) return;
 
 
-            if (storage.HasComponent(entityID) == false) return;
-
-            if (storage2.HasComponent(entityID) == false) return;
-
-            if (storage3.HasComponent(entityID) == false) return;
-
-            if (storage4.HasComponent(entityID) == false) return;
             var entity = Actor.entites[entityID];
-            if (entity.isActiveAndEnabled == false) return;
-            if (!tagsChecked)
-            {
-                if (Composition.include.Length > 0)
-                    if (!entity.HasTags(Composition.include))
-                        return;
+            if (composition.include.Length > 0 && !entity.TagsHave(composition.include))
+                return;
 
-                if (Composition.exclude.Length > 0)
-                    if (entity.HasTagAny(Composition.exclude))
-                        return;
-            }
+
+            if (composition.exclude.Length > 0 && entity.TagsHaveAny(composition.exclude))
+                return;
 
 
             if (entities.Length <= length)
             {
-                var len = entityID == 0 ? EngineSettings.MinComponents : entityID << 1;
+                int len = entityID == 0 ? EngineSettings.MinComponents : entityID << 1;
+                len += 1;
                 Array.Resize(ref entities, len);
                 Array.Resize(ref component, len);
                 Array.Resize(ref component2, len);
@@ -700,80 +738,91 @@ namespace Homebrew
                 Array.Resize(ref component4, len);
             }
 
-            entities[length] = entityID;
-            component4[length] = storage4.components[entityID];
-            component3[length] = storage3.components[entityID];
-            component2[length] = storage2.components[entityID];
-            component[length++] = storage.components[entityID];
+
+            indexLast = length++;
+ 
+            entities[indexLast] = entityID;
+            component[indexLast] = storage.components[entityID];
+            component2[indexLast] = storage2.components[entityID];
+            component3[indexLast] = storage3.components[entityID];
+            component4[indexLast] = storage4.components[entityID];
+
+
             if (OnAdded != null)
-                OnAdded(length-1);
+                OnAdded(indexLast);
         }
 
-        public override void TryRemoveEntity(int entityID)
+        public override void AddChecked(int entityID)
         {
-            for (var i = 0; i < length; i++)
+            if (entities.Length <= length)
             {
-                if (entities[i] != entityID) continue;
-                OnRemoved?.Invoke(i);
-                length--;
-                Array.Copy(entities, i + 1, entities, i, length - i);
-                Array.Copy(component, i + 1, component, i, length - i);
-                Array.Copy(component2, i + 1, component2, i, length - i);
-                Array.Copy(component3, i + 1, component3, i, length - i);
-                Array.Copy(component4, i + 1, component4, i, length - i);
-
-                break;
+                int len = entityID == 0 ? EngineSettings.MinComponents : entityID << 1;
+                len += 1;
+                Array.Resize(ref entities, len);
+                Array.Resize(ref component, len);
+                Array.Resize(ref component2, len);
+                Array.Resize(ref component3, len);
+                Array.Resize(ref component4, len);
             }
+
+            indexLast = length++;
+       
+            entities[indexLast] = entityID;
+            component[indexLast] = storage.components[entityID];
+            component2[indexLast] = storage2.components[entityID];
+            component3[indexLast] = storage3.components[entityID];
+            component4[indexLast] = storage4.components[entityID];
+     
+            if (OnAdded != null)
+                OnAdded(indexLast);
         }
+
 
         public override void Populate()
         {
-            var storage = Storage<T>.Instance;
-            var storage2 = Storage<Y>.Instance;
-            var storage3 = Storage<U>.Instance;
-            var storage4 = Storage<I>.Instance;
-
             storage.groups.Add(this);
             storage2.groups.Add(this);
             storage3.groups.Add(this);
             storage4.groups.Add(this);
 
-            for (var i = 0; i < Actor.lastID; i++)
+            for (int i = 0; i < Actor.lastID; i++)
             {
                 var e = Actor.entites[i];
-                if (e!=null&&e.isActiveAndEnabled == false) continue;
-                if (Composition.include.Length > 0)
-                    if (!e.HasTags(Composition.include))
+                if (e == null || !e.state.enabled) continue;
+
+                if (composition.include.Length > 0)
+                    if (!e.TagsHave(composition.include))
                         continue;
 
-                if (Composition.exclude.Length > 0)
-                    if (e.HasTagAny(Composition.exclude))
+                if (composition.exclude.Length > 0)
+                    if (e.TagsHaveAny(composition.exclude))
                         continue;
-
-                if (storage.HasComponent(e.id) == false) continue;
-                if (storage2.HasComponent(e.id) == false) continue;
-                if (storage3.HasComponent(e.id) == false) continue;
-                if (storage4.HasComponent(e.id) == false) continue;
+                int entityID = e.id;
+                if (!storage.HasComponent(entityID) ||
+                    !storage2.HasComponent(entityID) ||
+                    !storage3.HasComponent(entityID) ||
+                    !storage4.HasComponent(entityID)
+                ) continue;
 
 
                 if (length == entities.Length)
-                    Array.Resize(ref entities, length << 1);
-
-                if (length == component.Length)
                 {
-                    var len = length << 1;
+                    int len = length << 1;
+                    len += 1;
+                    Array.Resize(ref entities, len);
                     Array.Resize(ref component, len);
                     Array.Resize(ref component2, len);
                     Array.Resize(ref component3, len);
                     Array.Resize(ref component4, len);
                 }
 
-                entities[length] = e.id;
-
-                component4[length] = storage4.components[e.id];
-                component3[length] = storage3.components[e.id];
-                component2[length] = storage2.components[e.id];
-                component[length++] = storage.components[e.id];
+                indexLast = length++;
+       
+                entities[indexLast] = entityID;
+                component[indexLast] = storage.components[entityID];
+                component2[indexLast] = storage2.components[entityID];
+                component3[indexLast] = storage3.components[entityID];
+                component4[indexLast] = storage4.components[entityID];
             }
         }
 
@@ -796,26 +845,27 @@ namespace Homebrew
         public I[] component4 = new I[EngineSettings.MinComponents];
         public O[] component5 = new O[EngineSettings.MinComponents];
 
+        Storage<T> storage = Storage<T>.Instance;
+        Storage<Y> storage2 = Storage<Y>.Instance;
+        Storage<U> storage3 = Storage<U>.Instance;
+        Storage<I> storage4 = Storage<I>.Instance;
+        Storage<O> storage5 = Storage<O>.Instance;
 
-        public override void TryAddVirtually(int entityID)
+
+        public override void AddVirtually(int entityID)
         {
-            var storage = Storage<T>.Instance;
-            var storage2 = Storage<Y>.Instance;
-            var storage3 = Storage<U>.Instance;
-            var storage4 = Storage<I>.Instance;
-            var storage5 = Storage<O>.Instance;
-
-
-            if (storage.HasComponent(entityID) == false) return;
-            if (storage2.HasComponent(entityID) == false) return;
-            if (storage3.HasComponent(entityID) == false) return;
-            if (storage4.HasComponent(entityID) == false) return;
-            if (storage5.HasComponent(entityID) == false) return;
+            if (!storage.HasComponent(entityID) ||
+                !storage2.HasComponent(entityID) ||
+                !storage3.HasComponent(entityID) ||
+                !storage4.HasComponent(entityID) ||
+                !storage5.HasComponent(entityID)
+            ) return;
 
 
             if (entities.Length <= length)
             {
-                var len = entityID == 0 ? EngineSettings.MinComponents : entityID << 1;
+                int len = entityID == 0 ? EngineSettings.MinComponents : entityID << 1;
+                len += 1;
                 Array.Resize(ref entities, len);
                 Array.Resize(ref component, len);
                 Array.Resize(ref component2, len);
@@ -824,51 +874,43 @@ namespace Homebrew
                 Array.Resize(ref component5, len);
             }
 
-            entities[length] = entityID;
-            component5[length] = storage5.components[entityID];
-            component4[length] = storage4.components[entityID];
-            component3[length] = storage3.components[entityID];
-            component2[length] = storage2.components[entityID];
-            component[length++] = storage.components[entityID];
+            indexLast = length++;
+ 
+            entities[indexLast] = entityID;
+            component[indexLast] = storage.components[entityID];
+            component2[indexLast] = storage2.components[entityID];
+            component3[indexLast] = storage3.components[entityID];
+            component4[indexLast] = storage4.components[entityID];
+            component5[indexLast] = storage5.components[entityID];
+
 
             if (OnAdded != null)
-                OnAdded(length-1);
+                OnAdded(indexLast);
         }
 
-        public override void TryAddEntity(int entityID, bool tagsChecked = false)
+        public override void Add(int entityID)
         {
-            var storage = Storage<T>.Instance;
-            var storage2 = Storage<Y>.Instance;
-            var storage3 = Storage<U>.Instance;
-            var storage4 = Storage<I>.Instance;
-            var storage5 = Storage<O>.Instance;
+            if (!storage.HasComponent(entityID) ||
+                !storage2.HasComponent(entityID) ||
+                !storage3.HasComponent(entityID) ||
+                !storage4.HasComponent(entityID) ||
+                !storage5.HasComponent(entityID)
+            ) return;
 
 
-            if (storage.HasComponent(entityID) == false) return;
-
-            if (storage2.HasComponent(entityID) == false) return;
-
-            if (storage3.HasComponent(entityID) == false) return;
-
-            if (storage4.HasComponent(entityID) == false) return;
-
-            if (storage5.HasComponent(entityID) == false) return;
             var entity = Actor.entites[entityID];
-            if (entity.isActiveAndEnabled == false) return;
-            if (!tagsChecked)
-            {
-                if (Composition.include.Length > 0)
-                    if (!entity.HasTags(Composition.include))
-                        return;
+            if (composition.include.Length > 0 && !entity.TagsHave(composition.include))
+                return;
 
-                if (Composition.exclude.Length > 0)
-                    if (entity.HasTagAny(Composition.exclude))
-                        return;
-            }
+
+            if (composition.exclude.Length > 0 && entity.TagsHaveAny(composition.exclude))
+                return;
+
 
             if (entities.Length <= length)
             {
-                var len = entityID == 0 ? EngineSettings.MinComponents : entityID << 1;
+                int len = entityID == 0 ? EngineSettings.MinComponents : entityID << 1;
+                len += 1;
                 Array.Resize(ref entities, len);
                 Array.Resize(ref component, len);
                 Array.Resize(ref component2, len);
@@ -877,43 +919,52 @@ namespace Homebrew
                 Array.Resize(ref component5, len);
             }
 
-            entities[length] = entityID;
-            component5[length] = storage5.components[entityID];
-            component4[length] = storage4.components[entityID];
-            component3[length] = storage3.components[entityID];
-            component2[length] = storage2.components[entityID];
-            component[length++] = storage.components[entityID];
+
+            indexLast = length++;
+ 
+            entities[indexLast] = entityID;
+            component[indexLast] = storage.components[entityID];
+            component2[indexLast] = storage2.components[entityID];
+            component3[indexLast] = storage3.components[entityID];
+            component4[indexLast] = storage4.components[entityID];
+            component5[indexLast] = storage5.components[entityID];
+
 
             if (OnAdded != null)
-                OnAdded(length-1);
+                OnAdded(indexLast);
         }
 
-        public override void TryRemoveEntity(int entityID)
+        public override void AddChecked(int entityID)
         {
-            for (var i = 0; i < length; i++)
+            if (entities.Length <= length)
             {
-                if (entities[i] != entityID) continue;
-                OnRemoved?.Invoke(i);
-                length--;
-                Array.Copy(entities, i + 1, entities, i, length - i);
-                Array.Copy(component, i + 1, component, i, length - i);
-                Array.Copy(component2, i + 1, component2, i, length - i);
-                Array.Copy(component3, i + 1, component3, i, length - i);
-                Array.Copy(component4, i + 1, component4, i, length - i);
-                Array.Copy(component5, i + 1, component5, i, length - i);
-
-                break;
+                int len = entityID == 0 ? EngineSettings.MinComponents : entityID << 1;
+                len += 1;
+                Array.Resize(ref entities, len);
+                Array.Resize(ref component, len);
+                Array.Resize(ref component2, len);
+                Array.Resize(ref component3, len);
+                Array.Resize(ref component4, len);
+                Array.Resize(ref component5, len);
             }
+
+            indexLast = length++;
+  
+            entities[indexLast] = entityID;
+            component[indexLast] = storage.components[entityID];
+            component2[indexLast] = storage2.components[entityID];
+            component3[indexLast] = storage3.components[entityID];
+            component4[indexLast] = storage4.components[entityID];
+            component5[indexLast] = storage5.components[entityID];
+    
+
+            if (OnAdded != null)
+                OnAdded(indexLast);
         }
+
 
         public override void Populate()
         {
-            var storage = Storage<T>.Instance;
-            var storage2 = Storage<Y>.Instance;
-            var storage3 = Storage<U>.Instance;
-            var storage4 = Storage<I>.Instance;
-            var storage5 = Storage<O>.Instance;
-
             storage.groups.Add(this);
             storage2.groups.Add(this);
             storage3.groups.Add(this);
@@ -921,32 +972,33 @@ namespace Homebrew
             storage5.groups.Add(this);
 
 
-            for (var i = 0; i < Actor.lastID; i++)
+            for (int i = 0; i < Actor.lastID; i++)
             {
                 var e = Actor.entites[i];
 
-                if (e!=null&&e.isActiveAndEnabled == false) continue;
-                if (Composition.include.Length > 0)
-                    if (!e.HasTags(Composition.include))
+                if (e == null || !e.state.enabled) continue;
+
+                if (composition.include.Length > 0)
+                    if (!e.TagsHave(composition.include))
                         continue;
 
-                if (Composition.exclude.Length > 0)
-                    if (e.HasTagAny(Composition.exclude))
+                if (composition.exclude.Length > 0)
+                    if (e.TagsHaveAny(composition.exclude))
                         continue;
-
-                if (storage.HasComponent(e.id) == false) continue;
-                if (storage2.HasComponent(e.id) == false) continue;
-                if (storage3.HasComponent(e.id) == false) continue;
-                if (storage4.HasComponent(e.id) == false) continue;
-                if (storage5.HasComponent(e.id) == false) continue;
+                int entityID = e.id;
+                if (!storage.HasComponent(entityID) ||
+                    !storage2.HasComponent(entityID) ||
+                    !storage3.HasComponent(entityID) ||
+                    !storage4.HasComponent(entityID) ||
+                    !storage5.HasComponent(entityID)
+                ) continue;
 
 
                 if (length == entities.Length)
-                    Array.Resize(ref entities, length << 1);
-
-                if (length == component.Length)
                 {
-                    var len = length << 1;
+                    int len = length << 1;
+                    len += 1;
+                    Array.Resize(ref entities, len);
                     Array.Resize(ref component, len);
                     Array.Resize(ref component2, len);
                     Array.Resize(ref component3, len);
@@ -954,25 +1006,31 @@ namespace Homebrew
                     Array.Resize(ref component5, len);
                 }
 
-                entities[length] = e.id;
-                component5[length] = storage5.components[e.id];
-                component4[length] = storage4.components[e.id];
-                component3[length] = storage3.components[e.id];
-                component2[length] = storage2.components[e.id];
-                component[length++] = storage.components[e.id];
+
+                indexLast = length++;
+      
+                entities[indexLast] = entityID;
+                component[indexLast] = storage.components[entityID];
+                component2[indexLast] = storage2.components[entityID];
+                component3[indexLast] = storage3.components[entityID];
+                component4[indexLast] = storage4.components[entityID];
+                component5[indexLast] = storage5.components[entityID];
             }
         }
 
 
         protected override void RemoveAt(int i)
         {
-            Array.Copy(entities, i + 1, entities, i, length - i);
-            Array.Copy(component, i + 1, component, i, length - i);
-            Array.Copy(component2, i + 1, component2, i, length - i);
-            Array.Copy(component3, i + 1, component3, i, length - i);
-            Array.Copy(component4, i + 1, component4, i, length - i);
-            Array.Copy(component5, i + 1, component5, i, length - i);
-            length--;
+            int next = i + 1;
+            int size = length-- - i;
+            OnRemoved?.Invoke(i);
+            Array.Copy(entities, next, entities, i, size);
+            Array.Copy(component, next, component, i, size);
+            Array.Copy(component2, next, component2, i, size);
+            Array.Copy(component3, next, component3, i, size);
+            Array.Copy(component4, next, component4, i, size);
+            Array.Copy(component5, next, component5, i, size);
+       
         }
 
 

@@ -11,27 +11,32 @@ using UnityEngine;
 
 namespace Homebrew
 {
- 
     public class ProcessingFastPool<T> : IDisposable where T : new()
     {
         public static readonly ProcessingFastPool<T> Instance = new ProcessingFastPool<T>();
         public Stack<T> pool = new Stack<T>(200);
-
+   
         public T Spawn()
         {
+        
+
+
             if (pool.Count > 0)
             {
-                return pool.Pop();
+                var v = pool.Pop();
+                return v ;
             }
 
             var obj = new T();
             return obj;
         }
 
+       
+
         public void Despawn(T component)
         {
             var disposable = component as IDisposable;
- 
+
             if (disposable != null) disposable.Dispose();
             AddToPool(component);
         }

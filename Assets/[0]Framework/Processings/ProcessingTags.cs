@@ -28,7 +28,7 @@ namespace Homebrew
 
 		public bool ContainAny(params int[] filter)
 		{
-			for (var i = 0; i < filter.Length; i++)
+			for (int i = 0; i < filter.Length; i++)
 			{
 				if (tags.ContainsKey(filter[i])) return true;
 			}
@@ -39,7 +39,7 @@ namespace Homebrew
 		public bool ContainAll(params int[] filter)
 		{
 			
-			for (var i = 0; i < filter.Length; i++)
+			for (int i = 0; i < filter.Length; i++)
 			{
 				if (!tags.ContainsKey(filter[i])) return false;
 			}
@@ -56,7 +56,7 @@ namespace Homebrew
 		public void Remove(params int[] ids)
 		{
 			bool tagsChanged = false;
-			foreach (var index in ids)
+			foreach (int index in ids)
 			{
 				int val;
 				if (tags.TryGetValue(index, out val))
@@ -96,8 +96,8 @@ namespace Homebrew
 
 		public void Add(params int[] ids)
 		{
-			var c = false;
-			foreach (var index in ids)
+			bool c = false;
+			foreach (int index in ids)
 			{
 				if (tags.ContainsKey(index))
 				{

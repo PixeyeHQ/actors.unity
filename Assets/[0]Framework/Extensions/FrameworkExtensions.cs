@@ -20,17 +20,9 @@ namespace Homebrew
     {
         private static System.Random _r = new System.Random();
 
-     
-       
-
-        public static Actor GetEntity(this object o, int id)
+        public static void Add<T>(this MonoCached mono) where T : class, new()
         {
-            return Actor.entites[id];
-        }
-
-        public static T Add<T>(this MonoCached mono) where T : class, new()
-        {
-            return mono.actorParent.Add<T>();
+            mono.actorParent.Add<T>();
         }
 
         public static T DeepClone<T>(this T obj)
@@ -48,171 +40,380 @@ namespace Homebrew
 
         #region 2dRaycasts
 
-//        public static Actor GetActor(this RaycastHit2D hit, params int[] tags)
-//        {
-//            var o = hit.collider.GetComponentInParent<MonoCached>();
-//            if (o == null) return null;
-//            var entity = o.actorParent;
-//            if (entity == null) return null;
-//            return entity.HasAllTags(tags) ? entity : null;
-//        }
-
         public static Actor GetActor(this RaycastHit2D hit, params int[] tags)
         {
             var actor = hit.collider.GetComponentInParent<Actor>();
             if (actor == null) return null;
-            if (actor.tags == null) return null;
-            return actor.HasTags(tags) ? actor : null;
+            return actor.TagsHave(tags) ? actor : null;
         }
 
+        #endregion
 
-//		public static bool HasTag(this RaycastHit2D o, int tag)
-//		{
-//			var componentTags = o.collider.GetComponent<ComponentTag>();
-//			if (componentTags == null) return false;
-//			return componentTags.CanBeObserved(tag);
-//		}
+
+        #region ARRAYS
+
+// public static void InsertCheck(this int[] a, int id,  ref int length, ref int indexLast)
+//        {
+//            if (length == 0)
+//            {
+//                indexLast = 0;
+//                length++;
+//                return;
+//            }
+//            
+//            if (id > a[0])
+//            {
+//                length++;
+//                indexLast = 0;
+//            }
+//            else if (id < a[length - 1])
+//            {
+//                indexLast = length;
+//                length++;
+//            }
+//            else
+//            {
+//           
+//           
+//                if (id < a[indexLast])
+//                {
+//                    length++;
 //
+//                    if (id > a[indexLast + 1])
+//                    {
+//                        indexLast = indexLast + 1;
+//                  
+//                    }
+//                    else
+//                    {
+//                        int indexNext = indexLast;
+//                        while (true)
+//                        {
+//                            if (id > a[indexNext])
+//                            {
+//                                indexLast = indexNext;
+//                        
+//                                break;
+//                            }
 //
-//		public static actor GetActor(this RaycastHit2D o, int id)
-//		{
-//			var componentTags = o.collider.GetComponent<ComponentTag>();
-//			if (componentTags == null) return null;
+//                            indexNext += 1;
+//                        }
+//                    }
+//                }
+//                else if (id > a[indexLast])
+//                {
+//                    
+//                    length++;
+//                    
+//                    if (id< a[indexLast - 1])
+//                    {
+//                
+//                    }
+//                    else
+//                    {
+//                        int indexPrev = indexLast;
+//                        while (true)
+//                        {
+//                            if (id < a[indexPrev])
+//                            {
+//                          
+//                                indexLast = indexPrev+1;
+//                                break;
+//                            }
 //
-//
-//			for (var i = 0; i < componentTags.tags.Count; i++)
-//			{
-//				var t = componentTags.tags[i];
-//				if (t.id == id)
-//				{
-//					var actor = componentTags.GetComponentInParent<actor>();
-//					return actor;
-//				}
-//			}
-//
-//			return null;
-//		}
-//
-//		public static bool IsDesiredActor(this actor a, params int[] id)
-//		{
-//			if (a == null) return false;
-//			return a.tags.ContainAll(id);
-//		}
-//
-//
-//		public static actor GetActor(this RaycastHit2D o, List<DataTag> colliderTags)
-//		{
-//			var componentTags = o.collider.GetComponent<ComponentTag>();
-//			if (componentTags == null) return null;
-//
-//
-//			for (var i = 0; i < componentTags.tags.Count; i++)
-//			{
-//				var t = componentTags.tags[i];
-//				for (int j = 0; j < colliderTags.Count; j++)
-//				{
-//					if (t.id == colliderTags[j].id) return componentTags.GetComponentInParent<actor>();
-//				}
-//			}
-//
-//			return null;
-//		}
-//
-//		public static ComponentTag CanBeObserved(this RaycastHit2D o, List<DataTag> colliderTags)
-//		{
-//			var componentTags = o.collider.GetComponent<ComponentTag>();
-//			if (componentTags == null) return null;
-//
-//			for (var i = 0; i < componentTags.tags.Count; i++)
-//			{
-//				var t = componentTags.tags[i];
-//
-//				for (int j = 0; j < colliderTags.Count; j++)
-//				{
-//					if (t.id == colliderTags[j].id) return componentTags;
-//				}
-//			}
-//
-//			return null;
-//		}
-//
-//		public static bool IsHittable(this actor target, List<DataTag> hittables)
-//		{
-//			for (var i = 0; i < hittables.Count; i++)
-//			{
-//				if (target.tags.Contain(hittables[i].id)) return true;
-//			}
-//
-//			return false;
-//		}
-//
-//
-//		public static bool HasTag(this Collider2D o, int tag)
-//		{
-//			var componentTags = o.GetComponent<ComponentTag>();
-//			if (componentTags == null) return false;
-//			return componentTags.CanBeObserved(tag);
-//		}
-//
-//
-//		public static actor GetActor(this Collider2D o, int id)
-//		{
-//			var componentTags = o.GetComponent<ComponentTag>();
-//			if (componentTags == null) return null;
-//
-//
-//			for (var i = 0; i < componentTags.tags.Count; i++)
-//			{
-//				var t = componentTags.tags[i];
-//				if (t.id == id)
-//				{
-//					var actor = componentTags.GetComponentInParent<actor>();
-//					return actor;
-//				}
-//			}
-//
-//			return null;
-//		}
-//
-//		public static actor GetActor(this Collider2D o, List<DataTag> colliderTags)
-//		{
-//			if (o == null || o.enabled == false) return null;
-//			var componentTags = o.GetComponent<ComponentTag>();
-//			if (componentTags == null) return null;
-//
-//
-//			for (var i = 0; i < componentTags.tags.Count; i++)
-//			{
-//				var t = componentTags.tags[i];
-//				for (int j = 0; j < colliderTags.Count; j++)
-//				{
-//					if (t.id == colliderTags[j].id) return componentTags.GetComponentInParent<actor>();
-//				}
-//			}
-//
-//			return null;
-//		}
-//
-//		public static ComponentTag CanBeObserved(this Collider2D o, List<DataTag> colliderTags)
-//		{
-//			if (o == null) return null;
-//			var componentTags = o.GetComponent<ComponentTag>();
-//			if (componentTags == null) return null;
-//
-//			for (var i = 0; i < componentTags.tags.Count; i++)
-//			{
-//				var t = componentTags.tags[i];
-//
-//				for (int j = 0; j < colliderTags.Count; j++)
-//				{
-//					if (t.id == colliderTags[j].id) return componentTags;
-//				}
-//			}
-//
-//			return null;
-//		}
+//                            indexPrev -= 1;
+//                        }
+//                    }
+//                }
+//            }
+//        }
+        public static void InsertCheck(this int[] a, int id, ref int length, ref int indexLast)
+        {
+            if (length == 0)
+            {
+                indexLast = 0;
+                length++;
+                return;
+            }
+
+            if (id > a[0])
+            {
+                length++;
+                indexLast = 0;
+            }
+            else if (id < a[length - 1])
+            {
+                indexLast = length;
+                length++;
+            }
+            else
+            {
+                if (id < a[indexLast])
+                {
+                    length++;
+
+                    if (id > a[indexLast + 1])
+                    {
+                        indexLast = indexLast + 1;
+                    }
+                    else
+                    {
+                        int indexNext = indexLast;
+                        while (true)
+                        {
+                            if (id > a[indexNext])
+                            {
+                                indexLast = indexNext;
+
+                                break;
+                            }
+
+                            indexNext += 1;
+                        }
+                    }
+                }
+                else if (id > a[indexLast])
+                {
+                    length++;
+
+                    if (id < a[indexLast - 1])
+                    {
+                    }
+                    else
+                    {
+                        int indexPrev = indexLast;
+                        while (true)
+                        {
+                            if (id < a[indexPrev])
+                            {
+                                indexLast = indexPrev + 1;
+                                break;
+                            }
+
+                            indexPrev -= 1;
+                        }
+                    }
+                }
+            }
+        }
+
+        public static void Insert<T>(this T[] a, T val, int length, int indexLast)
+        {
+            Array.Copy(a, indexLast, a, indexLast + 1, length - indexLast - 1);
+            a[indexLast] = val;
+        }
+
+        public static void Insert(this int[] a, ref int length, ref int idLast, ref int indexLast, int id)
+        {
+            if (id < a[0])
+            {
+                if (length == a.Length)
+                    Array.Resize(ref a, (length << 1) + 1);
+
+                length++;
+                Array.Copy(a, 0, a, 1, length - 1);
+                a[0] = id;
+                idLast = id;
+                indexLast = 0;
+            }
+            else if (id > a[length - 1])
+            {
+                if (length == a.Length)
+                    Array.Resize(ref a, (length << 1) + 1);
+
+                idLast = id;
+                indexLast = length;
+                a[length++] = id;
+            }
+            else
+            {
+                if (id > a[indexLast])
+                {
+                    if (length == a.Length)
+                        Array.Resize(ref a, (length << 1) + 1);
+
+                    length++;
+
+                    if (id < a[indexLast + 1])
+                    {
+                        Array.Copy(a, indexLast + 1, a, indexLast + 2, length - indexLast - 1);
+                        idLast = id;
+                        indexLast = indexLast + 1;
+                        a[indexLast] = id;
+                    }
+                    else
+                    {
+                        int indexNext = indexLast + 2;
+                        while (true)
+                        {
+                            if (id < a[indexNext])
+                            {
+                                Array.Copy(a, indexNext, a, indexNext + 1, length - indexNext - 1);
+                                idLast = id;
+                                indexLast = indexNext;
+                                a[indexLast] = id;
+                                break;
+                            }
+
+                            indexNext += 1;
+                        }
+                    }
+                }
+                else if (id < a[indexLast])
+                {
+                    if (length == a.Length)
+                        Array.Resize(ref a, (length << 1) + 1);
+
+                    length++;
+
+                    if (id > a[indexLast - 1])
+                    {
+                        Array.Copy(a, indexLast, a, indexLast + 1, length - indexLast - 1);
+                        idLast = id;
+                        indexLast = indexLast - 1;
+                        a[indexLast] = id;
+                    }
+                    else
+                    {
+                        int indexPrev = indexLast - 2;
+                        while (true)
+                        {
+                            if (id > a[indexPrev])
+                            {
+                                Array.Copy(a, indexPrev, a, indexPrev + 1, length - indexPrev - 1);
+                                idLast = id;
+                                indexLast = indexPrev;
+                                a[indexLast] = id;
+                                break;
+                            }
+
+                            indexPrev -= 1;
+                        }
+                    }
+                }
+            }
+        }
+
+        public static void Add<T>(this T[] a, T element, ref int length) where T : class
+        {
+            int index = 0;
+            int len = a.Length;
+            for (int i = 0; i < len; i++)
+            {
+                if (a[i] != null) index++;
+                else break;
+            }
+
+            if (index >= len)
+            {
+                len = index << 1;
+                Array.Resize(ref a, len);
+            }
+
+            a[length++] = element;
+        }
+
+        public static void Remove<T>(this T[] a, T element, ref int length) where T : class
+        {
+            for (int i = 0; i < length; i++)
+            {
+                if (a[i] != element) continue;
+                length--;
+                Array.Copy(a, i + 1, a, i, length - i);
+                break;
+            }
+        }
+
+        public static void InsertionSort(int[] array)
+        {
+            for (int i = 0; i < array.Length - 1; i++)
+            {
+                int j = i + 1;
+                int tmp = array[j];
+                while (j > 0 && tmp < array[j - 1])
+                {
+                    array[j] = array[j - 1];
+                    j--;
+                }
+
+                array[j] = tmp;
+            }
+        }
+
+        public static void Quicksort(int[] array, int left, int right)
+        {
+            while (true)
+            {
+                if (left < right)
+                {
+                    int boundary = left;
+                    for (int i = left + 1; i < right; i++)
+                    {
+                        if (array[i] > array[left])
+                        {
+                            Swap(array, i, ++boundary);
+                        }
+                    }
+
+                    Swap(array, left, boundary);
+                    Quicksort(array, left, boundary);
+                    left = boundary + 1;
+                    continue;
+                }
+
+                break;
+            }
+        }
+
+        private static void Swap(int[] array, int left, int right)
+        {
+            int tmp = array[right];
+            array[right] = array[left];
+            array[left] = tmp;
+        }
+
+        public static int SearchLinear(this int[] array, int value)
+        {
+            for (int i = 0; i<array.Length; i++)
+            {
+                if (array[i] == value)
+                    return i;
+            }
+
+            return -1;
+        }
+ 
+        public static int SearchBinary(this int[] array, int rightIndex, int value, int prev)
+        {
+            int leftIndex = 0;
+
+            if (array[leftIndex] == value) return 0;
+            if (array[rightIndex - 1] == value) return rightIndex - 1;
+
+            while (true)
+            {
+                if (leftIndex == rightIndex && array[leftIndex] != value) return -1;
+                int middleIndex = (rightIndex + leftIndex) / 2;
+
+                if (array[middleIndex] == value) return middleIndex;
+                if (middleIndex == prev) return -1;
+
+                if (array[middleIndex] > value)
+                {
+                    leftIndex = middleIndex + 1;
+                    prev = middleIndex;
+                    continue;
+                }
+
+                rightIndex = middleIndex - 1;
+                prev = middleIndex;
+            }
+        }
 
         #endregion
+
+
+        #region RANDOM
 
         public static int Between(this object o, int a, int b, float chance = 0.5f)
         {
@@ -225,46 +426,14 @@ namespace Homebrew
         }
 
 
-        #region OLD
-
-        public static float ClampAngle(this float angle, float min, float max)
-        {
-            if (min < 0 && max > 0 && (angle > max || angle < min))
-            {
-                angle -= 360;
-                if (angle > max || angle < min)
-                {
-                    return Mathf.Abs(Mathf.DeltaAngle(angle, min)) < Mathf.Abs(Mathf.DeltaAngle(angle, max))
-                        ? min
-                        : max;
-                }
-            }
-            else if (min > 0 && (angle > max || angle < min))
-            {
-                angle += 360;
-                if (angle > max || angle < min)
-                {
-                    return Mathf.Abs(Mathf.DeltaAngle(angle, min)) < Mathf.Abs(Mathf.DeltaAngle(angle, max))
-                        ? min
-                        : max;
-                }
-            }
-
-            if (angle < min) return min;
-            else if (angle > max)
-                return max;
-            else
-                return angle;
-        }
-
         public static int ReturnNearestIndex(this Vector3[] nodes, Vector3 destination)
         {
-            var nearestDistance = Mathf.Infinity;
-            var index = 0;
-            var length = nodes.Length;
-            for (var i = 0; i < length; i++)
+            float nearestDistance = Mathf.Infinity;
+            int index = 0;
+            int length = nodes.Length;
+            for (int i = 0; i < length; i++)
             {
-                var distanceToNode = (destination + nodes[i]).sqrMagnitude;
+                float distanceToNode = (destination + nodes[i]).sqrMagnitude;
                 if (!(nearestDistance > distanceToNode)) continue;
                 nearestDistance = distanceToNode;
                 index = i;
@@ -291,22 +460,22 @@ namespace Homebrew
 
         public static T GetRandom<T>(this List<T> vals) where T : IRandom
         {
-            var total = 0f;
+            float total = 0f;
 
             var probs = new float[vals.Count];
 
 
-            for (var i = 0; i < probs.Length; i++)
+            for (int i = 0; i < probs.Length; i++)
             {
                 probs[i] = vals[i].returnChance;
                 total += probs[i];
             }
 
 
-            var randomPoint = (float) _r.NextDouble() * total;
+            float randomPoint = (float) _r.NextDouble() * total;
 
 
-            for (var i = 0; i < probs.Length; i++)
+            for (int i = 0; i < probs.Length; i++)
             {
                 if (randomPoint < probs[i])
                     return vals[i];
@@ -351,12 +520,12 @@ namespace Homebrew
             if (vals == null || vals.Length == 0) return -1;
 
 
-            var total = 0f;
+            float total = 0f;
 
             var probs = new float[vals.Length];
 
 
-            for (var i = 0; i < probs.Length; i++)
+            for (int i = 0; i < probs.Length; i++)
             {
                 probs[i] = vals[i];
                 total += probs[i];
@@ -366,7 +535,7 @@ namespace Homebrew
             var randomPoint = (float) _r.NextDouble() * total;
 
 
-            for (var i = 0; i < probs.Length; i++)
+            for (int i = 0; i < probs.Length; i++)
             {
                 if (randomPoint < probs[i])
                     return probs[i];
@@ -382,22 +551,22 @@ namespace Homebrew
             if (vals == null || vals.Length == 0) return -1;
 
 
-            var total = 0f;
+            float total = 0f;
 
             var probs = new float[vals.Length];
 
 
-            for (var i = 0; i < probs.Length; i++)
+            for (int i = 0; i < probs.Length; i++)
             {
                 probs[i] = vals[i];
                 total += probs[i];
             }
 
 
-            var randomPoint = (float) _r.NextDouble() * total;
+            float randomPoint = (float) _r.NextDouble() * total;
 
 
-            for (var i = 0; i < probs.Length; i++)
+            for (int i = 0; i < probs.Length; i++)
             {
                 if (randomPoint < probs[i])
                     return i;
@@ -419,7 +588,7 @@ namespace Homebrew
 
         public static T RandomWithRemove<T>(this List<T> vals)
         {
-            var index = UnityEngine.Random.Range(0, vals.Count);
+            int index = UnityEngine.Random.Range(0, vals.Count);
             var val = vals[index];
             vals.RemoveAt(index);
             return val;
@@ -445,10 +614,10 @@ namespace Homebrew
             }
 
 
-            var randomPoint = (float) _r.NextDouble() * total;
+            float randomPoint = (float) _r.NextDouble() * total;
 
 
-            for (var i = 0; i < probs.Length; i++)
+            for (int i = 0; i < probs.Length; i++)
             {
                 if (randomPoint < probs[i])
                 {
@@ -467,13 +636,13 @@ namespace Homebrew
             if (vals == null || vals.Length == 0) return default(T);
 
 
-            var total = probs.Sum();
+            float total = probs.Sum();
 
 
-            var randomPoint = (float) _r.NextDouble() * total;
+            float randomPoint = (float) _r.NextDouble() * total;
 
 
-            for (var i = 0; i < probs.Length; i++)
+            for (int i = 0; i < probs.Length; i++)
             {
                 if (randomPoint < probs[i])
                     return vals[i];
@@ -505,6 +674,41 @@ namespace Homebrew
             return v;
         }
 
+        #endregion
+
+
+        #region TRANSFORMS
+
+        public static float ClampAngle(this float angle, float min, float max)
+        {
+            if (min < 0 && max > 0 && (angle > max || angle < min))
+            {
+                angle -= 360;
+                if (angle > max || angle < min)
+                {
+                    return Mathf.Abs(Mathf.DeltaAngle(angle, min)) < Mathf.Abs(Mathf.DeltaAngle(angle, max))
+                        ? min
+                        : max;
+                }
+            }
+            else if (min > 0 && (angle > max || angle < min))
+            {
+                angle += 360;
+                if (angle > max || angle < min)
+                {
+                    return Mathf.Abs(Mathf.DeltaAngle(angle, min)) < Mathf.Abs(Mathf.DeltaAngle(angle, max))
+                        ? min
+                        : max;
+                }
+            }
+
+            if (angle < min) return min;
+            else if (angle > max)
+                return max;
+            else
+                return angle;
+        }
+
         public static Vector3 MultiplyX(this Vector3 v, float val)
         {
             v = new Vector3(val * v.x, v.y, v.z);
@@ -524,79 +728,9 @@ namespace Homebrew
         }
 
 
-        public static T[] Increase<T>(this T[] values, int increment)
-        {
-            T[] array = new T[values.Length + increment];
-            values.CopyTo(array, 0);
-            return array;
-        }
-
-        public static T[] AddOrPopulate<T>(this T[] array, T val)
-        {
-            var length = array.Length;
-
-            for (var i = 0; i < length; i++)
-            {
-                if (array[i] != null) continue;
-                array[i] = val;
-                return array;
-            }
-
-            array = array.Increase(10);
-            array[length] = val;
-            return array;
-        }
-
-        public static T[] Add<T>(this T[] array, T val)
-        {
-            var length = array.Length;
-
-            array = array.Increase(1);
-            array[length] = val;
-            return array;
-        }
-
-
-        public static T[] Remove<T>(this T[] source, object obj, ref int amount)
-        {
-            var index = Array.FindIndex(source, o => o != null && o.Equals(obj));
-            if (index == -1)
-            {
-                return source;
-            }
-
-            T[] dest = new T[source.Length - 1];
-
-
-            if (index > 0)
-                Array.Copy(source, 0, dest, 0, index);
-
-            if (index < source.Length - 1)
-                Array.Copy(source, index + 1, dest, index, source.Length - index - 1);
-            amount--;
-            return dest;
-        }
-
-        public static T[] RemoveAt<T>(this T[] source, int index)
-        {
-            T[] dest = new T[source.Length - 1];
-            if (index > 0)
-                Array.Copy(source, 0, dest, 0, index);
-
-            if (index < source.Length - 1)
-                Array.Copy(source, index + 1, dest, index, source.Length - index - 1);
-
-            return dest;
-        }
-
-        #endregion
-
-
-        #region TRANSFORMS
-
         public static Transform[] GetChildTransfroms(this Transform t)
         {
-            var size = t.childCount;
+            int size = t.childCount;
             var array = new Transform[size];
             for (int i = 0; i < size; i++)
             {
@@ -608,7 +742,7 @@ namespace Homebrew
 
         public static Vector3[] GetChildTransfromsPos(this Transform t)
         {
-            var size = t.childCount;
+            int size = t.childCount;
             var array = new Vector3[size];
             for (int i = 0; i < size; i++)
             {
@@ -637,8 +771,8 @@ namespace Homebrew
                 return obj;
             }
 
-            var count = obj.childCount;
-            for (var i = 0; i < count; ++i)
+            int count = obj.childCount;
+            for (int i = 0; i < count; ++i)
             {
                 var posObj = obj.GetChild(i).FindDeep(id);
                 if (posObj != null)

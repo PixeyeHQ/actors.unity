@@ -262,9 +262,9 @@ public class FastString
             if( isToReplace ) // Do the replacement
             {
                 i += oldStr.Length-1;
-                if( newStr != null )
-                    for( int k=0; k<newStr.Length; k++ )
-                        m_replacement.Add( newStr[ k ] );
+                if (newStr == null) continue;
+                for( int k=0; k<newStr.Length; k++ )
+                    m_replacement.Add( newStr[ k ] );
             }
             else // No replacement, copy the old character
                 m_replacement.Add( m_buffer[ i ] );
@@ -285,7 +285,7 @@ public class FastString
         if( m_bufferPos + nbCharsToAdd > m_charsCapacity )
         {
             m_charsCapacity = System.Math.Max( m_charsCapacity + nbCharsToAdd, m_charsCapacity * 2 );
-            char[] newChars = new char[ m_charsCapacity ];
+            var newChars = new char[ m_charsCapacity ];
             m_buffer.CopyTo( newChars, 0 );
             m_buffer = newChars;
         }
