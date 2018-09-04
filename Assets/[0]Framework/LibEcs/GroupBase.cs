@@ -6,7 +6,8 @@ Date:       5/14/2018  6:32 PM
 ================================================================*/
 
 using System;
- 
+using UnityEngine;
+
 
 namespace Homebrew
 {
@@ -14,7 +15,7 @@ namespace Homebrew
     {
         public int length;
         public int[] entities = new int[EngineSettings.MinEntities];
-      
+
         public Composition composition;
 
 
@@ -56,7 +57,7 @@ namespace Homebrew
 
             return -1;
         }
- 
+
 
         public int FromVirtual(int id)
         {
@@ -118,7 +119,7 @@ namespace Homebrew
             }
 
             indexLast = length++;
- 
+
 
             entities[indexLast] = entityID;
 
@@ -137,9 +138,9 @@ namespace Homebrew
             }
 
             indexLast = length++;
- 
+
             entities[indexLast] = entityID;
- 
+
             if (OnAdded != null)
                 OnAdded(indexLast);
         }
@@ -173,9 +174,9 @@ namespace Homebrew
 
         protected override void RemoveAt(int i)
         {
+            var l = length--;
             OnRemoved?.Invoke(i);
-            Array.Copy(entities, i + 1, entities, i, length-- - i);
-        
+            Array.Copy(entities, i + 1, entities, i, l - i);
         }
 
         protected override void OnDispose()
@@ -195,14 +196,14 @@ namespace Homebrew
             if (entities.Length <= length)
             {
                 int len = entityID == 0 ? EngineSettings.MinComponents : entityID << 1;
-                len += 1;
+                len += 1;     
                 Array.Resize(ref entities, len);
                 Array.Resize(ref component, len);
             }
 
             indexLast = length++;
-            
-     
+
+
             entities[indexLast] = entityID;
             component[indexLast] = storage.components[entityID];
 
@@ -231,10 +232,10 @@ namespace Homebrew
             }
 
             indexLast = length++;
- 
+
             entities[indexLast] = entityID;
             component[indexLast] = storage.components[entityID];
- 
+
 
             if (OnAdded != null)
                 OnAdded(indexLast);
@@ -254,11 +255,10 @@ namespace Homebrew
 
 
             indexLast = length++;
- 
+
             entities[indexLast] = entityID;
             component[indexLast] = storage.components[entityID];
-            
- 
+
 
             if (OnAdded != null)
                 OnAdded(indexLast);
@@ -296,7 +296,7 @@ namespace Homebrew
 
                 int entityID = e.id;
                 indexLast = length++;
-      
+
                 entities[indexLast] = entityID;
                 component[indexLast] = storage.components[entityID];
 
@@ -308,12 +308,13 @@ namespace Homebrew
 
         protected override void RemoveAt(int i)
         {
+            int l = length--;
             int next = i + 1;
-            int size = length-- - i;
+            int size = l - i;
+
             OnRemoved?.Invoke(i);
             Array.Copy(entities, next, entities, i, size);
             Array.Copy(component, next, component, i, size);
-          
         }
 
 
@@ -347,7 +348,7 @@ namespace Homebrew
             }
 
             indexLast = length++;
- 
+
             entities[indexLast] = entityID;
             component[indexLast] = storage.components[entityID];
             component2[indexLast] = storage2.components[entityID];
@@ -381,11 +382,11 @@ namespace Homebrew
             }
 
             indexLast = length++;
- 
+
             entities[indexLast] = entityID;
             component[indexLast] = storage.components[entityID];
             component2[indexLast] = storage2.components[entityID];
- 
+
             if (OnAdded != null)
                 OnAdded(indexLast);
         }
@@ -406,11 +407,11 @@ namespace Homebrew
             }
 
             indexLast = length++;
-           
+
             entities[indexLast] = entityID;
             component[indexLast] = storage.components[entityID];
             component2[indexLast] = storage2.components[entityID];
-        
+
 
             if (OnAdded != null)
                 OnAdded(indexLast);
@@ -450,7 +451,7 @@ namespace Homebrew
 
                 int entityID = e.id;
                 indexLast = length++;
-  
+
                 entities[indexLast] = entityID;
                 component[indexLast] = storage.components[entityID];
                 component2[indexLast] = storage2.components[entityID];
@@ -459,13 +460,13 @@ namespace Homebrew
 
         protected override void RemoveAt(int i)
         {
+            int l = length--;
             int next = i + 1;
-            int size = length-- - i;
+            int size = l - i;
             OnRemoved?.Invoke(i);
             Array.Copy(entities, next, entities, i, size);
             Array.Copy(component, next, component, i, size);
             Array.Copy(component2, next, component2, i, size);
-         
         }
 
 
@@ -486,14 +487,14 @@ namespace Homebrew
 
         protected override void RemoveAt(int i)
         {
+            int l = length--;
             int next = i + 1;
-            int size = length-- - i;
+            int size = l - i;
             OnRemoved?.Invoke(i);
             Array.Copy(entities, next, entities, i, size);
             Array.Copy(component, next, component, i, size);
             Array.Copy(component2, next, component2, i, size);
             Array.Copy(component3, next, component3, i, size);
-             
         }
 
         public override void AddVirtually(int entityID)
@@ -515,7 +516,7 @@ namespace Homebrew
             }
 
             indexLast = length++;
-        
+
             entities[indexLast] = entityID;
             component[indexLast] = storage.components[entityID];
             component2[indexLast] = storage2.components[entityID];
@@ -553,13 +554,12 @@ namespace Homebrew
             }
 
             indexLast = length++;
- 
+
             entities[indexLast] = entityID;
             component[indexLast] = storage.components[entityID];
             component2[indexLast] = storage2.components[entityID];
             component3[indexLast] = storage3.components[entityID];
-       
-           
+
 
             if (OnAdded != null)
                 OnAdded(indexLast);
@@ -582,12 +582,12 @@ namespace Homebrew
             }
 
             indexLast = length++;
-     
+
             entities[indexLast] = entityID;
             component[indexLast] = storage.components[entityID];
             component2[indexLast] = storage2.components[entityID];
             component3[indexLast] = storage3.components[entityID];
-           
+
 
             if (OnAdded != null)
                 OnAdded(indexLast);
@@ -633,7 +633,7 @@ namespace Homebrew
                 }
 
                 indexLast = length++;
-    
+
                 entities[indexLast] = entityID;
                 component[indexLast] = storage.components[entityID];
                 component2[indexLast] = storage2.components[entityID];
@@ -665,15 +665,15 @@ namespace Homebrew
 
         protected override void RemoveAt(int i)
         {
+            int l = length--;
             int next = i + 1;
-            int size = length-- - i;
+            int size = l - i;
             OnRemoved?.Invoke(i);
             Array.Copy(entities, next, entities, i, size);
             Array.Copy(component, next, component, i, size);
             Array.Copy(component2, next, component2, i, size);
             Array.Copy(component3, next, component3, i, size);
             Array.Copy(component4, next, component4, i, size);
-             
         }
 
         public override void AddVirtually(int entityID)
@@ -697,7 +697,7 @@ namespace Homebrew
             }
 
             indexLast = length++;
- 
+
             entities[indexLast] = entityID;
             component[indexLast] = storage.components[entityID];
             component2[indexLast] = storage2.components[entityID];
@@ -740,7 +740,7 @@ namespace Homebrew
 
 
             indexLast = length++;
- 
+
             entities[indexLast] = entityID;
             component[indexLast] = storage.components[entityID];
             component2[indexLast] = storage2.components[entityID];
@@ -766,13 +766,13 @@ namespace Homebrew
             }
 
             indexLast = length++;
-       
+
             entities[indexLast] = entityID;
             component[indexLast] = storage.components[entityID];
             component2[indexLast] = storage2.components[entityID];
             component3[indexLast] = storage3.components[entityID];
             component4[indexLast] = storage4.components[entityID];
-     
+
             if (OnAdded != null)
                 OnAdded(indexLast);
         }
@@ -817,7 +817,7 @@ namespace Homebrew
                 }
 
                 indexLast = length++;
-       
+
                 entities[indexLast] = entityID;
                 component[indexLast] = storage.components[entityID];
                 component2[indexLast] = storage2.components[entityID];
@@ -875,7 +875,7 @@ namespace Homebrew
             }
 
             indexLast = length++;
- 
+
             entities[indexLast] = entityID;
             component[indexLast] = storage.components[entityID];
             component2[indexLast] = storage2.components[entityID];
@@ -921,7 +921,7 @@ namespace Homebrew
 
 
             indexLast = length++;
- 
+
             entities[indexLast] = entityID;
             component[indexLast] = storage.components[entityID];
             component2[indexLast] = storage2.components[entityID];
@@ -949,14 +949,14 @@ namespace Homebrew
             }
 
             indexLast = length++;
-  
+
             entities[indexLast] = entityID;
             component[indexLast] = storage.components[entityID];
             component2[indexLast] = storage2.components[entityID];
             component3[indexLast] = storage3.components[entityID];
             component4[indexLast] = storage4.components[entityID];
             component5[indexLast] = storage5.components[entityID];
-    
+
 
             if (OnAdded != null)
                 OnAdded(indexLast);
@@ -1008,7 +1008,7 @@ namespace Homebrew
 
 
                 indexLast = length++;
-      
+
                 entities[indexLast] = entityID;
                 component[indexLast] = storage.components[entityID];
                 component2[indexLast] = storage2.components[entityID];
@@ -1021,8 +1021,9 @@ namespace Homebrew
 
         protected override void RemoveAt(int i)
         {
+            int l = length--;
             int next = i + 1;
-            int size = length-- - i;
+            int size = l - i;
             OnRemoved?.Invoke(i);
             Array.Copy(entities, next, entities, i, size);
             Array.Copy(component, next, component, i, size);
@@ -1030,7 +1031,6 @@ namespace Homebrew
             Array.Copy(component3, next, component3, i, size);
             Array.Copy(component4, next, component4, i, size);
             Array.Copy(component5, next, component5, i, size);
-       
         }
 
 
