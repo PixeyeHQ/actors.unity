@@ -12,15 +12,13 @@ using UnityEngine;
 
 namespace Homebrew
 {
-  
-
     public enum StorageType
     {
         Local = 0,
         Global = 1,
     }
 
-    public class Storage<T>  where T : new()
+    public class Storage<T> where T : new()
     {
         public static readonly Storage<T> Instance = new Storage<T>();
         public T[] components = new T[EngineSettings.MinComponents];
@@ -30,7 +28,7 @@ namespace Homebrew
 
         public List<GroupBase> groups = new List<GroupBase>();
 
- 
+
         public T AddVirtual(T component, int entityID)
         {
             if (entityID >= length)
@@ -40,7 +38,7 @@ namespace Homebrew
                 Array.Resize(ref components, length);
                 Array.Resize(ref entityHasComponent, length);
             }
- 
+
             components[entityID] = component;
             entityHasComponent[entityID] = true;
 
@@ -69,7 +67,7 @@ namespace Homebrew
             entityHasComponent[entityID] = true;
 
             int len = groups.Count;
-        
+
             for (int i = 0; i < len; i++)
             {
                 groups[i].Add(entityID);
@@ -97,7 +95,7 @@ namespace Homebrew
             entityHasComponent[entityID] = true;
 
             int len = groups.Count;
- 
+
             for (int i = 0; i < len; i++)
             {
                 groups[i].Add(entityID);
@@ -129,8 +127,18 @@ namespace Homebrew
             return entityID >= length ? default(T) : components[entityID];
         }
 
-   
-    }
+        public bool TryGet(int entityID, out T val)
+        {
+            Debug.Log(entityID+"_"+length);
+            if (entityID >= length)
+            {
+                
+                val = default(T);
+                return false;
+            }
 
-    
+            val = components[entityID];
+            return true;
+        }
+    }
 }

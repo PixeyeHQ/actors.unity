@@ -38,12 +38,16 @@ namespace Homebrew
         /// <returns></returns>
         public static Timer Add(float finishTime, Action action = null)
         {
+            if (finishTime == 0)
+            {
+                action();
+                return null;
+            }
+            
             var timer = new Timer();
-              
-//            timer.isAutoKill = true;
-             timer.finishTime = finishTime;
-//            timer.callBackAction = null;
-//            timer.id = null;
+
+            timer.finishTime = finishTime;
+
             if (action == null) return timer;
             timer.callBackAction = action;
             timer.Play();
@@ -54,7 +58,7 @@ namespace Homebrew
         public Timer()
         {
         }
- 
+
         public Timer(Action callBackAction, float finishTime, bool isAutoKill = false)
         {
             this.isAutoKill = isAutoKill;
@@ -72,7 +76,7 @@ namespace Homebrew
             t.timer = 0.0f;
             return t;
         }
-        
+
         public Timer AddID(object id)
         {
             this.id = id;
@@ -90,9 +94,9 @@ namespace Homebrew
             if (obj == null) return;
             if (Toolbox.applicationIsQuitting) return;
 
-    
+
             obj.Dispose();
-          
+
             // ProcessingFastPool<Timer>.Instance.Despawn(obj);
         }
 
@@ -159,32 +163,31 @@ namespace Homebrew
             timer = 0.0f;
             IsRunning = false;
 
-      
+
             callBackAction();
- 
+
             if (isAutoKill) Kill();
             else
             {
-                 ProcessingUpdate.Default.Remove(this);
-                 ProcessingTimer.Default.allWorkingTimers.Remove(this);
+                ProcessingUpdate.Default.Remove(this);
+                ProcessingTimer.Default.allWorkingTimers.Remove(this);
             }
         }
 
         public void Kill()
         {
             if (Toolbox.applicationIsQuitting) return;
-  
-          //  ProcessingPools.Default.Despawn(this);
+
+            //  ProcessingPools.Default.Despawn(this);
             //callBackAction = null;
-          //  ProcessingFastPool<Timer>.Instance.Despawn(this);
-      
+            //  ProcessingFastPool<Timer>.Instance.Despawn(this);
+
             Dispose();
         }
 
 
         public void Dispose()
         {
-     
             ProcessingUpdate.Default.Remove(this);
             ProcessingTimer.Default.allWorkingTimers.Remove(this);
             timer = 0.0f;

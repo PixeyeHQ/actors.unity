@@ -176,14 +176,15 @@ namespace Homebrew
         {
             if (state.released) return;
             state.released = true;
-            state.enabled = false;
-            OnHandleDestroy();
+         
+    
             if (pool == Pool.None)
             {
+                OnHandleDestroy();
                 Destroy(gameObject, timeDestroyDelay);
                 return;
             }
-
+ 
             HandleReturnToPool();
         }
 

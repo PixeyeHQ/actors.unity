@@ -74,9 +74,13 @@ namespace Homebrew
         public abstract void Add(int entityID);
         public abstract void AddChecked(int entityID);
 
+
+        //TODO : check remove by component mask
         public void Remove(int entityID)
         {
             int i = GetIndex(entityID);
+            if (i == -1) return;
+
             RemoveAt(i);
         }
 
@@ -174,7 +178,7 @@ namespace Homebrew
 
         protected override void RemoveAt(int i)
         {
-            var l = length--;
+            int l = length--;
             OnRemoved?.Invoke(i);
             Array.Copy(entities, i + 1, entities, i, l - i);
         }
@@ -196,7 +200,7 @@ namespace Homebrew
             if (entities.Length <= length)
             {
                 int len = entityID == 0 ? EngineSettings.MinComponents : entityID << 1;
-                len += 1;     
+                len += 1;
                 Array.Resize(ref entities, len);
                 Array.Resize(ref component, len);
             }
