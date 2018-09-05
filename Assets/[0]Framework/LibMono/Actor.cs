@@ -528,12 +528,12 @@ namespace Homebrew
 
 
         #region TAGS
-
+    
         public bool TagsHaveAny(params int[] filter)
         {
             for (int i = 0; i < filter.Length; i++)
             {
-                if (tags.ContainsKey(filter[i])) return true;
+                return tags.ContainsKey(filter[i]);
             }
 
             return false;
