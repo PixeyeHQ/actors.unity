@@ -71,8 +71,11 @@ namespace Homebrew
             for (int i = 0; i < len; i++)
             {
                 var gr = groups[i];
+
                 if (gr.CheckTags(entityID))
+                {
                     gr.TryAdd(entityID);
+                }
             }
 
 
@@ -100,7 +103,12 @@ namespace Homebrew
 
             for (int i = 0; i < len; i++)
             {
-                groups[i].TryAdd(entityID);
+                var gr = groups[i];
+
+                if (gr.CheckTags(entityID))
+                {
+                    gr.TryAdd(entityID);
+                }
             }
 
             return components[entityID];
@@ -138,7 +146,6 @@ namespace Homebrew
 
         public bool TryGet(int entityID, out T val)
         {
-         
             if (entityID >= length)
             {
                 val = default(T);
