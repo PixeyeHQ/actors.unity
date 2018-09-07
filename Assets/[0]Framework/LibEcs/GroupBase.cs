@@ -6,7 +6,6 @@ Date:       5/14/2018  6:32 PM
 ================================================================*/
 
 using System;
-using UnityEngine;
 
 
 namespace Homebrew
@@ -14,15 +13,21 @@ namespace Homebrew
     public abstract class GroupBase : IDisposable
     {
         public int length;
-        public int[] entities = new int[EngineSettings.MinEntities];
 
+        public int[] entities = new int[EngineSettings.MinEntities];
         public Composition composition;
 
 
         public Action<int> OnAdded;
         public Action<int> OnRemoved;
+        public Action<int, int> OnTagsChanged;
 
         protected int indexLast;
+
+        public T Get<T>(int index) where T : new()
+        {
+            return Storage<T>.Instance.TryGet(entities[index]);
+        }
 
         public void TagsChanged(int entityID)
         {
@@ -34,10 +39,13 @@ namespace Homebrew
                 if (composition.include.Length > 0 && !actor.TagsHave(composition.include)) return;
                 if (actor.TagsHaveAny(composition.exclude)) return;
 
-                AddChecked(entityID);
+                TryAdd(entityID);
             }
             else
             {
+                if (OnTagsChanged != null)
+                    OnTagsChanged(index, entityID);
+
                 if (composition.include.Length > 0 && !actor.TagsHave(composition.include) ||
                     actor.TagsHaveAny(composition.exclude))
                 {
@@ -45,7 +53,6 @@ namespace Homebrew
                 }
             }
         }
-
 
         public int GetIndex(int id)
         {
@@ -59,28 +66,34 @@ namespace Homebrew
         }
 
 
-        public int FromVirtual(int id)
+        public int GetID(int id)
         {
             return entities[id];
         }
 
-
-        public Actor From(int id)
+        public Actor GetActor(int id)
         {
             return Actor.entites[entities[id]];
         }
 
+        public bool CheckTags(int entityID)
+        {
+            var entity = Actor.entites[entityID];
+            if (composition.include.Length > 0 && !entity.TagsHave(composition.include))
+                return false;
+           
+            return composition.exclude.Length <= 0 || !entity.TagsHaveAny(composition.exclude);
+        }
+
         public abstract void AddVirtually(int entityID);
-        public abstract void Add(int entityID);
-        public abstract void AddChecked(int entityID);
 
-
+        public abstract void TryAdd(int entityID);
+ 
         //TODO : check remove by component mask
         public void Remove(int entityID)
         {
             int i = GetIndex(entityID);
             if (i == -1) return;
-
             RemoveAt(i);
         }
 
@@ -108,17 +121,12 @@ namespace Homebrew
         {
         }
 
-        public override void Add(int entityID)
+        public override void TryAdd(int entityID)
         {
-            var entity = Actor.entites[entityID];
-
-            if (composition.include.Length > 0 && !entity.TagsHave(composition.include))
-                return;
-            if (composition.exclude.Length > 0 && entity.TagsHaveAny(composition.exclude)) return;
             if (entities.Length <= length)
             {
                 int len = entityID == 0 ? EngineSettings.MinComponents : entityID << 1;
-                len += 1;
+
                 Array.Resize(ref entities, len);
             }
 
@@ -127,28 +135,11 @@ namespace Homebrew
 
             entities[indexLast] = entityID;
 
-
             if (OnAdded != null)
                 OnAdded(indexLast);
         }
 
-        public override void AddChecked(int entityID)
-        {
-            if (entities.Length <= length)
-            {
-                int len = entityID == 0 ? EngineSettings.MinComponents : entityID << 1;
-                len += 1;
-                Array.Resize(ref entities, len);
-            }
-
-            indexLast = length++;
-
-            entities[indexLast] = entityID;
-
-            if (OnAdded != null)
-                OnAdded(indexLast);
-        }
-
+  
 
         public override void Populate()
         {
@@ -200,7 +191,7 @@ namespace Homebrew
             if (entities.Length <= length)
             {
                 int len = entityID == 0 ? EngineSettings.MinComponents : entityID << 1;
-                len += 1;
+
                 Array.Resize(ref entities, len);
                 Array.Resize(ref component, len);
             }
@@ -216,43 +207,14 @@ namespace Homebrew
                 OnAdded(indexLast);
         }
 
-        public override void Add(int entityID)
+        public override void TryAdd(int entityID)
         {
             if (!storage.HasComponent(entityID)) return;
-
-            var entity = Actor.entites[entityID];
-            if (composition.include.Length > 0 && !entity.TagsHave(composition.include))
-                return;
-            if (composition.exclude.Length > 0 && entity.TagsHaveAny(composition.exclude))
-                return;
-
-
+          
             if (entities.Length <= length)
             {
                 int len = entityID == 0 ? EngineSettings.MinComponents : entityID << 1;
-                len += 1;
-                Array.Resize(ref entities, len);
-                Array.Resize(ref component, len);
-            }
 
-            indexLast = length++;
-
-            entities[indexLast] = entityID;
-            component[indexLast] = storage.components[entityID];
-
-
-            if (OnAdded != null)
-                OnAdded(indexLast);
-        }
-
-        public override void AddChecked(int entityID)
-        {
-            if (!storage.HasComponent(entityID)) return;
-
-            if (entities.Length <= length)
-            {
-                int len = entityID == 0 ? EngineSettings.MinComponents : entityID << 1;
-                len += 1;
                 Array.Resize(ref entities, len);
                 Array.Resize(ref component, len);
             }
@@ -268,6 +230,7 @@ namespace Homebrew
                 OnAdded(indexLast);
         }
 
+     
 
         public override void Populate()
         {
@@ -345,7 +308,7 @@ namespace Homebrew
             if (entities.Length <= length)
             {
                 int len = entityID == 0 ? EngineSettings.MinComponents : entityID << 1;
-                len += 1;
+
                 Array.Resize(ref entities, len);
                 Array.Resize(ref component, len);
                 Array.Resize(ref component2, len);
@@ -362,49 +325,13 @@ namespace Homebrew
                 OnAdded(indexLast);
         }
 
-        public override void Add(int entityID)
+        public override void TryAdd(int entityID)
         {
             if (!storage.HasComponent(entityID) || !storage2.HasComponent(entityID)) return;
-
-
-            var entity = Actor.entites[entityID];
-            if (composition.include.Length > 0 && !entity.TagsHave(composition.include))
-                return;
-
-
-            if (composition.exclude.Length > 0 && entity.TagsHaveAny(composition.exclude))
-                return;
-
-
             if (entities.Length <= length)
             {
                 int len = entityID == 0 ? EngineSettings.MinComponents : entityID << 1;
-                len += 1;
-                Array.Resize(ref entities, len);
-                Array.Resize(ref component, len);
-                Array.Resize(ref component2, len);
-            }
 
-            indexLast = length++;
-
-            entities[indexLast] = entityID;
-            component[indexLast] = storage.components[entityID];
-            component2[indexLast] = storage2.components[entityID];
-
-            if (OnAdded != null)
-                OnAdded(indexLast);
-        }
-
-        public override void AddChecked(int entityID)
-        {
-            if (!storage.HasComponent(entityID)
-                || !storage2.HasComponent(entityID)) return;
-
-
-            if (entities.Length <= length)
-            {
-                int len = entityID == 0 ? EngineSettings.MinComponents : entityID << 1;
-                len += 1;
                 Array.Resize(ref entities, len);
                 Array.Resize(ref component, len);
                 Array.Resize(ref component2, len);
@@ -421,6 +348,7 @@ namespace Homebrew
                 OnAdded(indexLast);
         }
 
+       
 
         public override void Populate()
         {
@@ -447,7 +375,7 @@ namespace Homebrew
                 if (length == entities.Length)
                 {
                     int len = length << 1;
-                    len += 1;
+
                     Array.Resize(ref entities, len);
                     Array.Resize(ref component, len);
                     Array.Resize(ref component2, len);
@@ -512,7 +440,7 @@ namespace Homebrew
             if (entities.Length <= length)
             {
                 int len = entityID == 0 ? EngineSettings.MinComponents : entityID << 1;
-                len += 1;
+
                 Array.Resize(ref entities, len);
                 Array.Resize(ref component, len);
                 Array.Resize(ref component2, len);
@@ -531,45 +459,7 @@ namespace Homebrew
                 OnAdded(indexLast);
         }
 
-        public override void Add(int entityID)
-        {
-            if (!storage.HasComponent(entityID) ||
-                !storage2.HasComponent(entityID) ||
-                !storage3.HasComponent(entityID)
-            ) return;
-
-            var entity = Actor.entites[entityID];
-            if (composition.include.Length > 0)
-                if (!entity.TagsHave(composition.include))
-                    return;
-
-
-            if (composition.exclude.Length > 0)
-                if (entity.TagsHaveAny(composition.exclude))
-                    return;
-
-            if (entities.Length <= length)
-            {
-                int len = entityID == 0 ? EngineSettings.MinComponents : entityID << 1;
-                Array.Resize(ref entities, len + 1);
-                Array.Resize(ref component, len + 1);
-                Array.Resize(ref component2, len + 1);
-                Array.Resize(ref component3, len + 1);
-            }
-
-            indexLast = length++;
-
-            entities[indexLast] = entityID;
-            component[indexLast] = storage.components[entityID];
-            component2[indexLast] = storage2.components[entityID];
-            component3[indexLast] = storage3.components[entityID];
-
-
-            if (OnAdded != null)
-                OnAdded(indexLast);
-        }
-
-        public override void AddChecked(int entityID)
+        public override void TryAdd(int entityID)
         {
             if (!storage.HasComponent(entityID) ||
                 !storage2.HasComponent(entityID) ||
@@ -595,8 +485,9 @@ namespace Homebrew
 
             if (OnAdded != null)
                 OnAdded(indexLast);
-        }
 
+        }
+ 
 
         public override void Populate()
         {
@@ -629,7 +520,7 @@ namespace Homebrew
                 if (length == entities.Length)
                 {
                     int len = length << 1;
-                    len += 1;
+
                     Array.Resize(ref entities, len);
                     Array.Resize(ref component, len);
                     Array.Resize(ref component2, len);
@@ -692,7 +583,7 @@ namespace Homebrew
             if (entities.Length <= length)
             {
                 int len = entityID == 0 ? EngineSettings.MinComponents : entityID << 1;
-                len += 1;
+
                 Array.Resize(ref entities, len);
                 Array.Resize(ref component, len);
                 Array.Resize(ref component2, len);
@@ -713,55 +604,18 @@ namespace Homebrew
                 OnAdded(indexLast);
         }
 
-        public override void Add(int entityID)
+        public override void TryAdd(int entityID)
         {
             if (!storage.HasComponent(entityID) ||
                 !storage2.HasComponent(entityID) ||
                 !storage3.HasComponent(entityID) ||
                 !storage4.HasComponent(entityID)
             ) return;
-
-
-            var entity = Actor.entites[entityID];
-            if (composition.include.Length > 0 && !entity.TagsHave(composition.include))
-                return;
-
-
-            if (composition.exclude.Length > 0 && entity.TagsHaveAny(composition.exclude))
-                return;
-
-
+           
             if (entities.Length <= length)
             {
                 int len = entityID == 0 ? EngineSettings.MinComponents : entityID << 1;
-                len += 1;
-                Array.Resize(ref entities, len);
-                Array.Resize(ref component, len);
-                Array.Resize(ref component2, len);
-                Array.Resize(ref component3, len);
-                Array.Resize(ref component4, len);
-            }
 
-
-            indexLast = length++;
-
-            entities[indexLast] = entityID;
-            component[indexLast] = storage.components[entityID];
-            component2[indexLast] = storage2.components[entityID];
-            component3[indexLast] = storage3.components[entityID];
-            component4[indexLast] = storage4.components[entityID];
-
-
-            if (OnAdded != null)
-                OnAdded(indexLast);
-        }
-
-        public override void AddChecked(int entityID)
-        {
-            if (entities.Length <= length)
-            {
-                int len = entityID == 0 ? EngineSettings.MinComponents : entityID << 1;
-                len += 1;
                 Array.Resize(ref entities, len);
                 Array.Resize(ref component, len);
                 Array.Resize(ref component2, len);
@@ -781,6 +635,7 @@ namespace Homebrew
                 OnAdded(indexLast);
         }
 
+        
 
         public override void Populate()
         {
@@ -794,13 +649,7 @@ namespace Homebrew
                 var e = Actor.entites[i];
                 if (e == null || !e.state.enabled) continue;
 
-                if (composition.include.Length > 0)
-                    if (!e.TagsHave(composition.include))
-                        continue;
 
-                if (composition.exclude.Length > 0)
-                    if (e.TagsHaveAny(composition.exclude))
-                        continue;
                 int entityID = e.id;
                 if (!storage.HasComponent(entityID) ||
                     !storage2.HasComponent(entityID) ||
@@ -809,10 +658,19 @@ namespace Homebrew
                 ) continue;
 
 
+                if (composition.include.Length > 0)
+                    if (!e.TagsHave(composition.include))
+                        continue;
+
+                if (composition.exclude.Length > 0)
+                    if (e.TagsHaveAny(composition.exclude))
+                        continue;
+
+
                 if (length == entities.Length)
                 {
                     int len = length << 1;
-                    len += 1;
+
                     Array.Resize(ref entities, len);
                     Array.Resize(ref component, len);
                     Array.Resize(ref component2, len);
@@ -869,7 +727,7 @@ namespace Homebrew
             if (entities.Length <= length)
             {
                 int len = entityID == 0 ? EngineSettings.MinComponents : entityID << 1;
-                len += 1;
+
                 Array.Resize(ref entities, len);
                 Array.Resize(ref component, len);
                 Array.Resize(ref component2, len);
@@ -892,7 +750,7 @@ namespace Homebrew
                 OnAdded(indexLast);
         }
 
-        public override void Add(int entityID)
+        public override void TryAdd(int entityID)
         {
             if (!storage.HasComponent(entityID) ||
                 !storage2.HasComponent(entityID) ||
@@ -901,49 +759,10 @@ namespace Homebrew
                 !storage5.HasComponent(entityID)
             ) return;
 
-
-            var entity = Actor.entites[entityID];
-            if (composition.include.Length > 0 && !entity.TagsHave(composition.include))
-                return;
-
-
-            if (composition.exclude.Length > 0 && entity.TagsHaveAny(composition.exclude))
-                return;
-
-
             if (entities.Length <= length)
             {
                 int len = entityID == 0 ? EngineSettings.MinComponents : entityID << 1;
-                len += 1;
-                Array.Resize(ref entities, len);
-                Array.Resize(ref component, len);
-                Array.Resize(ref component2, len);
-                Array.Resize(ref component3, len);
-                Array.Resize(ref component4, len);
-                Array.Resize(ref component5, len);
-            }
 
-
-            indexLast = length++;
-
-            entities[indexLast] = entityID;
-            component[indexLast] = storage.components[entityID];
-            component2[indexLast] = storage2.components[entityID];
-            component3[indexLast] = storage3.components[entityID];
-            component4[indexLast] = storage4.components[entityID];
-            component5[indexLast] = storage5.components[entityID];
-
-
-            if (OnAdded != null)
-                OnAdded(indexLast);
-        }
-
-        public override void AddChecked(int entityID)
-        {
-            if (entities.Length <= length)
-            {
-                int len = entityID == 0 ? EngineSettings.MinComponents : entityID << 1;
-                len += 1;
                 Array.Resize(ref entities, len);
                 Array.Resize(ref component, len);
                 Array.Resize(ref component2, len);
@@ -965,6 +784,8 @@ namespace Homebrew
             if (OnAdded != null)
                 OnAdded(indexLast);
         }
+
+    
 
 
         public override void Populate()
@@ -1001,7 +822,7 @@ namespace Homebrew
                 if (length == entities.Length)
                 {
                     int len = length << 1;
-                    len += 1;
+
                     Array.Resize(ref entities, len);
                     Array.Resize(ref component, len);
                     Array.Resize(ref component2, len);

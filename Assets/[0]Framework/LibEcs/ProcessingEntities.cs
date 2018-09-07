@@ -140,11 +140,13 @@ namespace Homebrew
             if (active)
             {
                 for (int i = 0; i < groupLengthActors; i++)
-                    GroupsActors[i].Add(entityID);
+                    if (GroupsBase[i].CheckTags(entityID))
+                        GroupsActors[i].TryAdd(entityID);
 
 
                 for (int i = 0; i < groupLength; i++)
-                    GroupsBase[i].Add(entityID);
+                    if (GroupsBase[i].CheckTags(entityID))
+                        GroupsBase[i].TryAdd(entityID);
             }
             else
             {

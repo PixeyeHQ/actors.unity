@@ -70,7 +70,9 @@ namespace Homebrew
 
             for (int i = 0; i < len; i++)
             {
-                groups[i].Add(entityID);
+                var gr = groups[i];
+                if (gr.CheckTags(entityID))
+                    gr.TryAdd(entityID);
             }
 
 
@@ -98,7 +100,7 @@ namespace Homebrew
 
             for (int i = 0; i < len; i++)
             {
-                groups[i].Add(entityID);
+                groups[i].TryAdd(entityID);
             }
 
             return components[entityID];
@@ -122,17 +124,23 @@ namespace Homebrew
             return entityID >= length ? false : entityHasComponent[entityID];
         }
 
+
+        public T Get(int entityID)
+        {
+            return components[entityID];
+        }
+
         public T TryGet(int entityID)
         {
             return entityID >= length ? default(T) : components[entityID];
         }
 
+
         public bool TryGet(int entityID, out T val)
         {
-            Debug.Log(entityID+"_"+length);
+         
             if (entityID >= length)
             {
-                
                 val = default(T);
                 return false;
             }

@@ -506,34 +506,33 @@ namespace Homebrew
             if (state.disabled) return;
 
 
-            
-                var groups = ProcessingEntities.Default.GroupsBase;
-                int len = ProcessingEntities.Default.groupLength;
+            var groups = ProcessingEntities.Default.GroupsBase;
+            int len = ProcessingEntities.Default.groupLength;
 
-                for (int i = 0; i < len; i++)
-                {
-                    groups[i].TagsChanged(id);
-                }
+            for (int i = 0; i < len; i++)
+            {
+                groups[i].TagsChanged(id);
+            }
 
-                groups = ProcessingEntities.Default.GroupsActors;
-                len = ProcessingEntities.Default.groupLengthActors;
-                for (int i = 0; i < len; i++)
-                {
-                    groups[i].TagsChanged(id);
-                } 
-     
+            groups = ProcessingEntities.Default.GroupsActors;
+            len = ProcessingEntities.Default.groupLengthActors;
+            for (int i = 0; i < len; i++)
+            {
+                groups[i].TagsChanged(id);
+            }
         }
 
         #endregion
 
 
         #region TAGS
-    
+
         public bool TagsHaveAny(params int[] filter)
         {
             for (int i = 0; i < filter.Length; i++)
             {
-                return tags.ContainsKey(filter[i]);
+                if (tags.ContainsKey(filter[i]))
+                    return true;
             }
 
             return false;
@@ -595,7 +594,6 @@ namespace Homebrew
             else tags[id] = val;
         }
 
-    
 
         public void TagsAdd(params int[] ids)
         {

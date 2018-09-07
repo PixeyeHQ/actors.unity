@@ -57,6 +57,11 @@ namespace Homebrew
             Timer.Add(Time.DeltaTimeFixed * 4, () => PostSetup());
         }
 
+        protected T Add<T>() where T : new()
+        {
+           return Toolbox.Add<T>();
+        }
+        
         protected virtual void Setup()
         {
         }
