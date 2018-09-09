@@ -10,7 +10,6 @@
 ## Translation
 * [en](https://github.com/dimmpixeye/Actors-Unity3d-Framework/blob/Actor2.0/README.md)
 * [ru](https://github.com/dimmpixeye/Actors-Unity3d-Framework/blob/Actor2.0/README-ru.md)
-
 * [Example project](https://github.com/dimmpixeye/Actors-example)
 
 # What is ACTORS ? 
