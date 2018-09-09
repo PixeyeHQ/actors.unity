@@ -95,4 +95,5 @@ public class StarterLevel1 : Starter
 
 }
 ```
- 
+Note that you always need to load kernel scene with starter in order to work correctly.
+ [![Image from Gyazo](https://i.gyazo.com/2961e2fec4d55a85950b5263cdd13a52.png)](https://gyazo.com/2961e2fec4d55a85950b5263cdd13a52)
