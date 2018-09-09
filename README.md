@@ -8,8 +8,8 @@
 [![license](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](https://github.com/dimmpixeye/Actors-Unity3d-Framework/blob/master/LICENSE)
 
 ## Translation
-* [en](https://github.com/dimmpixeye/Actors-Unity3d-Framework/blob/Actor2.0/README.md)
-* [ru](https://github.com/dimmpixeye/Actors-Unity3d-Framework/blob/Actor2.0/README-ru.md)
+* [EN](https://github.com/dimmpixeye/Actors-Unity3d-Framework/blob/Actor2.0/README.md)
+* [RU](https://github.com/dimmpixeye/Actors-Unity3d-Framework/blob/Actor2.0/README-ru.md)
 * [Example project](https://github.com/dimmpixeye/Actors-example)
 
 # What is ACTORS ? 
