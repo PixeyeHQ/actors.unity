@@ -79,9 +79,9 @@ namespace Homebrew
 		{
 			var awakeble = obj as IAwake;
 			if (awakeble != null) awakeble.OnAwake();
-
-			var tickable = obj as ITick;
-			if (tickable != null) ProcessingUpdate.Default.Add(tickable);
+           
+			
+			ProcessingUpdate.Default.Add(obj);
 		}
 
 

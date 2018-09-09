@@ -118,5 +118,14 @@ namespace Homebrew
 
             countTicks = ticks.Count;
         }
+
+        public static void Create()
+        {
+            var obj = new GameObject("ActorsUpdate");
+            DontDestroyOnLoad(obj);
+            Default =  obj.AddComponent<ProcessingUpdate>();
+        }
+        
+        
     }
 }

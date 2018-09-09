@@ -5,7 +5,7 @@ Company:    Homebrew - http://hbrew.store
 Date:       12/09/2017 16:10
 ================================================================*/
 
-using System;
+
 using System.Collections.Generic;
 using UnityEngine;
 #if ODIN_INSPECTOR
@@ -27,9 +27,9 @@ namespace Homebrew
 
         void Awake()
         {
-            for (var i = 0; i < factories.Count; i++)
+            if (ProcessingUpdate.Default == null)
             {
-                Toolbox.Add(factories[i]);
+                ProcessingUpdate.Create();
             }
 
 
@@ -39,6 +39,12 @@ namespace Homebrew
 
         public void BindScene()
         {
+            for (var i = 0; i < factories.Count; i++)
+            {
+                Toolbox.Add(factories[i]);
+            }
+
+
             var poolReg = GetComponent<PoolRegister>();
             if (poolReg) poolReg.Reigster();
 
@@ -57,11 +63,11 @@ namespace Homebrew
             Timer.Add(Time.DeltaTimeFixed * 4, () => PostSetup());
         }
 
-        protected T Add<T>() where T : new()
+        protected static T Add<T>() where T : new()
         {
-           return Toolbox.Add<T>();
+            return Toolbox.Add<T>();
         }
-        
+
         protected virtual void Setup()
         {
         }
@@ -69,7 +75,5 @@ namespace Homebrew
         protected virtual void PostSetup()
         {
         }
-
-
     }
 }

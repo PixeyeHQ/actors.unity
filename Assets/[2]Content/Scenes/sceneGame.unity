@@ -194,12 +194,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 1315877078}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8b65b11b6f62d6b478b6e153d5da44d3, type: 3}
+  m_Script: {fileID: 11500000, guid: fe5b2aa71ed58b84f91b7cc95e1df48f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   factories: []
   ScenesToKeep: 02000000
-  SceneDependsOn: 0200000001000000
+  SceneDependsOn: 02000000
 --- !u!4 &1315877080
 Transform:
   m_ObjectHideFlags: 0

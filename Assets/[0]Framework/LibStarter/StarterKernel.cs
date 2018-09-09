@@ -26,17 +26,13 @@ namespace Homebrew
         private void Awake()
         {
             Toolbox.Add(blueprints);
-           
-            GameObject.Find("[KERNEL]").AddComponent<ProcessingUpdate>();
+        
             Time.Default = Toolbox.Add<Time>();
-
-
             ProcessingTimer.Default = Toolbox.Add<ProcessingTimer>();
             ProcessingSignals.Default = Toolbox.Add<ProcessingSignals>();
             ProcessingGoPool.Default = Toolbox.Add<ProcessingGoPool>();
             Box.Default = Toolbox.Add<Box>();
             ProcessingEntities.Default = Toolbox.Add<ProcessingEntities>();
-           // ProcessingBehaviorAttributes.Default = Toolbox.Add<ProcessingBehaviorAttributes>();
             ProcessingScene.Default = Toolbox.Add<ProcessingScene>();
 
 

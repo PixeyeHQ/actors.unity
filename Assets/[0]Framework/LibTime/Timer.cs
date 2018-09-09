@@ -7,7 +7,6 @@ Date:       08/10/2017 21:54
 
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace Homebrew
 {
@@ -43,7 +42,7 @@ namespace Homebrew
                 action();
                 return null;
             }
-            
+
             var timer = new Timer();
 
             timer.finishTime = finishTime;
@@ -77,6 +76,7 @@ namespace Homebrew
             return t;
         }
 
+
         public Timer AddID(object id)
         {
             this.id = id;
@@ -96,8 +96,7 @@ namespace Homebrew
 
 
             obj.Dispose();
-
-            // ProcessingFastPool<Timer>.Instance.Despawn(obj);
+ 
         }
 
         public void Stop()
@@ -177,11 +176,6 @@ namespace Homebrew
         public void Kill()
         {
             if (Toolbox.applicationIsQuitting) return;
-
-            //  ProcessingPools.Default.Despawn(this);
-            //callBackAction = null;
-            //  ProcessingFastPool<Timer>.Instance.Despawn(this);
-
             Dispose();
         }
 
@@ -195,6 +189,16 @@ namespace Homebrew
             isAutoKill = true;
             id = null;
             callBackAction = null;
+        }
+    }
+
+    public static class ExtensionTimer
+    {
+        public static Timer TryRestart(this Timer t, Action callBackAction, float finishTime, bool isAutoKill = false)
+        {
+            if (t == null) t = new Timer(callBackAction, finishTime, isAutoKill);
+            t.Restart();
+            return t;
         }
     }
 }

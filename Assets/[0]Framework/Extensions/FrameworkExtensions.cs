@@ -11,13 +11,20 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
- 
+
 
 namespace Homebrew
 {
     public static partial class FrameworkExtensions
     {
         private static System.Random _r = new System.Random();
+
+
+        public static T Add<T>(this int entity) where T : new()
+        {
+            return Storage<T>.Instance.AddVirtual(entity);
+        }
+
 
         public static void Add<T>(this MonoCached mono) where T : class, new()
         {
@@ -373,7 +380,7 @@ namespace Homebrew
 
         public static int SearchLinear(this int[] array, int value)
         {
-            for (int i = 0; i<array.Length; i++)
+            for (int i = 0; i < array.Length; i++)
             {
                 if (array[i] == value)
                     return i;
@@ -381,7 +388,7 @@ namespace Homebrew
 
             return -1;
         }
- 
+
         public static int SearchBinary(this int[] array, int rightIndex, int value, int prev)
         {
             int leftIndex = 0;
@@ -836,11 +843,4 @@ namespace Homebrew
 
         #endregion
     }
-    
-    
-    
-    
-    
-    
-    
 }

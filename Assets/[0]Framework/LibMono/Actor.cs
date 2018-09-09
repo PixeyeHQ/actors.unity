@@ -22,6 +22,10 @@ namespace Homebrew
         public static Stack<int> prevID = new Stack<int>(100);
         public static int lastID;
 
+        [InfoBox("An actor is a body for an entity. The entity itself is just an incremental number." +
+                 "Use actors when you want to compose your entities from the inspector.")] 
+        
+        
         #region FIELDS
 
         [FoldoutGroup("Actor")] public int id;
@@ -316,6 +320,10 @@ namespace Homebrew
             }
         }
 
+        
+      
+        
+        
         public T Add<T>(StorageType storageType = StorageType.Global) where T : class, new()
         {
             if (typeof(T).IsSubclassOf(typeof(Behavior)))
@@ -384,17 +392,28 @@ namespace Homebrew
             }
 
 
-            IData data;
-            if (!cachedData.TryGetValue(key, out data)) return;
-            var disposable = data as IDisposable;
-            if (disposable != null) disposable.Dispose();
-            cachedData.Remove(key);
+       
+            if (cachedData != null)
+            {
+                IData data;
+                if (!cachedData.TryGetValue(key, out data)) return;
+                var disposable = data as IDisposable;
+                if (disposable != null) disposable.Dispose();
+                cachedData.Remove(key);
+            }
         }
 
         #endregion
 
         #region  GET
 
+
+        public T Get<T>() where T : new()
+        {
+            return Storage<T>.Instance.Add(id);
+        }
+        
+        
         public T Get<T>(StorageType stype = StorageType.Global) where T : new()
         {
             var obj = stype == StorageType.Global

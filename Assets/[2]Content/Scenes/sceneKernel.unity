@@ -122,8 +122,6 @@ GameObject:
   m_Component:
   - component: {fileID: 322678236}
   - component: {fileID: 322678235}
-  - component: {fileID: 322678237}
-  - component: {fileID: 322678238}
   m_Layer: 0
   m_Name: '[KERNEL]'
   m_TagString: Untagged
@@ -139,14 +137,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 322678234}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 40d8f374346a46518a7bc0cabef0bcc2, type: 3}
+  m_Script: {fileID: 11500000, guid: cd3ed82cb1f79aa46b26a51f607d8aea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   blueprints: {fileID: 11400000, guid: c29af42d543de624e855fe900b413efe, type: 2}
   dataGameSettings: {fileID: 11400000, guid: 192290467e54a7d44bf2a73f136bfcf1, type: 2}
   dataGameSession: {fileID: 11400000, guid: 3f665a2314a196044a3174d32ed93652, type: 2}
-  pluggables:
-  - {fileID: 11400000, guid: dafd99ce458d5694a87a091455eadc9a, type: 2}
+  pluggables: []
 --- !u!4 &322678236
 Transform:
   m_ObjectHideFlags: 0
@@ -160,35 +157,3 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &322678237
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 322678234}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -619905303, guid: f70555f144d8491a825f0804e09c671c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_FirstSelected: {fileID: 0}
-  m_sendNavigationEvents: 1
-  m_DragThreshold: 10
---- !u!114 &322678238
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 322678234}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 1077351063, guid: f70555f144d8491a825f0804e09c671c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_HorizontalAxis: Horizontal
-  m_VerticalAxis: Vertical
-  m_SubmitButton: Submit
-  m_CancelButton: Cancel
-  m_InputActionsPerSecond: 10
-  m_RepeatDelay: 0.5
-  m_ForceModuleActive: 0

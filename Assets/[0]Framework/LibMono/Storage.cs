@@ -7,8 +7,7 @@ Date:       7/25/2018 11:49 AM
 
 using System;
 using System.Collections.Generic;
-using UnityEngine;
-
+ 
 
 namespace Homebrew
 {
@@ -52,6 +51,37 @@ namespace Homebrew
             return component;
         }
 
+        public T AddVirtual(int entityID)
+        {
+            
+            if (entityHasComponent[entityID]) return components[entityID];
+
+            if (entityID >= length)
+            {
+                length = entityID << 1;
+
+                Array.Resize(ref components, length);
+                Array.Resize(ref entityHasComponent, length);
+            }
+
+            if (components[entityID] == null)
+                components[entityID] = new T();
+
+            entityHasComponent[entityID] = true;
+            
+
+            int len = groups.Count;
+            for (int i = 0; i < len; i++)
+            {
+                groups[i].AddVirtually(entityID);
+            }
+
+
+            return components[entityID];
+        }
+        
+        
+        
         public T Add(T component, int entityID)
         {
             if (entityID >= length)

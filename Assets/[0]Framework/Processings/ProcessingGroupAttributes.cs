@@ -7,17 +7,13 @@ Date:       5/14/2018  6:42 PM
 
 
 using System;
-using System.Collections.Generic;
 using System.Reflection;
-using UnityEngine;
 
 
 namespace Homebrew
 {
     public class ProcessingGroupAttributes
     {
-
-     
         public static void Setup(object b)
         {
             var type = b.GetType();
@@ -26,7 +22,7 @@ namespace Homebrew
 
             var groupType = typeof(GroupBase);
 
-      
+
             for (int i = 0; i < length; i++)
             {
                 var myFieldInfo = objectFields[i];
@@ -37,30 +33,19 @@ namespace Homebrew
                     Attribute.GetCustomAttribute(myFieldInfo, typeof(GroupExcludeAttribute)) as
                         GroupExcludeAttribute;
 
- 
- 
-                if (!myFieldInfo.FieldType.IsSubclassOf(groupType) || myFieldInfo.IsStatic) continue;
-                
-                
-                
-                var excludeFilter = new int[0];
-                if (groupExcludeAttribute!=null)
-                excludeFilter = groupExcludeAttribute.filter;
 
-                var includeFilter   = new int[0];
-                if (groupByAttribute!=null)
-                includeFilter = groupByAttribute.filter;
- 
-                
-                
+                if (!myFieldInfo.FieldType.IsSubclassOf(groupType) || myFieldInfo.IsStatic) continue;
+
+
+                var excludeFilter = groupExcludeAttribute != null ? groupExcludeAttribute.filter : new int[0];
+                var includeFilter = groupByAttribute != null ? groupByAttribute.filter : new int[0];
+
                 var filter = new Composition();
                 filter.exclude = excludeFilter;
                 filter.include = includeFilter;
-              
-          
-                
-                myFieldInfo.SetValue(b,
-                    ProcessingEntities.Default.SetupGroup(myFieldInfo.FieldType,filter));
+
+
+                myFieldInfo.SetValue(b, ProcessingEntities.Default.SetupGroup(myFieldInfo.FieldType, filter));
             }
         }
     }
