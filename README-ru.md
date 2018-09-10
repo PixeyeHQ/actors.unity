@@ -163,5 +163,95 @@ public DataMove : IData, ISetup, IDisposable{
 * Обязательно помечайте компоненты данных как [System.Serializable] если хотите увидеть их в инспекторе при работе с актором.
 * Может показаться, что мы добавляем дата компоненты в актор. В действительно актор связывается с хранилищем компонентов и по своему ID передает в нужную ячейку хранилища данные. Все данные во фреймворке хранятся в однотипных массивах внутри хранилищ. ( см. концепции ECS  )
 
+## Создаем Processing
+Processing - обработчик используются как системы в рамках ECS или как глобальные скрипты и наследуются от ProcessingBase. В 90% случаев через обработчики пишутся все поведения для наших акторов.
+
+В чем главное отличие обработчика от обычного скрипта поведения? Обработчик следуя из названия обрабатывает однородные объекты по некоторому фильтру. 
+```csharp
+using UnityEngine;
+namespace Homebrew
+{
+    public class ProcessingExampleInput : ProcessingBase
+    {
+        // Группа обработчика. Группа собирает ВСЕ сущности у которых существует DataInputExample
+        public Group<DataInputExample> actors;
+     }
+}
+```
+Класс группы это фильтр. В группы входят любые сущности которые обладают заданными компонентами данных. Для примера DataInputExample.
+Чтобы обрабатывать группу нужен Update метод. Для этого наследуем processing от ITick интерфейса. Чтобы делать перебор по группе используется переменная length. 
+
+```csharp
+using UnityEngine;
+
+namespace Homebrew
+{
+    public class ProcessingExampleInput : ProcessingBase, ITick
+    {
+        // Группа обработчика - их тут может быть несколько, для простоты пока 1. Группа собирает ВСЕ сущности у которых существует DataInputExample
+        public Group<DataInputExample> actors;
+    
+      public void Tick()
+        {
+            // цикл считающих группу. Для этого используется переменная length 
+            for (int i = 0; i < actors.length; i++)
+            {
+                // берем дату из следующего доступного актора в группе. Группа хранит не самих акторов, а ссылки на их компоненты в виде массивов component component2 component3 и тп.
+                // у нас по умолчанию один компонент ( DataInputExample ) 
+                var data = actors.component[i];
+                
+                // по нажатию вытаскиваем актора из группы. Для этого юзаем метод GetActor(index) - где индекс это его порядковый номер в группе. В нашем случае цикл идет по i 
+                if (Input.GetKeyDown(data.Up))
+                    Debug.Log(actors.GetActor(i).gameObject + " UP!" );
+                 
+                if (Input.GetKeyDown(data.Down))
+                    Debug.Log(actors.GetActor(i).gameObject + " DOWN!" );
+                 
+                if (Input.GetKeyDown(data.Right))
+                    Debug.Log(actors.GetActor(i).gameObject + " RIGHT!" );
+                 
+                if (Input.GetKeyDown(data.Left))
+                    Debug.Log(actors.GetActor(i).gameObject + " LEFT!" );
+            }
+        }
+    }
+}
+```
+ 
+*На заметку*
+* Группа перебирает именно указанные компоненты сущности, а не самих сущностей. 
+* Чтобы получить ID сущности из группы используйте .GetID(i)
+* Чтобы получить Актора из группы используйте .GetActor(i)
+
+[![Image from Gyazo](https://i.gyazo.com/2556f80c95b356056454f6b33ca4793e.png)](https://gyazo.com/2556f80c95b356056454f6b33ca4793e)
+ 
+## Создаем Starter.
+По умолчанию в играх юнити нет единой точки входа. Классы Starter позволяют нам реализовать такую точку. Starter обязательный класс для сцены так как с него идет подгрузка всех необходимых для работы зависимостей. Так же через Starter добавляются все Processing скрипты.
+По Starter скрипту легко определить что происходит на сцене. Для создания новых Starter классов мы наследуется от базового класса Starter и используем методы Setup, PostSetup для инициализации.
+
+```csharp
+public class StarterLevel1 : Starter
+{
+    protected override void Setup()
+    {
+        Add<ProcessingExampleInput>(); 
+    }
+}
+```
+
+[![Image from Gyazo](https://i.gyazo.com/758d7f5565c1a10e65f1fbf6314a44a1.png)](https://gyazo.com/758d7f5565c1a10e65f1fbf6314a44a1)
+
+Обычно Starter компонент живет на игровом объекте [SETUP]. Для правильной работы нам всегда нужно подключать сцену SceneKernel, она отвечает за все основные процессы фреймворка. 
+[![Image from Gyazo](https://i.gyazo.com/12bb8bed7fb7b8b2ddf9a5ac1f279c17.gif)](https://gyazo.com/12bb8bed7fb7b8b2ddf9a5ac1f279c17)
+
+SceneKernel должен быть как в Scenes To Keep так и в Scenes Depends On. Так же не забудьте добавить сцены в BuildSettings. Порядок неважен.
+[![Image from Gyazo](https://i.gyazo.com/00c0b22d0a76651945711171cbad1372.png)](https://gyazo.com/00c0b22d0a76651945711171cbad1372)
+
+Чтобы сохранить ID сцен используйте команду SaveScenes.
+[![Image from Gyazo](https://i.gyazo.com/ccd34e93f273f1c2bb72bac1dbd156f7.gif)](https://gyazo.com/ccd34e93f273f1c2bb72bac1dbd156f7)
+
+ID сцен хранятся в виде Enum в скрипте Scenes.cs 
+Если по какой то причине Scenes.cs неправильно собрался, то можно проставить значения вручную.
+
 
 
