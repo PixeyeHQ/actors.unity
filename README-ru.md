@@ -242,12 +242,15 @@ public class StarterLevel1 : Starter
 [![Image from Gyazo](https://i.gyazo.com/758d7f5565c1a10e65f1fbf6314a44a1.png)](https://gyazo.com/758d7f5565c1a10e65f1fbf6314a44a1)
 
 Обычно Starter компонент живет на игровом объекте [SETUP]. Для правильной работы нам всегда нужно подключать сцену SceneKernel, она отвечает за все основные процессы фреймворка. 
+
 [![Image from Gyazo](https://i.gyazo.com/12bb8bed7fb7b8b2ddf9a5ac1f279c17.gif)](https://gyazo.com/12bb8bed7fb7b8b2ddf9a5ac1f279c17)
 
 SceneKernel должен быть как в Scenes To Keep так и в Scenes Depends On. Так же не забудьте добавить сцены в BuildSettings. Порядок неважен.
+
 [![Image from Gyazo](https://i.gyazo.com/00c0b22d0a76651945711171cbad1372.png)](https://gyazo.com/00c0b22d0a76651945711171cbad1372)
 
 Чтобы сохранить ID сцен используйте команду SaveScenes.
+
 [![Image from Gyazo](https://i.gyazo.com/ccd34e93f273f1c2bb72bac1dbd156f7.gif)](https://gyazo.com/ccd34e93f273f1c2bb72bac1dbd156f7)
 
 ID сцен хранятся в виде Enum в скрипте Scenes.cs 
