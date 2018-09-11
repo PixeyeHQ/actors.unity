@@ -163,5 +163,212 @@ public DataMove : IData, ISetup, IDisposable{
 * Обязательно помечайте компоненты данных как [System.Serializable] если хотите увидеть их в инспекторе при работе с актором.
 * Может показаться, что мы добавляем дата компоненты в актор. В действительно актор связывается с хранилищем компонентов и по своему ID передает в нужную ячейку хранилища данные. Все данные во фреймворке хранятся в однотипных массивах внутри хранилищ. ( см. концепции ECS  )
 
+## Создаем Processing
+Processing - обработчик используются как системы в рамках ECS или как глобальные скрипты и наследуются от ProcessingBase. В 90% случаев через обработчики пишутся все поведения для наших акторов.
+
+В чем главное отличие обработчика от обычного скрипта поведения? Обработчик следуя из названия обрабатывает однородные объекты по некоторому фильтру. 
+```csharp
+using UnityEngine;
+namespace Homebrew
+{
+    public class ProcessingExampleInput : ProcessingBase
+    {
+        // Группа обработчика. Группа собирает ВСЕ сущности у которых существует DataInputExample
+        public Group<DataInputExample> actors;
+     }
+}
+```
+Класс группы это фильтр. В группы входят любые сущности которые обладают заданными компонентами данных. Для примера DataInputExample.
+Чтобы обрабатывать группу нужен Update метод. Для этого наследуем processing от ITick интерфейса. Чтобы делать перебор по группе используется переменная length. 
+
+```csharp
+using UnityEngine;
+
+namespace Homebrew
+{
+    public class ProcessingExampleInput : ProcessingBase, ITick
+    {
+        // Группа обработчика - их тут может быть несколько, для простоты пока 1. Группа собирает ВСЕ сущности у которых существует DataInputExample
+        public Group<DataInputExample> actors;
+    
+      public void Tick()
+        {
+            // цикл считающих группу. Для этого используется переменная length 
+            for (int i = 0; i < actors.length; i++)
+            {
+                // берем дату из следующего доступного актора в группе. Группа хранит не самих акторов, а ссылки на их компоненты в виде массивов component component2 component3 и тп.
+                // у нас по умолчанию один компонент ( DataInputExample ) 
+                var data = actors.component[i];
+                
+                // по нажатию вытаскиваем актора из группы. Для этого юзаем метод GetActor(index) - где индекс это его порядковый номер в группе. В нашем случае цикл идет по i 
+                if (Input.GetKeyDown(data.Up))
+                    Debug.Log(actors.GetActor(i).gameObject + " UP!" );
+                 
+                if (Input.GetKeyDown(data.Down))
+                    Debug.Log(actors.GetActor(i).gameObject + " DOWN!" );
+                 
+                if (Input.GetKeyDown(data.Right))
+                    Debug.Log(actors.GetActor(i).gameObject + " RIGHT!" );
+                 
+                if (Input.GetKeyDown(data.Left))
+                    Debug.Log(actors.GetActor(i).gameObject + " LEFT!" );
+            }
+        }
+    }
+}
+```
+ 
+*На заметку*
+* Группа перебирает именно указанные компоненты сущности, а не самих сущностей. 
+* Чтобы получить ID сущности из группы используйте .GetID(i)
+* Чтобы получить Актора из группы используйте .GetActor(i)
+
+[![Image from Gyazo](https://i.gyazo.com/2556f80c95b356056454f6b33ca4793e.png)](https://gyazo.com/2556f80c95b356056454f6b33ca4793e)
+ 
+## Создаем Starter
+По умолчанию в играх юнити нет единой точки входа. Классы Starter позволяют нам реализовать такую точку. Starter обязательный класс для сцены так как с него идет подгрузка всех необходимых для работы зависимостей. Так же через Starter добавляются все Processing скрипты.
+По Starter скрипту легко определить что происходит на сцене. Для создания новых Starter классов нужно наследоваться от базового класса Starter. Методы Setup и PostSetup ( аналоги Awake, Start ) используются для инициализации. 
+
+Метод Setup начнет работать только после того как подгрузятся все зависимые сцены. 
+Starter так же отвечает за инициализацию всех сущностей которые были добавлены на сцену через редактор.
+
+```csharp
+public class StarterLevel1 : Starter
+{
+    protected override void Setup()
+    {
+        Add<ProcessingExampleInput>(); 
+    }
+}
+```
+
+[![Image from Gyazo](https://i.gyazo.com/758d7f5565c1a10e65f1fbf6314a44a1.png)](https://gyazo.com/758d7f5565c1a10e65f1fbf6314a44a1)
+
+Обычно Starter компонент живет на игровом объекте [SETUP]. Для правильной работы нам всегда нужно подключать сцену SceneKernel, она отвечает за все основные процессы фреймворка. 
+
+[![Image from Gyazo](https://i.gyazo.com/12bb8bed7fb7b8b2ddf9a5ac1f279c17.gif)](https://gyazo.com/12bb8bed7fb7b8b2ddf9a5ac1f279c17)
+
+SceneKernel должен быть как в Scenes To Keep так и в Scenes Depends On. Так же не забудьте добавить сцены в BuildSettings. Порядок неважен.
+
+[![Image from Gyazo](https://i.gyazo.com/00c0b22d0a76651945711171cbad1372.png)](https://gyazo.com/00c0b22d0a76651945711171cbad1372)
+
+Чтобы сохранить ID сцен используйте команду SaveScenes.
+
+[![Image from Gyazo](https://i.gyazo.com/ccd34e93f273f1c2bb72bac1dbd156f7.gif)](https://gyazo.com/ccd34e93f273f1c2bb72bac1dbd156f7)
+
+ID сцен хранятся в виде Enum в скрипте Scenes.cs 
+Если по какой то причине Scenes.cs неправильно собрался, то можно проставить значения вручную.
+
+
+## Работа с сигналами
+
+Сигналы служат для обемена данными/событиями по типу между не связанными частями приложения. За работу с сигналами отвечает ProcessingSignals. Для того чтобы использовать сигнал нужно наследовать нужный класс от интерфейса IRecieve<ТИП_СИГНАЛА>
+
+Схема работы сигналов проста : есть некий обработчик сигналов который управляет подписками/отписками. Передавая в этот обработчик новый сигнал обработчик переправит его всем своим подписчикам.
+
+```csharp
+public class ProcessingDamageble : ProcessingBase, IReceive<SignalDamage>
+{
+public void HandleSignal(SignalDamage arg)
+{
+     Debug.Log(arg.damage);
+}
+}
+```
+Само тело сигнала это структура. 
+
+```csharp
+public struct SignalDamage
+{
+    public int actorID;
+    public int damage;
+    public float pushForce;
+    public float direction;
+}
+```
+
+Для того чтобы отправить сигнал можно использовать метод Send. Этот метод отправит сигнал глобальному обработчику сигналов.
+
+```csharp
+ SignalDamage signal;
+ signal.actorID = actor.id;
+ signal.damage = 1;
+ signal.pushForce = 0;
+ signal.direction = data.face;
+ ProcessingSignals.Send(signal);
+```
+Наследуясь от Monocached/Actor , ProcessingBase, Behavior фреймворк сам отвечает за подписку/отписку сигналов. 
+Во всех остальных случаях нужно выбрать вручную обработчик сигналов и зарегистирировать подписчиков через метод .Add() указав текущий объект. Обработчик сам проверит наличие нужных ему интерфейсов.
+
+```csharp
+    public ProcessingSignals signalsLocals = new ProcessingSignals();
+    
+    protected override void Setup()
+    {
+        // глобальный обработчик - пытаемся добавить сигнал 
+        Toolbox.Get<ProcessingSignals>().Add(this);
+
+        // локальный обработчик - пытаемся добавить сигнал  
+        signalsLocals.Add(this);
+        
+        // глобальный обработчик - пытаемся убрать сигнал 
+        Toolbox.Get<ProcessingSignals>().Remove(this);
+    }
+```
+
+### Как использовать сигналы во фреймворке
+Концепция сигналов очень полезна однако как ее использовать с фреймворком ведь наши поведения не живут на сущностях и мы не держим там никакой логики. К кому обращаться в таком случае? 
+
+В качестве примера рассмотрим получение урона. Есть обработчик урона с группой всех сущностей у которых присутствует DataHealth.
+Обработчик наследуется от IRecieve<SignalDamageExample> - простой структуры передающей actorID и damage. Метод HandleSignal обрабатывает пришедший сигнал. Зная ID сущности мы получаем индекс ( порядковый номер сущности в группе ). Если нам вернулось -1 то в группе нет сущности и прерываем обработку сигнала. Если индекс существующий то мы берем компонент группы ( DataHealth ) по нужному индексу и отнимаем здоровье.
+
+```csharp
+// Пример 1
+public class ProcessingDamagebleExample : ProcessingBase, IReceive<SignalDamageExample>
+{
+    public Group<DataHealth> groupDamageble;
+ 
+    public void HandleSignal(SignalDamageExample arg)
+    {  
+        // перебираем группу, ищем актора с нужным ID, если такого нет сбрасываем обработку.
+        int index = groupDamageble.GetIndex(arg.actorID);
+        if (index==-1) return;
+        groupDamageble.component[index].hp -= arg.damage; 
+    }
+    
+}
+// Пример 2
+public class ProcessingDamagebleExample : ProcessingBase, IReceive<SignalDamageExample>
+{
+    // в этом примере нет групп.
+    public void HandleSignal(SignalDamageExample arg)
+    {  
+    
+    // Так как в действительности все компоненты данных хранятся в однотипных хранилищах чей размер всегда равен макс. кол-ву 
+  //сущностей мы можем напрямую обратиться к хранилищу по ID сущности и попытаться взять DataHealth. Если сущность "обладает"
+  //dataHealth то мы работаем дальше. Принцип вытаскивания компонента повторяет вытаскивания значения по ключу из словаря.
+    
+            DataHealth dataHealth;
+            if (!Storage<DataHealth>.Instance.TryGet(arg.actorID,out dataHealth)) continue;
+            dataHealth.hp -= arg.damage;
+    }
+    
+}
+public struct SignalDamageExample
+{
+    public int actorID;
+    public int damage;
+}
+```
+
+Это очень схематичный пример того что можно делать. Самый естественный вопрос: если мы знаем, что у сущности есть компонент здоровья почему бы напрямую из атаки не обратиться к нему и не совершить все нужные действия? 
+
+1) Как правило мы предполагаем, а не знаем точно. Например добавилась логика с бессмертным монстром у которого нет здоровья, а бить его можно. Ну хорошо, тогда мы просто можем добавить код проверки на наличие компонента здоровья прямо в атаку. И это будет плохо потому что код начнет быть похожим на огромный текстовый массив логических проверок которые будут добавляться время от времени с новыми фичами. Не исключено, что завтра у вас уже будет два разных по типу источника атаки вместо одного и эти проверки придется дублировать.
+Код усложняется потому что мы выполняем в одном месте сразу несколько действий не имеющих отношения друг к другу :
+Регистрация урона, проверка на соответствие и обработка урона. 
+
+2) Код логики становится не только чище, но и модульным. Отключив модуль обработки урона даже если сигналы будут отправляться обрабатывать их будет некому, но это не приведт к ошибкам : нету зависимостей в коде.
+
+
 
 
