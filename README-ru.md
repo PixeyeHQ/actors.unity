@@ -330,7 +330,8 @@ public class ProcessingDamagebleExample : ProcessingBase, IReceive<SignalDamageE
  
     public void HandleSignal(SignalDamageExample arg)
     {  
-        // перебираем группу, ищем актора с нужным ID, если такого нет сбрасываем обработку.
+        // перебираем группу, ищем актора с нужным ID, если такого нет сбрасываем обработку. 
+        // вариант подходит если группа сложная, состоящая из большого кол-ва компонентов.
         int index = groupDamageble.GetIndex(arg.actorID);
         if (index==-1) return;
         groupDamageble.component[index].hp -= arg.damage; 
