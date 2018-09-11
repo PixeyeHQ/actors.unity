@@ -176,7 +176,7 @@ namespace Homebrew
 
         public bool TryGet(int entityID, out T val)
         {
-            if (entityID >= length)
+            if (entityID >= length || !entityHasComponent[entityID])
             {
                 val = default(T);
                 return false;
