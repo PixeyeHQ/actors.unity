@@ -84,8 +84,6 @@ namespace Homebrew
 }
 ```
 
-[![Image from Gyazo](https://i.gyazo.com/2556f80c95b356056454f6b33ca4793e.png)](https://gyazo.com/2556f80c95b356056454f6b33ca4793e)
-
 Starters are classes that initialize scene and can be used to add all processing you would need on the level. Developers control what scenes to load from starter scripts. Using add method in starter class is equal to Toolbox.Add<T>();
  
 ```csharp
