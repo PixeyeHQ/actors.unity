@@ -13,7 +13,7 @@ namespace Homebrew
     public class ProcessingSignals : IComponent, IDisposable
     {
         public static ProcessingSignals Default;
-        public readonly Dictionary<int, List<IRecieve>> signals = new Dictionary<int, List<IRecieve>>();
+        public readonly Dictionary<int, List<IRecieve>> signals = new Dictionary<int, List<IRecieve>>(new FastDict());
 
         #region LOGIC
 
