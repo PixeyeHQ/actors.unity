@@ -36,7 +36,7 @@ namespace Homebrew
 
 			public void Populate()
 			{
-				var procPool = Toolbox.Get<ProcessingGoPool>();
+				var procPool = ProcessingGoPool.Default;
 			
 
 				var poolStash = procPool.pools[(int)pool];
@@ -47,9 +47,7 @@ namespace Homebrew
 				{
 					poolStash.AddToPool(createdObjs[i], prefab);
 				}
-			//	procPool.pools[pool.GetHashCode()].AddToPool();
-
-				//Toolbox.Get<ProcessingPool>().AddPool()
+	 
 			}
 			
 		}

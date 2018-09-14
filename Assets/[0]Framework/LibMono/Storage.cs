@@ -7,7 +7,7 @@ Date:       7/25/2018 11:49 AM
 
 using System;
 using System.Collections.Generic;
- 
+
 
 namespace Homebrew
 {
@@ -17,8 +17,16 @@ namespace Homebrew
         Global = 1,
     }
 
-    public class Storage<T> where T : new()
+    public abstract class Storage
     {
+        public static List<Storage> all = new List<Storage>(40);
+        public abstract void Clear(int index);
+        public abstract void Remove(int index, bool addCallBacks = true);
+    }
+
+    public class Storage<T> : Storage where T : new()
+    {
+        
         public static readonly Storage<T> Instance = new Storage<T>();
         public T[] components = new T[EngineSettings.MinComponents];
         public bool[] entityHasComponent = new bool[EngineSettings.MinComponents];
@@ -26,6 +34,11 @@ namespace Homebrew
 
 
         public List<GroupBase> groups = new List<GroupBase>();
+
+        public Storage()
+        {
+            all.Add(this);
+        }
 
 
         public T AddVirtual(T component, int entityID)
@@ -53,7 +66,6 @@ namespace Homebrew
 
         public T AddVirtual(int entityID)
         {
-            
             if (entityHasComponent[entityID]) return components[entityID];
 
             if (entityID >= length)
@@ -68,7 +80,7 @@ namespace Homebrew
                 components[entityID] = new T();
 
             entityHasComponent[entityID] = true;
-            
+
 
             int len = groups.Count;
             for (int i = 0; i < len; i++)
@@ -79,9 +91,8 @@ namespace Homebrew
 
             return components[entityID];
         }
-        
-        
-        
+
+
         public T Add(T component, int entityID)
         {
             if (entityID >= length)
@@ -95,6 +106,7 @@ namespace Homebrew
 
             components[entityID] = component;
             entityHasComponent[entityID] = true;
+
 
             int len = groups.Count;
 
@@ -127,6 +139,7 @@ namespace Homebrew
             if (components[entityID] == null)
                 components[entityID] = new T();
 
+
             entityHasComponent[entityID] = true;
 
             int len = groups.Count;
@@ -144,7 +157,8 @@ namespace Homebrew
             return components[entityID];
         }
 
-        public void Remove(int entityID)
+
+        public override void Remove(int entityID, bool addCallBacks = true)
         {
             if (!entityHasComponent[entityID]) return;
 
@@ -153,7 +167,7 @@ namespace Homebrew
             int len = groups.Count;
             for (int i = 0; i < len; i++)
             {
-                groups[i].Remove(entityID);
+                groups[i].Remove(entityID, addCallBacks);
             }
         }
 
@@ -161,29 +175,16 @@ namespace Homebrew
         {
             return entityID >= length ? false : entityHasComponent[entityID];
         }
-
-
-        public T Get(int entityID)
-        {
-            return components[entityID];
-        }
-
+ 
         public T TryGet(int entityID)
         {
-            return entityID >= length ? default(T) : components[entityID];
+            return entityID >= length || !entityHasComponent[entityID] ? default(T) : components[entityID];
         }
-
-
-        public bool TryGet(int entityID, out T val)
+ 
+        public override void Clear(int index)
         {
-            if (entityID >= length || !entityHasComponent[entityID])
-            {
-                val = default(T);
-                return false;
-            }
-
-            val = components[entityID];
-            return true;
+            if (!entityHasComponent[index]) return;
+            entityHasComponent[index] = false;
         }
     }
 }

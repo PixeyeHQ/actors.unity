@@ -24,13 +24,16 @@ namespace Homebrew
         {
             return Storage<T>.Instance.AddVirtual(entity);
         }
-
-
-        public static void Add<T>(this MonoCached mono) where T : class, new()
+        public static void Remove<T>(this Actor a) where T : new()
         {
-            mono.actorParent.Add<T>();
+            Storage<T>.Instance.Remove(a.id);
         }
 
+        public static void Remove<T>(this int entity) where T : new()
+        {
+             Storage<T>.Instance.Remove(entity);
+        }
+        
         public static T DeepClone<T>(this T obj)
         {
             using (var ms = new MemoryStream())

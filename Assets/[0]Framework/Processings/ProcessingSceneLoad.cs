@@ -13,184 +13,217 @@ using UnityEngine.SceneManagement;
 
 namespace Homebrew
 {
-	public class ProcessingSceneLoad
-	{
-		private List<string> scenesToKeep = new List<string>();
-		private List<string> sceneDependsOn = new List<string>();
-		private Dictionary<string, Scene> scenes = new Dictionary<string, Scene>();
-	 
+    public class ProcessingSceneLoad : IKernel
+    {
+        public static ProcessingSceneLoad Default;
 
-		public Action sceneLoaded = delegate { };
-		public Action sceneClosing = delegate { };
+        private List<string> scenesToKeep = new List<string>();
+        private List<string> sceneDependsOn = new List<string>();
+        private Dictionary<string, UnityEngine.SceneManagement.Scene> scenes = new Dictionary<string, UnityEngine.SceneManagement.Scene>();
 
 
-		public void Setup(List<Scenes> scenesToKeep, List<Scenes> sceneDependsOn, Starter starter)
-		{
-		
-			this.scenesToKeep.Clear();
-			this.sceneDependsOn.Clear();
-			
-			for (var i = 0; i < scenesToKeep.Count; i++)
-			{
-			 
-				this.scenesToKeep.Add(scenesToKeep[i].ToString());
-			}
-			
-			for (var i = 0; i < sceneDependsOn.Count; i++)
-			{
-		 
-				this.sceneDependsOn.Add(sceneDependsOn[i].ToString());
-			}
-		 
-			Toolbox.Instance.StartCoroutine(_Setup(starter));
-		}
-
-		IEnumerator _Setup(Starter starter)
-		{
-			for (var i = 0; i < SceneManager.sceneCount; i++)
-			{
-				var scene = SceneManager.GetSceneAt(i);
-
-				scenes.Add(scene.name, scene);
-			}
-
-			for (var i = 0; i < sceneDependsOn.Count; i++)
-			{
-				var name = sceneDependsOn[i];
-				if (scenes.ContainsKey(name))
-				{
-					yield return new WaitForSeconds(0.1f);
-					continue;
-				}
-
-				var load = SceneManager.LoadSceneAsync(sceneDependsOn[i], LoadSceneMode.Additive);
-				while (!load.isDone)
-				{
-					yield return 0;
-				}
-
-				scenes.Add(name, SceneManager.GetSceneByName(name));
-			}
-
-			sceneLoaded();
-
-			starter.BindScene();
-		}
-
-		IEnumerator _Load(string name)
-		{
-			sceneClosing();
-			Toolbox.changingScene = true;
-			Toolbox.Instance.ClearSessionData();
+        public Action sceneLoaded = delegate { };
+        public Action sceneClosing = delegate { };
 
 
-			var s = SceneManager.GetActiveScene();
-			var sName = s.name;
+        public void Setup(List<Scenes> scenesToKeep, List<Scenes> sceneDependsOn, Starter starter)
+        {
+            this.scenesToKeep.Clear();
+            this.sceneDependsOn.Clear();
 
-			var job = SceneManager.UnloadSceneAsync(s);
+            for (var i = 0; i < scenesToKeep.Count; i++)
+            {
+                this.scenesToKeep.Add(scenesToKeep[i].ToString());
+            }
 
-			while (!job.isDone)
-			{
-				yield return 0;
-			}
+            for (var i = 0; i < sceneDependsOn.Count; i++)
+            {
+                this.sceneDependsOn.Add(sceneDependsOn[i].ToString());
+            }
 
+            Toolbox.Instance.StartCoroutine(_Setup(starter));
+        }
 
-			scenes.Remove(sName);
-			foreach (var key in scenes.Keys)
-			{
-			 
-				if (scenesToKeep.Contains(key)) continue;
+        IEnumerator _Setup(Starter starter)
+        {
+            for (var i = 0; i < SceneManager.sceneCount; i++)
+            {
+                var scene = SceneManager.GetSceneAt(i);
 
-				job = SceneManager.UnloadSceneAsync(scenes[key]);
+                scenes.Add(scene.name, scene);
+            }
 
-				while (!job.isDone)
-				{
-					yield return 0;
-				}
-			}
+            for (var i = 0; i < sceneDependsOn.Count; i++)
+            {
+                var name = sceneDependsOn[i];
+                if (scenes.ContainsKey(name))
+                {
+                    yield return new WaitForSeconds(0.1f);
+                    continue;
+                }
 
-			job = Resources.UnloadUnusedAssets();
-			while (!job.isDone)
-			{
-				yield return 0;
-			}
+                var load = SceneManager.LoadSceneAsync(sceneDependsOn[i], LoadSceneMode.Additive);
+                while (!load.isDone)
+                {
+                    yield return 0;
+                }
 
-			scenes.Clear();
+                scenes.Add(name, SceneManager.GetSceneByName(name));
+            }
 
-			job = SceneManager.LoadSceneAsync(name, LoadSceneMode.Additive);
-			while (!job.isDone)
-			{
-				yield return 0;
-			}
+            sceneLoaded();
 
-			SceneManager.SetActiveScene(SceneManager.GetSceneByName(name));
-			job.allowSceneActivation = true;
-			Toolbox.changingScene = false;
-		}
+            starter.BindScene();
+        }
 
-		IEnumerator _Load(int id)
-		{
-			sceneClosing();
-			Toolbox.changingScene = true;
-			Toolbox.Instance.ClearSessionData();
-
-
-			var s = SceneManager.GetActiveScene();
-			var sName = s.name;
-
-			var job = SceneManager.UnloadSceneAsync(s);
-
-			while (!job.isDone)
-			{
-				yield return 0;
-			}
+        IEnumerator _Load(string name)
+        {
+            sceneClosing();
+            Toolbox.changingScene = true;
+            Toolbox.Instance.ClearSessionData();
 
 
-			scenes.Remove(sName);
-			foreach (var key in scenes.Keys)
-			{
-	 
-				if (scenesToKeep.Contains(key)) continue;
+            var s = SceneManager.GetActiveScene();
+            var sName = s.name;
 
-				job = SceneManager.UnloadSceneAsync(scenes[key]);
+            var job = SceneManager.UnloadSceneAsync(s);
 
-				while (!job.isDone)
-				{
-					yield return 0;
-				}
-			}
+            while (!job.isDone)
+            {
+                yield return 0;
+            }
 
-			job = Resources.UnloadUnusedAssets();
-			while (!job.isDone)
-			{
-				yield return 0;
-			}
 
-			scenes.Clear();
+            scenes.Remove(sName);
+            foreach (var key in scenes.Keys)
+            {
+                if (scenesToKeep.Contains(key)) continue;
 
-			job = SceneManager.LoadSceneAsync(id, LoadSceneMode.Additive);
-			while (!job.isDone)
-			{
-				yield return 0;
-			}
+                job = SceneManager.UnloadSceneAsync(scenes[key]);
 
-			SceneManager.SetActiveScene(SceneManager.GetSceneByBuildIndex(id));
-			job.allowSceneActivation = true;
-			Toolbox.changingScene = false;
-		}
+                while (!job.isDone)
+                {
+                    yield return 0;
+                }
+            }
 
- 
-		public static void To(int id)
-		{
-			var processing = Toolbox.Get<ProcessingSceneLoad>();
+            job = Resources.UnloadUnusedAssets();
+            while (!job.isDone)
+            {
+                yield return 0;
+            }
 
-			Toolbox.Instance.StartCoroutine(processing._Load(id));
-		}
+            scenes.Clear();
 
-		public static void To(string name)
-		{
-			var processing = Toolbox.Get<ProcessingSceneLoad>();
-			Toolbox.Instance.StartCoroutine(processing._Load(name));
-		}
-	}
+            job = SceneManager.LoadSceneAsync(name, LoadSceneMode.Additive);
+            while (!job.isDone)
+            {
+                yield return 0;
+            }
+
+            SceneManager.SetActiveScene(SceneManager.GetSceneByName(name));
+            job.allowSceneActivation = true;
+            Toolbox.changingScene = false;
+        }
+
+        IEnumerator _Load(int id)
+        {
+            sceneClosing();
+            Toolbox.changingScene = true;
+            Toolbox.Instance.ClearSessionData();
+
+
+            var s = SceneManager.GetActiveScene();
+            var sName = s.name;
+
+            var job = SceneManager.UnloadSceneAsync(s);
+
+            while (!job.isDone)
+            {
+                yield return 0;
+            }
+
+
+            scenes.Remove(sName);
+            foreach (var key in scenes.Keys)
+            {
+                if (scenesToKeep.Contains(key)) continue;
+
+                job = SceneManager.UnloadSceneAsync(scenes[key]);
+
+                while (!job.isDone)
+                {
+                    yield return 0;
+                }
+            }
+
+            job = Resources.UnloadUnusedAssets();
+            while (!job.isDone)
+            {
+                yield return 0;
+            }
+
+            scenes.Clear();
+
+            job = SceneManager.LoadSceneAsync(id, LoadSceneMode.Additive);
+            while (!job.isDone)
+            {
+                yield return 0;
+            }
+
+            SceneManager.SetActiveScene(SceneManager.GetSceneByBuildIndex(id));
+            job.allowSceneActivation = true;
+            Toolbox.changingScene = false;
+        }
+
+        public static void Add(int id)
+        {
+            var processing = Default;
+            Toolbox.Instance.StartCoroutine(processing._Add(id));
+        }
+
+        public static void Remove(int id)
+        {
+            var processing = Default;
+            Toolbox.Instance.StartCoroutine(processing._Remove(id));
+        }
+
+        IEnumerator _Add(int id)
+        {
+            Toolbox.changingScene = true;
+            var job = SceneManager.LoadSceneAsync(id, LoadSceneMode.Additive);
+            while (!job.isDone)
+            {
+                yield return 0;
+            }
+
+            Toolbox.changingScene = false;
+        }
+
+        IEnumerator _Remove(int id)
+        {
+            Toolbox.changingScene = true;
+            var job = SceneManager.UnloadSceneAsync(id);
+            while (!job.isDone)
+            {
+                yield return 0;
+            }
+
+            Toolbox.changingScene = false;
+        }
+
+
+        public static void To(int id)
+        {
+            var processing = Default;
+
+            Toolbox.Instance.StartCoroutine(processing._Load(id));
+        }
+
+        public static void To(string name)
+        {
+            var processing = Default;
+            Toolbox.Instance.StartCoroutine(processing._Load(name));
+        }
+    }
 }

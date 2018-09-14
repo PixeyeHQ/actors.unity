@@ -16,26 +16,22 @@ using UnityEngine;
 
 namespace Homebrew
 {
-    public class Actor : MonoCached
+    public class Actor : MonoCached, IPoolable
     {
         public static Actor[] entites = new Actor[EngineSettings.MinEntities];
         public static Stack<int> prevID = new Stack<int>(100);
         public static int lastID;
 
         [InfoBox("An actor is a body for an entity. The entity itself is just an incremental number." +
-                 "Use actors when you want to compose your entities from the inspector.")] 
-        
-        
+                 "Use actors when you want to compose your entities from the inspector.", InfoMessageType.Info)]
+
         #region FIELDS
 
-        [FoldoutGroup("Actor")] public int id;
+        [FoldoutGroup("Actor")]
+        public int id;
 
-
-        private List<Composition> compositions;
-        private List<int> compositionNoTags = new List<int>();
 
         private Dictionary<int, int> tags = new Dictionary<int, int>(new FastComparable());
-        private Dictionary<int, IData> cachedData;
 
         private Dictionary<int, Transform> cachedTransforms;
         private Action OnTagsChanged;
@@ -48,6 +44,14 @@ namespace Homebrew
         {
             OnTagsChanged = HandleTagsChanged;
             ProcessingEntities.Add(this);
+
+            #if ACTORS_DEBUG
+
+            var name = gameObject.name.Split('(')[0];
+            gameObject.name = name + "_" + id;
+
+            #endif
+
             base.Awake();
         }
 
@@ -57,57 +61,49 @@ namespace Homebrew
             if (state.enabled || state.requireStarter ||
                 state.requireActorParent) return;
 
-
-            if (state.disabled)
+            if (state.initialized)
+            {
                 ProcessingEntities.Default.CheckGroups(id, true);
-
+            }
 
             HandleEnable();
             state.released = false;
-            state.disabled = false;
+
             state.enabled = true;
 
-            if (ProcessingSignals.TryAddToGlobal(this))
-            {
-                if (signals == null)
-                {
-                    signals = new ProcessingSignals();
-                }
-
-                signals.Add(this);
-            }
+            ProcessingSignals.Default.Add(this);
 
 
-            int len = compositionNoTags.Count;
-            int i;
-
-            for (i = 0; i < len; i++)
-            {
-                Behavior.behaviors[compositionNoTags[i]].AddElement(id);
-            }
-
-
-            len = compositions != null ? compositions.Count : -1;
-
-            for (i = 0; i < len; i++)
-            {
-                var composition = compositions[i];
-
-                if (composition.changed || !composition.Contain(tags)) continue;
-                composition.changed = true;
-                int l = composition.ids.Count;
-
-                for (int j = 0; j < l; j++)
-                {
-                    Behavior.behaviors[composition.ids[j]].AddElement(id);
-                }
-
-                l = composition.delegates.Count;
-                for (int j = 0; j < l; j++)
-                {
-                    composition.delegates[j](true);
-                }
-            }
+//            int len = compositionNoTags.Count;
+//            int i;
+//
+//            for (i = 0; i < len; i++)
+//            {
+//                Behavior.behaviors[compositionNoTags[i]].AddElement(id);
+//            }
+//
+//
+//            len = compositions != null ? compositions.Count : -1;
+//
+//            for (i = 0; i < len; i++)
+//            {
+//                var composition = compositions[i];
+//
+//                if (composition.changed || !composition.Contain(tags)) continue;
+//                composition.changed = true;
+//                int l = composition.ids.Count;
+//
+//                for (int j = 0; j < l; j++)
+//                {
+//                    Behavior.behaviors[composition.ids[j]].AddElement(id);
+//                }
+//
+//                l = composition.delegates.Count;
+//                for (int j = 0; j < l; j++)
+//                {
+//                    composition.delegates[j](true);
+//                }
+//            }
 
 
             ProcessingUpdate.Default.Add(this);
@@ -120,46 +116,40 @@ namespace Homebrew
                 !state.enabled) return;
 
             state.enabled = false;
-            state.disabled = true;
-
+            state.released = true;
             ProcessingEntities.Default.CheckGroups(id, false);
 
-            int len = compositionNoTags.Count;
-            int i;
-
-            for (i = 0; i < len; i++)
-            {
-                Behavior.behaviors[compositionNoTags[i]].RemoveElement(id);
-            }
-
-
-            len = compositions != null ? compositions.Count : -1;
-
-            for (i = 0; i < len; i++)
-            {
-                var composition = compositions[i];
-                if (composition.changed || !composition.Contain(tags)) continue;
-                composition.changed = true;
-                int l = composition.ids.Count;
-                for (int j = 0; j < l; j++)
-                {
-                    Behavior.behaviors[composition.ids[j]].RemoveElement(id);
-                }
-
-                l = composition.delegates.Count;
-                for (int j = 0; j < l; j++)
-                {
-                    composition.delegates[j](false);
-                }
-            }
-
-
-            if (ProcessingSignals.TryRemoveGlobal(this))
-            {
-                signals?.Remove(this);
-            }
+//            int len = compositionNoTags.Count;
+//            int i;
+//
+//            for (i = 0; i < len; i++)
+//            {
+//                Behavior.behaviors[compositionNoTags[i]].RemoveElement(id);
+//            }
+//
+//
+//            len = compositions != null ? compositions.Count : -1;
+//
+//            for (i = 0; i < len; i++)
+//            {
+//                var composition = compositions[i];
+//                if (composition.changed || !composition.Contain(tags)) continue;
+//                composition.changed = true;
+//                int l = composition.ids.Count;
+//                for (int j = 0; j < l; j++)
+//                {
+//                    Behavior.behaviors[composition.ids[j]].RemoveElement(id);
+//                }
+//
+//                l = composition.delegates.Count;
+//                for (int j = 0; j < l; j++)
+//                {
+//                    composition.delegates[j](false);
+//                }
+//            }
 
 
+            ProcessingSignals.Default.Remove(this);
             ProcessingUpdate.Default.Remove(this);
 
             HandleDisable();
@@ -167,109 +157,120 @@ namespace Homebrew
 
         protected override void HandleReturnToPool()
         {
-            TagsClearAll();
-
-            ProcessingEntities.Default.CheckGroups(id, false);
-
-            int len = compositionNoTags.Count;
-            int i;
-
-            for (i = 0; i < len; i++)
+            int len = Storage.all.Count;
+            for (int j = 0; j < len; j++)
             {
-                Behavior.behaviors[compositionNoTags[i]].RemoveElement(id);
+                Storage.all[j].Remove(id, false);
             }
 
+            cachedTransforms.Clear();
+//            len = compositionNoTags.Count;
+//            int i;
+//             
+//
+//            for (i = 0; i < len; i++)
+//            {
+//                Behavior.behaviors[compositionNoTags[i]].RemoveElement(id);
+//            }
+//
+//
+//            len = compositions != null ? compositions.Count : -1;
+//
+//            for (i = 0; i < len; i++)
+//            {
+//                var composition = compositions[i];
+//
+//                composition.changed = false;
+//                int l = composition.ids.Count;
+//                for (int j = 0; j < l; j++)
+//                {
+//                    Behavior.behaviors[composition.ids[j]].RemoveElement(id);
+//                }
+//
+//                l = composition.delegates.Count;
+//                for (int j = 0; j < l; j++)
+//                {
+//                    composition.delegates[j](false);
+//                }
+//            }
 
-            len = compositions != null ? compositions.Count : -1;
-
-            for (i = 0; i < len; i++)
-            {
-                var composition = compositions[i];
-
-                composition.changed = false;
-                int l = composition.ids.Count;
-                for (int j = 0; j < l; j++)
-                {
-                    Behavior.behaviors[composition.ids[j]].RemoveElement(id);
-                }
-
-                l = composition.delegates.Count;
-                for (int j = 0; j < l; j++)
-                {
-                    composition.delegates[j](false);
-                }
-            }
-
-
-            if (ProcessingSignals.TryRemoveGlobal(this))
-            {
-                signals?.Remove(this);
-            }
-
-
+            ProcessingSignals.Default.Remove(this);
             ProcessingUpdate.Default.Remove(this);
 
+            //  compositionNoTags?.Clear();
+            //  compositions?.Clear();
+            tags?.Clear();
 
             base.HandleReturnToPool();
+//            if (cachedData == null) return;
+//
+//            foreach (var valuePair in cachedData)
+//            {
+//                var data = valuePair.Value as IDisposable;
+//                if (data != null) data.Dispose();
+//            }
+//
+//            cachedData.Clear();
         }
 
         protected void OnDestroy()
         {
-            if (Toolbox.isQuittingOrChangingScene()) return;
+            int len = Storage.all.Count;
+            for (int j = 0; j < len; j++)
+            {
+                Storage.all[j].Remove(id, false);
+            }
+
             prevID.Push(id);
+
+
+            if (Toolbox.isQuittingOrChangingScene()) return;
 
 
             ProcessingEntities.Default.CheckGroups(id, false);
 
-            int len = compositionNoTags.Count;
-            int i;
-
-            for (i = 0; i < len; i++)
-            {
-                Behavior.behaviors[compositionNoTags[i]].RemoveElement(id);
-            }
-
-
-            len = compositions != null ? compositions.Count : -1;
-
-            for (i = 0; i < len; i++)
-            {
-                var composition = compositions[i];
-
-                int l = composition.ids.Count;
-                for (int j = 0; j < l; j++)
-                {
-                    Behavior.behaviors[composition.ids[j]].RemoveElement(id);
-                }
-
-                composition.delegates.Clear();
-            }
-
-
-            if (ProcessingSignals.TryRemoveGlobal(this))
-            {
-                signals?.Remove(this);
-            }
+//            len = compositionNoTags.Count;
+//            int i;
+//
+//            for (i = 0; i < len; i++)
+//            {
+//                Behavior.behaviors[compositionNoTags[i]].RemoveElement(id);
+//            }
+//
+//
+//            len = compositions != null ? compositions.Count : -1;
+//
+//            for (i = 0; i < len; i++)
+//            {
+//                var composition = compositions[i];
+//
+//                int l = composition.ids.Count;
+//                for (int j = 0; j < l; j++)
+//                {
+//                    Behavior.behaviors[composition.ids[j]].RemoveElement(id);
+//                }
+//
+//                composition.delegates.Clear();
+//            }
 
 
+            ProcessingSignals.Default.Remove(this);
             ProcessingUpdate.Default.Remove(this);
 
-
-            compositionNoTags?.Clear();
-            compositions?.Clear();
+            // compositionNoTags?.Clear();
+            // compositions?.Clear();
             tags?.Clear();
-            signals?.Dispose();
-            signals = null;
 
-            if (cachedData == null) return;
 
-            foreach (var valuePair in cachedData)
-            {
-                var data = valuePair.Value as IDisposable;
-                if (data != null) data.Dispose();
-            }
-
-            cachedData.Clear();
+//            if (cachedData == null) return;
+//
+//            foreach (var valuePair in cachedData)
+//            {
+//                var data = valuePair.Value as IDisposable;
+//                if (data != null) data.Dispose();
+//            }
+//
+//            cachedData.Clear();
         }
 
         #endregion
@@ -281,152 +282,35 @@ namespace Homebrew
             if (cachedTransforms == null) cachedTransforms = new Dictionary<int, Transform>(2, new FastComparable());
             cachedTransforms.Add(key, Get<Transform>(path));
         }
-
-        public Composition BindComposiiton()
+        public void Add<T>(T component) where T : IData, new()
         {
-            var compo = new Composition();
-            if (compositions == null)
-            {
-                compositions = new List<Composition>();
-                OnTagsChanged = HandleTagsChangedComposition;
-            }
-
-            compositions.Add(compo);
-            return compo;
-        }
-
-
-        public void Add<T>(T component, StorageType storageType = StorageType.Global) where T : IData, new()
-        {
-            if (storageType == StorageType.Global)
-                Storage<T>.Instance.Add(component, id);
-            else
-            {
-                if (cachedData == null)
-                {
-                    cachedData = new Dictionary<int, IData>(3, new FastComparable());
-                    cachedData.Add(typeof(T).GetHashCode(), component);
-                }
-                else
-                {
-                    cachedData.Add(typeof(T).GetHashCode(), component);
-                }
-            }
-
             var setupable = component as ISetup;
             if (setupable != null)
             {
                 setupable.Setup(this);
             }
+            Storage<T>.Instance.Add(component, id);
         }
-
-        
-      
-        
-        
-        public T Add<T>(StorageType storageType = StorageType.Global) where T : class, new()
+        public T Add<T>() where T : IData, new()
         {
-            if (typeof(T).IsSubclassOf(typeof(Behavior)))
-            {
-                int key = typeof(T).GetHashCode();
-                Behavior behavior;
-                if (!Behavior.behaviors.TryGetValue(key, out behavior))
-                {
-                    behavior = new T() as Behavior;
-                    Behavior.behaviors.Add(key, behavior);
-                }
-
-                compositionNoTags.Add(key);
-                return behavior as T;
-            }
-
-            T component;
-            if (storageType == StorageType.Global)
-                component = Storage<T>.Instance.Add(id);
-            else
-            {
-                component = new T();
-                if (cachedData == null)
-                {
-                    cachedData = new Dictionary<int, IData>(3, new FastComparable());
-                    cachedData.Add(typeof(T).GetHashCode(), component as IData);
-                }
-                else
-                {
-                    cachedData.Add(typeof(T).GetHashCode(), component as IData);
-                }
-            }
-
+            var component = Storage<T>.Instance.Add(id);
             var setupable = component as ISetup;
             if (setupable != null)
             {
                 setupable.Setup(this);
             }
-
             return component;
-        }
-
-
-        public void Bind<T>() where T : new()
-        {
-            Storage<T>.Instance.Add(id);
-        }
-
-        public void Unbind<T>() where T : new()
-        {
-            Storage<T>.Instance.Remove(id);
-        }
-
-
-        public void Remove<T>() where T : new()
-        {
-            int key = typeof(T).GetHashCode();
-            if (typeof(T).IsSubclassOf(typeof(Behavior)))
-            {
-                Behavior behavior;
-
-                if (!Behavior.behaviors.TryGetValue(key, out behavior)) return;
-                behavior.RemoveElement(id);
-                compositionNoTags.Remove(key);
-                return;
-            }
-
-
-       
-            if (cachedData != null)
-            {
-                IData data;
-                if (!cachedData.TryGetValue(key, out data)) return;
-                var disposable = data as IDisposable;
-                if (disposable != null) disposable.Dispose();
-                cachedData.Remove(key);
-            }
         }
 
         #endregion
 
         #region  GET
 
-
-        public T Get<T>() where T : new()
+        public T Get<T>() where T : IData, new()
         {
-            return Storage<T>.Instance.Add(id);
+            return Storage<T>.Instance.TryGet(id);
         }
-        
-        
-        public T Get<T>(StorageType stype = StorageType.Global) where T : new()
-        {
-            var obj = stype == StorageType.Global
-                ? Storage<T>.Instance.TryGet(id)
-                : (T) cachedData[typeof(T).GetHashCode()];
-
-            return obj != null
-                ? obj
-                : typeof(T).IsSubclassOf(typeof(UnityEngine.Object))
-                    ? GetComponentInChildren<T>()
-                    : default(T);
-        }
-
+ 
         public T Get<T>(int hash)
         {
             return cachedTransforms[hash].GetComponent<T>();
@@ -438,8 +322,10 @@ namespace Homebrew
             return o.GetComponent<T>();
         }
 
+       
+        
+        
         #endregion
-
 
         #region METHODS
 
@@ -455,74 +341,11 @@ namespace Homebrew
                 childs[i].SetupAfterActor();
             }
         }
-
-        void HandleTagsChangedComposition()
-        {
-            if (Toolbox.isQuittingOrChangingScene()) return;
-            if (state.disabled) return;
-
-
-            int len = compositions.Count;
-
-            for (int i = 0; i < len; i++)
-            {
-                var composition = compositions[i];
-
-                if (composition.Contain(tags))
-                {
-                    if (composition.changed) continue;
-
-                    int count = composition.ids.Count;
-                    composition.changed = true;
-                    for (int j = 0; j < count; j++)
-                    {
-                        Behavior.behaviors[composition.ids[j]].AddElement(id);
-                    }
-
-                    int l = composition.delegates.Count;
-                    for (int j = 0; j < l; j++)
-                    {
-                        composition.delegates[j](true);
-                    }
-                }
-                else
-                {
-                    if (!composition.changed) continue;
-                    composition.changed = false;
-                    int count = composition.ids.Count;
-                    for (int j = 0; j < count; j++)
-                    {
-                        Behavior.behaviors[composition.ids[j]].RemoveElement(id);
-                    }
-
-                    int l = composition.delegates.Count;
-                    for (int j = 0; j < l; j++)
-                    {
-                        composition.delegates[j](false);
-                    }
-                }
-            }
-
-            var groups = ProcessingEntities.Default.GroupsBase;
-            len = ProcessingEntities.Default.groupLength;
-
-            for (int i = 0; i < len; i++)
-            {
-                groups[i].TagsChanged(id);
-            }
-
-            groups = ProcessingEntities.Default.GroupsActors;
-            len = ProcessingEntities.Default.groupLengthActors;
-            for (int i = 0; i < len; i++)
-            {
-                groups[i].TagsChanged(id);
-            }
-        }
-
+ 
         void HandleTagsChanged()
         {
             if (Toolbox.isQuittingOrChangingScene()) return;
-            if (state.disabled) return;
+            if (state.initialized && !state.enabled) return;
 
 
             var groups = ProcessingEntities.Default.GroupsBase;
@@ -542,7 +365,6 @@ namespace Homebrew
         }
 
         #endregion
-
 
         #region TAGS
 
@@ -594,11 +416,6 @@ namespace Homebrew
             OnTagsChanged();
         }
 
-        public void TagsClearAll()
-        {
-            tags.Clear();
-        }
-
         public void TagsRemove(int id, bool all = false)
         {
             int val;
@@ -616,6 +433,7 @@ namespace Homebrew
 
         public void TagsAdd(params int[] ids)
         {
+            if (state.released) return;
             bool c = false;
             foreach (int index in ids)
             {
@@ -637,6 +455,7 @@ namespace Homebrew
 
         public void TagsAdd(int id)
         {
+            if (state.released) return;
             if (tags.ContainsKey(id))
             {
                 tags[id] += 1;
@@ -647,6 +466,32 @@ namespace Homebrew
             tags.Add(id, 1);
 
             OnTagsChanged();
+        }
+
+        #endregion
+
+        #region POOL
+
+        public void Spawn(bool condition_spawned)
+        {
+            if (condition_spawned)
+            {
+                state.released = false;
+                Setup();
+                OnEnable();
+                OnSpawned();
+
+                Timer.Add(Time.DeltaTimeFixed, () =>
+                {
+                    PostSetup();
+
+                    state.initialized = true;
+                });
+            }
+        }
+
+        protected virtual void OnSpawned()
+        {
         }
 
         #endregion

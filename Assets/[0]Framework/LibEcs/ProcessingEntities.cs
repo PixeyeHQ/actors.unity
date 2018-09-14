@@ -7,12 +7,11 @@
 
 
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Homebrew
 {
-    public class ProcessingEntities : IDisposable
+    public class ProcessingEntities : IDisposable, IKernel
     {
         //  public static List<IStorageType> storageTypes = new List<IStorageType>();
         public static ProcessingEntities Default;
@@ -136,12 +135,15 @@ namespace Homebrew
         }
 
 
+        
+        
         public void CheckGroups(int entityID, bool active)
         {
+     
             if (active)
             {
                 for (int i = 0; i < groupLengthActors; i++)
-                    if (GroupsBase[i].CheckTags(entityID))
+                    if (GroupsActors[i].CheckTags(entityID))
                         GroupsActors[i].TryAdd(entityID);
 
 
@@ -162,6 +164,12 @@ namespace Homebrew
 
         public void Dispose()
         {
+            for (int i = 0; i < groupLengthActors; i++)
+                GroupsActors[i].Dispose();
+            
+            for (int i = 0; i < groupLength; i++)
+                GroupsBase[i].Dispose();
+          
         }
     }
 }

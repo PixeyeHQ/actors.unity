@@ -27,13 +27,13 @@ namespace Homebrew
         {
             Toolbox.Add(blueprints);
         
-            Time.Default = Toolbox.Add<Time>();
-            ProcessingTimer.Default = Toolbox.Add<ProcessingTimer>();
-            ProcessingSignals.Default = Toolbox.Add<ProcessingSignals>();
-            ProcessingGoPool.Default = Toolbox.Add<ProcessingGoPool>();
-            Box.Default = Toolbox.Add<Box>();
-            ProcessingEntities.Default = Toolbox.Add<ProcessingEntities>();
-            ProcessingScene.Default = Toolbox.Add<ProcessingScene>();
+            Time.Default = Toolbox.Create<Time>();
+            ProcessingTimer.Default = Toolbox.Create<ProcessingTimer>();
+            ProcessingSignals.Default = Toolbox.Create<ProcessingSignals>();
+            ProcessingGoPool.Default = Toolbox.Create<ProcessingGoPool>();
+            Box.Default = Toolbox.Create<Box>();
+            ProcessingEntities.Default = Toolbox.Create<ProcessingEntities>();
+            ProcessingScene.Default = Toolbox.Create<ProcessingScene>();
 
 
             for (var i = 0; i < pluggables.Count; i++)

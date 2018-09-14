@@ -16,14 +16,14 @@ namespace Homebrew
 		{
 			ProcessingSystemAttributes.Setup(this);
 			ProcessingGroupAttributes.Setup(this);
-			ProcessingSignals.TryAddToGlobal(this);
+			ProcessingSignals.Default.Add(this);
 		}
 
 
 		public void Dispose()
 		{
  
-			Toolbox.Get<ProcessingSignals>().Remove(this);
+			ProcessingSignals.Default.Remove(this);
 			ProcessingUpdate.Default.Remove(this);
  
 			OnDispose();

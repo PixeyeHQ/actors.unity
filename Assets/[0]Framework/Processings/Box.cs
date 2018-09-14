@@ -6,12 +6,14 @@ Date:       17/09/2017 11:58
 ================================================================*/
 
 
+using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Homebrew
 {
-    public class Box
+    public class Box: IKernel, IDisposable
     {
         public static Box Default;
 
@@ -64,6 +66,12 @@ namespace Homebrew
             obj = Resources.Load(Default.itemsPaths[id]) as GameObject;
             Default.items.Add(id, obj);
             return obj as T;
+        }
+
+        public void Dispose()
+        {
+            items.Clear();
+            itemsPaths.Clear();
         }
     }
 }

@@ -12,8 +12,11 @@ public class InfoBoxAttribute : PropertyAttribute {
     public string description;
     public InfoMessageType messageType;
  
-  
-    public InfoBoxAttribute(string description, InfoMessageType messageType = InfoMessageType.Info)
+    /// <summary>Adds the property to the specified foldout group.</summary>
+    /// <param name="name">Name of the foldout group.</param>
+    /// <param name="foldEverything">Toggle to put all properties to the specified group</param>
+	
+    public InfoBoxAttribute(string description, InfoMessageType messageType)
     {
         this.messageType = messageType;
         this.description = description;

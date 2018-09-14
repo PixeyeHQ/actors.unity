@@ -4,6 +4,7 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine.SceneManagement;
 using UnityEngine;
+using Scene = UnityEngine.SceneManagement.Scene;
 
 
 [InitializeOnLoad]

@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace Homebrew
 {
-    public class ProcessingUpdate : MonoBehaviour, IDisposable
+    public class ProcessingUpdate : MonoBehaviour, IDisposable, IKernel
     {
         private List<ITick> ticks = new List<ITick>(1000);
         private List<ITickFixed> ticksFixed = new List<ITickFixed>();
@@ -26,7 +26,6 @@ namespace Homebrew
         private void Awake()
         {
             Default = this;
-            Toolbox.Add(this);
         }
 
         public int GetTicksCount()

@@ -7,31 +7,26 @@ Date:       5/2/2018  9:47 AM
 
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace Homebrew
 {
-    public class ProcessingFastPool<T> : IDisposable where T : new()
+    public class ProcessingFastPool<T> : IKernel, IDisposable where T : new()
     {
         public static readonly ProcessingFastPool<T> Instance = new ProcessingFastPool<T>();
         public Stack<T> pool = new Stack<T>(200);
-   
+
         public T Spawn()
         {
-        
-
-
             if (pool.Count > 0)
             {
                 var v = pool.Pop();
-                return v ;
+                return v;
             }
 
             var obj = new T();
             return obj;
         }
 
-       
 
         public void Despawn(T component)
         {

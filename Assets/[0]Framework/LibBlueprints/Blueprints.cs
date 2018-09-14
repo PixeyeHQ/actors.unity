@@ -6,20 +6,19 @@ Date:       2/14/2018  12:07 PM
 ================================================================*/
 
 
-using System;
+
 using System.Collections.Generic;
 using System.IO;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 using UnityEngine;
-using UnityEngine.Experimental.UIElements;
 
 namespace Homebrew
 {
     
     [System.Serializable]
-    public class Blueprints : Pluggable, IAwake
+    public class Blueprints : Pluggable, IAwake, IKernel
     {
         public List<Blueprint> blueprints = new List<Blueprint>();
 
@@ -43,28 +42,7 @@ namespace Homebrew
 
             EditorUtility.SetDirty(bl);
         }
-//        [MenuItem("Tools/Actors/CreateDataBlueprints", priority = 210)]
-//        public static void CreateOrReturnBlueprints()
-//        {
-//            var bl = 
-//                Resources.Load<Blueprints>("Data/Blueprints/blueprints");
-//            if (bl==null)
-//                bl = ScriptableObjectUtility
-//            Debug.Log(bl);
-////            var guids = AssetDatabase.FindAssets("bp_", new[] {"Assets/[2]Content/Resources/BluePrints"});
-////            bl.blueprints.Clear();
-////            foreach (var guid in guids)
-////            {
-////                AssetDatabase.GUIDToAssetPath(guid);
-////                var b = (Blueprint) AssetDatabase.LoadAssetAtPath(AssetDatabase.GUIDToAssetPath(guid),
-////                    typeof(Blueprint));
-////                bl.blueprints.Add(b);
-////            }
-////
-////
-////            EditorUtility.SetDirty(bl);
-//        }
-        
+
         public static T CreateOrGetAsset<T>(string p, string n) where T : ScriptableObject
         {
             var asset = AssetDatabase.LoadAssetAtPath<T>("Assets/" + p + "/" + n + ".asset");

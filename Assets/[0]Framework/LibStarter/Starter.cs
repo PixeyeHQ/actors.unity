@@ -32,8 +32,12 @@ namespace Homebrew
                 ProcessingUpdate.Create();
             }
 
+            if (ProcessingSceneLoad.Default == null)
+                ProcessingSceneLoad.Default = Toolbox.Create<ProcessingSceneLoad>();
 
-            Toolbox.Add<ProcessingSceneLoad>().Setup(ScenesToKeep, SceneDependsOn, this);
+            ProcessingSceneLoad.Default.Setup(ScenesToKeep,SceneDependsOn,this);
+
+            //Toolbox.Add<ProcessingSceneLoad>().Setup(ScenesToKeep, SceneDependsOn, this);
         }
 
 
@@ -60,7 +64,7 @@ namespace Homebrew
             }
 
 
-            Timer.Add(Time.DeltaTimeFixed * 4, () => PostSetup());
+            Timer.Add(Time.DeltaTimeFixed * 2, () => PostSetup());
         }
 
         protected static T Add<T>() where T : new()
@@ -74,6 +78,11 @@ namespace Homebrew
 
         protected virtual void PostSetup()
         {
+        }
+
+        protected virtual void OnDestroy()
+        {
+            initialized = false;
         }
     }
 }

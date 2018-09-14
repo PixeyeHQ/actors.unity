@@ -17,7 +17,7 @@ namespace Homebrew
     {
         #region FIELDS
 
-        [InfoBox("Monocached is a base monobehavior class of the ACTORS framework. It is used to initialize an object, handle object pooling/destroying.")] 
+        [InfoBox("Monocached is a base monobehavior class of the ACTORS framework. It is used to initialize an object, handle object pooling/destroying.", InfoMessageType.Info)] 
  
         [FoldoutGroup("Mono")] public Pool pool;
         [FoldoutGroup("Mono")] public float timeDestroyDelay;
@@ -25,7 +25,7 @@ namespace Homebrew
         [FoldoutGroup("Mono")] public Actor actorParent;
         [FoldoutGroup("Mono")] public EntityState state;
  
-        [HideInInspector] public ProcessingSignals signals;
+       // [HideInInspector] public ProcessingSignals signals;
         [HideInInspector] public Transform selfTransform;
 
         #endregion
@@ -38,7 +38,7 @@ namespace Homebrew
 
             state.enabled = false;
             state.initialized = false;
-
+ 
 
             if (Starter.initialized == false)
             {
@@ -73,16 +73,7 @@ namespace Homebrew
             state.enabled = true;
 
 
-            if (ProcessingSignals.TryAddToGlobal(this))
-            {
-                if (signals == null)
-                {
-                    signals = new ProcessingSignals();
-                }
-
-                signals.Add(this);
-            }
-
+            ProcessingSignals.Default.Add(this);
 
             ProcessingUpdate.Default.Add(this);
 
@@ -96,12 +87,7 @@ namespace Homebrew
 
             state.enabled = false;
 
-
-            if (ProcessingSignals.TryRemoveGlobal(this))
-            {
-                signals?.Remove(this);
-            }
-
+            ProcessingSignals.Default.Remove(this);
 
             ProcessingUpdate.Default.Remove(this);
 
@@ -120,8 +106,9 @@ namespace Homebrew
 
             Timer.Add(Time.DeltaTimeFixed, () =>
             {
-                state.initialized = true;
+              
                 PostSetup();
+                state.initialized = true;
             });
         }
 
@@ -134,8 +121,9 @@ namespace Homebrew
 
             Timer.Add(Time.DeltaTimeFixed, () =>
             {
-                state.initialized = true;
+             
                 PostSetup();
+                state.initialized = true;
             });
         }
 
@@ -143,11 +131,7 @@ namespace Homebrew
 
         #region METHODS
 
-        protected void BindSignals()
-        {
-            signals = new ProcessingSignals();
-        }
-
+      
         protected virtual void Setup()
         {
         }
@@ -190,7 +174,7 @@ namespace Homebrew
 
         protected virtual void HandleReturnToPool()
         {
-            var processingPool = Toolbox.Get<ProcessingGoPool>();
+            var processingPool = ProcessingGoPool.Default;
             if (timeDestroyDelay > 0)
                 Timer.Add(timeDestroyDelay, () => processingPool.Despawn(pool, gameObject));
             else processingPool.Despawn(pool, gameObject);

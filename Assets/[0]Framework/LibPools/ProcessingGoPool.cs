@@ -4,7 +4,7 @@ using UnityEngine;
  
 namespace Homebrew
 {
-	public class ProcessingGoPool : IDisposable, IAwake
+	public class ProcessingGoPool : IDisposable, IAwake, IKernel
 	{
 
 		public static ProcessingGoPool Default;

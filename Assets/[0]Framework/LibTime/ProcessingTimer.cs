@@ -11,7 +11,7 @@ using System.Collections.Generic;
 
 namespace Homebrew
 {
-	public class ProcessingTimer : IDisposable
+	public class ProcessingTimer : IDisposable, IKernel
 	{
 		public static ProcessingTimer Default;
 		public readonly List<Timer> allWorkingTimers = new List<Timer>();

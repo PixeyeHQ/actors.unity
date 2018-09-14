@@ -66,17 +66,6 @@ namespace Homebrew
             timer = 0.0f;
         }
 
-        public static Timer Create(Action callBackAction, float finishTime, bool isAutoKill = false)
-        {
-            var t = ProcessingFastPool<Timer>.Instance.Spawn();
-            t.isAutoKill = isAutoKill;
-            t.finishTime = finishTime;
-            t.callBackAction = callBackAction;
-            t.timer = 0.0f;
-            return t;
-        }
-
-
         public Timer AddID(object id)
         {
             this.id = id;
@@ -96,7 +85,6 @@ namespace Homebrew
 
 
             obj.Dispose();
- 
         }
 
         public void Stop()

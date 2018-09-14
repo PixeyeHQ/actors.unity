@@ -19,7 +19,8 @@ namespace Homebrew
             Transform parent = null,
             WorldParenters parenters = WorldParenters.Level)
         {
-            var parenter = parent ?? Toolbox.Get<ProcessingScene>().Get(parenters);
+ 
+            var parenter = parent ?? ProcessingScene.Default.Get(parenters);
 
             var go = poolID == Pool.None
                 ? Object.Instantiate(prefab, startPosition, startRotation, parenter).transform
@@ -67,7 +68,7 @@ namespace Homebrew
         public static T Populate<T>(this object o, Pool poolID, GameObject prefabID, string parentID,
             Vector3 startPosition = default(Vector3), Quaternion startRotation = default(Quaternion)) where T : class
         {
-            var parent = Toolbox.Get<ProcessingScene>().Get(parentID);
+            var parent = ProcessingScene.Default.Get(parentID);
             var tr = o.Populate(poolID, prefabID, startPosition, startRotation, parent);
 
             return tr.GetComponent<T>();
@@ -76,7 +77,7 @@ namespace Homebrew
         public static T Populate<T>(this object o, Pool poolID, string prefabID, string parentID,
             Vector3 startPosition = default(Vector3), Quaternion startRotation = default(Quaternion)) where T : class
         {
-            var parent = Toolbox.Get<ProcessingScene>().Get(parentID);
+            var parent = ProcessingScene.Default.Get(parentID);
             var tr = o.Populate(poolID, prefabID, startPosition, startRotation, parent);
 
             return tr.GetComponent<T>();
