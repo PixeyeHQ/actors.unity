@@ -3,12 +3,10 @@
     [System.Flags]
     public enum Scenes
     {
-        sceneLevel1 = 0,
-        sceneLv1Room6 = 1,
-        sceneKernel = 2,
-        sceneCamera = 3,
-        sceneLv1Room5 = 4,
-        sceneLoader = 5
+     
+        sceneGame = 0,
+        sceneCamera = 1,
+        sceneKernel = 2
     }
 
     public static partial class Game
