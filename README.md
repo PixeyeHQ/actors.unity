@@ -10,7 +10,6 @@
 ## Translation
 * [EN](https://github.com/dimmpixeye/Actors-Unity3d-Framework/blob/Actor2.0/README.md)
 * [RU](https://github.com/dimmpixeye/Actors-Unity3d-Framework/blob/Actor2.0/README-ru.md)
-* [Example project](https://github.com/dimmpixeye/Actors-example)
 
 # What is ACTORS ? 
 A complete game framework with multiscene editing, game object pooling and ECS ( entity-component-system ) data-driven approach for game logic explicitly built for Unity3d. It is used to ease the pain of decoupling data from behaviors without tons of boilerplate code. It relies on Unity3d scripting monobehavior concept but without unnecessary overhead.
