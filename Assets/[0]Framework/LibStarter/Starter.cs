@@ -36,8 +36,7 @@ namespace Homebrew
                 ProcessingSceneLoad.Default = Toolbox.Create<ProcessingSceneLoad>();
 
             ProcessingSceneLoad.Default.Setup(ScenesToKeep,SceneDependsOn,this);
-
-            //Toolbox.Add<ProcessingSceneLoad>().Setup(ScenesToKeep, SceneDependsOn, this);
+ 
         }
 
 
