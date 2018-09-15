@@ -56,13 +56,10 @@ namespace Homebrew
         void Remove(IRecieve recieve, Type type)
         {
             List<IRecieve> cachedSignals;
-            Timer.Add(Time.DeltaTime, () =>
+            if (signals.TryGetValue(type.GetHashCode(), out cachedSignals))
             {
-                if (signals.TryGetValue(type.GetHashCode(), out cachedSignals))
-                {
-                    cachedSignals.Remove(recieve);
-                }
-            });
+                cachedSignals.Remove(recieve);
+            }
         }
 
 
