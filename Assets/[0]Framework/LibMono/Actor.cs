@@ -73,38 +73,7 @@ namespace Homebrew
 
             ProcessingSignals.Default.Add(this);
 
-
-//            int len = compositionNoTags.Count;
-//            int i;
-//
-//            for (i = 0; i < len; i++)
-//            {
-//                Behavior.behaviors[compositionNoTags[i]].AddElement(id);
-//            }
-//
-//
-//            len = compositions != null ? compositions.Count : -1;
-//
-//            for (i = 0; i < len; i++)
-//            {
-//                var composition = compositions[i];
-//
-//                if (composition.changed || !composition.Contain(tags)) continue;
-//                composition.changed = true;
-//                int l = composition.ids.Count;
-//
-//                for (int j = 0; j < l; j++)
-//                {
-//                    Behavior.behaviors[composition.ids[j]].AddElement(id);
-//                }
-//
-//                l = composition.delegates.Count;
-//                for (int j = 0; j < l; j++)
-//                {
-//                    composition.delegates[j](true);
-//                }
-//            }
-
+ 
 
             ProcessingUpdate.Default.Add(this);
         }
@@ -164,56 +133,19 @@ namespace Homebrew
             }
 
             cachedTransforms.Clear();
-//            len = compositionNoTags.Count;
-//            int i;
-//             
-//
-//            for (i = 0; i < len; i++)
-//            {
-//                Behavior.behaviors[compositionNoTags[i]].RemoveElement(id);
-//            }
-//
-//
-//            len = compositions != null ? compositions.Count : -1;
-//
-//            for (i = 0; i < len; i++)
-//            {
-//                var composition = compositions[i];
-//
-//                composition.changed = false;
-//                int l = composition.ids.Count;
-//                for (int j = 0; j < l; j++)
-//                {
-//                    Behavior.behaviors[composition.ids[j]].RemoveElement(id);
-//                }
-//
-//                l = composition.delegates.Count;
-//                for (int j = 0; j < l; j++)
-//                {
-//                    composition.delegates[j](false);
-//                }
-//            }
+ 
 
             ProcessingSignals.Default.Remove(this);
             ProcessingUpdate.Default.Remove(this);
 
-            //  compositionNoTags?.Clear();
-            //  compositions?.Clear();
+ 
             tags?.Clear();
 
             base.HandleReturnToPool();
-//            if (cachedData == null) return;
-//
-//            foreach (var valuePair in cachedData)
-//            {
-//                var data = valuePair.Value as IDisposable;
-//                if (data != null) data.Dispose();
-//            }
-//
-//            cachedData.Clear();
+ 
         }
 
-        protected void OnDestroy()
+        protected virtual void OnDestroy()
         {
             int len = Storage.all.Count;
             for (int j = 0; j < len; j++)
@@ -228,49 +160,14 @@ namespace Homebrew
 
 
             ProcessingEntities.Default.CheckGroups(id, false);
-
-//            len = compositionNoTags.Count;
-//            int i;
-//
-//            for (i = 0; i < len; i++)
-//            {
-//                Behavior.behaviors[compositionNoTags[i]].RemoveElement(id);
-//            }
-//
-//
-//            len = compositions != null ? compositions.Count : -1;
-//
-//            for (i = 0; i < len; i++)
-//            {
-//                var composition = compositions[i];
-//
-//                int l = composition.ids.Count;
-//                for (int j = 0; j < l; j++)
-//                {
-//                    Behavior.behaviors[composition.ids[j]].RemoveElement(id);
-//                }
-//
-//                composition.delegates.Clear();
-//            }
-
+ 
 
             ProcessingSignals.Default.Remove(this);
             ProcessingUpdate.Default.Remove(this);
-
-            // compositionNoTags?.Clear();
-            // compositions?.Clear();
+ 
             tags?.Clear();
 
-
-//            if (cachedData == null) return;
-//
-//            foreach (var valuePair in cachedData)
-//            {
-//                var data = valuePair.Value as IDisposable;
-//                if (data != null) data.Dispose();
-//            }
-//
-//            cachedData.Clear();
+ 
         }
 
         #endregion
