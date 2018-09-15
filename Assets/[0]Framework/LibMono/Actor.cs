@@ -46,7 +46,6 @@ namespace Homebrew
             ProcessingEntities.Add(this);
 
             #if ACTORS_DEBUG
-
             var name = gameObject.name.Split('(')[0];
             gameObject.name = name + "_" + id;
 
@@ -73,7 +72,6 @@ namespace Homebrew
 
             ProcessingSignals.Default.Add(this);
 
- 
 
             ProcessingUpdate.Default.Add(this);
         }
@@ -81,6 +79,8 @@ namespace Homebrew
 
         public override void OnDisable()
         {
+            ProcessingSignals.Default.Remove(this);
+            
             if (Toolbox.isQuittingOrChangingScene() || state.released ||
                 !state.enabled) return;
 
@@ -88,37 +88,7 @@ namespace Homebrew
             state.released = true;
             ProcessingEntities.Default.CheckGroups(id, false);
 
-//            int len = compositionNoTags.Count;
-//            int i;
-//
-//            for (i = 0; i < len; i++)
-//            {
-//                Behavior.behaviors[compositionNoTags[i]].RemoveElement(id);
-//            }
-//
-//
-//            len = compositions != null ? compositions.Count : -1;
-//
-//            for (i = 0; i < len; i++)
-//            {
-//                var composition = compositions[i];
-//                if (composition.changed || !composition.Contain(tags)) continue;
-//                composition.changed = true;
-//                int l = composition.ids.Count;
-//                for (int j = 0; j < l; j++)
-//                {
-//                    Behavior.behaviors[composition.ids[j]].RemoveElement(id);
-//                }
-//
-//                l = composition.delegates.Count;
-//                for (int j = 0; j < l; j++)
-//                {
-//                    composition.delegates[j](false);
-//                }
-//            }
 
-
-            ProcessingSignals.Default.Remove(this);
             ProcessingUpdate.Default.Remove(this);
 
             HandleDisable();
@@ -133,16 +103,15 @@ namespace Homebrew
             }
 
             cachedTransforms.Clear();
- 
+
 
             ProcessingSignals.Default.Remove(this);
             ProcessingUpdate.Default.Remove(this);
 
- 
+
             tags?.Clear();
 
             base.HandleReturnToPool();
- 
         }
 
         protected virtual void OnDestroy()
@@ -160,14 +129,12 @@ namespace Homebrew
 
 
             ProcessingEntities.Default.CheckGroups(id, false);
- 
+
 
             ProcessingSignals.Default.Remove(this);
             ProcessingUpdate.Default.Remove(this);
- 
-            tags?.Clear();
 
- 
+            tags?.Clear();
         }
 
         #endregion
@@ -179,6 +146,7 @@ namespace Homebrew
             if (cachedTransforms == null) cachedTransforms = new Dictionary<int, Transform>(2, new FastComparable());
             cachedTransforms.Add(key, Get<Transform>(path));
         }
+
         public void Add<T>(T component) where T : IData, new()
         {
             var setupable = component as ISetup;
@@ -186,8 +154,10 @@ namespace Homebrew
             {
                 setupable.Setup(this);
             }
+
             Storage<T>.Instance.Add(component, id);
         }
+
         public T Add<T>() where T : IData, new()
         {
             var component = Storage<T>.Instance.Add(id);
@@ -196,6 +166,7 @@ namespace Homebrew
             {
                 setupable.Setup(this);
             }
+
             return component;
         }
 
@@ -207,7 +178,7 @@ namespace Homebrew
         {
             return Storage<T>.Instance.TryGet(id);
         }
- 
+
         public T Get<T>(int hash)
         {
             return cachedTransforms[hash].GetComponent<T>();
@@ -219,9 +190,6 @@ namespace Homebrew
             return o.GetComponent<T>();
         }
 
-       
-        
-        
         #endregion
 
         #region METHODS
@@ -238,7 +206,7 @@ namespace Homebrew
                 childs[i].SetupAfterActor();
             }
         }
- 
+
         void HandleTagsChanged()
         {
             if (Toolbox.isQuittingOrChangingScene()) return;
