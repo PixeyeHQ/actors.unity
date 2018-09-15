@@ -119,7 +119,6 @@ namespace Homebrew
 
 
             ProcessingTimer.Default.Dispose();
-            ProcessingSignals.Default.Dispose();
             ProcessingGoPool.Default.Dispose();
             ProcessingEntities.Default.Dispose();
             ProcessingScene.Default.Dispose();
