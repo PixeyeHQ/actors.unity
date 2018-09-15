@@ -53,11 +53,11 @@ namespace Homebrew
             }
         }
 
-        public int GetIndex(int id)
+        public int GetIndex(int actorID)
         {
             for (int i = 0; i < length; i++)
             {
-                if (entities[i] != id) continue;
+                if (entities[i] != actorID) continue;
                 return i;
             }
 
@@ -65,14 +65,14 @@ namespace Homebrew
         }
 
 
-        public int GetID(int id)
+        public int GetActorID(int index)
         {
-            return entities[id];
+            return entities[index];
         }
 
-        public Actor GetActor(int id)
+        public Actor GetActor(int index)
         {
-            return Actor.entites[entities[id]];
+            return Actor.entites[entities[index]];
         }
 
         public bool CheckTags(int entityID)
