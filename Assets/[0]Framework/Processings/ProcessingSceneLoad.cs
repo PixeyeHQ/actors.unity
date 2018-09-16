@@ -19,26 +19,26 @@ namespace Homebrew
 
         private List<string> scenesToKeep = new List<string>();
         private List<string> sceneDependsOn = new List<string>();
-        private Dictionary<string, UnityEngine.SceneManagement.Scene> scenes = new Dictionary<string, UnityEngine.SceneManagement.Scene>();
+        private Dictionary<string, Scene> scenes = new Dictionary<string, Scene>();
 
 
         public Action sceneLoaded = delegate { };
         public Action sceneClosing = delegate { };
 
 
-        public void Setup(List<Scenes> scenesToKeep, List<Scenes> sceneDependsOn, Starter starter)
+        public void Setup(List<SceneField> scenesToKeep, List<SceneField> sceneDependsOn, Starter starter)
         {
             this.scenesToKeep.Clear();
             this.sceneDependsOn.Clear();
 
             for (var i = 0; i < scenesToKeep.Count; i++)
             {
-                this.scenesToKeep.Add(scenesToKeep[i].ToString());
+                this.scenesToKeep.Add(scenesToKeep[i].SceneName);
             }
 
             for (var i = 0; i < sceneDependsOn.Count; i++)
             {
-                this.sceneDependsOn.Add(sceneDependsOn[i].ToString());
+                this.sceneDependsOn.Add(sceneDependsOn[i].SceneName);
             }
 
             Toolbox.Instance.StartCoroutine(_Setup(starter));

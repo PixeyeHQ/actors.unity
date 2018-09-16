@@ -198,8 +198,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   factories: []
-  ScenesToKeep: 02000000
-  SceneDependsOn: 02000000
+  ScenesToKeep:
+  - m_SceneAsset: {fileID: 102900000, guid: 2642f792712675d40a8d87889fdfee7a, type: 3}
+    m_SceneName: sceneKernel
+  SceneDependsOn:
+  - m_SceneAsset: {fileID: 102900000, guid: 2642f792712675d40a8d87889fdfee7a, type: 3}
+    m_SceneName: sceneKernel
 --- !u!4 &1315877080
 Transform:
   m_ObjectHideFlags: 0

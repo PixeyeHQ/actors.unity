@@ -6,6 +6,8 @@
 /[Bb]uilds/
 /Assets/Demo
 /Assets/AssetStoreTools*
+/Assets/[0]Framework/LibStarter/Scenes.cs
+ 
 
 # Visual Studio 2015 cache directory
 /.vs/
@@ -34,3 +36,4 @@ sysinfo.txt
 # Builds
 *.apk
 *.unitypackage
+Assets/Plugins/Editor/JetBrains/JetBrains.Rider.Unity.Editor.Plugin.Repacked.dll

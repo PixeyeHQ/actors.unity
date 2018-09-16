@@ -83,14 +83,14 @@ namespace Homebrew
 
         public virtual void OnDisable()
         {
-            ProcessingUpdate.Default.Remove(this);
-            
+           
+            ProcessingSignals.Default.Remove(this);
             if (Toolbox.isQuittingOrChangingScene() || !state.enabled) return;
 
             state.enabled = false;
 
-            ProcessingSignals.Default.Remove(this);
             
+            ProcessingUpdate.Default.Remove(this); 
 
             HandleDisable();
         }

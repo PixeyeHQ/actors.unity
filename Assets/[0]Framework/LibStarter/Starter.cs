@@ -22,9 +22,10 @@ namespace Homebrew
         public static bool initialized;
 
         [FoldoutGroup("SetupData")] public List<Factory> factories;
-        [FoldoutGroup("SetupData")] public List<Scenes> ScenesToKeep;
-        [FoldoutGroup("SetupData")] public List<Scenes> SceneDependsOn;
-
+        [FoldoutGroup("SetupData")] public List<SceneField> ScenesToKeep;
+        [FoldoutGroup("SetupData")] public List<SceneField> SceneDependsOn;
+ 
+  
         void Awake()
         {
             if (ProcessingUpdate.Default == null)

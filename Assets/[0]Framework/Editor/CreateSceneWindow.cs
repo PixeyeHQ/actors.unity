@@ -44,7 +44,7 @@ public class CreateSceneWindow : EditorWindow
         var d = new GameObject("Dynamic");
         d.transform.parent = s.transform;
         Debug.Log("New scene created!");
-        SaveSceneName.SaveScenesName();
+ 
     }
 }
 
