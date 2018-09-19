@@ -5,7 +5,7 @@
 using Homebrew;
 using UnityEngine;
 
-public static class ExtGame
+public static class Game
 {
     public static readonly Vector2[] sides = {Vector2.up, Vector2.right, Vector2.down, Vector2.left};
     public static readonly RaycastHit2D[] hits = new RaycastHit2D[20];
@@ -22,7 +22,7 @@ public static class ExtGame
         return tags;
     }
 
-    public static void TagsAdd(this Actor a, params TagNode[] tagNodes)
+    public static void ConvertTags(this Actor a, params TagNode[] tagNodes)
     {
         var tags = new int[tagNodes.Length];
 
@@ -31,6 +31,7 @@ public static class ExtGame
             tags[i] = tagNodes[i].tag;
         }
 
-        a.TagsAdd(tags);
+        a.AddTags(tags);
+ 
     }
 }

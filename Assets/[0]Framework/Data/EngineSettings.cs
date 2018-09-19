@@ -13,8 +13,8 @@ namespace Homebrew
 		public const int MonoElementsFixedCountEstimate = 50;
 		public const int MonoElementsLateCountEstimate = 10;
 		public const int OtherCountEstimate = 5;
-		public const int MinComponents = 100;
-		public const int MinEntities = 50;
+		public const int MinComponents = 10;
+		public const int MinEntities = 10;
 		public const int MinBehaviors = 20;
 	}
 }

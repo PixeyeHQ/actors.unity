@@ -14,7 +14,7 @@ namespace Homebrew
     {
         #region CREATE
 
-        public static Transform Populate(this object o, Pool poolID, GameObject prefab,
+        public static Transform Populate(this object o, int poolID, GameObject prefab,
             Vector3 startPosition = default(Vector3), Quaternion startRotation = default(Quaternion),
             Transform parent = null,
             WorldParenters parenters = WorldParenters.Level)
@@ -29,7 +29,7 @@ namespace Homebrew
             return go;
         }
 
-        public static T Populate<T>(this Object o, Pool poolID, GameObject prefab,
+        public static T Populate<T>(this Object o, int poolID, GameObject prefab,
             Vector3 startPosition = default(Vector3),
             Quaternion startRotation = default(Quaternion), Transform parent = null,
             WorldParenters parenters = WorldParenters.Level) where T : class
@@ -38,7 +38,7 @@ namespace Homebrew
             return tr.GetComponent<T>();
         }
 
-        public static Transform Populate(this object o, Pool poolID, string prefabID,
+        public static Transform Populate(this object o, int poolID, string prefabID,
             Vector3 startPosition = default(Vector3), Quaternion startRotation = default(Quaternion),
             Transform parent = null,
             WorldParenters parenters = WorldParenters.Level)
@@ -55,7 +55,7 @@ namespace Homebrew
         }
 
 
-        public static T Populate<T>(this object o, Pool poolID, string prefabID,
+        public static T Populate<T>(this object o, int poolID, string prefabID,
             Vector3 startPosition = default(Vector3),
             Quaternion startRotation = default(Quaternion), Transform parent = null,
             WorldParenters parenters = WorldParenters.Level) where T : class
@@ -65,7 +65,7 @@ namespace Homebrew
         }
 
 
-        public static T Populate<T>(this object o, Pool poolID, GameObject prefabID, string parentID,
+        public static T Populate<T>(this object o, int poolID, GameObject prefabID, string parentID,
             Vector3 startPosition = default(Vector3), Quaternion startRotation = default(Quaternion)) where T : class
         {
             var parent = ProcessingScene.Default.Get(parentID);
@@ -74,7 +74,7 @@ namespace Homebrew
             return tr.GetComponent<T>();
         }
 
-        public static T Populate<T>(this object o, Pool poolID, string prefabID, string parentID,
+        public static T Populate<T>(this object o, int poolID, string prefabID, string parentID,
             Vector3 startPosition = default(Vector3), Quaternion startRotation = default(Quaternion)) where T : class
         {
             var parent = ProcessingScene.Default.Get(parentID);
@@ -88,7 +88,7 @@ namespace Homebrew
 
         #region BY HASH
 
-        public static Transform Populate(this object o, Pool poolID, int prefabID,
+        public static Transform Populate(this object o, int poolID, int prefabID,
             Vector3 startPosition = default(Vector3), Quaternion startRotation = default(Quaternion),
             Transform parent = null,
             WorldParenters parenters = WorldParenters.Level)
@@ -105,7 +105,7 @@ namespace Homebrew
         }
 
 
-        public static T Populate<T>(this object o, Pool poolID, int prefabID, Vector3 startPosition = default(Vector3),
+        public static T Populate<T>(this object o, int poolID, int prefabID, Vector3 startPosition = default(Vector3),
             Quaternion startRotation = default(Quaternion), Transform parent = null,
             WorldParenters parenters = WorldParenters.Level) where T : class
         {
@@ -114,7 +114,7 @@ namespace Homebrew
         }
 
 
-        public static T Populate<T>(this object o, Pool poolID, int prefabID, string parentID,
+        public static T Populate<T>(this object o, int poolID, int prefabID, string parentID,
             Vector3 startPosition = default(Vector3), Quaternion startRotation = default(Quaternion)) where T : class
         {
             var parent = Toolbox.Get<ProcessingScene>().Get(parentID);

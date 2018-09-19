@@ -9,12 +9,12 @@ namespace Homebrew
 {
  
 
-	public interface IReceive<T> : IRecieve
+	public interface IReceive<T> : IReceive
 	{
-		void HandleSignal(T arg);
+		void HandleSignal(ref T arg);
 	}
 
-	public interface IRecieve
+	public interface IReceive
 	{
 	}
 }

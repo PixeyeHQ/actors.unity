@@ -1,6 +1,4 @@
- 
 using System.Collections.Generic;
- 
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -12,9 +10,10 @@ namespace Homebrew
         public List<GameObject> activeObjs = new List<GameObject>(100);
 
         protected Transform parent;
-        protected Dictionary<int, Stack<GameObject>> cachedObjects = new Dictionary<int, Stack<GameObject>>(100,new FastComparable());
-        protected Dictionary<int, int> cachedIds = new Dictionary<int, int>(100,new FastComparable());
-
+        protected Dictionary<int, Stack<GameObject>> cachedObjects = new Dictionary<int, Stack<GameObject>>(100, new FastComparable());
+        protected Dictionary<int, IPoolable> cachedPoolables = new Dictionary<int, IPoolable>(100, new FastComparable());
+        protected Dictionary<int, int> cachedIds = new Dictionary<int, int>(100, new FastComparable());
+ 
         public void SetPoolParent(Transform parent)
         {
             this.parent = parent;
@@ -80,12 +79,14 @@ namespace Homebrew
                 transform.gameObject.SetActive(true);
                 if (isPosLocal) transform.localPosition = position;
                 else transform.position = position;
-                var poolable = transform.GetComponent<IPoolable>();
-                if (poolable != null) poolable.Spawn(true);
-              
+
+                IPoolable poolable;
+                if (cachedPoolables.TryGetValue(transform.gameObject.GetInstanceID(), out poolable))
+                    poolable.Spawn(true);
 
                 return transform.gameObject;
             }
+
 
             if (!stacked)
             {
@@ -93,7 +94,19 @@ namespace Homebrew
             }
 
             var createdPrefab = Populate(prefab, position, rotation, parent, isPosLocal);
-            cachedIds.Add(createdPrefab.GetInstanceID(), key);
+            var k = createdPrefab.GetInstanceID();
+
+            var p = createdPrefab.GetComponent<IPoolable>();
+            if (p != null)
+            {
+                if (!cachedPoolables.ContainsKey(k))
+                {
+                    cachedPoolables.Add(k, p);
+                }
+            }
+
+
+            cachedIds.Add(k, key);
             return createdPrefab;
         }
 
@@ -103,10 +116,11 @@ namespace Homebrew
 
             cachedObjects[cachedIds[go.GetInstanceID()]].Push(go);
 
-            var poolable = go.GetComponent<IPoolable>();
-            if (poolable != null) poolable.Spawn(false);
-
-            if (parent != null) go.transform.SetParent(parent);
+            IPoolable poolable;
+            if (cachedPoolables.TryGetValue(go.GetInstanceID(), out poolable))
+            {
+                poolable.Spawn(false);
+            }
         }
 
         public void DespawnAll()
@@ -121,6 +135,7 @@ namespace Homebrew
 
         public void Dispose()
         {
+            cachedPoolables.Clear();
             cachedObjects.Clear();
             cachedIds.Clear();
         }
@@ -130,6 +145,7 @@ namespace Homebrew
             var go = Populate(prefab, Vector3.zero, Quaternion.identity, parent);
             go.SetActive(false);
             cachedIds.Add(go.GetInstanceID(), key);
+
             cachedObjects[key].Push(go);
         }
 
@@ -150,5 +166,6 @@ namespace Homebrew
 
             return go.gameObject;
         }
+ 
     }
 }

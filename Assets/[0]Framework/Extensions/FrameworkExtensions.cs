@@ -20,10 +20,23 @@ namespace Homebrew
         private static System.Random _r = new System.Random();
 
 
+        public static T Create<T>(this int entity) where T : new()
+        {
+            var d = Storage<T>.Instance.TryGet(entity);
+            if (d == null) d = new T();
+            return d;
+        }
+
+        public static void Add<T>(this int entity, T component) where T : new()
+        {
+            Storage<T>.Instance.Add(component, entity);
+        }
+
         public static T Add<T>(this int entity) where T : new()
         {
-            return Storage<T>.Instance.AddVirtual(entity);
+            return Storage<T>.Instance.Add(entity);
         }
+
         public static void Remove<T>(this Actor a) where T : new()
         {
             Storage<T>.Instance.Remove(a.id);
@@ -31,9 +44,9 @@ namespace Homebrew
 
         public static void Remove<T>(this int entity) where T : new()
         {
-             Storage<T>.Instance.Remove(entity);
+            Storage<T>.Instance.Remove(entity);
         }
-        
+
         public static T DeepClone<T>(this T obj)
         {
             using (var ms = new MemoryStream())
@@ -53,7 +66,7 @@ namespace Homebrew
         {
             var actor = hit.collider.GetComponentInParent<Actor>();
             if (actor == null) return null;
-            return actor.TagsHave(tags) ? actor : null;
+            return Tags.Has(actor.id, tags) ? actor : null;
         }
 
         #endregion
@@ -327,7 +340,7 @@ namespace Homebrew
             for (int i = 0; i < length; i++)
             {
                 if (a[i] != element) continue;
-                length--;
+                --length;
                 Array.Copy(a, i + 1, a, i, length - i);
                 break;
             }
@@ -594,6 +607,16 @@ namespace Homebrew
         {
             return vals[UnityEngine.Random.Range(0, vals.Count)];
         }
+
+        public static T RandomWithRemove<T>(this List<T> vals, out int index)
+        {
+            index = UnityEngine.Random.Range(0, vals.Count);
+
+            var val = vals[index];
+            vals.RemoveAt(index);
+            return val;
+        }
+
 
         public static T RandomWithRemove<T>(this List<T> vals)
         {

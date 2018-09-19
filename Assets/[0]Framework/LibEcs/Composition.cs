@@ -16,40 +16,7 @@ namespace Homebrew
 
     public class Composition : IEquatable<Composition>
     {
-        public List<CompositionDelegate> delegates = new List<CompositionDelegate>(4);
-        public List<int> ids = new List<int>(20);
-        public bool changed;
-
-//        public Composition TagsInclude(params int[] include)
-//        {
-//            this.include = include;
-//            return this;
-//        }
-//
-//        public Composition TagsExclude(params int[] exclude)
-//        {
-//            this.exclude = exclude;
-//            return this;
-//        }
-
-//        public Composition Add(CompositionDelegate del)
-//        {
-//            delegates.Add(del);
-//            return this;
-//        }
-//        public Composition Add<T>() where T : new()
-//        {
-//            int key = typeof(T).GetHashCode();
-//            ids.Add(key);
-//            if (Behavior.behaviors.ContainsKey(key)) return this;
-//
-//            var behavior = new T() as Behavior;
-//            Behavior.behaviors.Add(key, behavior);
-//     
-//            return this;
-//        }
-
-
+  
         public int[] include = new int[0];
         public int[] exclude = new int[0];
 

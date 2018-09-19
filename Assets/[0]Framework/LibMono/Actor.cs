@@ -31,10 +31,9 @@ namespace Homebrew
         public int id;
 
 
-        private Dictionary<int, int> tags = new Dictionary<int, int>(new FastComparable());
+        // private Dictionary<int, int> tags = new Dictionary<int, int>(new FastComparable());
 
         private Dictionary<int, Transform> cachedTransforms;
-        private Action OnTagsChanged;
 
         #endregion
 
@@ -42,7 +41,6 @@ namespace Homebrew
 
         protected override void Awake()
         {
-            OnTagsChanged = HandleTagsChanged;
             ProcessingEntities.Add(this);
 
             #if ACTORS_DEBUG
@@ -67,11 +65,10 @@ namespace Homebrew
 
             HandleEnable();
             state.released = false;
-
             state.enabled = true;
 
-            ProcessingSignals.Default.Add(this);
-
+            if (conditionSignals)
+                ProcessingSignals.Default.Add(this);
 
             ProcessingUpdate.Default.Add(this);
         }
@@ -79,16 +76,15 @@ namespace Homebrew
 
         public override void OnDisable()
         {
-            ProcessingSignals.Default.Remove(this);
-            
+            if (conditionSignals)
+                ProcessingSignals.Default.Remove(this);
+
             if (Toolbox.isQuittingOrChangingScene() || state.released ||
                 !state.enabled) return;
 
             state.enabled = false;
             state.released = true;
             ProcessingEntities.Default.CheckGroups(id, false);
-
-
             ProcessingUpdate.Default.Remove(this);
 
             HandleDisable();
@@ -102,39 +98,40 @@ namespace Homebrew
                 Storage.all[j].Remove(id, false);
             }
 
-            cachedTransforms.Clear();
+            if (cachedTransforms != null)
+                cachedTransforms.Clear();
 
+            Tags.Clear(id);
 
-            ProcessingSignals.Default.Remove(this);
+            if (conditionSignals)
+                ProcessingSignals.Default.Remove(this);
+
             ProcessingUpdate.Default.Remove(this);
-
-
-            tags?.Clear();
 
             base.HandleReturnToPool();
         }
 
         protected virtual void OnDestroy()
         {
+            if (Toolbox.applicationIsQuitting) return;
+
             int len = Storage.all.Count;
             for (int j = 0; j < len; j++)
             {
                 Storage.all[j].Remove(id, false);
             }
 
+            Tags.Clear(id);
             prevID.Push(id);
 
+            if (conditionSignals)
+                ProcessingSignals.Default.Remove(this);
 
-            if (Toolbox.isQuittingOrChangingScene()) return;
+            if (Toolbox.changingScene) return;
 
 
             ProcessingEntities.Default.CheckGroups(id, false);
-
-
-            ProcessingSignals.Default.Remove(this);
             ProcessingUpdate.Default.Remove(this);
-
-            tags?.Clear();
         }
 
         #endregion
@@ -170,6 +167,11 @@ namespace Homebrew
             return component;
         }
 
+        public void Remove<T>() where T : new()
+        {
+            Storage<T>.Instance.Remove(id);
+        }
+        
         #endregion
 
         #region  GET
@@ -233,105 +235,32 @@ namespace Homebrew
 
         #region TAGS
 
-        public bool TagsHaveAny(params int[] filter)
-        {
-            for (int i = 0; i < filter.Length; i++)
-            {
-                if (tags.ContainsKey(filter[i]))
-                    return true;
-            }
-
-            return false;
-        }
-
-        public bool TagsHave(params int[] filter)
-        {
-            for (int i = 0; i < filter.Length; i++)
-            {
-                if (!tags.ContainsKey(filter[i])) return false;
-            }
-
-            return true;
-        }
-
-        public bool TagsHave(int val)
-        {
-            return tags.ContainsKey(val);
-        }
-
-
-        public void TagsRemove(params int[] ids)
-        {
-            bool tagsChanged = false;
-            foreach (int index in ids)
-            {
-                int val;
-                if (!tags.TryGetValue(index, out val)) continue;
-                val = Mathf.Max(0, val - 1);
-
-                if (val == 0)
-                {
-                    tags.Remove(index);
-                    tagsChanged = true;
-                }
-                else tags[index] = val;
-            }
-
-            if (tagsChanged == false) return;
-            OnTagsChanged();
-        }
-
-        public void TagsRemove(int id, bool all = false)
-        {
-            int val;
-            if (!tags.TryGetValue(id, out val)) return;
-            val = all ? 0 : Mathf.Max(0, val - 1);
-
-            if (val == 0)
-            {
-                tags.Remove(id);
-                OnTagsChanged();
-            }
-            else tags[id] = val;
-        }
-
-
-        public void TagsAdd(params int[] ids)
-        {
-            if (state.released) return;
-            bool c = false;
-            foreach (int index in ids)
-            {
-                if (tags.ContainsKey(index))
-                {
-                    tags[index] += 1;
-                    continue;
-                }
-
-
-                tags.Add(index, 1);
-                c = true;
-            }
-
-            if (!c) return;
-
-            OnTagsChanged();
-        }
-
-        public void TagsAdd(int id)
-        {
-            if (state.released) return;
-            if (tags.ContainsKey(id))
-            {
-                tags[id] += 1;
-
-                return;
-            }
-
-            tags.Add(id, 1);
-
-            OnTagsChanged();
-        }
+//        public void AddTags(params int[] tags)
+//        {
+//            if (state.released) return;
+//            Tags.Add(id, tags);
+//        }
+//
+//        public void AddTags(int tag)
+//        {
+//            if (state.released) return;
+//            Tags.Add(id, tag);
+//        }
+//
+//        public void RemoveTags(params int[] tags)
+//        {
+//            Tags.Remove(id, tags);
+//        }
+//
+//        public void RemoveTags(bool all = false, params int[] tags)
+//        {
+//            Tags.Remove(id, all, tags);
+//        }
+//
+//        public void RemoveTags(int tag, bool all = false)
+//        {
+//            Tags.Remove(id, tag, all);
+//        }
 
         #endregion
 

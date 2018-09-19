@@ -4,7 +4,7 @@ Developer:  Dimitry Pixeye - pixeye@hbrew.store
 Company:    Homebrew - http://hbrew.store
 Date:       24/06/2017 20:56
 ================================================================*/
- 
+
 #if ODIN_INSPECTOR
 using Sirenix.OdinInspector;
 #endif
@@ -17,16 +17,18 @@ namespace Homebrew
     {
         #region FIELDS
 
-        [InfoBox("Monocached is a base monobehavior class of the ACTORS framework. It is used to initialize an object, handle object pooling/destroying.", InfoMessageType.Info)] 
- 
-        [FoldoutGroup("Mono")] public Pool pool;
+        [InfoBox("Monocached is a base monobehavior class of the ACTORS framework. It is used to initialize an object, handle object pooling/destroying.", InfoMessageType.Info)]
+        [FoldoutGroup("Mono"), TagFilter(typeof(Pool))]
+        public int pool;
+
         [FoldoutGroup("Mono")] public float timeDestroyDelay;
         [FoldoutGroup("Mono")] public float timeScale = 1;
         [FoldoutGroup("Mono")] public Actor actorParent;
         [FoldoutGroup("Mono")] public EntityState state;
- 
-       // [HideInInspector] public ProcessingSignals signals;
+
         [HideInInspector] public Transform selfTransform;
+
+        protected bool conditionSignals;
 
         #endregion
 
@@ -38,7 +40,8 @@ namespace Homebrew
 
             state.enabled = false;
             state.initialized = false;
- 
+
+            conditionSignals = ProcessingSignals.Check(this);
 
             if (Starter.initialized == false)
             {
@@ -72,8 +75,8 @@ namespace Homebrew
             state.released = false;
             state.enabled = true;
 
-
-            ProcessingSignals.Default.Add(this);
+            if (conditionSignals)
+                ProcessingSignals.Default.Add(this);
 
             ProcessingUpdate.Default.Add(this);
 
@@ -83,14 +86,15 @@ namespace Homebrew
 
         public virtual void OnDisable()
         {
-           
-            ProcessingSignals.Default.Remove(this);
+            if (conditionSignals)
+                ProcessingSignals.Default.Remove(this);
+
             if (Toolbox.isQuittingOrChangingScene() || !state.enabled) return;
 
             state.enabled = false;
 
-            
-            ProcessingUpdate.Default.Remove(this); 
+
+            ProcessingUpdate.Default.Remove(this);
 
             HandleDisable();
         }
@@ -107,7 +111,6 @@ namespace Homebrew
 
             Timer.Add(Time.DeltaTimeFixed, () =>
             {
-              
                 PostSetup();
                 state.initialized = true;
             });
@@ -122,7 +125,6 @@ namespace Homebrew
 
             Timer.Add(Time.DeltaTimeFixed, () =>
             {
-             
                 PostSetup();
                 state.initialized = true;
             });
@@ -132,7 +134,6 @@ namespace Homebrew
 
         #region METHODS
 
-      
         protected virtual void Setup()
         {
         }
@@ -166,7 +167,7 @@ namespace Homebrew
             if (pool == Pool.None)
             {
                 OnHandleDestroy();
-                Destroy(gameObject, timeDestroyDelay);
+                Destroy(gameObject, timeDestroyDelay + 0.03f);
                 return;
             }
 
@@ -176,9 +177,7 @@ namespace Homebrew
         protected virtual void HandleReturnToPool()
         {
             var processingPool = ProcessingGoPool.Default;
-            if (timeDestroyDelay > 0)
-                Timer.Add(timeDestroyDelay, () => processingPool.Despawn(pool, gameObject));
-            else processingPool.Despawn(pool, gameObject);
+            Timer.Add(timeDestroyDelay + 0.03f, () => processingPool.Despawn(pool, gameObject));
         }
 
         #endregion

@@ -29,7 +29,7 @@ namespace Homebrew
 		[System.Serializable]
 		public class PoolNode
 		{
-			public Pool pool = Pool.None;
+			public int pool = Pool.None;
 			public GameObject prefab;
 			public List<GameObject> createdObjs = new List<GameObject>();
 
@@ -39,7 +39,7 @@ namespace Homebrew
 				var procPool = ProcessingGoPool.Default;
 			
 
-				var poolStash = procPool.pools[(int)pool];
+				var poolStash = procPool.pools[pool];
 				
 				 poolStash.RegisterObject(prefab);
 				

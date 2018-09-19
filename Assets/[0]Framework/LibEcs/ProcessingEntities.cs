@@ -7,13 +7,12 @@
 
 
 using System;
-using UnityEngine;
-
+ 
 namespace Homebrew
 {
     public class ProcessingEntities : IDisposable, IKernel
     {
-        //  public static List<IStorageType> storageTypes = new List<IStorageType>();
+ 
         public static ProcessingEntities Default;
 
         public GroupBase[] GroupsBase = new GroupBase[64];
@@ -24,7 +23,15 @@ namespace Homebrew
 
         public static void Kill(int index)
         {
+            int len = Storage.all.Count;
+            for (int j = 0; j < len; j++)
+            {
+                Storage.all[j].Remove(index, false);
+            }
+
+            Tags.Clear(index);
             Actor.prevID.Push(index);
+            Default.CheckGroups(index, false);
         }
 
         public static void Unbind<T>(int index) where T : new()
@@ -35,7 +42,8 @@ namespace Homebrew
         public static void Add(Actor monoActor)
         {
             int len = Actor.entites.Length;
-            if (Actor.lastID == len)
+           
+            if (Actor.lastID  >= len)
                 Array.Resize(ref Actor.entites, Actor.lastID << 1);
 
             if (Actor.prevID.Count > 0)
@@ -48,6 +56,8 @@ namespace Homebrew
                 monoActor.id = Actor.lastID;
                 Actor.entites[Actor.lastID++] = monoActor;
             }
+
+            Tags.AddTags(monoActor.id);
         }
 
         public static int Add()
@@ -60,6 +70,9 @@ namespace Homebrew
             else
 
                 id = Actor.lastID++;
+
+
+            Tags.AddTags(id);
 
             return id;
         }
@@ -135,11 +148,8 @@ namespace Homebrew
         }
 
 
-        
-        
         public void CheckGroups(int entityID, bool active)
         {
-     
             if (active)
             {
                 for (int i = 0; i < groupLengthActors; i++)
@@ -166,10 +176,9 @@ namespace Homebrew
         {
             for (int i = 0; i < groupLengthActors; i++)
                 GroupsActors[i].Dispose();
-            
+
             for (int i = 0; i < groupLength; i++)
                 GroupsBase[i].Dispose();
-          
         }
     }
 }
