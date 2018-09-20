@@ -46,7 +46,6 @@ namespace Homebrew
             #if ACTORS_DEBUG
             var name = gameObject.name.Split('(')[0];
             gameObject.name = name + "_" + id;
-
             #endif
 
             base.Awake();
@@ -144,6 +143,11 @@ namespace Homebrew
             cachedTransforms.Add(key, Get<Transform>(path));
         }
 
+        public void AddTags(params int[] tags)
+        {
+            Tags.AddTags(id, tags);
+        }
+        
         public void Add<T>(T component) where T : IData, new()
         {
             var setupable = component as ISetup;
