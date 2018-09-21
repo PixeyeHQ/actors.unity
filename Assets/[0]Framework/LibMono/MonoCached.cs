@@ -105,6 +105,7 @@ namespace Homebrew
 
         public virtual void SetupAfterStarter()
         {
+            if (state.requireActorParent) return; 
             state.requireStarter = false;
             Setup();
             OnEnable();
