@@ -1,0 +1,12 @@
+using Homebrew;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+&NameSpace&
+	[System.Serializable]
+	public class ##NAME## : IData
+	{
+
+	}
+&NameSpaceEnd&

@@ -1,0 +1,14 @@
+using Homebrew;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+&NameSpace&
+	public class ##NAME## : ProcessingBase, ITick
+	{
+		public void Tick()
+		{
+         
+		}
+	}
+&NameSpaceEnd&
