@@ -31,7 +31,7 @@ namespace Homebrew
 
             Tags.Clear(index);
             Actor.prevID.Push(index);
-            Default.CheckGroups(index, false);
+           
         }
 
         public static void Unbind<T>(int index) where T : new()

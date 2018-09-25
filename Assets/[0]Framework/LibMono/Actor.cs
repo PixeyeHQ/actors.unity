@@ -128,8 +128,7 @@ namespace Homebrew
 
             if (Toolbox.changingScene) return;
 
-
-            ProcessingEntities.Default.CheckGroups(id, false);
+ 
             ProcessingUpdate.Default.Remove(this);
         }
 
