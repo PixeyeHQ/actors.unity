@@ -177,8 +177,8 @@ namespace Homebrew
 
         protected virtual void HandleReturnToPool()
         {
-            var processingPool = ProcessingGoPool.Default;
-            Timer.Add(timeDestroyDelay + 0.03f, () => processingPool.Despawn(pool, gameObject));
+
+            Timer.Add(timeDestroyDelay + 0.03f, () => ProcessingPool.Despawn(pool,gameObject)); 
         }
 
         #endregion

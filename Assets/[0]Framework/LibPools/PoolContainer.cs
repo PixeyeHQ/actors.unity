@@ -4,20 +4,16 @@ using Object = UnityEngine.Object;
 
 namespace Homebrew
 {
-    public class PoolStash
+    public class PoolContainer
     {
         public bool globalPool = false;
-        public List<GameObject> activeObjs = new List<GameObject>(100);
+        public List<GameObject> activeObjs = new List<GameObject>(600);
 
         protected Transform parent;
-        protected Dictionary<int, Stack<GameObject>> cachedObjects = new Dictionary<int, Stack<GameObject>>(100, new FastComparable());
-        protected Dictionary<int, IPoolable> cachedPoolables = new Dictionary<int, IPoolable>(100, new FastComparable());
-        protected Dictionary<int, int> cachedIds = new Dictionary<int, int>(100, new FastComparable());
- 
-        public void SetPoolParent(Transform parent)
-        {
-            this.parent = parent;
-        }
+        protected Dictionary<int, Stack<GameObject>> cachedObjects = new Dictionary<int, Stack<GameObject>>(600, new FastComparable());
+        protected Dictionary<int, IPoolable> cachedPoolables = new Dictionary<int, IPoolable>(600, new FastComparable());
+        protected Dictionary<int, int> cachedIds = new Dictionary<int, int>(600, new FastComparable());
+
 
         public void RegisterObject(GameObject prefab)
         {
@@ -32,7 +28,7 @@ namespace Homebrew
             cachedIds.Add(go.GetInstanceID(), prefab.GetInstanceID());
         }
 
-        public PoolStash PopulateWith(GameObject prefab, int amount, int amountPerTick = 10, int timeRate = 1)
+        public PoolContainer PopulateWith(GameObject prefab, int amount, int amountPerTick = 10, int timeRate = 1)
         {
             var key = prefab.GetInstanceID();
             Stack<GameObject> stack;
@@ -59,8 +55,7 @@ namespace Homebrew
             return this;
         }
 
-        public GameObject Spawn(GameObject prefab, Vector3 position = default(Vector3),
-            Quaternion rotation = default(Quaternion), Transform parent = null, bool isPosLocal = false)
+        public GameObject Spawn(GameObject prefab, Transform parent = null)
         {
             if (parent == null)
             {
@@ -68,32 +63,33 @@ namespace Homebrew
             }
 
             var key = prefab.GetInstanceID();
+
             Stack<GameObject> objs;
             var stacked = cachedObjects.TryGetValue(key, out objs);
 
             if (stacked && objs.Count > 0)
             {
-                var transform = objs.Pop().transform;
-                transform.SetParent(parent);
-                transform.rotation = rotation;
+                var obj = objs.Pop();
+                var transform = obj.transform;
+                if (transform.parent != parent)
+                    transform.SetParent(parent);
                 transform.gameObject.SetActive(true);
-                if (isPosLocal) transform.localPosition = position;
-                else transform.position = position;
-
                 IPoolable poolable;
-                if (cachedPoolables.TryGetValue(transform.gameObject.GetInstanceID(), out poolable))
+
+                if (cachedPoolables.TryGetValue(obj.GetInstanceID(), out poolable))
                     poolable.Spawn(true);
 
-                return transform.gameObject;
+                return obj;
             }
 
 
             if (!stacked)
             {
-                cachedObjects.Add(key, new Stack<GameObject>(100));
+                cachedObjects.Add(key, new Stack<GameObject>(600));
             }
 
-            var createdPrefab = Populate(prefab, position, rotation, parent, isPosLocal);
+            var createdPrefab = Object.Instantiate(prefab, parent);
+
             var k = createdPrefab.GetInstanceID();
 
             var p = createdPrefab.GetComponent<IPoolable>();
@@ -104,7 +100,6 @@ namespace Homebrew
                     cachedPoolables.Add(k, p);
                 }
             }
-
 
             cachedIds.Add(k, key);
             return createdPrefab;
@@ -142,30 +137,10 @@ namespace Homebrew
 
         private void Populate(GameObject prefab, int key)
         {
-            var go = Populate(prefab, Vector3.zero, Quaternion.identity, parent);
+            var go = Object.Instantiate(prefab);
             go.SetActive(false);
             cachedIds.Add(go.GetInstanceID(), key);
-
             cachedObjects[key].Push(go);
         }
-
-        private GameObject Populate(GameObject prefab, Vector3 position = default(Vector3),
-            Quaternion rotation = default(Quaternion),
-            Transform parent = null, bool isPosLocal = false)
-        {
-            if (parent == null)
-            {
-                parent = this.parent;
-            }
-
-
-            var go = Object.Instantiate(prefab, position, rotation, parent).transform;
-            // go.name += "_" + index; 
-            if (isPosLocal) go.localPosition = position;
-            else go.position = position;
-
-            return go.gameObject;
-        }
- 
     }
 }

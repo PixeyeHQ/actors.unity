@@ -7,15 +7,13 @@ Date:       7/25/2018 11:49 AM
 
 using System;
 using System.Collections.Generic;
-using UnityEngine;
-
 
 namespace Homebrew
 {
     public abstract class Storage
     {
         public static List<Storage> all = new List<Storage>(40);
-        public abstract void Remove(int index, bool addCallBacks = true);
+        public abstract void Remove(int index);
     }
 
     public class Storage<T> : Storage where T : new()
@@ -24,8 +22,6 @@ namespace Homebrew
         public T[] components = new T[EngineSettings.MinComponents];
 
         public bool[] entityHasComponent = new bool[EngineSettings.MinComponents];
-        //  public int length = EngineSettings.MinComponents;
-
 
         public List<GroupBase> groups = new List<GroupBase>();
 
@@ -40,7 +36,7 @@ namespace Homebrew
             if (entityID >= components.Length)
             {
                 var l = entityID << 1;
-            
+
                 Array.Resize(ref components, l);
                 Array.Resize(ref entityHasComponent, l);
             }
@@ -69,7 +65,7 @@ namespace Homebrew
             if (entityID >= components.Length)
             {
                 var l = entityID << 1;
-               
+
                 Array.Resize(ref components, l);
                 Array.Resize(ref entityHasComponent, l);
             }
@@ -97,17 +93,19 @@ namespace Homebrew
         }
 
 
-        public override void Remove(int entityID, bool addCallBacks = true)
+        public override void Remove(int entityID)
         {
             if (entityID >= entityHasComponent.Length) return;
             if (!entityHasComponent[entityID]) return;
 
             entityHasComponent[entityID] = false;
 
+            
+            
             int len = groups.Count;
             for (int i = 0; i < len; i++)
             {
-                groups[i].Remove(entityID, addCallBacks);
+                groups[i].Remove(entityID);
             }
         }
 
@@ -116,9 +114,31 @@ namespace Homebrew
             return entityID >= components.Length ? false : entityHasComponent[entityID];
         }
 
+        public T Get(int entityID)
+        {
+            return components[entityID];
+        }
+
+
         public T TryGet(int entityID)
         {
             return entityID >= components.Length || !entityHasComponent[entityID] ? default(T) : components[entityID];
+        }
+
+        public bool TryGet(int entityID, out T component)
+        {
+            component = components[entityID];
+            return entityID >= components.Length || entityHasComponent[entityID];
+        }
+
+        public T GetOrCreate(int entityID)
+        {
+            if (entityID >= components.Length)
+                return new T();
+            if (components[entityID] == null)
+                return new T();
+
+            return components[entityID];
         }
     }
 }

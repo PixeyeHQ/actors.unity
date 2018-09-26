@@ -24,15 +24,15 @@ namespace Homebrew
         public static void Kill(int index)
         {
             int len = Storage.all.Count;
+
             for (int j = 0; j < len; j++)
             {
-                Storage.all[j].Remove(index, false);
+                Storage.all[j].Remove(index);
             }
 
             Tags.Clear(index);
             Actor.prevID.Push(index);
-           
-        }
+       }
 
         public static void Unbind<T>(int index) where T : new()
         {

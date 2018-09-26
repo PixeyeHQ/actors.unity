@@ -28,6 +28,8 @@ namespace Homebrew
   
         void Awake()
         {
+            ProcessingScene.Dynamic = GameObject.Find("Dynamic").transform;
+            
             if (ProcessingUpdate.Default == null)
             {
                 ProcessingUpdate.Create();

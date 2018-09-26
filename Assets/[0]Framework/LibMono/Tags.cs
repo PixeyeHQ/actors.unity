@@ -36,11 +36,9 @@ namespace Homebrew
         }
 
 
-        static void HandleChange(int id)
+       public static void HandleChange(int id)
         {
             if (Toolbox.isQuittingOrChangingScene()) return;
-            //   if (state.initialized && !state.enabled) return;
-
 
             var groups = ProcessingEntities.Default.GroupsBase;
             int len = ProcessingEntities.Default.groupLength;

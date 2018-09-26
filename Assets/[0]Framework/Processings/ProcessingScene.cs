@@ -17,6 +17,8 @@ namespace Homebrew
 
 		protected readonly Dictionary<string, Transform> sceneObjs = new Dictionary<string, Transform>();
 
+		public static Transform Dynamic = GameObject.Find("Dynamic").transform;
+ 
 
 		public void Dispose()
 		{

@@ -46,6 +46,7 @@ namespace Homebrew
             #if ACTORS_DEBUG
             var name = gameObject.name.Split('(')[0];
             gameObject.name = name + "_" + id;
+
             #endif
 
             base.Awake();
@@ -94,7 +95,7 @@ namespace Homebrew
             int len = Storage.all.Count;
             for (int j = 0; j < len; j++)
             {
-                Storage.all[j].Remove(id, false);
+                Storage.all[j].Remove(id);
             }
 
             if (cachedTransforms != null)
@@ -117,7 +118,7 @@ namespace Homebrew
             int len = Storage.all.Count;
             for (int j = 0; j < len; j++)
             {
-                Storage.all[j].Remove(id, false);
+                Storage.all[j].Remove(id);
             }
 
             Tags.Clear(id);
@@ -127,7 +128,6 @@ namespace Homebrew
                 ProcessingSignals.Default.Remove(this);
 
             if (Toolbox.changingScene) return;
-
  
             ProcessingUpdate.Default.Remove(this);
         }
@@ -146,7 +146,9 @@ namespace Homebrew
         {
             Tags.AddTags(id, tags);
         }
-        
+
+       
+
         public void Add<T>(T component) where T : IData, new()
         {
             var setupable = component as ISetup;
@@ -170,11 +172,12 @@ namespace Homebrew
             return component;
         }
 
+
         public void Remove<T>() where T : new()
         {
             Storage<T>.Instance.Remove(id);
         }
-        
+
         #endregion
 
         #region  GET

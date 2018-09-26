@@ -29,6 +29,7 @@ namespace Homebrew
 		[System.Serializable]
 		public class PoolNode
 		{
+			[TagFilter(typeof(Pool))]
 			public int pool = Pool.None;
 			public GameObject prefab;
 			public List<GameObject> createdObjs = new List<GameObject>();
@@ -36,10 +37,8 @@ namespace Homebrew
 
 			public void Populate()
 			{
-				var procPool = ProcessingGoPool.Default;
-			
-
-				var poolStash = procPool.pools[pool];
+			    if (pool==Pool.None) return;
+				var poolStash = ProcessingPool.pools[pool];
 				
 				 poolStash.RegisterObject(prefab);
 				

@@ -20,11 +20,15 @@ namespace Homebrew
         private static System.Random _r = new System.Random();
 
 
+        public static T Get<T>(this int entity) where T : new()
+        {
+            return Storage<T>.Instance.TryGet(entity);
+        }
+
+
         public static T Create<T>(this int entity) where T : new()
         {
-            var d = Storage<T>.Instance.TryGet(entity);
-            if (d == null) d = new T();
-            return d;
+            return Storage<T>.Instance.GetOrCreate(entity);
         }
 
         public static void Add<T>(this int entity, T component) where T : new()

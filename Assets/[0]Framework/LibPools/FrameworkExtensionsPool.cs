@@ -14,18 +14,28 @@ namespace Homebrew
     {
         #region CREATE
 
+        public static Transform Populate(this object o, int poolID, GameObject prefab, Vector3 startPosition, Quaternion startRotation)
+        {
+            var go = ProcessingPool.pools[poolID].Spawn(prefab, ProcessingScene.Dynamic).transform;
+            go.localPosition = startPosition;
+            go.localRotation = startRotation;
+            return go;
+        }
+
+
         public static Transform Populate(this object o, int poolID, GameObject prefab,
             Vector3 startPosition = default(Vector3), Quaternion startRotation = default(Quaternion),
             Transform parent = null,
             WorldParenters parenters = WorldParenters.Level)
         {
- 
             var parenter = parent ?? ProcessingScene.Default.Get(parenters);
 
+
             var go = poolID == Pool.None
-                ? Object.Instantiate(prefab, startPosition, startRotation, parenter).transform
-                : ProcessingGoPool.HandleSpawn(poolID, prefab, startPosition, startRotation, parenter).transform;
-            go.position = startPosition;
+                ? Object.Instantiate(prefab, parenter).transform
+                : ProcessingPool.pools[poolID].Spawn(prefab, parenter).transform;
+            go.localPosition = startPosition;
+            go.localRotation = startRotation;
             return go;
         }
 
@@ -47,10 +57,10 @@ namespace Homebrew
             var prefab = Box.GetPrefab<GameObject>(prefabID);
 
             var go = poolID == Pool.None
-                ? Object.Instantiate(prefab, startPosition, startRotation, parenter).transform
-                : ProcessingGoPool.HandleSpawn(poolID, prefab, startPosition, startRotation, parenter).transform;
+                ? Object.Instantiate(prefab, parenter).transform
+                : ProcessingPool.pools[poolID].Spawn(prefab, parenter).transform;
             go.localPosition = startPosition;
-            go.position = startPosition;
+            go.localRotation = startRotation;
             return go;
         }
 
@@ -97,10 +107,10 @@ namespace Homebrew
             var prefab = Box.GetPrefab<GameObject>(prefabID);
 
             var go = poolID == Pool.None
-                ? Object.Instantiate(prefab, startPosition, startRotation, parenter).transform
-                : ProcessingGoPool.HandleSpawn(poolID, prefab, startPosition, startRotation, parenter).transform;
+                ? Object.Instantiate(prefab, parenter).transform
+                : ProcessingPool.pools[poolID].Spawn(prefab, parenter).transform;
             go.localPosition = startPosition;
-            go.position = startPosition;
+            go.localRotation = startRotation;
             return go;
         }
 
@@ -119,7 +129,6 @@ namespace Homebrew
         {
             var parent = Toolbox.Get<ProcessingScene>().Get(parentID);
             var tr = o.Populate(poolID, prefabID, startPosition, startRotation, parent);
-
             return tr.GetComponent<T>();
         }
 
