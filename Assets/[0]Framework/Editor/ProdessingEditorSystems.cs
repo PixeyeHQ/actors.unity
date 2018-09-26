@@ -43,7 +43,6 @@ public class ProdessingEditorSystems :  EndNameEditAction
         string xmlPath = @"Assets\[0]Framework\Editor\Template\Settings.xml";
         if (File.Exists(xmlPath))
         {
-            Debug.Log(File.Exists(xmlPath));
             XmlDocument xmlDoc = new XmlDocument();
             xmlDoc.Load(xmlPath);
             ProgectName = xmlDoc.SelectSingleNode("Settings/namespace").InnerText;
