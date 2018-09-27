@@ -45,7 +45,6 @@ public class ProcessingEditorComponent : EndNameEditAction
             XmlDocument xmlDoc = new XmlDocument();
             xmlDoc.Load(xmlPath);
             ProjectName = xmlDoc.SelectSingleNode("Settings/namespace").InnerText;
- 
         }
 
         if (!File.Exists(templatePath)) return (MonoScript)AssetDatabase.LoadAssetAtPath(pathName, typeof(MonoScript));

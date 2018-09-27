@@ -20,7 +20,6 @@ public class ProdessingEditorSystems :  EndNameEditAction
         CreateFromTemplate("Processing.cs", PATH_TO_TEMPLATE);
     }
 
-
     public static void CreateFromTemplate(string name, string pathName)
     {
         ProjectWindowUtil.StartNameEditingIfProjectWindowExists(
@@ -46,7 +45,6 @@ public class ProdessingEditorSystems :  EndNameEditAction
             XmlDocument xmlDoc = new XmlDocument();
             xmlDoc.Load(xmlPath);
             ProgectName = xmlDoc.SelectSingleNode("Settings/namespace").InnerText;
-
         }
 
         if (!File.Exists(templatePath)) return (MonoScript)AssetDatabase.LoadAssetAtPath(pathName, typeof(MonoScript));
