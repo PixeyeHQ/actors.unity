@@ -237,7 +237,7 @@ namespace Homebrew
 
                 if (length == entities.Length)
                 {
-                    int len = length << 2;
+                    int len = length << 1;
                     Array.Resize(ref entities, len);
                     Array.Resize(ref component, len);
                 }
