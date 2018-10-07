@@ -8,7 +8,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0ca494d51d1b0c74ead347ed086e3ec5, type: 3}
-  m_Name: Blueprints
+  m_Script: {fileID: 11500000, guid: 65c4f3afef73422983e5934e9d493e26, type: 3}
+  m_Name: Data Game Settings
   m_EditorClassIdentifier: 
-  blueprints: []

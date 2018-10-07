@@ -1,0 +1,23 @@
+1. Skip this step if you are interested in using framework from external Unity project. 
+Right click on Assets folder in project view -> Import Package -> Custom Package and choose Framework.unitypackage
+
+2. You can use the framework from external project. This is useful if you want to update framework from github.
+In order to use this feature right click on Assets folder in project view -> Create -> Folder(Symlink) and choose Framework/Runtime folder from 
+your framework project.
+
+3. Edit->Project Settings->Player->Scripting Runtime Version .Net 4.x Equivalent 
+
+4. Right click on Assets folder in project view -> Import Package -> Custom Package and choose Template.unitypackage
+
+5. Add Scene Kernel, Scene Game and Scene Camera to the game build settings.
+
+6. Edit->Project Settings->Script Execution Order and set scripts below
+- Homebrew.StarterKernel: -30000
+- Homebrew.Starter: -20000
+- Homebrew.MonoCached: 100
+
+You are ready to go!
+
+Our discord channel : https://discord.gg/ukhzx83
+
+

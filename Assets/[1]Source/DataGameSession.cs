@@ -1,5 +1,4 @@
-﻿using Homebrew;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Homebrew
 {

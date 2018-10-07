@@ -1,0 +1,12 @@
+{
+    "name": "Homebrew.Framework.Linker.Editor",
+    "references": [
+        "ASM-Framework"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false
+}

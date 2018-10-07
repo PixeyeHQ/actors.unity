@@ -1,0 +1,10 @@
+{
+    "name": "Homebrew.Game",
+    "references": [
+        "ASM-Framework"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false
+}
