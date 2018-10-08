@@ -1,5 +1,5 @@
 {
-    "name": "ASM-EditorFramework",
+    "name": "Homebrew.Framework.Editor",
     "references": [
         "ASM-Framework"
     ],
