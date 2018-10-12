@@ -9,7 +9,7 @@ namespace Homebrew
         [TagFilter(typeof(Tag))] public int tag;
     }
 
-    public static partial class Game
+    public static partial class FrameworkExtensions
     {
         public static int[] Convert(this TagNode[] tagNodes)
         {
