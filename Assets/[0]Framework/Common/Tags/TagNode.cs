@@ -4,7 +4,7 @@
 namespace Homebrew
 {
     [System.Serializable]
-    public struct TagNode
+    public class TagNode
     {
         [TagFilter(typeof(Tag))] public int tag;
     }
