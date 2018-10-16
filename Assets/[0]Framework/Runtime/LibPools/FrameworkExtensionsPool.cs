@@ -12,6 +12,15 @@ namespace Homebrew
 {
     public static partial class FrameworkExtensions
     {
+        public static void Release(this GameObject o, int poolID = -1)
+        {
+            if (poolID == -1)
+            {
+                GameObject.Destroy(o);
+            }
+            else ProcessingPool.Despawn(poolID, o);
+        }
+
         #region CREATE
 
         public static Transform Populate(this object o, int poolID, GameObject prefab, Vector3 startPosition, Quaternion startRotation)
@@ -22,6 +31,14 @@ namespace Homebrew
             return go;
         }
 
+        public static Transform Populate(this object o, int poolID, string prefabID, Vector3 startPosition, Quaternion startRotation)
+        {
+            var prefab = Box.GetPrefab<GameObject>(prefabID);
+            var go     = ProcessingPool.pools[poolID].Spawn(prefab, ProcessingScene.Dynamic).transform;
+            go.localPosition = startPosition;
+            go.localRotation = startRotation;
+            return go;
+        }
 
         public static Transform Populate(this object o, int poolID, GameObject prefab,
             Vector3 startPosition = default(Vector3), Quaternion startRotation = default(Quaternion),
@@ -54,7 +71,7 @@ namespace Homebrew
             WorldParenters parenters = WorldParenters.Level)
         {
             var parenter = parent ?? ProcessingScene.Default.Get(parenters);
-            var prefab = Box.GetPrefab<GameObject>(prefabID);
+            var prefab   = Box.GetPrefab<GameObject>(prefabID);
 
             var go = poolID == Pool.None
                 ? Object.Instantiate(prefab, parenter).transform
@@ -79,7 +96,7 @@ namespace Homebrew
             Vector3 startPosition = default(Vector3), Quaternion startRotation = default(Quaternion)) where T : class
         {
             var parent = ProcessingScene.Default.Get(parentID);
-            var tr = o.Populate(poolID, prefabID, startPosition, startRotation, parent);
+            var tr     = o.Populate(poolID, prefabID, startPosition, startRotation, parent);
 
             return tr.GetComponent<T>();
         }
@@ -88,13 +105,12 @@ namespace Homebrew
             Vector3 startPosition = default(Vector3), Quaternion startRotation = default(Quaternion)) where T : class
         {
             var parent = ProcessingScene.Default.Get(parentID);
-            var tr = o.Populate(poolID, prefabID, startPosition, startRotation, parent);
+            var tr     = o.Populate(poolID, prefabID, startPosition, startRotation, parent);
 
             return tr.GetComponent<T>();
         }
 
         #endregion
-
 
         #region BY HASH
 
@@ -104,7 +120,7 @@ namespace Homebrew
             WorldParenters parenters = WorldParenters.Level)
         {
             var parenter = parent ?? ProcessingScene.Default.Get(parenters);
-            var prefab = Box.GetPrefab<GameObject>(prefabID);
+            var prefab   = Box.GetPrefab<GameObject>(prefabID);
 
             var go = poolID == Pool.None
                 ? Object.Instantiate(prefab, parenter).transform
@@ -128,7 +144,7 @@ namespace Homebrew
             Vector3 startPosition = default(Vector3), Quaternion startRotation = default(Quaternion)) where T : class
         {
             var parent = Toolbox.Get<ProcessingScene>().Get(parentID);
-            var tr = o.Populate(poolID, prefabID, startPosition, startRotation, parent);
+            var tr     = o.Populate(poolID, prefabID, startPosition, startRotation, parent);
             return tr.GetComponent<T>();
         }
 

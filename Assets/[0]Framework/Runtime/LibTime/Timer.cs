@@ -150,7 +150,7 @@ namespace Homebrew
             timer = 0.0f;
             IsRunning = false;
 
-
+            if (callBackAction!=null)
             callBackAction();
 
             if (isAutoKill) Kill();

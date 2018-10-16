@@ -12,13 +12,12 @@ using System.Collections.Generic;
 
 namespace Homebrew
 {
-    public delegate void CompositionDelegate(bool added);
-
+  
     public class Composition : IEquatable<Composition>
     {
   
-        public int[] include = new int[0];
-        public int[] exclude = new int[0];
+        internal int[] include = new int[0];
+        internal int[] exclude = new int[0];
 
 
         public override bool Equals(object obj)
@@ -50,21 +49,7 @@ namespace Homebrew
             return hc;
         }
 
-    
-        public bool Contain(IReadOnlyDictionary<int, int> tags)
-        {
-            for (int i = 0; i < include.Length; i++)
-            {
-                if (!tags.ContainsKey(include[i])) return false;
-            }
-
-            for (int i = 0; i < exclude.Length; i++)
-            {
-                if (tags.ContainsKey(exclude[i])) return false;
-            }
-
-            return true;
-        }
+     
  
         public bool Equals(Composition other)
         {

@@ -22,4 +22,5 @@ public struct EntityState
     public bool requireStarter;
     public bool requireActorParent;
     public bool initialized;
+    
 }

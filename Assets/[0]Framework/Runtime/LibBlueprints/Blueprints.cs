@@ -18,7 +18,7 @@ namespace Homebrew
 {
     
     [System.Serializable]
-    public class Blueprints : Pluggable, IAwake, IKernel
+    public class Blueprints : ScriptableObject, IAwake, IKernel
     {
         public List<Blueprint> blueprints = new List<Blueprint>();
 
@@ -76,10 +76,6 @@ namespace Homebrew
                  
             }
         }
-
-        public override void Plug()
-        {
-            Toolbox.Add(this);
-        }
+ 
     }
 }

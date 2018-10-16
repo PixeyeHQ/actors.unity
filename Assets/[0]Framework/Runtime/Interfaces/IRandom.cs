@@ -9,9 +9,6 @@ using UnityEngine;
 namespace Homebrew{
 
 public interface IRandom {
-
-
     float returnChance { get; }
-
 }
 }

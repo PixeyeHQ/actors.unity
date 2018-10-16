@@ -200,10 +200,10 @@ MonoBehaviour:
   factories: []
   ScenesToKeep:
   - m_SceneAsset: {fileID: 102900000, guid: 2642f792712675d40a8d87889fdfee7a, type: 3}
-    m_SceneName: sceneKernel
+    m_SceneName: Scene Kernel
   SceneDependsOn:
   - m_SceneAsset: {fileID: 102900000, guid: 2642f792712675d40a8d87889fdfee7a, type: 3}
-    m_SceneName: sceneKernel
+    m_SceneName: Scene Kernel
 --- !u!4 &1315877080
 Transform:
   m_ObjectHideFlags: 0

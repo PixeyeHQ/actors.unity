@@ -17,7 +17,7 @@ namespace Homebrew
 
 		protected readonly Dictionary<string, Transform> sceneObjs = new Dictionary<string, Transform>();
 
-		public static Transform Dynamic = GameObject.Find("Dynamic").transform;
+		internal static Transform Dynamic = GameObject.Find("Dynamic").transform;
  
 
 		public void Dispose()
@@ -28,7 +28,7 @@ namespace Homebrew
 		public Transform Get(string id)
 		{
 			Transform obj;
-			var haveFound = sceneObjs.TryGetValue(id, out obj);
+			var       haveFound = sceneObjs.TryGetValue(id, out obj);
 			if (!haveFound)
 			{
 				var o = GameObject.Find(id);

@@ -17,9 +17,9 @@ namespace Homebrew
 
         public void RegisterObject(GameObject prefab)
         {
-            var key = prefab.GetInstanceID();
+            var               key = prefab.GetInstanceID();
             Stack<GameObject> stack;
-            var hasValue = cachedObjects.TryGetValue(key, out stack);
+            var               hasValue = cachedObjects.TryGetValue(key, out stack);
             if (!hasValue) cachedObjects.Add(key, new Stack<GameObject>());
         }
 
@@ -30,9 +30,9 @@ namespace Homebrew
 
         public PoolContainer PopulateWith(GameObject prefab, int amount, int amountPerTick = 10, int timeRate = 1)
         {
-            var key = prefab.GetInstanceID();
+            var               key = prefab.GetInstanceID();
             Stack<GameObject> stack;
-            var hasValue = cachedObjects.TryGetValue(key, out stack);
+            var               hasValue = cachedObjects.TryGetValue(key, out stack);
             if (!hasValue) cachedObjects.Add(key, new Stack<GameObject>(amount));
 
 
@@ -65,11 +65,11 @@ namespace Homebrew
             var key = prefab.GetInstanceID();
 
             Stack<GameObject> objs;
-            var stacked = cachedObjects.TryGetValue(key, out objs);
+            var               stacked = cachedObjects.TryGetValue(key, out objs);
 
             if (stacked && objs.Count > 0)
             {
-                var obj = objs.Pop();
+                var obj       = objs.Pop();
                 var transform = obj.transform;
                 if (transform.parent != parent)
                     transform.SetParent(parent);
@@ -77,7 +77,7 @@ namespace Homebrew
                 IPoolable poolable;
 
                 if (cachedPoolables.TryGetValue(obj.GetInstanceID(), out poolable))
-                    poolable.Spawn(true);
+                    poolable.Spawn();
 
                 return obj;
             }
@@ -110,12 +110,6 @@ namespace Homebrew
             go.SetActive(false);
 
             cachedObjects[cachedIds[go.GetInstanceID()]].Push(go);
-
-            IPoolable poolable;
-            if (cachedPoolables.TryGetValue(go.GetInstanceID(), out poolable))
-            {
-                poolable.Spawn(false);
-            }
         }
 
         public void DespawnAll()

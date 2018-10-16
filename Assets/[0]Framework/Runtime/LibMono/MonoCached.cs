@@ -28,7 +28,9 @@ namespace Homebrew
 
         [HideInInspector] public Transform selfTransform;
 
-        protected bool conditionSignals;
+        internal bool conditionSignals;
+        public bool conditionTick;
+        public ITick t;
 
         #endregion
 
@@ -43,10 +45,10 @@ namespace Homebrew
 
             conditionSignals = ProcessingSignals.Check(this);
 
+
             if (Starter.initialized == false)
             {
                 state.requireStarter = true;
-
                 return;
             }
 
@@ -58,42 +60,32 @@ namespace Homebrew
 
 
             Setup();
-
-            Timer.Add(Time.DeltaTimeFixed, () =>
-            {
-                state.initialized = true;
-
-                PostSetup();
-            });
+            state.initialized = true;
         }
 
         public virtual void OnEnable()
         {
-            if (state.enabled || state.requireStarter ||
+            if (state.requireStarter ||
                 state.requireActorParent) return;
 
             state.released = false;
             state.enabled = true;
 
+            HandleEnable();
+
             if (conditionSignals)
                 ProcessingSignals.Default.Add(this);
 
             ProcessingUpdate.Default.Add(this);
-
-            HandleEnable();
         }
 
 
         public virtual void OnDisable()
         {
-            if (conditionSignals)
-                ProcessingSignals.Default.Remove(this);
-
-            if (Toolbox.isQuittingOrChangingScene() || !state.enabled) return;
-
             state.enabled = false;
 
-
+            if (conditionSignals)
+                ProcessingSignals.Default.Remove(this);
             ProcessingUpdate.Default.Remove(this);
 
             HandleDisable();
@@ -103,32 +95,23 @@ namespace Homebrew
 
         #region SETUPS
 
-        public virtual void SetupAfterStarter()
+        internal virtual void SetupAfterStarter()
         {
-            if (state.requireActorParent) return; 
             state.requireStarter = false;
             Setup();
             OnEnable();
-
-            Timer.Add(Time.DeltaTimeFixed, () =>
-            {
-                PostSetup();
-                state.initialized = true;
-            });
+            state.initialized = true;
+            // Timer.Add(Time.DeltaTimeFixed, () => { state.initialized = true; });
         }
 
-        public void SetupAfterActor()
+        internal void SetupAfterActor()
         {
             if (!state.requireActorParent) return;
             state.requireActorParent = false;
             Setup();
             OnEnable();
-
-            Timer.Add(Time.DeltaTimeFixed, () =>
-            {
-                PostSetup();
-                state.initialized = true;
-            });
+            state.initialized = true;
+            // Timer.Add(Time.DeltaTimeFixed, () => { state.initialized = true; });
         }
 
         #endregion
@@ -139,9 +122,6 @@ namespace Homebrew
         {
         }
 
-        protected virtual void PostSetup()
-        {
-        }
 
         protected virtual void HandleEnable()
         {
@@ -155,19 +135,15 @@ namespace Homebrew
 
         #region DESTROY
 
-        protected virtual void OnHandleDestroy()
-        {
-        }
-
-        public void HandleDestroy()
+        public void Release()
         {
             if (state.released) return;
             state.released = true;
 
+            OnHandleRelease();
 
             if (pool == Pool.None)
             {
-                OnHandleDestroy();
                 Destroy(gameObject, timeDestroyDelay + 0.03f);
                 return;
             }
@@ -175,10 +151,15 @@ namespace Homebrew
             HandleReturnToPool();
         }
 
-        protected virtual void HandleReturnToPool()
+        protected virtual void OnHandleRelease()
         {
+        }
 
-            Timer.Add(timeDestroyDelay + 0.03f, () => ProcessingPool.Despawn(pool,gameObject)); 
+        internal void HandleReturnToPool()
+        {
+            if (timeDestroyDelay > 0)
+                Timer.Add(timeDestroyDelay, () => gameObject.Release(pool));
+            else gameObject.Release(pool);
         }
 
         #endregion

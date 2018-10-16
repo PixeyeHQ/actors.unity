@@ -19,16 +19,54 @@ namespace Homebrew
     {
         private static System.Random _r = new System.Random();
 
+        #region ACTORS
 
-        public static T Get<T>(this int entity) where T : new()
+        public static void Kill(this int entity)
+        {
+            int len = Storage.all.Count;
+
+            for (int j = 0; j < len; j++)
+            {
+                Storage.all[j].Remove(entity);
+            }
+
+            Tags.Clear(entity);
+            Actor.prevID.Push(entity);
+        }
+
+        public static Actor GetActor(this int entity)
+        {
+            return Actor.entites[entity];
+        }
+
+        public static void HandleDestroy(this int entity)
+        {
+            Actor.entites[entity].Release();
+        }
+
+        public static Transform GetTransform(this int entity)
+        {
+            return Actor.entites[entity].selfTransform;
+        }
+
+        public static T Create<T>(this int entity) where T : IComponent, new()
+        {
+            return Storage<T>.Instance.GetOrCreate(entity);
+        }
+
+        public static T Get<T>(this int entity, string path)
+        {
+            return Actor.entites[entity].Get<T>(path);
+        }
+
+        public static T Get<T>(this int entity) where T : IComponent, new()
         {
             return Storage<T>.Instance.TryGet(entity);
         }
 
-
-        public static T Create<T>(this int entity) where T : new()
+        public static bool Has<T>(this int entity) where T : IComponent, new()
         {
-            return Storage<T>.Instance.GetOrCreate(entity);
+            return Storage<T>.Instance.HasComponent(entity);
         }
 
         public static void Add<T>(this int entity, T component) where T : new()
@@ -43,7 +81,7 @@ namespace Homebrew
 
         public static void Remove<T>(this Actor a) where T : new()
         {
-            Storage<T>.Instance.Remove(a.id);
+            Storage<T>.Instance.Remove(a.entity);
         }
 
         public static void Remove<T>(this int entity) where T : new()
@@ -63,96 +101,10 @@ namespace Homebrew
             }
         }
 
-
-        #region 2dRaycasts
-
-        public static Actor GetActor(this RaycastHit2D hit, params int[] tags)
-        {
-            var actor = hit.collider.GetComponentInParent<Actor>();
-            if (actor == null) return null;
-            return Tags.Has(actor.id, tags) ? actor : null;
-        }
-
         #endregion
-
 
         #region ARRAYS
 
-// public static void InsertCheck(this int[] a, int id,  ref int length, ref int indexLast)
-//        {
-//            if (length == 0)
-//            {
-//                indexLast = 0;
-//                length++;
-//                return;
-//            }
-//            
-//            if (id > a[0])
-//            {
-//                length++;
-//                indexLast = 0;
-//            }
-//            else if (id < a[length - 1])
-//            {
-//                indexLast = length;
-//                length++;
-//            }
-//            else
-//            {
-//           
-//           
-//                if (id < a[indexLast])
-//                {
-//                    length++;
-//
-//                    if (id > a[indexLast + 1])
-//                    {
-//                        indexLast = indexLast + 1;
-//                  
-//                    }
-//                    else
-//                    {
-//                        int indexNext = indexLast;
-//                        while (true)
-//                        {
-//                            if (id > a[indexNext])
-//                            {
-//                                indexLast = indexNext;
-//                        
-//                                break;
-//                            }
-//
-//                            indexNext += 1;
-//                        }
-//                    }
-//                }
-//                else if (id > a[indexLast])
-//                {
-//                    
-//                    length++;
-//                    
-//                    if (id< a[indexLast - 1])
-//                    {
-//                
-//                    }
-//                    else
-//                    {
-//                        int indexPrev = indexLast;
-//                        while (true)
-//                        {
-//                            if (id < a[indexPrev])
-//                            {
-//                          
-//                                indexLast = indexPrev+1;
-//                                break;
-//                            }
-//
-//                            indexPrev -= 1;
-//                        }
-//                    }
-//                }
-//            }
-//        }
         public static void InsertCheck(this int[] a, int id, ref int length, ref int indexLast)
         {
             if (length == 0)
@@ -323,7 +275,7 @@ namespace Homebrew
         public static void Add<T>(this T[] a, T element, ref int length) where T : class
         {
             int index = 0;
-            int len = a.Length;
+            int len   = a.Length;
             for (int i = 0; i < len; i++)
             {
                 if (a[i] != null) index++;
@@ -354,7 +306,7 @@ namespace Homebrew
         {
             for (int i = 0; i < array.Length - 1; i++)
             {
-                int j = i + 1;
+                int j   = i + 1;
                 int tmp = array[j];
                 while (j > 0 && tmp < array[j - 1])
                 {
@@ -438,7 +390,6 @@ namespace Homebrew
 
         #endregion
 
-
         #region RANDOM
 
         public static int Between(this object o, int a, int b, float chance = 0.5f)
@@ -451,24 +402,7 @@ namespace Homebrew
             return UnityEngine.Random.value > chance ? a : b;
         }
 
-
-        public static int ReturnNearestIndex(this Vector3[] nodes, Vector3 destination)
-        {
-            float nearestDistance = Mathf.Infinity;
-            int index = 0;
-            int length = nodes.Length;
-            for (int i = 0; i < length; i++)
-            {
-                float distanceToNode = (destination + nodes[i]).sqrMagnitude;
-                if (!(nearestDistance > distanceToNode)) continue;
-                nearestDistance = distanceToNode;
-                index = i;
-            }
-
-            return index;
-        }
-
-        public static T ReturnRandom<T>(this List<T> list, T[] itemsToExclude)
+        public static T Random<T>(this List<T> list, T[] itemsToExclude)
         {
             var val = list[UnityEngine.Random.Range(0, list.Count)];
 
@@ -478,13 +412,13 @@ namespace Homebrew
             return val;
         }
 
-        public static T ReturnRandom<T>(this List<T> list)
+        public static T Random<T>(this List<T> list)
         {
             var val = list[UnityEngine.Random.Range(0, list.Count)];
             return val;
         }
 
-        public static T GetRandom<T>(this List<T> vals) where T : IRandom
+        public static T Select<T>(this List<T> vals) where T : IRandom
         {
             float total = 0f;
 
@@ -511,49 +445,15 @@ namespace Homebrew
             return vals[0];
         }
 
-        public static T GetRandom<T>(this T[] vals) where T : IRandom
+        public static T Select<T>(this T[] vals) where T : IRandom
         {
-            if (vals == null || vals.Length == 0) return default(T);
-
-
-            float total = 0f;
-
-            float[] probs = new float[vals.Length];
-
-
-            for (int i = 0; i < probs.Length; i++)
-            {
-                probs[i] = vals[i].returnChance;
-                total += probs[i];
-            }
-
-
-            float randomPoint = (float) _r.NextDouble() * total;
-
-
-            for (int i = 0; i < probs.Length; i++)
-            {
-                if (randomPoint < probs[i])
-                    return vals[i];
-                else randomPoint -= probs[i];
-            }
-
-            return vals[0];
-        }
-
-        public static float GetRandomArg(this float[] vals)
-        {
-            if (vals == null || vals.Length == 0) return -1;
-
-
-            float total = 0f;
-
+            var total = 0f;
             var probs = new float[vals.Length];
 
 
             for (int i = 0; i < probs.Length; i++)
             {
-                probs[i] = vals[i];
+                probs[i] = vals[i].returnChance;
                 total += probs[i];
             }
 
@@ -564,74 +464,14 @@ namespace Homebrew
             for (int i = 0; i < probs.Length; i++)
             {
                 if (randomPoint < probs[i])
-                    return probs[i];
+                    return vals[i];
                 randomPoint -= probs[i];
             }
 
-            return 0;
+            return vals[0];
         }
-
-
-        public static int GetRandom(this float[] vals)
-        {
-            if (vals == null || vals.Length == 0) return -1;
-
-
-            float total = 0f;
-
-            var probs = new float[vals.Length];
-
-
-            for (int i = 0; i < probs.Length; i++)
-            {
-                probs[i] = vals[i];
-                total += probs[i];
-            }
-
-
-            float randomPoint = (float) _r.NextDouble() * total;
-
-
-            for (int i = 0; i < probs.Length; i++)
-            {
-                if (randomPoint < probs[i])
-                    return i;
-                randomPoint -= probs[i];
-            }
-
-            return 0;
-        }
-
-        public static T Random<T>(this T[] vals)
-        {
-            return vals[UnityEngine.Random.Range(0, vals.Length)];
-        }
-
-        public static T RandomList<T>(this List<T> vals)
-        {
-            return vals[UnityEngine.Random.Range(0, vals.Count)];
-        }
-
-        public static T RandomWithRemove<T>(this List<T> vals, out int index)
-        {
-            index = UnityEngine.Random.Range(0, vals.Count);
-
-            var val = vals[index];
-            vals.RemoveAt(index);
-            return val;
-        }
-
-
-        public static T RandomWithRemove<T>(this List<T> vals)
-        {
-            int index = UnityEngine.Random.Range(0, vals.Count);
-            var val = vals[index];
-            vals.RemoveAt(index);
-            return val;
-        }
-
-
-        public static T GetRandom<T>(this T[] vals, out int index) where T : IRandom
+ 
+        public static T Select<T>(this T[] vals, out int index) where T : IRandom
         {
             index = -1;
 
@@ -666,139 +506,24 @@ namespace Homebrew
 
             return vals[0];
         }
-
-        public static T GetRandom<T>(this T[] vals, float[] probs) where T : IRandom
+ 
+        public static T Random<T>(this T[] vals)
         {
-            if (vals == null || vals.Length == 0) return default(T);
-
-
-            float total = probs.Sum();
-
-
-            float randomPoint = (float) _r.NextDouble() * total;
-
-
-            for (int i = 0; i < probs.Length; i++)
-            {
-                if (randomPoint < probs[i])
-                    return vals[i];
-                randomPoint -= probs[i];
-            }
-
-            return vals[0];
+            return vals[UnityEngine.Random.Range(0, vals.Length)];
         }
 
-
-        public static float GetRandom(this Vector2 v)
+        public static T RandomDequeue<T>(this List<T> vals)
         {
-            return UnityEngine.Random.Range(v.x, v.y);
+            var index = UnityEngine.Random.Range(0, vals.Count);
+            var val = vals[index];
+            vals.RemoveAt(index);
+            return val;
         }
-
-        public static float GetRandomChoice(this Vector2 v)
-        {
-            return UnityEngine.Random.value >= 0.5f ? v.x : v.y;
-        }
-
-
-        public static Vector3 MixRandom(this Vector3 me, Vector3 v1, Vector3 v2)
-        {
-            var v = new Vector3(
-                UnityEngine.Random.Range(v1.x, v2.x),
-                UnityEngine.Random.Range(v1.y, v2.y),
-                UnityEngine.Random.Range(v1.z, v2.z)
-            );
-            return v;
-        }
-
+ 
+     
         #endregion
 
-
         #region TRANSFORMS
-
-        public static float ClampAngle(this float angle, float min, float max)
-        {
-            if (min < 0 && max > 0 && (angle > max || angle < min))
-            {
-                angle -= 360;
-                if (angle > max || angle < min)
-                {
-                    return Mathf.Abs(Mathf.DeltaAngle(angle, min)) < Mathf.Abs(Mathf.DeltaAngle(angle, max))
-                        ? min
-                        : max;
-                }
-            }
-            else if (min > 0 && (angle > max || angle < min))
-            {
-                angle += 360;
-                if (angle > max || angle < min)
-                {
-                    return Mathf.Abs(Mathf.DeltaAngle(angle, min)) < Mathf.Abs(Mathf.DeltaAngle(angle, max))
-                        ? min
-                        : max;
-                }
-            }
-
-            if (angle < min) return min;
-            else if (angle > max)
-                return max;
-            else
-                return angle;
-        }
-
-        public static Vector3 MultiplyX(this Vector3 v, float val)
-        {
-            v = new Vector3(val * v.x, v.y, v.z);
-            return v;
-        }
-
-        public static Vector3 MultiplyY(this Vector3 v, float val)
-        {
-            v = new Vector3(v.x, val * v.y, v.z);
-            return v;
-        }
-
-        public static Vector3 MultiplyZ(this Vector3 v, float val)
-        {
-            v = new Vector3(v.x, v.y, val * v.z);
-            return v;
-        }
-
-
-        public static Transform[] GetChildTransfroms(this Transform t)
-        {
-            int size = t.childCount;
-            var array = new Transform[size];
-            for (int i = 0; i < size; i++)
-            {
-                array[i] = t.GetChild(i);
-            }
-
-            return array;
-        }
-
-        public static Vector3[] GetChildTransfromsPos(this Transform t)
-        {
-            int size = t.childCount;
-            var array = new Vector3[size];
-            for (int i = 0; i < size; i++)
-            {
-                array[i] = t.GetChild(i).position;
-            }
-
-            return array;
-        }
-
-
-        public static Vector3 AppendZ(this Transform obj, float zVal = 0.0f)
-        {
-            return new Vector3(obj.position.x, obj.position.y, zVal);
-        }
-
-        public static Vector3 AppendZ(this Vector3 obj, float zVal = 0.0f)
-        {
-            return new Vector3(obj.x, obj.y, zVal);
-        }
-
 
         public static Transform FindDeep(this Transform obj, string id)
         {
@@ -819,7 +544,6 @@ namespace Homebrew
 
             return null;
         }
-
 
         public static List<T> GetAll<T>(this Transform obj)
         {
@@ -861,15 +585,6 @@ namespace Homebrew
 //					return time / duration;
 //			}
 //		}
-
-        #endregion
-
-        #region COLORS
-
-        public static Color SetColorAlpha(this Color c, float alpha)
-        {
-            return new Color(c.r, c.g, c.b, alpha);
-        }
 
         #endregion
     }

@@ -12,22 +12,28 @@ namespace Homebrew
     public abstract class GroupBase : IDisposable
     {
         public int length;
- 
+
         public int[] entities = new int[EngineSettings.MinEntities];
         public Composition composition;
 
- 
+
         public Action<int> OnAdded;
         public Action<int> OnRemoved;
         public Action<int, int> OnTagsChanged;
 
         protected int indexLast;
- 
+
+        public T Get<T>(int index) where T : new()
+        {
+            return Storage<T>.Instance.TryGet(entities[index]);
+        }
+
         public void Kill(int i)
         {
-            var entity = GetActorID(i);
-            ProcessingEntities.Kill(entity);
+            var entity = GetEntityID(i);
+            entity.Kill();
         }
+
 
         public void TagsChanged(int entityID)
         {
@@ -35,7 +41,7 @@ namespace Homebrew
 
             if (index == -1)
             {
-                if (composition.include.Length > 0 && !entityID.Has(composition.include)) return;
+                if (!entityID.Has(composition.include)) return;
                 if (entityID.HasAny(composition.exclude)) return;
 
                 TryAdd(entityID);
@@ -45,13 +51,12 @@ namespace Homebrew
                 if (OnTagsChanged != null)
                     OnTagsChanged(index, entityID);
 
-                if (composition.include.Length > 0 && !entityID.Has(composition.include) ||
-                    entityID.HasAny(composition.exclude))
-                {
+                if (!entityID.Has(composition.include) || entityID.HasAny(composition.exclude))
+
                     RemoveAt(index);
-                }
             }
         }
+
 
         public int GetIndex(int actorID)
         {
@@ -64,7 +69,7 @@ namespace Homebrew
             return -1;
         }
 
-        public int GetActorID(int index)
+        public int GetEntityID(int index)
         {
             return entities[index];
         }
@@ -74,18 +79,12 @@ namespace Homebrew
             return Actor.entites[entities[index]];
         }
 
-        public T Get<T>(int index) where T : IData, new()
-        {
-            return Storage<T>.Instance.TryGet(entities[index]);
-        }
-       
-        
         public bool CheckTags(int entityID)
         {
-            if (composition.include.Length > 0 && !entityID.Has(composition.include))
+            if (!entityID.Has(composition.include))
                 return false;
 
-            return composition.exclude.Length <= 0 || !entityID.HasAny(composition.exclude);
+            return !entityID.HasAny(composition.exclude);
         }
 
 
@@ -95,9 +94,7 @@ namespace Homebrew
         public void Remove(int entityID)
         {
             int i = GetIndex(entityID);
-
             if (i == -1) return;
-
             RemoveAt(i);
         }
 
@@ -118,68 +115,8 @@ namespace Homebrew
         protected abstract void OnDispose();
     }
 
-    public class Group : GroupBase
-    {
-        public override void TryAdd(int entityID)
-        {
-            if (entities.Length == length)
-            {
-               
-                int len = length << 1;
-                Array.Resize(ref entities, len);
-            }
 
-
-            indexLast = length++;
-
-
-            entities[indexLast] = entityID;
-
-            if (OnAdded != null)
-                OnAdded(indexLast);
-        }
-
-
-        public override void Populate()
-        {
-            for (int i = 0; i < Actor.lastID; i++)
-            {
-                var e = Actor.entites[i];
-
-                if (e == null || !e.state.enabled) continue;
-
-                if (composition.include.Length > 0)
-                    if (!e.id.Has(composition.include))
-                        continue;
-
-                if (composition.exclude.Length > 0)
-                    if (e.id.HasAny(composition.exclude))
-                        continue;
-
-                if (length == entities.Length)
-                    Array.Resize(ref entities, length << 1);
-
-
-                entities.InsertCheck(e.id, ref length, ref indexLast);
-                Array.Copy(entities, indexLast, entities, indexLast + 1, length - indexLast - 1);
-                entities[indexLast] = e.id;
-            }
-        }
-
-        protected override void RemoveAt(int i)
-        {
-            int l = --length;
-            if (OnRemoved != null)
-                OnRemoved(i);
-            Array.Copy(entities, i + 1, entities, i, l - i);
-        }
-
-        protected override void OnDispose()
-        {
-        }
-    }
-
-    public class Group<T> : GroupBase where T : IData, new()
+    public class Group<T> : GroupBase where T : IComponent, new()
     {
         public T[] component = new T[EngineSettings.MinComponents];
         private Storage<T> storage = Storage<T>.Instance;
@@ -190,7 +127,7 @@ namespace Homebrew
             if (!storage.HasComponent(entityID)) return;
 
 
-            if (entities.Length == length)
+            if (entities.Length <= length)
             {
                 int len = length << 1;
                 Array.Resize(ref entities, len);
@@ -219,15 +156,15 @@ namespace Homebrew
                 if (e == null || !e.state.enabled) continue;
 
                 if (composition.include.Length > 0)
-                    if (!e.id.Has(composition.include))
+                    if (!e.entity.Has(composition.include))
                         continue;
 
                 if (composition.exclude.Length > 0)
-                    if (e.id.HasAny(composition.exclude))
+                    if (e.entity.HasAny(composition.exclude))
                         continue;
 
 
-                if (!storage.HasComponent(e.id)) continue;
+                if (!storage.HasComponent(e.entity)) continue;
 
 
                 if (length == entities.Length)
@@ -237,7 +174,7 @@ namespace Homebrew
                     Array.Resize(ref component, len);
                 }
 
-                int entityID = e.id;
+                int entityID = e.entity;
                 indexLast = length++;
 
 
@@ -271,7 +208,7 @@ namespace Homebrew
         }
     }
 
-    public class Group<T, Y> : GroupBase where T : IData, new() where Y : IData, new()
+    public class Group<T, Y> : GroupBase where T : IComponent, new() where Y : new()
     {
         public T[] component = new T[EngineSettings.MinComponents];
         public Y[] component2 = new Y[EngineSettings.MinComponents];
@@ -282,7 +219,7 @@ namespace Homebrew
         public override void TryAdd(int entityID)
         {
             if (!storage.HasComponent(entityID) || !storage2.HasComponent(entityID)) return;
-            if (entities.Length == length)
+            if (entities.Length <= length)
             {
                 int len = length << 1;
 
@@ -315,15 +252,15 @@ namespace Homebrew
                 var e = Actor.entites[i];
                 if (e == null || !e.state.enabled) continue;
                 if (composition.include.Length > 0)
-                    if (!e.id.Has(composition.include))
+                    if (!e.entity.Has(composition.include))
                         continue;
 
                 if (composition.exclude.Length > 0)
-                    if (e.id.HasAny(composition.exclude))
+                    if (e.entity.HasAny(composition.exclude))
                         continue;
 
 
-                if (!storage.HasComponent(e.id) || !storage2.HasComponent(e.id)) continue;
+                if (!storage.HasComponent(e.entity) || !storage2.HasComponent(e.entity)) continue;
 
 
                 if (length == entities.Length)
@@ -335,7 +272,7 @@ namespace Homebrew
                     Array.Resize(ref component2, len);
                 }
 
-                int entityID = e.id;
+                int entityID = e.entity;
                 indexLast = length++;
 
 
@@ -347,7 +284,7 @@ namespace Homebrew
 
         protected override void RemoveAt(int i)
         {
-            int l = --length;
+            int l    = --length;
             int next = i + 1;
             int size = l - i;
 
@@ -367,7 +304,7 @@ namespace Homebrew
         }
     }
 
-    public class Group<T, Y, U> : GroupBase where T : IData, new() where Y : IData, new() where U : IData, new()
+    public class Group<T, Y, U> : GroupBase where T : IComponent, new() where Y : new() where U : new()
     {
         public T[] component = new T[EngineSettings.MinComponents];
         public Y[] component2 = new Y[EngineSettings.MinComponents];
@@ -378,7 +315,7 @@ namespace Homebrew
 
         protected override void RemoveAt(int i)
         {
-            int l = --length;
+            int l    = --length;
             int next = i + 1;
             int size = l - i;
             if (OnRemoved != null)
@@ -397,13 +334,13 @@ namespace Homebrew
             ) return;
 
 
-            if (entities.Length == length)
+            if (entities.Length <= length)
             {
                 int len = length << 1;
-                Array.Resize(ref entities, len + 1);
-                Array.Resize(ref component, len + 1);
-                Array.Resize(ref component2, len + 1);
-                Array.Resize(ref component3, len + 1);
+                Array.Resize(ref entities, len);
+                Array.Resize(ref component, len);
+                Array.Resize(ref component2, len);
+                Array.Resize(ref component3, len);
             }
 
 
@@ -432,14 +369,14 @@ namespace Homebrew
                 if (e == null || !e.state.enabled) continue;
 
                 if (composition.include.Length > 0)
-                    if (!e.id.Has(composition.include))
+                    if (!e.entity.Has(composition.include))
                         continue;
 
                 if (composition.exclude.Length > 0)
-                    if (e.id.HasAny(composition.exclude))
+                    if (e.entity.HasAny(composition.exclude))
                         continue;
 
-                int entityID = e.id;
+                int entityID = e.entity;
 
                 if (!storage.HasComponent(entityID) ||
                     !storage2.HasComponent(entityID) ||
@@ -475,10 +412,10 @@ namespace Homebrew
         }
     }
 
-    public class Group<T, Y, U, I> : GroupBase where T : IData, new()
-        where Y : IData, new()
-        where U : IData, new()
-        where I : IData, new()
+    public class Group<T, Y, U, I> : GroupBase where T : IComponent, new()
+                                               where Y : new()
+                                               where U : new()
+                                               where I : new()
     {
         public T[] component = new T[EngineSettings.MinComponents];
         public Y[] component2 = new Y[EngineSettings.MinComponents];
@@ -492,7 +429,7 @@ namespace Homebrew
 
         protected override void RemoveAt(int i)
         {
-            int l = --length;
+            int l    = --length;
             int next = i + 1;
             int size = l - i;
             if (OnRemoved != null)
@@ -549,7 +486,7 @@ namespace Homebrew
                 if (e == null || !e.state.enabled) continue;
 
 
-                int entityID = e.id;
+                int entityID = e.entity;
                 if (!storage.HasComponent(entityID) ||
                     !storage2.HasComponent(entityID) ||
                     !storage3.HasComponent(entityID) ||
@@ -558,11 +495,11 @@ namespace Homebrew
 
 
                 if (composition.include.Length > 0)
-                    if (!e.id.Has(composition.include))
+                    if (!e.entity.Has(composition.include))
                         continue;
 
                 if (composition.exclude.Length > 0)
-                    if (e.id.HasAny(composition.exclude))
+                    if (e.entity.HasAny(composition.exclude))
                         continue;
 
 
@@ -597,11 +534,11 @@ namespace Homebrew
         }
     }
 
-    public class Group<T, Y, U, I, O> : GroupBase where T : IData, new()
-        where Y : IData, new()
-        where U : IData, new()
-        where I : IData, new()
-        where O : IData, new()
+    public class Group<T, Y, U, I, O> : GroupBase where T : IComponent, new()
+                                                  where Y : new()
+                                                  where U : new()
+                                                  where I : new()
+                                                  where O : new()
     {
         public T[] component = new T[EngineSettings.MinComponents];
         public Y[] component2 = new Y[EngineSettings.MinComponents];
@@ -627,7 +564,7 @@ namespace Homebrew
 
             if (entities.Length <= length)
             {
-                int len = length << 1;
+                int len = entityID == 0 ? EngineSettings.MinComponents : length << 1;
 
                 Array.Resize(ref entities, len);
                 Array.Resize(ref component, len);
@@ -668,13 +605,13 @@ namespace Homebrew
                 if (e == null || !e.state.enabled) continue;
 
                 if (composition.include.Length > 0)
-                    if (!e.id.Has(composition.include))
+                    if (!e.entity.Has(composition.include))
                         continue;
 
                 if (composition.exclude.Length > 0)
-                    if (e.id.HasAny(composition.exclude))
+                    if (e.entity.HasAny(composition.exclude))
                         continue;
-                int entityID = e.id;
+                int entityID = e.entity;
                 if (!storage.HasComponent(entityID) ||
                     !storage2.HasComponent(entityID) ||
                     !storage3.HasComponent(entityID) ||
@@ -710,7 +647,7 @@ namespace Homebrew
 
         protected override void RemoveAt(int i)
         {
-            int l = --length;
+            int l    = --length;
             int next = i + 1;
             int size = l - i;
             if (OnRemoved != null)
@@ -735,12 +672,12 @@ namespace Homebrew
     }
 
 
-    public class Group<T, Y, U, I, O, P> : GroupBase where T : IData, new()
-        where Y : IData, new()
-        where U : IData, new()
-        where I : IData, new()
-        where O : IData, new()
-        where P : IData, new()
+    public class Group<T, Y, U, I, O, P> : GroupBase where T : IComponent, new()
+                                                     where Y : new()
+                                                     where U : new()
+                                                     where I : new()
+                                                     where O : new()
+                                                     where P : new()
     {
         public T[] component = new T[EngineSettings.MinComponents];
         public Y[] component2 = new Y[EngineSettings.MinComponents];
@@ -811,13 +748,13 @@ namespace Homebrew
                 if (e == null || !e.state.enabled) continue;
 
                 if (composition.include.Length > 0)
-                    if (!e.id.Has(composition.include))
+                    if (!e.entity.Has(composition.include))
                         continue;
 
                 if (composition.exclude.Length > 0)
-                    if (e.id.HasAny(composition.exclude))
+                    if (e.entity.HasAny(composition.exclude))
                         continue;
-                int entityID = e.id;
+                int entityID = e.entity;
                 if (!storage.HasComponent(entityID) ||
                     !storage2.HasComponent(entityID) ||
                     !storage3.HasComponent(entityID) ||
@@ -856,7 +793,7 @@ namespace Homebrew
 
         protected override void RemoveAt(int i)
         {
-            int l = --length;
+            int l    = --length;
             int next = i + 1;
             int size = l - i;
 

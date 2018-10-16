@@ -5,8 +5,6 @@ Company:    Homebrew
 Date:       7/25/2018 11:32 AM
 ================================================================*/
 
-
-using System;
 using System.Collections.Generic;
 #if ODIN_INSPECTOR
 using Sirenix.OdinInspector;
@@ -28,128 +26,95 @@ namespace Homebrew
         #region FIELDS
 
         [FoldoutGroup("Actor")]
-        public int id;
+        public int entity;
 
-
-        // private Dictionary<int, int> tags = new Dictionary<int, int>(new FastComparable());
 
         private Dictionary<int, Transform> cachedTransforms;
 
         #endregion
 
-        #region MONO
+        #region METHODS
 
         protected override void Awake()
         {
-            ProcessingEntities.Add(this);
-
+            ProcessingEntities.Create(this);
             #if ACTORS_DEBUG
             var name = gameObject.name.Split('(')[0];
             gameObject.name = name + "_" + id;
-
             #endif
-
             base.Awake();
+            AddGo();
         }
 
+        internal override void SetupAfterStarter()
+        {
+            base.SetupAfterStarter();
+
+            var childs = GetComponentsInChildren<MonoCached>();
+
+            for (int i = 1; i < childs.Length; i++)
+            {
+                childs[i].actorParent = this;
+                childs[i].SetupAfterActor();
+            }
+        }
 
         public override void OnEnable()
         {
-            if (state.enabled || state.requireStarter ||
-                state.requireActorParent) return;
+            if (state.requireStarter || state.requireActorParent) return;
 
-            if (state.initialized)
-            {
-                ProcessingEntities.Default.CheckGroups(id, true);
-            }
 
-            HandleEnable();
             state.released = false;
             state.enabled = true;
 
-            if (conditionSignals)
-                ProcessingSignals.Default.Add(this);
-
-            ProcessingUpdate.Default.Add(this);
+            HandleEnable();
+            ProcessingEntities.Default.CheckGroups(entity, true);
         }
-//TODO: refactor
 
         public override void OnDisable()
         {
-            if (conditionSignals)
-                ProcessingSignals.Default.Remove(this);
-
-            if (Toolbox.isQuittingOrChangingScene() || state.released ||
-                !state.enabled) return;
-
             state.enabled = false;
             state.released = true;
-            ProcessingEntities.Default.CheckGroups(id, false);
-            ProcessingUpdate.Default.Remove(this);
+
+
+            ProcessingEntities.Default.CheckGroups(entity, false);
 
             HandleDisable();
         }
 
-        protected override void HandleReturnToPool()
+        protected void OnDestroy()
         {
             int len = Storage.all.Count;
             for (int j = 0; j < len; j++)
             {
-                Storage.all[j].Remove(id);
+                Storage.all[j].RemoveNoCheck(entity);
             }
 
-            if (cachedTransforms != null)
-                cachedTransforms.Clear();
-
-            Tags.Clear(id);
-
-            if (conditionSignals)
-                ProcessingSignals.Default.Remove(this);
-
-            ProcessingUpdate.Default.Remove(this);
-
-            base.HandleReturnToPool();
-        }
-
-        protected virtual void OnDestroy()
-        {
-            if (Toolbox.applicationIsQuitting) return;
-
-            int len = Storage.all.Count;
-            for (int j = 0; j < len; j++)
-            {
-                Storage.all[j].Remove(id);
-            }
-
-            Tags.Clear(id);
-            prevID.Push(id);
-
-            if (conditionSignals)
-                ProcessingSignals.Default.Remove(this);
-
-            if (Toolbox.changingScene) return;
- 
-            ProcessingUpdate.Default.Remove(this);
+            Tags.Clear(entity);
+            prevID.Push(entity);
         }
 
         #endregion
 
         #region ADD/REMOVE
 
-        public void AddCache(int key, string path)
+        public void Add(int key, string path)
         {
             if (cachedTransforms == null) cachedTransforms = new Dictionary<int, Transform>(2, new FastComparable());
             cachedTransforms.Add(key, Get<Transform>(path));
         }
 
-        public void AddTags(params int[] tags)
+        protected void Add(int tags)
         {
-            Tags.AddTags(id, tags);
+            Tags.AddTagsRaw(entity, tags);
         }
 
-       
+        protected void Add(params int[] tags)
+        {
+            Tags.AddTagsRaw(entity, tags);
+        }
 
-        public void Add<T>(T component) where T : IData, new()
+        protected void Add<T>(T component) where T : IComponent, new()
         {
             var setupable = component as ISetup;
             if (setupable != null)
@@ -157,34 +122,40 @@ namespace Homebrew
                 setupable.Setup(this);
             }
 
-            Storage<T>.Instance.Add(component, id);
+            Storage<T>.Instance.AddWithNoCheck(component, entity);
         }
 
-        public T Add<T>() where T : IData, new()
+        protected void Add<T>() where T : IComponent, new()
         {
-            var component = Storage<T>.Instance.Add(id);
+            var component = Storage<T>.Instance.GetOrCreate(entity);
             var setupable = component as ISetup;
             if (setupable != null)
             {
                 setupable.Setup(this);
             }
-
-            return component;
         }
 
-
-        public void Remove<T>() where T : new()
+        protected void Remove<T>() where T : new()
         {
-            Storage<T>.Instance.Remove(id);
+            Storage<T>.Instance.Remove(entity);
+        }
+
+        void AddGo()
+        {
+            var component = Storage<ComponentObject>.Instance.GetOrCreate(entity);
+            component.transform = selfTransform;
+            component.obj = gameObject;
+            component.entityID = entity;
+            Storage<ComponentObject>.Instance.AddWithNoCheck(component, entity);
         }
 
         #endregion
 
         #region  GET
 
-        public T Get<T>() where T : IData, new()
+        public T Get<T>() where T : IComponent, new()
         {
-            return Storage<T>.Instance.TryGet(id);
+            return Storage<T>.Instance.TryGet(entity);
         }
 
         public T Get<T>(int hash)
@@ -200,95 +171,15 @@ namespace Homebrew
 
         #endregion
 
-        #region METHODS
-
-        public override void SetupAfterStarter()
-        {
-            base.SetupAfterStarter();
-
-            var childs = GetComponentsInChildren<MonoCached>();
-
-            for (int i = 1; i < childs.Length; i++)
-            {
-                childs[i].actorParent = this;
-                childs[i].SetupAfterActor();
-            }
-        }
-
-        void HandleTagsChanged()
-        {
-            if (Toolbox.isQuittingOrChangingScene()) return;
-            if (state.initialized && !state.enabled) return;
-
-
-            var groups = ProcessingEntities.Default.GroupsBase;
-            int len = ProcessingEntities.Default.groupLength;
-
-            for (int i = 0; i < len; i++)
-            {
-                groups[i].TagsChanged(id);
-            }
-
-            groups = ProcessingEntities.Default.GroupsActors;
-            len = ProcessingEntities.Default.groupLengthActors;
-            for (int i = 0; i < len; i++)
-            {
-                groups[i].TagsChanged(id);
-            }
-        }
-
-        #endregion
-
-        #region TAGS
-
-//        public void AddTags(params int[] tags)
-//        {
-//            if (state.released) return;
-//            Tags.Add(id, tags);
-//        }
-//
-//        public void AddTags(int tag)
-//        {
-//            if (state.released) return;
-//            Tags.Add(id, tag);
-//        }
-//
-//        public void RemoveTags(params int[] tags)
-//        {
-//            Tags.Remove(id, tags);
-//        }
-//
-//        public void RemoveTags(bool all = false, params int[] tags)
-//        {
-//            Tags.Remove(id, all, tags);
-//        }
-//
-//        public void RemoveTags(int tag, bool all = false)
-//        {
-//            Tags.Remove(id, tag, all);
-//        }
-
-        #endregion
-
         #region POOL
 
-        public void Spawn(bool condition_spawned)
+        public void Spawn()
         {
-            if (condition_spawned)
-            {
-                state.released = false;
-                Setup();
-                OnEnable();
-                OnSpawned();
-
-                Timer.Add(Time.DeltaTimeFixed, () =>
-                {
-                    PostSetup();
-
-                    state.initialized = true;
-                });
-            }
+            AddGo();
+            OnEnable();
+            OnSpawned();
         }
+
 
         protected virtual void OnSpawned()
         {

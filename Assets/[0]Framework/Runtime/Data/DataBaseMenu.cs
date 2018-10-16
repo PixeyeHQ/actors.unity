@@ -10,7 +10,7 @@ using UnityEngine;
 namespace Homebrew
 {
 	[System.Serializable]
-	public class DataBaseMenu : IData
+	public class ComponentBaseMenu : IComponent
 	{
 		public GameObject defaultSelected;
 

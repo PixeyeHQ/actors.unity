@@ -44,8 +44,7 @@ namespace Homebrew
 		}
 
 		public void Tick()
-		{
-		 
+		{		 
 			var timeSinceStart = UnityEngine.Time.unscaledTime;
 			_deltaTime = UnityEngine.Time.unscaledDeltaTime * isActive;// (timeSinceStart - _lastFrame) * isActive;
 			_lastFrame = timeSinceStart;

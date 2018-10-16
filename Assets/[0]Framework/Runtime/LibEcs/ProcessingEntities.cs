@@ -7,60 +7,18 @@
 
 
 using System;
- 
+using System.Collections.Generic;
+
 namespace Homebrew
 {
-    public class ProcessingEntities : IDisposable, IKernel
+    internal class ProcessingEntities : IDisposable, IKernel
     {
+        internal static ProcessingEntities Default;
+
+        internal GroupBase[] GroupsBase = new GroupBase[64];
+        internal int groupLength;
  
-        public static ProcessingEntities Default;
-
-        public GroupBase[] GroupsBase = new GroupBase[64];
-        public int groupLength;
-        public Group[] GroupsActors = new Group[32];
-        public int groupLengthActors;
-
-
-        public static void Kill(int index)
-        {
-            int len = Storage.all.Count;
-
-            for (int j = 0; j < len; j++)
-            {
-                Storage.all[j].Remove(index);
-            }
-
-            Tags.Clear(index);
-            Actor.prevID.Push(index);
-       }
-
-        public static void Unbind<T>(int index) where T : new()
-        {
-            Storage<T>.Instance.Remove(index);
-        }
-
-        public static void Add(Actor monoActor)
-        {
-            int len = Actor.entites.Length;
-           
-            if (Actor.lastID  >= len)
-                Array.Resize(ref Actor.entites, Actor.lastID << 1);
-
-            if (Actor.prevID.Count > 0)
-            {
-                monoActor.id = Actor.prevID.Pop();
-                Actor.entites[monoActor.id] = monoActor;
-            }
-            else
-            {
-                monoActor.id = Actor.lastID;
-                Actor.entites[Actor.lastID++] = monoActor;
-            }
-
-            Tags.AddTags(monoActor.id);
-        }
-
-        public static int Add()
+        internal static int Create()
         {
             int id;
             if (Actor.prevID.Count > 0)
@@ -77,44 +35,30 @@ namespace Homebrew
             return id;
         }
 
-
-        public GroupBase SetupGroupActors(Type groupType, Composition filter)
+        internal static void Create(Actor a)
         {
-            int i = groupLengthActors - 1;
+            int len = Actor.entites.Length;
 
-            for (; i >= 0; i--)
+            if (Actor.lastID >= len)
+                Array.Resize(ref Actor.entites, Actor.lastID << 1);
+
+            if (Actor.prevID.Count > 0)
             {
-                if (GroupsActors[i].composition.Equals(filter))
-                {
-                    break;
-                }
+                a.entity = Actor.prevID.Pop();
+                Actor.entites[a.entity] = a;
+            }
+            else
+            {
+                a.entity = Actor.lastID;
+                Actor.entites[Actor.lastID++] = a;
             }
 
-            if (i != -1) return GroupsActors[i];
-
-
-            var group_ = Activator.CreateInstance(groupType, true) as Group;
-
-            group_.composition = filter;
-            group_.Populate();
-
-            if (groupLengthActors == GroupsActors.Length)
-            {
-                Array.Resize(ref GroupsActors, groupLengthActors << 1);
-            }
-
-            GroupsActors[groupLengthActors++] = group_;
-
-            return group_;
+            Tags.AddTags(a.entity);
         }
 
-        public GroupBase SetupGroup(Type groupType, Composition filter)
-        {
-            if (groupType == typeof(Group))
-            {
-                return SetupGroupActors(groupType, filter);
-            }
 
+        internal GroupBase SetupGroup(Type groupType, Composition filter)
+        {
             int i = groupLength - 1;
             for (; i >= 0; i--)
             {
@@ -133,6 +77,34 @@ namespace Homebrew
 
             group.composition = filter;
 
+            List<GroupBase> groups;
+            foreach (var tag in filter.include)
+            {
+                if (Tags.groupsInclude.TryGetValue(tag, out groups))
+                {
+                    groups.Add(group);
+                }
+                else
+                {
+                    groups = new List<GroupBase>(5);
+                    groups.Add(group);
+                    Tags.groupsInclude.Add(tag, groups);
+                }
+            }
+
+            foreach (var tag in filter.exclude)
+            {
+                if (Tags.groupsDeclude.TryGetValue(tag, out groups))
+                {
+                    groups.Add(group);
+                }
+                else
+                {
+                    groups = new List<GroupBase>(5);
+                    groups.Add(group);
+                    Tags.groupsDeclude.Add(tag, groups);
+                }
+            }
 
             group.Populate();
 
@@ -147,16 +119,10 @@ namespace Homebrew
             return GroupsBase[i];
         }
 
-
-        public void CheckGroups(int entityID, bool active)
+        internal void CheckGroups(int entityID, bool active)
         {
             if (active)
             {
-                for (int i = 0; i < groupLengthActors; i++)
-                    if (GroupsActors[i].CheckTags(entityID))
-                        GroupsActors[i].TryAdd(entityID);
-
-
                 for (int i = 0; i < groupLength; i++)
                     if (GroupsBase[i].CheckTags(entityID))
                         GroupsBase[i].TryAdd(entityID);
@@ -165,20 +131,59 @@ namespace Homebrew
             {
                 for (int i = 0; i < groupLength; i++)
                     GroupsBase[i].Remove(entityID);
-
-
-                for (int i = 0; i < groupLengthActors; i++)
-                    GroupsActors[i].Remove(entityID);
             }
         }
 
         public void Dispose()
         {
-            for (int i = 0; i < groupLengthActors; i++)
-                GroupsActors[i].Dispose();
-
             for (int i = 0; i < groupLength; i++)
                 GroupsBase[i].Dispose();
+        }
+    }
+
+    public struct EntityComposer
+    {
+        public int id;
+        private Storage[] storages;
+        private int length;
+
+        public EntityComposer(int components = 1)
+        {
+            storages = new Storage[components];
+            id = ProcessingEntities.Create();
+            length = 0;
+        }
+
+        public EntityComposer(int entityID, int components = 1)
+        {
+            storages = new Storage[components];
+            id = entityID;
+            length = 0;
+        }
+
+        public T Add<T>() where T : new()
+        {
+            var storage = Storage<T>.Instance;
+            storages[length++] = storage;
+
+            return storage.GetOrCreate(id);
+        }
+
+        public void Deploy()
+        {
+            foreach (var storage in storages)
+            {
+                storage.Deploy(id);
+            }
+
+            storages = null;
+            length = 0;
+        }
+
+        public void Deploy(params int[] tags)
+        {
+            Deploy();
+            id.AddTags(tags);
         }
     }
 }

@@ -8,15 +8,13 @@ using System.Text;
 using UnityEditor;
 using UnityEditor.ProjectWindowCallback;
 using UnityEngine;
- 
+using static System.Char;
 using Object = UnityEngine.Object;
+ 
 
-namespace Homebrew
+public class ProcessingEditorBlueprints : EndNameEditAction
 {
-
-    public class ProcessingEditorBlueprints : EndNameEditAction
-{
-    public const string PATH_TO_TEMPLATE = @"Assets\[0]Framework\Runtime\LibBlueprints\BlueprintTemplate.txt";
+    public const string PATH_TO_TEMPLATE = @"Assets\[0]Framework\LibBlueprints\BlueprintTemplate.txt";
     private const int MENU_ITEM_PRIORITY = 70;
     private static Texture2D scriptIcon = (EditorGUIUtility.IconContent("cs Script Icon").image as Texture2D);
 
@@ -54,7 +52,9 @@ namespace Homebrew
         templateContents = templateContents.Replace("##NAME##", className);
    
         var n = className.Replace("Blueprint", "");
- 
+       
+        n = ToLowerInvariant(n[0]) + n.Substring(1);
+  
         templateContents = templateContents.Replace("&NAME&", n );
 
         var encoding = new UTF8Encoding(true, false);
@@ -81,6 +81,3 @@ namespace Homebrew
         AssetDatabase.Refresh();
     }
 }
-
-}
- 

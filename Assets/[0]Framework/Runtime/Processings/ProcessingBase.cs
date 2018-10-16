@@ -19,8 +19,7 @@ namespace Homebrew
 			ProcessingSignals.Default.Add(this);
 		}
 
- 
-		
+
 		public void Dispose()
 		{
  
@@ -31,7 +30,6 @@ namespace Homebrew
 		}
 
 
-		
 		protected virtual void OnDispose()
 		{
 		}

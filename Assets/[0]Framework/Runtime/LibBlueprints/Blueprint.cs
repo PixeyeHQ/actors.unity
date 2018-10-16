@@ -13,7 +13,7 @@ using UnityEngine;
 namespace Homebrew
 {
     [Serializable]
-    public class Blueprint : ScriptableObject, IComponent, IStorage
+    public class Blueprint : ScriptableObject, IComponent
     {
         protected Dictionary<int, object> components = new Dictionary<int, object>(2, new FastComparable());
 
@@ -23,7 +23,7 @@ namespace Homebrew
             if (awakeComponent != null)
                 awakeComponent.OnAwake();
 
-            components.Add(typeof(T).GetHashCode(), component);
+            components.Add(component.GetType().GetHashCode(), component);
         }
 
         public object Get(Type t)
@@ -31,14 +31,9 @@ namespace Homebrew
             return components[t.GetHashCode()];
         }
 
-        public T Get<T>() where T : class
+        public T Get<T>()
         {
-            return components[typeof(T).GetHashCode()] as T;
-        }
-        
-        public T Get<T>(int key) where T : class
-        {
-            return components[key] as T;
+            return (T) components[typeof(T).GetHashCode()];
         }
 
         public virtual void Setup()

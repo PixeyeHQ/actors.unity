@@ -5,17 +5,20 @@
 
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 
 namespace Homebrew
 {
     public static class Tags
     {
-        public static Dictionary<int, int>[] tags = new Dictionary<int, int>[EngineSettings.MinEntities];
-        public static int length = -1;
+        internal static Dictionary<int, int>[] tags = new Dictionary<int, int>[EngineSettings.MinEntities];
+        internal static Dictionary<int, List<GroupBase>> groupsInclude = new Dictionary<int, List<GroupBase>>();
+        internal static Dictionary<int, List<GroupBase>> groupsDeclude = new Dictionary<int, List<GroupBase>>();
 
+        static internal int length = -1;
 
-        public static void AddTags(int entityID)
+        static internal void AddTags(int entityID)
         {
             if (length > entityID) return;
 
@@ -29,218 +32,143 @@ namespace Homebrew
             length++;
             tags[entityID] = new Dictionary<int, int>(4, new FastComparable());
         }
- 
-        public static void Clear(int id)
+
+        static internal void Clear(int id)
         {
             tags[id].Clear();
         }
 
-
-       public static void HandleChange(int id)
+        static internal void HandleChange(int id, int tag)
         {
             if (Toolbox.isQuittingOrChangingScene()) return;
 
-            var groups = ProcessingEntities.Default.GroupsBase;
-            int len = ProcessingEntities.Default.groupLength;
-
-            for (int i = 0; i < len; i++)
+            List<GroupBase> groups;
+            if (groupsInclude.TryGetValue(tag, out groups))
             {
-                groups[i].TagsChanged(id);
+                var len = groups.Count;
+
+                for (int i = 0; i < len; i++)
+                {
+                    groups[i].TagsChanged(id);
+                }
             }
 
-            groups = ProcessingEntities.Default.GroupsActors;
-            len = ProcessingEntities.Default.groupLengthActors;
-            for (int i = 0; i < len; i++)
+            if (groupsDeclude.TryGetValue(tag, out groups))
             {
-                groups[i].TagsChanged(id);
+                var len = groups.Count;
+                for (int i = 0; i < len; i++)
+                {
+                    groups[i].TagsChanged(id);
+                }
             }
         }
+
 
         #region TAGS
 
         public static void RemoveTags(this int entityID, int tagID)
         {
-            bool tagsChanged = false;
-
+            var dict = tags[entityID];
             int val;
-            if (!tags[entityID].TryGetValue(tagID, out val)) return;
+            if (!dict.TryGetValue(tagID, out val)) return;
             val = Math.Max(0, val - 1);
 
             if (val == 0)
             {
-                tags[entityID].Remove(tagID);
-                tagsChanged = true;
+                dict.Remove(tagID);
+
+                HandleChange(entityID, tagID);
             }
-            else tags[entityID][tagID] = val;
-
-
-            if (tagsChanged == false) return;
-            HandleChange(entityID);
+            else dict[tagID] = val;
         }
 
         public static void RemoveTags(this int entityID, params int[] tagIds)
         {
-            bool tagsChanged = false;
+            var dict = tags[entityID];
+
             foreach (int index in tagIds)
             {
                 int val;
-                if (!tags[entityID].TryGetValue(index, out val)) continue;
+                if (!dict.TryGetValue(index, out val)) continue;
                 val = Math.Max(0, val - 1);
 
                 if (val == 0)
                 {
-                    tags[entityID].Remove(index);
-                    tagsChanged = true;
+                    dict.Remove(index);
+                    HandleChange(entityID, index);
                 }
-                else tags[entityID][index] = val;
+                else dict[index] = val;
             }
-
-            if (tagsChanged == false) return;
-            HandleChange(entityID);
         }
 
         public static void RemoveAllTags(this int entityID, params int[] tagIds)
         {
-            bool tagsChanged = false;
+            var dict = tags[entityID];
             foreach (int index in tagIds)
             {
-                if (!tags[entityID].ContainsKey(index)) continue;
-                tags[entityID].Remove(index);
-                tagsChanged = true;
+                if (!dict.ContainsKey(index)) continue;
+                dict.Remove(index);
+                HandleChange(entityID, index);
             }
-
-            if (tagsChanged == false) return;
-            HandleChange(entityID);
         }
 
-        
-        public static void RemoveTags(this Actor a, int tagID)
-        {
-            bool tagsChanged = false;
-            var entityID = a.id;
-            int val;
-            if (!tags[entityID].TryGetValue(tagID, out val)) return;
-            val = Math.Max(0, val - 1);
-
-            if (val == 0)
-            {
-                tags[entityID].Remove(tagID);
-                tagsChanged = true;
-            }
-            else tags[entityID][tagID] = val;
-
-
-            if (tagsChanged == false) return;
-            HandleChange(entityID);
-        }
-
-        public static void RemoveTags(this Actor a, params int[] tagIds)
-        {
-            bool tagsChanged = false;
-            var entityID = a.id;
-            foreach (int index in tagIds)
-            {
-                int val;
-                if (!tags[entityID].TryGetValue(index, out val)) continue;
-                val = Math.Max(0, val - 1);
-
-                if (val == 0)
-                {
-                    tags[entityID].Remove(index);
-                    tagsChanged = true;
-                }
-                else tags[entityID][index] = val;
-            }
-
-            if (tagsChanged == false) return;
-            HandleChange(entityID);
-        }
-
-        public static void RemoveAllTags(this Actor a, params int[] tagIds)
-        {
-            bool tagsChanged = false;
-            var entityID = a.id;
-            foreach (int index in tagIds)
-            {
-                if (!tags[entityID].ContainsKey(index)) continue;
-                tags[entityID].Remove(index);
-                tagsChanged = true;
-            }
-
-            if (tagsChanged == false) return;
-            HandleChange(entityID);
-        }
-
- 
-        
         public static void AddTags(this int entityID, int tagId)
         {
-            if (tags[entityID].ContainsKey(tagId))
+            var dict = tags[entityID];
+            if (dict.ContainsKey(tagId))
             {
-                tags[entityID][tagId] += 1;
+                dict[tagId] += 1;
                 return;
             }
 
-            tags[entityID].Add(tagId, 1);
-            HandleChange(entityID);
+            dict.Add(tagId, 1);
+            HandleChange(entityID, tagId);
         }
 
         public static void AddTags(this int entityID, params int[] tagIds)
         {
-            bool c = false;
+            var dict = tags[entityID];
             foreach (int index in tagIds)
             {
-                if (tags[entityID].ContainsKey(index))
+                if (dict.ContainsKey(index))
                 {
-                    tags[entityID][index] += 1;
+                    dict[index] += 1;
                     continue;
                 }
 
 
-                tags[entityID].Add(index, 1);
-                c = true;
+                dict.Add(index, 1);
+                HandleChange(entityID, index);
             }
-
-            if (!c) return;
-            HandleChange(entityID);
         }
 
-        
-        public static void AddTags(this Actor a, int tagId)
+        internal static void AddTagsRaw(this int entityID, params int[] tagIds)
         {
-            var entityID = a.id;
-            if (tags[entityID].ContainsKey(tagId))
-            {
-                tags[entityID][tagId] += 1;
-                return;
-            }
-
-            tags[entityID].Add(tagId, 1);
-            HandleChange(entityID);
-        }
-
-        public static void AddTags(this Actor a, params int[] tagIds)
-        {
-            var entityID = a.id;
-            bool c = false;
+            var dict = tags[entityID];
             foreach (int index in tagIds)
             {
-                if (tags[entityID].ContainsKey(index))
+                if (dict.ContainsKey(index))
                 {
-                    tags[entityID][index] += 1;
+                    dict[index] += 1;
                     continue;
                 }
 
 
-                tags[entityID].Add(index, 1);
-                c = true;
+                dict.Add(index, 1);
             }
-
-            if (!c) return;
-            HandleChange(entityID);
         }
 
-        
+        internal static void RemoveTagsRaw(this int entityID, params int[] tagIds)
+        {
+            var dict = tags[entityID];
+            foreach (int index in tagIds)
+            {
+                if (!dict.ContainsKey(index)) continue;
+                dict.Remove(index);
+            }
+        }
+
+
         public static bool Has(this int entityID, int filter)
         {
             var container = tags[entityID];
@@ -257,37 +185,6 @@ namespace Homebrew
             }
 
             return true;
-        }
-
-        public static bool Has(this Actor a, int filter)
-        {
-            var container = tags[a.id];
-
-            return container.ContainsKey(filter);
-        }
-
-        public static bool Has(this Actor a, params int[] filter)
-        {
-            var container = tags[a.id];
-            for (int i = 0; i < filter.Length; i++)
-            {
-                if (!container.ContainsKey(filter[i])) return false;
-            }
-
-            return true;
-        }
-
-        public static bool HasAny(this Actor a, params int[] filter)
-        {
-            var container = tags[a.id];
-
-            for (int i = 0; i < filter.Length; i++)
-            {
-                if (container.ContainsKey(filter[i]))
-                    return true;
-            }
-
-            return false;
         }
 
         public static bool HasAny(this int entityID, params int[] filter)

@@ -24,8 +24,8 @@ namespace Homebrew
         [FoldoutGroup("SetupData")] public List<Factory> factories;
         [FoldoutGroup("SetupData")] public List<SceneField> ScenesToKeep;
         [FoldoutGroup("SetupData")] public List<SceneField> SceneDependsOn;
- 
-  
+
+
         void Awake()
         {
             ProcessingScene.Dynamic = GameObject.Find("Dynamic").transform;
@@ -38,8 +38,7 @@ namespace Homebrew
             if (ProcessingSceneLoad.Default == null)
                 ProcessingSceneLoad.Default = Toolbox.Create<ProcessingSceneLoad>();
 
-            ProcessingSceneLoad.Default.Setup(ScenesToKeep,SceneDependsOn,this);
- 
+            ProcessingSceneLoad.Default.Setup(ScenesToKeep, SceneDependsOn, this);
         }
 
 

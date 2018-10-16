@@ -83,7 +83,7 @@ namespace Homebrew
             Toolbox.Instance.ClearSessionData();
 
 
-            var s = SceneManager.GetActiveScene();
+            var s     = SceneManager.GetActiveScene();
             var sName = s.name;
 
             var job = SceneManager.UnloadSceneAsync(s);
@@ -133,7 +133,7 @@ namespace Homebrew
             Toolbox.Instance.ClearSessionData();
 
 
-            var s = SceneManager.GetActiveScene();
+            var s     = SceneManager.GetActiveScene();
             var sName = s.name;
 
             var job = SceneManager.UnloadSceneAsync(s);
@@ -179,18 +179,18 @@ namespace Homebrew
         public static void Add(int id)
         {
             var processing = Default;
-            Toolbox.Instance.StartCoroutine(processing._Add(id));
+            Toolbox.Instance.StartCoroutine(_Add(id));
         }
 
         public static void Remove(int id)
         {
-            var processing = Default;
-            Toolbox.Instance.StartCoroutine(processing._Remove(id));
+            Toolbox.Instance.StartCoroutine(_Remove(id));
         }
 
-        IEnumerator _Add(int id)
+        static IEnumerator _Add(int id)
         {
             Toolbox.changingScene = true;
+            SceneManager.sceneLoaded += OnAdditiveLoaded;
             var job = SceneManager.LoadSceneAsync(id, LoadSceneMode.Additive);
             while (!job.isDone)
             {
@@ -200,7 +200,51 @@ namespace Homebrew
             Toolbox.changingScene = false;
         }
 
-        IEnumerator _Remove(int id)
+        private static void OnAdditiveLoaded(Scene arg0, LoadSceneMode arg1)
+        {
+            if (arg1 != LoadSceneMode.Additive) return;
+
+            SceneManager.sceneLoaded -= OnAdditiveLoaded;
+            Toolbox.Instance.StartCoroutine(_OnAdditiveLoaded(arg0));
+        }
+
+        private static IEnumerator _OnAdditiveLoaded(Scene arg)
+        {
+            var roots = arg.GetRootGameObjects();
+            var list  = new List<Actor>(10);
+
+
+            foreach (var o in roots)
+                list.AddRange(o.transform.GetAll<Actor>());
+
+
+            var len = list.Count;
+            if (len == 0) yield break;
+
+
+            while (true)
+            {
+                for (int i = 0; i < len; i++)
+                {
+                    while (true)
+                    {
+                        if (list[i].state.initialized)
+                            break;
+                        yield return 0;
+                    }
+                }
+
+                break;
+            }
+
+            for (int i = 0; i < len; i++)
+            {
+                ProcessingEntities.Default.CheckGroups(list[i].entity, true);
+            }
+        }
+
+
+        static IEnumerator _Remove(int id)
         {
             Toolbox.changingScene = true;
             var job = SceneManager.UnloadSceneAsync(id);

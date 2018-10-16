@@ -60,8 +60,6 @@ namespace Homebrew
 
         public void Remove(object updateble)
         {
-            if (Toolbox.applicationIsQuitting) return;
-
             if (ticks.Remove(updateble as ITick))
             {
                 countTicks--;
@@ -122,9 +120,7 @@ namespace Homebrew
         {
             var obj = new GameObject("ActorsUpdate");
             DontDestroyOnLoad(obj);
-            Default =  obj.AddComponent<ProcessingUpdate>();
+            Default = obj.AddComponent<ProcessingUpdate>();
         }
-        
-        
     }
 }
