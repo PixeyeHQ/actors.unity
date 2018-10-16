@@ -66,7 +66,7 @@ namespace Homebrew
 
         #region TAGS
 
-        public static void RemoveTags(this int entityID, int tagID)
+        public static void Remove(this int entityID, int tagID)
         {
             var dict = tags[entityID];
             int val;
@@ -82,7 +82,7 @@ namespace Homebrew
             else dict[tagID] = val;
         }
 
-        public static void RemoveTags(this int entityID, params int[] tagIds)
+        public static void Remove(this int entityID, params int[] tagIds)
         {
             var dict = tags[entityID];
 
@@ -101,7 +101,7 @@ namespace Homebrew
             }
         }
 
-        public static void RemoveAllTags(this int entityID, params int[] tagIds)
+        public static void RemoveAll(this int entityID, params int[] tagIds)
         {
             var dict = tags[entityID];
             foreach (int index in tagIds)
@@ -112,7 +112,7 @@ namespace Homebrew
             }
         }
 
-        public static void AddTags(this int entityID, int tagId)
+        public static void Add(this int entityID, int tagId)
         {
             var dict = tags[entityID];
             if (dict.ContainsKey(tagId))
@@ -125,7 +125,7 @@ namespace Homebrew
             HandleChange(entityID, tagId);
         }
 
-        public static void AddTags(this int entityID, params int[] tagIds)
+        public static void Add(this int entityID, params int[] tagIds)
         {
             var dict = tags[entityID];
             foreach (int index in tagIds)

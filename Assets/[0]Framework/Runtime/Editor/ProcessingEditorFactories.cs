@@ -11,7 +11,7 @@ using static System.Char;
 
 public class ProcessingEditorFactories : EndNameEditAction
 {
-    public const string PATH_TO_TEMPLATE = @"Assets\[0]Framework\LibBlueprints\FactoryTemplate.txt";
+    public const string PATH_TO_TEMPLATE = @"Assets\[0]Framework\Runtime\LibBlueprints\FactoryTemplate.txt";
     private const int MENU_ITEM_PRIORITY = 80;
     private static Texture2D scriptIcon = (EditorGUIUtility.IconContent("cs Script Icon").image as Texture2D);
 
@@ -50,7 +50,7 @@ public class ProcessingEditorFactories : EndNameEditAction
 
         var n = className.Replace("Factory", "");
 
-        n = ToLowerInvariant(n[0]) + n.Substring(1);
+        n = ToUpperInvariant(n[0]) + n.Substring(1);
 
         templateContents = templateContents.Replace("&NAME&", n);
 

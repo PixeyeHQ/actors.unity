@@ -76,7 +76,7 @@ namespace Homebrew
 
             if (tags != null)
             {
-                entityID.AddTags(tags);
+                entityID.Add(tags);
             }
 
             int len = groups.Count;
@@ -111,7 +111,7 @@ namespace Homebrew
 
             if (tags != null)
             {
-                entityID.AddTags(tags);
+                entityID.Add(tags);
             }
 
             entityHasComponent[entityID] = true;
@@ -174,7 +174,7 @@ namespace Homebrew
             }
 
             if (tags != null)
-                entityID.RemoveTags(tags);
+                entityID.Remove(tags);
         }
 
         internal override void RemoveNoCheck(int entityID)

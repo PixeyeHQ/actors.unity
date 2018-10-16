@@ -1,7 +1,7 @@
 {
     "name": "Homebrew.Framework.Editor",
     "references": [
-        "Homebrew.Framework"
+        "ASM-Framework"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [

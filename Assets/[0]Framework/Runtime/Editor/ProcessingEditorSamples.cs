@@ -12,14 +12,14 @@ using static System.Char;
 
 public class ProcessingEditorSamples : EndNameEditAction
 {
-    public const string PATH_TO_TEMPLATE = @"Assets\[0]Framework\LibBlueprints\SampleTemplate.txt";
+    public const string PATH_TO_TEMPLATE = @"Assets\[0]Framework\Runtime\LibBlueprints\SampleTemplate.txt";
     private const int MENU_ITEM_PRIORITY = 60;
     private static Texture2D scriptIcon = (EditorGUIUtility.IconContent("cs Script Icon").image as Texture2D);
 
-    [MenuItem("Tools/Actors/Add/Sample", false, MENU_ITEM_PRIORITY)]
+    [MenuItem("Tools/Actors/Add/Template", false, MENU_ITEM_PRIORITY)]
     public static void CreateSample()
     {
-        CreateFromTemplate("SampleDefault.cs", PATH_TO_TEMPLATE);
+        CreateFromTemplate("TemplateDefault.cs", PATH_TO_TEMPLATE);
     }
 
 
@@ -49,9 +49,9 @@ public class ProcessingEditorSamples : EndNameEditAction
 
         templateContents = templateContents.Replace("##NAME##", className);
 
-        var n = className.Replace("Sample", "");
+        var n = className.Replace("Template", "");
 
-        n = ToLowerInvariant(n[0]) + n.Substring(1);
+        n = ToUpperInvariant(n[0]) + n.Substring(1);
 
         n = templateContents.Replace("&NAME&", n);
 

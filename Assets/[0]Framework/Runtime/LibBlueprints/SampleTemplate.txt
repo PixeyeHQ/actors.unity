@@ -1,8 +1,8 @@
- using Homebrew;
+
 using UnityEngine;
 namespace Homebrew{
-[CreateAssetMenu(fileName = "sample_&NAME&", menuName = "Actors/Samples/##NAME##")]
-public class ##NAME## : Sample
+[CreateAssetMenu(fileName = "Template &NAME&", menuName = "Actors/Templates/&NAME&")]
+public class ##NAME## : Template
 {
      
 }

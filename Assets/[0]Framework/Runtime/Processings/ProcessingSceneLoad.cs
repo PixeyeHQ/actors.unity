@@ -178,7 +178,6 @@ namespace Homebrew
 
         public static void Add(int id)
         {
-            var processing = Default;
             Toolbox.Instance.StartCoroutine(_Add(id));
         }
 

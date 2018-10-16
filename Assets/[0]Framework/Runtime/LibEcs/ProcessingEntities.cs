@@ -183,7 +183,7 @@ namespace Homebrew
         public void Deploy(params int[] tags)
         {
             Deploy();
-            id.AddTags(tags);
+            id.Add(tags);
         }
     }
 }

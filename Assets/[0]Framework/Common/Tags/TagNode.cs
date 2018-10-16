@@ -21,7 +21,7 @@ namespace Homebrew
 
             return tags;
         }
-
+                      
         public static void ConvertTags(this Actor a, params TagNode[] tagNodes)
         {
             var tags = new int[tagNodes.Length];
@@ -31,7 +31,7 @@ namespace Homebrew
                 tags[i] = tagNodes[i].tag;
             }
 
-            a.AddTags(tags);
+            a.entity.Add(tags);
         }
     }
 }

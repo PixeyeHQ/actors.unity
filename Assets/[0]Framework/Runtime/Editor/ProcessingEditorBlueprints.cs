@@ -14,7 +14,7 @@ using Object = UnityEngine.Object;
 
 public class ProcessingEditorBlueprints : EndNameEditAction
 {
-    public const string PATH_TO_TEMPLATE = @"Assets\[0]Framework\LibBlueprints\BlueprintTemplate.txt";
+    public const string PATH_TO_TEMPLATE = @"Assets\[0]Framework\Runtime\LibBlueprints\BlueprintTemplate.txt";
     private const int MENU_ITEM_PRIORITY = 70;
     private static Texture2D scriptIcon = (EditorGUIUtility.IconContent("cs Script Icon").image as Texture2D);
 
@@ -53,7 +53,7 @@ public class ProcessingEditorBlueprints : EndNameEditAction
    
         var n = className.Replace("Blueprint", "");
        
-        n = ToLowerInvariant(n[0]) + n.Substring(1);
+        n = ToUpperInvariant(n[0]) + n.Substring(1);
   
         templateContents = templateContents.Replace("&NAME&", n );
 
