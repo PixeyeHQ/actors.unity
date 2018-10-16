@@ -22,15 +22,12 @@ namespace Homebrew
         public int pool;
 
         [FoldoutGroup("Mono")] public float timeDestroyDelay;
-        [FoldoutGroup("Mono")] public float timeScale = 1;
         [FoldoutGroup("Mono")] public Actor actorParent;
         [FoldoutGroup("Mono")] public EntityState state;
 
         [HideInInspector] public Transform selfTransform;
 
         internal bool conditionSignals;
-        public bool conditionTick;
-        public ITick t;
 
         #endregion
 
@@ -101,7 +98,6 @@ namespace Homebrew
             Setup();
             OnEnable();
             state.initialized = true;
-            // Timer.Add(Time.DeltaTimeFixed, () => { state.initialized = true; });
         }
 
         internal void SetupAfterActor()
@@ -111,7 +107,6 @@ namespace Homebrew
             Setup();
             OnEnable();
             state.initialized = true;
-            // Timer.Add(Time.DeltaTimeFixed, () => { state.initialized = true; });
         }
 
         #endregion
