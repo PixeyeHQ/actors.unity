@@ -141,6 +141,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   blueprints: {fileID: 11400000, guid: c29af42d543de624e855fe900b413efe, type: 2}
+  scripts: {fileID: 0}
   dataGameSettings: {fileID: 11400000, guid: 192290467e54a7d44bf2a73f136bfcf1, type: 2}
   dataGameSession: {fileID: 11400000, guid: 3f665a2314a196044a3174d32ed93652, type: 2}
   pluggables: []
