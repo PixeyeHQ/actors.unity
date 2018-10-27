@@ -7,7 +7,6 @@ Date:       4/29/2018  4:53 PM
 
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace Homebrew
 {
@@ -26,7 +25,7 @@ namespace Homebrew
         public void Dispatch<T>(ref T val)
         {
             List<IReceive> cachedSignals;
-    
+
             if (!signals.TryGetValue(typeof(T).GetHashCode(), out cachedSignals)) return;
 
             var len = cachedSignals.Count;
@@ -41,17 +40,15 @@ namespace Homebrew
         void Add(IReceive receive, Type type)
         {
             List<IReceive> cachedSignals;
-            var key = type.GetHashCode();
-        
+            var            key = type.GetHashCode();
+
             if (signals.TryGetValue(key, out cachedSignals))
             {
-         
                 cachedSignals.Add(receive);
                 return;
             }
- 
+
             signals.Add(key, new List<IReceive> {receive});
-            
         }
 
         void Remove(IReceive receive, Type type)
@@ -67,13 +64,13 @@ namespace Homebrew
         public static bool Check(object obj)
         {
             var reciever = obj as IReceive;
-            return reciever!=null;
+            return reciever != null;
         }
 
 
         public void Add(object obj)
         {
-            var all = obj.GetType().GetInterfaces();
+            var all      = obj.GetType().GetInterfaces();
             var reciever = obj as IReceive;
             foreach (var intType in all)
             {
@@ -86,7 +83,7 @@ namespace Homebrew
 
         public void Remove(object obj)
         {
-            var all = obj.GetType().GetInterfaces();
+            var all      = obj.GetType().GetInterfaces();
             var reciever = obj as IReceive;
             foreach (var intType in all)
             {

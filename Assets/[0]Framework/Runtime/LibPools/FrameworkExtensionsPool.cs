@@ -16,13 +16,22 @@ namespace Homebrew
         {
             if (poolID == -1)
             {
-                GameObject.Destroy(o);
+                UnityEngine.GameObject.Destroy(o);
             }
             else ProcessingPool.Despawn(poolID, o);
         }
 
         #region CREATE
+        public static Transform Populate(this object o, GameObject prefab, Vector3 startPosition, Quaternion startRotation)
 
+        {
+            var go = Object.Instantiate(prefab, ProcessingScene.Dynamic).transform;
+            go.localPosition = startPosition;
+            go.localRotation = startRotation;
+            return go;
+        }
+
+        
         public static Transform Populate(this object o, int poolID, GameObject prefab, Vector3 startPosition, Quaternion startRotation)
         {
             var go = ProcessingPool.pools[poolID].Spawn(prefab, ProcessingScene.Dynamic).transform;

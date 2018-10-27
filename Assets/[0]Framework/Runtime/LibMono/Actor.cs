@@ -28,9 +28,6 @@ namespace Homebrew
         [FoldoutGroup("Actor")]
         public int entity;
 
-
-        private Dictionary<int, Transform> cachedTransforms;
-
         #endregion
 
         #region METHODS
@@ -42,8 +39,8 @@ namespace Homebrew
             var name = gameObject.name.Split('(')[0];
             gameObject.name = name + "_" + id;
             #endif
-            base.Awake();
             AddGo();
+            base.Awake();
         }
 
         internal override void SetupAfterStarter()
@@ -54,7 +51,7 @@ namespace Homebrew
 
             for (int i = 1; i < childs.Length; i++)
             {
-                childs[i].actorParent = this;
+                childs[i].entityParent = entity;
                 childs[i].SetupAfterActor();
             }
         }
@@ -85,6 +82,7 @@ namespace Homebrew
         protected void OnDestroy()
         {
             int len = Storage.all.Count;
+            entity.ComponentObject().cachedTransforms?.Clear();
             for (int j = 0; j < len; j++)
             {
                 Storage.all[j].RemoveNoCheck(entity);
@@ -100,8 +98,9 @@ namespace Homebrew
 
         public void Add(int key, string path)
         {
-            if (cachedTransforms == null) cachedTransforms = new Dictionary<int, Transform>(2, new FastComparable());
-            cachedTransforms.Add(key, Get<Transform>(path));
+            var cObject = entity.ComponentObject();
+            if (cObject.cachedTransforms == null) cObject.cachedTransforms = new Dictionary<int, Transform>(2, new FastComparable());
+            cObject.cachedTransforms.Add(key, selfTransform.Find(path));
         }
 
         protected void Add(int tags)
@@ -143,30 +142,9 @@ namespace Homebrew
         void AddGo()
         {
             var component = Storage<ComponentObject>.Instance.GetOrCreate(entity);
-            component.transform = selfTransform;
+            component.transform = transform;
             component.obj = gameObject;
-            component.entityID = entity;
             Storage<ComponentObject>.Instance.AddWithNoCheck(component, entity);
-        }
-
-        #endregion
-
-        #region  GET
-
-        public T Get<T>() where T : IComponent, new()
-        {
-            return Storage<T>.Instance.TryGet(entity);
-        }
-
-        public T Get<T>(int hash)
-        {
-            return cachedTransforms[hash].GetComponent<T>();
-        }
-
-        public T Get<T>(string path)
-        {
-            var o = selfTransform.Find(path);
-            return o.GetComponent<T>();
         }
 
         #endregion

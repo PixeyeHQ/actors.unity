@@ -22,7 +22,7 @@ namespace Homebrew
         public int pool;
 
         [FoldoutGroup("Mono")] public float timeDestroyDelay;
-        [FoldoutGroup("Mono")] public Actor actorParent;
+        [FoldoutGroup("Mono")] public int entityParent;
         [FoldoutGroup("Mono")] public EntityState state;
 
         [HideInInspector] public Transform selfTransform;
@@ -52,7 +52,7 @@ namespace Homebrew
 
             if (state.requireActorParent)
             {
-                actorParent = GetComponentInParent<Actor>();
+                entityParent = GetComponentInParent<Actor>().entity;
             }
 
 
@@ -95,9 +95,11 @@ namespace Homebrew
         internal virtual void SetupAfterStarter()
         {
             state.requireStarter = false;
+            if (state.requireActorParent) return;
             Setup();
             OnEnable();
             state.initialized = true;
+         
         }
 
         internal void SetupAfterActor()
@@ -107,6 +109,7 @@ namespace Homebrew
             Setup();
             OnEnable();
             state.initialized = true;
+            // Timer.Add(Time.DeltaTimeFixed, () => { state.initialized = true; });
         }
 
         #endregion

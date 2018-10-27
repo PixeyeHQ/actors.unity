@@ -8,15 +8,17 @@ Date:       7/25/2018 11:49 AM
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using UnityEngine;
 
 namespace Homebrew
 {
     public abstract class Storage
     {
         public static List<Storage> all = new List<Storage>(40);
-        public abstract void Remove(int entityID);
-        internal abstract void RemoveNoCheck(int entityID);
-        public abstract void Deploy(int entityID);
+        public abstract bool HasComponent(int entity);
+        public abstract void Remove(int entity);
+        internal abstract void RemoveNoCheck(int entity);
+        public abstract void Deploy(int entity);
     }
 
     public class Storage<T> : Storage where T : new()
@@ -24,17 +26,17 @@ namespace Homebrew
         public static readonly Storage<T> Instance = new Storage<T>();
         public T[] components = new T[EngineSettings.MinComponents];
 
-        public int[] tags = null;
+        public int[] tags;
 
         public bool[] entityHasComponent = new bool[EngineSettings.MinComponents];
 
-        public List<GroupBase> groups = new List<GroupBase>();
+        public List<GroupBase> groups = new List<GroupBase>(3);
 
         public Storage()
         {
             all.Add(this);
             var type = typeof(T);
-            var atr  = type.GetCustomAttribute<TagRequireAttribute>();
+            var atr  = type.GetCustomAttribute<RequireTagsAttribute>();
             if (atr == null) return;
             tags = atr.tags;
         }
@@ -60,23 +62,23 @@ namespace Homebrew
             return component;
         }
 
-        public T Add(T component, int entityID)
+        public T Add(T component, int entity)
         {
-            if (entityID >= components.Length)
+            if (entity >= components.Length)
             {
-                var l = entityID << 1;
+                var l = entity << 1;
 
                 Array.Resize(ref components, l);
                 Array.Resize(ref entityHasComponent, l);
             }
 
 
-            components[entityID] = component;
-            entityHasComponent[entityID] = true;
+            components[entity] = component;
+            entityHasComponent[entity] = true;
 
             if (tags != null)
             {
-                entityID.Add(tags);
+                entity.Add(tags);
             }
 
             int len = groups.Count;
@@ -84,9 +86,9 @@ namespace Homebrew
             {
                 var gr = groups[i];
 
-                if (gr.CheckTags(entityID))
+                if (gr.CheckTags(entity))
                 {
-                    gr.TryAdd(entityID);
+                    gr.TryAdd(entity);
                 }
             }
 
@@ -94,108 +96,110 @@ namespace Homebrew
             return component;
         }
 
-        public T Add(int entityID)
+        public T Add(int entity)
         {
-            if (entityID >= components.Length)
+            if (entity >= components.Length)
             {
-                var l = entityID << 1;
+                var l = entity << 1;
 
                 Array.Resize(ref components, l);
                 Array.Resize(ref entityHasComponent, l);
             }
 
-            if (entityHasComponent[entityID]) return components[entityID];
+            if (entityHasComponent[entity]) return components[entity];
 
-            if (components[entityID] == null)
-                components[entityID] = new T();
+            if (components[entity] == null)
+                components[entity] = new T();
 
             if (tags != null)
             {
-                entityID.Add(tags);
+                entity.Add(tags);
             }
 
-            entityHasComponent[entityID] = true;
+            entityHasComponent[entity] = true;
 
             int len = groups.Count;
             for (int i = 0; i < len; i++)
             {
                 var gr = groups[i];
 
-                if (gr.CheckTags(entityID))
+                if (gr.CheckTags(entity))
                 {
-                    gr.TryAdd(entityID);
+                    gr.TryAdd(entity);
                 }
             }
 
-            return components[entityID];
+
+            return components[entity];
         }
 
-        private T Create(int entityID)
+        private T Create(int entity)
         {
-            components[entityID] = new T();
-            entityHasComponent[entityID] = true;
+            components[entity] = new T();
+            entityHasComponent[entity] = true;
 
             if (tags != null)
             {
-                entityID.AddTagsRaw(tags);
+                entity.AddTagsRaw(tags);
             }
 
-            return components[entityID];
+            return components[entity];
         }
 
-        private T CreateAndResize(int entityID)
+        private T CreateAndResize(int entity)
         {
-            var l = entityID << 1;
+            var l = entity << 1;
             Array.Resize(ref components, l);
             Array.Resize(ref entityHasComponent, l);
 
-            components[entityID] = new T();
-            entityHasComponent[entityID] = true;
+            components[entity] = new T();
+            entityHasComponent[entity] = true;
 
             if (tags != null)
             {
-                entityID.AddTagsRaw(tags);
+                entity.AddTagsRaw(tags);
             }
 
-            return components[entityID];
+            return components[entity];
         }
 
-        public override void Remove(int entityID)
-        {
-            if (entityID >= entityHasComponent.Length) return;
-            if (!entityHasComponent[entityID]) return;
 
-            entityHasComponent[entityID] = false;
+        public override void Remove(int entity)
+        {
+            if (Toolbox.applicationIsQuitting) return;
+            if (entity >= entityHasComponent.Length) return;
+            if (!entityHasComponent[entity]) return;
+
 
             int len = groups.Count;
             for (int i = 0; i < len; i++)
             {
-                groups[i].Remove(entityID);
+                groups[i].Remove(entity);
             }
 
             if (tags != null)
-                entityID.Remove(tags);
-        }
-
-        internal override void RemoveNoCheck(int entityID)
-        {
-            if (entityID >= entityHasComponent.Length) return;
-            if (!entityHasComponent[entityID]) return;
-
-            entityHasComponent[entityID] = false;
-
-            int len = groups.Count;
-            for (int i = 0; i < len; i++)
             {
-                groups[i].Remove(entityID);
+                entity.Remove(tags);
             }
 
+
+            entityHasComponent[entity] = false;
+        }
+
+        internal override void RemoveNoCheck(int entity)
+        {
+            if (Toolbox.applicationIsQuitting) return;
+            if (entity >= entityHasComponent.Length) return;
+            if (!entityHasComponent[entity]) return;
+ 
+            entityHasComponent[entity] = false;
+ 
             if (tags != null)
-                entityID.RemoveTagsRaw(tags);
+                entity.RemoveTagsRaw(tags);
         }
 
 
-        public override void Deploy(int entityID)
+        public override void Deploy(int entity)
         {
             int len = groups.Count;
 
@@ -203,7 +207,7 @@ namespace Homebrew
             {
                 foreach (var tag in tags)
                 {
-                    Tags.HandleChange(entityID, tag);
+                    Tags.HandleChange(entity, tag);
                 }
             }
 
@@ -211,41 +215,41 @@ namespace Homebrew
             {
                 var gr = groups[i];
 
-                int index = gr.GetIndex(entityID);
+                int index = gr.GetIndex(entity);
                 if (index == -1)
                 {
-                    if (gr.CheckTags(entityID))
+                    if (gr.CheckTags(entity))
                     {
-                        gr.TryAdd(entityID);
+                        gr.TryAdd(entity);
                     }
                 }
             }
         }
 
-        public bool HasComponent(int entityID)
+        public override bool HasComponent(int entity)
         {
-            return entityID >= components.Length ? false : entityHasComponent[entityID];
+            return entity >= components.Length ? false : entityHasComponent[entity];
         }
 
-        public T TryGet(int entityID)
+        public T TryGet(int entity)
         {
-            return entityID >= components.Length || !entityHasComponent[entityID] ? default(T) : components[entityID];
+            return entity >= components.Length || !entityHasComponent[entity] ? default(T) : components[entity];
         }
 
-        public T GetOrCreate(int entityID)
+        public T GetOrCreate(int entity)
         {
-            if (entityID >= components.Length)
-                return CreateAndResize(entityID);
-            if (components[entityID] == null)
-                return Create(entityID);
-            entityHasComponent[entityID] = true;
+            if (entity >= components.Length)
+                return CreateAndResize(entity);
+            if (components[entity] == null)
+                return Create(entity);
+            entityHasComponent[entity] = true;
 
             if (tags != null)
             {
-                entityID.AddTagsRaw(tags);
+                entity.AddTagsRaw(tags);
             }
 
-            return components[entityID];
+            return components[entity];
         }
     }
 }

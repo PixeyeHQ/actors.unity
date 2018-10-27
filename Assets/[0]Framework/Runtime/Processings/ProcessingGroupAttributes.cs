@@ -16,13 +16,12 @@ namespace Homebrew
     {
         public static void Setup(object b)
         {
-            var type = b.GetType();
+            var type         = b.GetType();
             var objectFields = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-            int length = objectFields.Length;
+            int length       = objectFields.Length;
 
-            var groupType = typeof(GroupBase);
-
-
+            var groupType      = typeof(GroupBase);
+      
             for (int i = 0; i < length; i++)
             {
                 var myFieldInfo = objectFields[i];
@@ -34,9 +33,11 @@ namespace Homebrew
                         GroupExcludeAttribute;
 
 
-                if (!myFieldInfo.FieldType.IsSubclassOf(groupType) || myFieldInfo.IsStatic) continue;
+                if (myFieldInfo.IsStatic)
+                    continue;
 
-
+                if (!myFieldInfo.FieldType.IsSubclassOf(groupType)) continue;
+                
                 var excludeFilter = groupExcludeAttribute != null ? groupExcludeAttribute.filter : new int[0];
                 var includeFilter = groupByAttribute != null ? groupByAttribute.filter : new int[0];
 
@@ -46,7 +47,11 @@ namespace Homebrew
 
 
                 myFieldInfo.SetValue(b, ProcessingEntities.Default.SetupGroup(myFieldInfo.FieldType, filter));
+
             }
+
+
+            // continue;
         }
     }
 }

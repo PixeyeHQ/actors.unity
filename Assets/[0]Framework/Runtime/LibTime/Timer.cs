@@ -78,7 +78,7 @@ namespace Homebrew
             obj.Stop();
         }
 
-        public static void Kill(Timer obj)
+        public static void Release(Timer obj)
         {
             if (obj == null) return;
             if (Toolbox.applicationIsQuitting) return;
@@ -150,10 +150,10 @@ namespace Homebrew
             timer = 0.0f;
             IsRunning = false;
 
-            if (callBackAction!=null)
-            callBackAction();
+            if (callBackAction != null)
+                callBackAction();
 
-            if (isAutoKill) Kill();
+            if (isAutoKill) Release();
             else
             {
                 ProcessingUpdate.Default.Remove(this);
@@ -161,7 +161,7 @@ namespace Homebrew
             }
         }
 
-        public void Kill()
+        public void Release()
         {
             if (Toolbox.applicationIsQuitting) return;
             Dispose();
@@ -187,6 +187,12 @@ namespace Homebrew
             if (t == null) t = new Timer(callBackAction, finishTime, isAutoKill);
             t.Restart();
             return t;
+        }
+
+        public static void Kill(this Timer t)
+        {
+            if (t == null) return;
+            t.Release();
         }
     }
 }

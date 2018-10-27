@@ -1,22 +1,16 @@
 /*===============================================================
-Product:    Cryoshock
+Product:    Shoot off their lumps
 Developer:  Dimitry Pixeye - pixeye@hbrew.store
 Company:    Homebrew - http://hbrew.store
-Date:       5/14/2018  6:33 PM
+Date:       17/01/2018 22:36
 ================================================================*/
 
 using System;
 
+
 namespace Homebrew
 {
-    public class GroupByAttribute : Attribute
+    public interface IComponent
     {
-        public int[] filter;
- 
-        public GroupByAttribute(params int[] filter)
-        {
-            this.filter = filter;
-        }
-       
     }
 }

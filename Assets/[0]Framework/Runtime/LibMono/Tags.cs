@@ -13,12 +13,14 @@ namespace Homebrew
     public static class Tags
     {
         internal static Dictionary<int, int>[] tags = new Dictionary<int, int>[EngineSettings.MinEntities];
-        internal static Dictionary<int, List<GroupBase>> groupsInclude = new Dictionary<int, List<GroupBase>>();
-        internal static Dictionary<int, List<GroupBase>> groupsDeclude = new Dictionary<int, List<GroupBase>>();
+        internal static Dictionary<int, List<GroupBase>> groupsInclude = new Dictionary<int, List<GroupBase>>(10, new FastComparable());
+
+        internal static Dictionary<int, List<GroupBase>> groupsDeclude = new Dictionary<int, List<GroupBase>>(10, new FastComparable());
+        //   internal static Dictionary<int, Action<int>> observers = new Dictionary<int, Action<int>>(10, new FastComparable());
 
         static internal int length = -1;
 
-        static internal void AddTags(int entityID)
+        static internal void Add(int entityID)
         {
             if (length > entityID) return;
 
@@ -38,7 +40,7 @@ namespace Homebrew
             tags[id].Clear();
         }
 
-        static internal void HandleChange(int id, int tag)
+        static internal void HandleChange(int entity, int tag)
         {
             if (Toolbox.isQuittingOrChangingScene()) return;
 
@@ -49,7 +51,7 @@ namespace Homebrew
 
                 for (int i = 0; i < len; i++)
                 {
-                    groups[i].TagsChanged(id);
+                    groups[i].TagsHaveChanged(entity);
                 }
             }
 
@@ -58,9 +60,16 @@ namespace Homebrew
                 var len = groups.Count;
                 for (int i = 0; i < len; i++)
                 {
-                    groups[i].TagsChanged(id);
+                    groups[i].TagsHaveChanged(entity);
                 }
             }
+
+            //    Action<int> action;
+            //  if (observers.TryGetValue(entity, out action))
+            // {
+            //  if (action!=null)
+            //   action(entity);
+            // }
         }
 
 
@@ -111,7 +120,7 @@ namespace Homebrew
                 HandleChange(entityID, index);
             }
         }
-
+ 
         public static void Add(this int entityID, int tagId)
         {
             var dict = tags[entityID];
@@ -174,6 +183,7 @@ namespace Homebrew
             var container = tags[entityID];
             return container.ContainsKey(filter);
         }
+
 
         public static bool Has(this int entityID, params int[] filter)
         {

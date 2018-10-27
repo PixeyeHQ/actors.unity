@@ -9,11 +9,11 @@ namespace Homebrew
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Enum | AttributeTargets.Delegate, Inherited = false)]
     [System.Runtime.InteropServices.ComVisible(true)]
-    public class TagRequireAttribute : Attribute
+    public class RequireTagsAttribute : Attribute
     {
         public int[] tags;
 
-        public TagRequireAttribute(params int[] tags)
+        public RequireTagsAttribute(params int[] tags)
         {
             this.tags = tags;
         }

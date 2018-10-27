@@ -5,54 +5,44 @@ Company:    Homebrew - http://hbrew.store
 Date:       2/15/2018  7:57 PM
 ================================================================*/
 
-using System.Linq;
+
 using UnityEngine;
-namespace Homebrew{
 
-public abstract class BaseStateMachineBehavior : StateMachineBehaviour
+namespace Homebrew
 {
-	protected Actor actor;
+    public abstract class BaseStateMachineBehavior : StateMachineBehaviour
+    {
+        protected Actor actor;
 
-	public void Setup(Actor actor)
-	{
+        public void Setup(Actor actor)
+        {
+            this.actor = actor;
+            OnSetup();
+        }
 
-		this.actor = actor;
-		OnSetup();
-	}
-
-	public virtual void End()
-	{
-		
-	}
-	
-	protected abstract void OnSetup();
+        public abstract void End();
+        protected abstract void OnSetup();
+    }
 
 
-}
-	
-	
-	public static class SMUtilities
-	{
-		
-		public static void End(this Animator animator)
-		{
-			var behaviors = animator.GetBehaviours<BaseStateMachineBehavior>().ToList();
-			for (var i = 0; i < behaviors.Count; i++)
-			{
-				behaviors[i].End();
-			}
-		}
-		
-		public static void Initialize(this Animator animator,  Actor a)
-		{
-		 var behaviors = animator.GetBehaviours<BaseStateMachineBehavior>().ToList();
-			for (var i = 0; i < behaviors.Count; i++)
-			{
-				 behaviors[i].Setup(a);
-			}
-		}
-	}
-	
-	
+    public static class SMUtilities
+    {
+        public static void End(this Animator animator)
+        {
+            var behaviors = animator.GetBehaviours<BaseStateMachineBehavior>();
+            foreach (var behavior in behaviors)
+            {
+                behavior.End();
+            }
+        }
 
+        public static void Initialize(this Animator animator, Actor a)
+        {
+            var behaviors = animator.GetBehaviours<BaseStateMachineBehavior>();
+            foreach (var behavior in behaviors)
+            {
+                behavior.Setup(a);
+            }
+        }
+    }
 }

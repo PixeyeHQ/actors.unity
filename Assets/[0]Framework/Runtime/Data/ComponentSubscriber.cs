@@ -2,13 +2,21 @@
 Product:    Cryoshock
 Developer:  Dimitry Pixeye - pixeye@hbrew.store
 Company:    Homebrew - http://hbrew.store
-Date:       5/7/2018  8:41 AM
+Date:       2/2/2018  7:54 AM
 ================================================================*/
 
-
-namespace Homebrew
+ 
+namespace Homebrew{
+[System.Serializable]
+public class ComponentSubscriber : IComponent
 {
-	public interface IComponent
+	public Actor Actor;
+  
+
+	public void Dispose()
 	{
+		Actor = null;
 	}
+}
+
 }

@@ -12,19 +12,32 @@ using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 
-
 namespace Homebrew
 {
     public static partial class FrameworkExtensions
     {
         private static System.Random _r = new System.Random();
 
+        #region Signals
+
+        public static void Send<T>(ref T signal) where T : struct
+        {
+            ProcessingSignals.Send(ref signal);
+        }
+
+        #endregion
+
         #region ACTORS
 
-        public static void Kill(this int entity)
+        public static void Release(this int entity, bool isActor = false)
         {
-            int len = Storage.all.Count;
+            if (isActor)
+            {
+                Actor.entites[entity].Release();
+                return;
+            }
 
+            int len = Storage.all.Count;
             for (int j = 0; j < len; j++)
             {
                 Storage.all[j].Remove(entity);
@@ -39,14 +52,15 @@ namespace Homebrew
             return Actor.entites[entity];
         }
 
-        public static void HandleDestroy(this int entity)
+
+        public static GameObject GameObject(this int entity)
         {
-            Actor.entites[entity].Release();
+            return entity.ComponentObject().obj;
         }
 
-        public static Transform GetTransform(this int entity)
+        public static Transform Transform(this int entity)
         {
-            return Actor.entites[entity].selfTransform;
+            return entity.ComponentObject().transform;
         }
 
         public static T Create<T>(this int entity) where T : IComponent, new()
@@ -54,9 +68,24 @@ namespace Homebrew
             return Storage<T>.Instance.GetOrCreate(entity);
         }
 
+        public static T Get<T>(this ComponentObject component, int hash)
+        {
+            return component.cachedTransforms[hash].GetComponent<T>();
+        }
+
+        public static T Get<T>(this ComponentObject component, string path)
+        {
+            return component.transform.Find(path).GetComponent<T>();
+        }
+
+        public static T Get<T>(this int entity, int hash)
+        {
+            return entity.ComponentObject().cachedTransforms[hash].GetComponent<T>();
+        }
+
         public static T Get<T>(this int entity, string path)
         {
-            return Actor.entites[entity].Get<T>(path);
+            return entity.ComponentObject().transform.Find(path).GetComponent<T>();
         }
 
         public static T Get<T>(this int entity) where T : IComponent, new()
@@ -470,7 +499,7 @@ namespace Homebrew
 
             return vals[0];
         }
- 
+
         public static T Select<T>(this T[] vals, out int index) where T : IRandom
         {
             index = -1;
@@ -506,7 +535,7 @@ namespace Homebrew
 
             return vals[0];
         }
- 
+
         public static T Random<T>(this T[] vals)
         {
             return vals[UnityEngine.Random.Range(0, vals.Length)];
@@ -515,12 +544,11 @@ namespace Homebrew
         public static T RandomDequeue<T>(this List<T> vals)
         {
             var index = UnityEngine.Random.Range(0, vals.Count);
-            var val = vals[index];
+            var val   = vals[index];
             vals.RemoveAt(index);
             return val;
         }
- 
-     
+
         #endregion
 
         #region TRANSFORMS

@@ -1,163 +1,14 @@
-/*===============================================================
-Product:    Cryoshock
-Developer:  Dimitry Pixeye - pixeye@hbrew.store
-Company:    Homebrew - http://hbrew.store
-Date:       5/14/2018  6:32 PM
-================================================================*/
+//   Project : Cryoshock
+//  Contacts : Pixeye - info@pixeye.games 
+//      Date : 10/23/2018
 
 using System;
-using System.Collections;
 
 namespace Homebrew
 {
-    public abstract class GroupBase : IEnumerable, IDisposable
+    public class GroupCoherent<T> : GroupBase where T : IComponent, new()
     {
-        public int length;
-
-        public int[] entities = new int[EngineSettings.MinEntities];
-        public Composition composition;
-
-
-        public Action<int> Added;
-        public Action<int> Removed;
-        public Action<int, int> TagsChanged;
-
-        protected int indexLast;
-
-        internal void TagsHaveChanged(int entity)
-        {
-            int index = GetIndex(entity);
-
-            if (index == -1)
-            {
-                if (!entity.Has(composition.include)) return;
-                if (entity.HasAny(composition.exclude)) return;
-
-                TryAdd(entity);
-            }
-            else
-            {
-                if (TagsChanged != null)
-                    TagsChanged(index, entity);
-
-                if (!entity.Has(composition.include) || entity.HasAny(composition.exclude))
-
-                    RemoveAt(index);
-            }
-        }
-        public bool Has (int entity)
-        {
-            for (int i = 0; i < length; i++)
-            {
-                if (entities[i] != entity) continue;
-                return true;
-            }
-
-            return false;
-        }
-
-        public int GetIndex(int entity)
-        {
-            for (int i = 0; i < length; i++)
-            {
-                if (entities[i] != entity) continue;
-                return i;
-            }
-
-            return -1;
-        }
-
-        public int GetEntity(int index)
-        {
-            return entities[index];
-        }
-
-        public Actor GetActor(int entity)
-        {
-            return Actor.entites[entity];
-        }
-
-        public bool CheckTags(int entity)
-        {
-            if (!entity.Has(composition.include))
-                return false;
-
-            return !entity.HasAny(composition.exclude);
-        }
-
-
-        public abstract void TryAdd(int entity);
-
-
-        public void Remove(int entity)
-        {
-            
-            int i = GetIndex(entity);
-            if (i == -1) return;
-            RemoveAt(i);
-        }
-
-
-        public abstract void Populate();
-        protected abstract void RemoveAt(int i);
-
-
-        public void Dispose()
-        {
-            Added = null;
-            Removed = null;
-            length = 0;
-            entities = new int[EngineSettings.MinEntities];
-            OnDispose();
-        }
-
-        protected abstract void OnDispose();
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-
-        public EntityEnumerator GetEnumerator()
-        {
-            return new EntityEnumerator(entities, length);
-        }
-    }
-
-    public struct EntityEnumerator : IEnumerator
-    {
-        public int[] entities;
-
-
-        int position;
-        private int length;
-
-        public EntityEnumerator(int[] list, int length)
-        {
-            entities = list;
-            position = -1;
-            this.length = length;
-        }
-
-        public bool MoveNext()
-        {
-            position++;
-            return position < length;
-        }
-
-        public void Reset()
-        {
-            position = -1;
-        }
-
-        object IEnumerator.Current => Current;
-
-        public int Current => entities[position];
-    }
-
-
-    public class Group<T> : GroupBase where T : IComponent, new()
-    {
+        public T[] component = new T[EngineSettings.MinComponents];
         private Storage<T> storage = Storage<T>.Instance;
 
 
@@ -170,16 +21,18 @@ namespace Homebrew
             {
                 int len = length << 1;
                 Array.Resize(ref entities, len);
+                Array.Resize(ref component, len);
             }
 
 
             indexLast = length++;
 
             entities[indexLast] = entity;
+            component[indexLast] = storage.components[entity];
 
 
             if (Added != null)
-                Added(entity);
+                Added(indexLast);
         }
 
 
@@ -208,6 +61,7 @@ namespace Homebrew
                 {
                     int len = length << 1;
                     Array.Resize(ref entities, len);
+                    Array.Resize(ref component, len);
                 }
 
                 int entityID = e.entity;
@@ -215,13 +69,14 @@ namespace Homebrew
 
 
                 entities[indexLast] = entityID;
+                component[indexLast] = storage.components[entityID];
             }
         }
 
         protected override void RemoveAt(int i)
         {
             if (Removed != null)
-                Removed(entities[i]);
+                Removed(i);
 
 
             int l = --length;
@@ -231,16 +86,20 @@ namespace Homebrew
 
 
             Array.Copy(entities, next, entities, i, size);
+            Array.Copy(component, next, component, i, size);
         }
 
 
         protected override void OnDispose()
         {
+            component = new T[EngineSettings.MinComponents];
         }
     }
 
-    public class Group<T, Y> : GroupBase where T : IComponent, new() where Y : new()
+    public class GroupCoherent<T, Y> : GroupBase where T : IComponent, new() where Y : new()
     {
+        public T[] component = new T[EngineSettings.MinComponents];
+        public Y[] component2 = new Y[EngineSettings.MinComponents];
         Storage<T> storage = Storage<T>.Instance;
         Storage<Y> storage2 = Storage<Y>.Instance;
 
@@ -253,16 +112,20 @@ namespace Homebrew
                 int len = length << 1;
 
                 Array.Resize(ref entities, len);
+                Array.Resize(ref component, len);
+                Array.Resize(ref component2, len);
             }
 
 
             indexLast = length++;
 
             entities[indexLast] = entity;
+            component[indexLast] = storage.components[entity];
+            component2[indexLast] = storage2.components[entity];
 
 
             if (Added != null)
-                Added(entity);
+                Added(indexLast);
         }
 
 
@@ -293,6 +156,8 @@ namespace Homebrew
                     int len = length << 1;
 
                     Array.Resize(ref entities, len);
+                    Array.Resize(ref component, len);
+                    Array.Resize(ref component2, len);
                 }
 
                 int entityID = e.entity;
@@ -300,29 +165,38 @@ namespace Homebrew
 
 
                 entities[indexLast] = entityID;
+                component[indexLast] = storage.components[entityID];
+                component2[indexLast] = storage2.components[entityID];
             }
         }
 
         protected override void RemoveAt(int i)
         {
             if (Removed != null)
-                Removed(entities[i]);
+                Removed(i);
 
             int l    = --length;
             int next = i + 1;
             int size = l - i;
 
             Array.Copy(entities, next, entities, i, size);
+            Array.Copy(component, next, component, i, size);
+            Array.Copy(component2, next, component2, i, size);
         }
 
 
         protected override void OnDispose()
         {
+            component = new T[EngineSettings.MinComponents];
+            component2 = new Y[EngineSettings.MinComponents];
         }
     }
 
-    public class Group<T, Y, U> : GroupBase where T : IComponent, new() where Y : new() where U : new()
+    public class GroupCoherent<T, Y, U> : GroupBase where T : IComponent, new() where Y : new() where U : new()
     {
+        public T[] component = new T[EngineSettings.MinComponents];
+        public Y[] component2 = new Y[EngineSettings.MinComponents];
+        public U[] component3 = new U[EngineSettings.MinComponents];
         Storage<T> storage = Storage<T>.Instance;
         Storage<Y> storage2 = Storage<Y>.Instance;
         Storage<U> storage3 = Storage<U>.Instance;
@@ -330,13 +204,16 @@ namespace Homebrew
         protected override void RemoveAt(int i)
         {
             if (Removed != null)
-                Removed(entities[i]);
+                Removed(i);
 
             int l    = --length;
             int next = i + 1;
             int size = l - i;
 
             Array.Copy(entities, next, entities, i, size);
+            Array.Copy(component, next, component, i, size);
+            Array.Copy(component2, next, component2, i, size);
+            Array.Copy(component3, next, component3, i, size);
         }
 
         public override void TryAdd(int entity)
@@ -351,16 +228,21 @@ namespace Homebrew
             {
                 int len = length << 1;
                 Array.Resize(ref entities, len);
+                Array.Resize(ref component, len);
+                Array.Resize(ref component2, len);
+                Array.Resize(ref component3, len);
             }
 
 
             indexLast = length++;
 
             entities[indexLast] = entity;
-
+            component[indexLast] = storage.components[entity];
+            component2[indexLast] = storage2.components[entity];
+            component3[indexLast] = storage3.components[entity];
 
             if (Added != null)
-                Added(entity);
+                Added(indexLast);
         }
 
 
@@ -397,25 +279,39 @@ namespace Homebrew
                     int len = length << 1;
 
                     Array.Resize(ref entities, len);
+                    Array.Resize(ref component, len);
+                    Array.Resize(ref component2, len);
+                    Array.Resize(ref component3, len);
                 }
 
                 indexLast = length++;
 
                 entities[indexLast] = entityID;
+                component[indexLast] = storage.components[entityID];
+                component2[indexLast] = storage2.components[entityID];
+                component3[indexLast] = storage3.components[entityID];
             }
         }
 
 
         protected override void OnDispose()
         {
+            component = new T[EngineSettings.MinComponents];
+            component2 = new Y[EngineSettings.MinComponents];
+            component3 = new U[EngineSettings.MinComponents];
         }
     }
 
-    public class Group<T, Y, U, I> : GroupBase where T : IComponent, new()
+    public class GroupCoherent<T, Y, U, I> : GroupBase where T : IComponent, new()
                                                where Y : new()
                                                where U : new()
                                                where I : new()
     {
+        public T[] component = new T[EngineSettings.MinComponents];
+        public Y[] component2 = new Y[EngineSettings.MinComponents];
+        public U[] component3 = new U[EngineSettings.MinComponents];
+        public I[] component4 = new I[EngineSettings.MinComponents];
+
         Storage<T> storage = Storage<T>.Instance;
         Storage<Y> storage2 = Storage<Y>.Instance;
         Storage<U> storage3 = Storage<U>.Instance;
@@ -424,13 +320,17 @@ namespace Homebrew
         protected override void RemoveAt(int i)
         {
             if (Removed != null)
-                Removed(entities[i]);
+                Removed(i);
 
             int l    = --length;
             int next = i + 1;
             int size = l - i;
 
             Array.Copy(entities, next, entities, i, size);
+            Array.Copy(component, next, component, i, size);
+            Array.Copy(component2, next, component2, i, size);
+            Array.Copy(component3, next, component3, i, size);
+            Array.Copy(component4, next, component4, i, size);
         }
 
         public override void TryAdd(int entity)
@@ -446,15 +346,23 @@ namespace Homebrew
                 int len = length << 1;
 
                 Array.Resize(ref entities, len);
+                Array.Resize(ref component, len);
+                Array.Resize(ref component2, len);
+                Array.Resize(ref component3, len);
+                Array.Resize(ref component4, len);
             }
 
             indexLast = length++;
 
             entities[indexLast] = entity;
+            component[indexLast] = storage.components[entity];
+            component2[indexLast] = storage2.components[entity];
+            component3[indexLast] = storage3.components[entity];
+            component4[indexLast] = storage4.components[entity];
 
 
             if (Added != null)
-                Added(entity);
+                Added(indexLast);
         }
 
 
@@ -493,26 +401,44 @@ namespace Homebrew
                     int len = length << 1;
 
                     Array.Resize(ref entities, len);
+                    Array.Resize(ref component, len);
+                    Array.Resize(ref component2, len);
+                    Array.Resize(ref component3, len);
+                    Array.Resize(ref component4, len);
                 }
 
                 indexLast = length++;
 
                 entities[indexLast] = entityID;
+                component[indexLast] = storage.components[entityID];
+                component2[indexLast] = storage2.components[entityID];
+                component3[indexLast] = storage3.components[entityID];
+                component4[indexLast] = storage4.components[entityID];
             }
         }
 
 
         protected override void OnDispose()
         {
+            component = new T[EngineSettings.MinComponents];
+            component2 = new Y[EngineSettings.MinComponents];
+            component3 = new U[EngineSettings.MinComponents];
+            component4 = new I[EngineSettings.MinComponents];
         }
     }
 
-    public class Group<T, Y, U, I, O> : GroupBase where T : IComponent, new()
+    public class GroupCoherent<T, Y, U, I, O> : GroupBase where T : IComponent, new()
                                                   where Y : new()
                                                   where U : new()
                                                   where I : new()
                                                   where O : new()
     {
+        public T[] component = new T[EngineSettings.MinComponents];
+        public Y[] component2 = new Y[EngineSettings.MinComponents];
+        public U[] component3 = new U[EngineSettings.MinComponents];
+        public I[] component4 = new I[EngineSettings.MinComponents];
+        public O[] component5 = new O[EngineSettings.MinComponents];
+
         Storage<T> storage = Storage<T>.Instance;
         Storage<Y> storage2 = Storage<Y>.Instance;
         Storage<U> storage3 = Storage<U>.Instance;
@@ -534,15 +460,25 @@ namespace Homebrew
                 int len = entity == 0 ? EngineSettings.MinComponents : length << 1;
 
                 Array.Resize(ref entities, len);
+                Array.Resize(ref component, len);
+                Array.Resize(ref component2, len);
+                Array.Resize(ref component3, len);
+                Array.Resize(ref component4, len);
+                Array.Resize(ref component5, len);
             }
 
             indexLast = length++;
 
             entities[indexLast] = entity;
+            component[indexLast] = storage.components[entity];
+            component2[indexLast] = storage2.components[entity];
+            component3[indexLast] = storage3.components[entity];
+            component4[indexLast] = storage4.components[entity];
+            component5[indexLast] = storage5.components[entity];
 
 
             if (Added != null)
-                Added(entity);
+                Added(indexLast);
         }
 
 
@@ -582,12 +518,22 @@ namespace Homebrew
                     int len = length << 1;
 
                     Array.Resize(ref entities, len);
+                    Array.Resize(ref component, len);
+                    Array.Resize(ref component2, len);
+                    Array.Resize(ref component3, len);
+                    Array.Resize(ref component4, len);
+                    Array.Resize(ref component5, len);
                 }
 
 
                 indexLast = length++;
 
                 entities[indexLast] = entityID;
+                component[indexLast] = storage.components[entityID];
+                component2[indexLast] = storage2.components[entityID];
+                component3[indexLast] = storage3.components[entityID];
+                component4[indexLast] = storage4.components[entityID];
+                component5[indexLast] = storage5.components[entityID];
             }
         }
 
@@ -595,29 +541,46 @@ namespace Homebrew
         protected override void RemoveAt(int i)
         {
             if (Removed != null)
-                Removed(entities[i]);
+                Removed(i);
 
             int l    = --length;
             int next = i + 1;
             int size = l - i;
 
             Array.Copy(entities, next, entities, i, size);
+            Array.Copy(component, next, component, i, size);
+            Array.Copy(component2, next, component2, i, size);
+            Array.Copy(component3, next, component3, i, size);
+            Array.Copy(component4, next, component4, i, size);
+            Array.Copy(component5, next, component5, i, size);
         }
 
 
         protected override void OnDispose()
         {
+            component = new T[EngineSettings.MinComponents];
+            component2 = new Y[EngineSettings.MinComponents];
+            component3 = new U[EngineSettings.MinComponents];
+            component4 = new I[EngineSettings.MinComponents];
+            component5 = new O[EngineSettings.MinComponents];
         }
     }
 
 
-    public class Group<T, Y, U, I, O, P> : GroupBase where T : IComponent, new()
+    public class GroupCoherent<T, Y, U, I, O, P> : GroupBase where T : IComponent, new()
                                                      where Y : new()
                                                      where U : new()
                                                      where I : new()
                                                      where O : new()
                                                      where P : new()
     {
+        public T[] component = new T[EngineSettings.MinComponents];
+        public Y[] component2 = new Y[EngineSettings.MinComponents];
+        public U[] component3 = new U[EngineSettings.MinComponents];
+        public I[] component4 = new I[EngineSettings.MinComponents];
+        public O[] component5 = new O[EngineSettings.MinComponents];
+        public P[] component6 = new P[EngineSettings.MinComponents];
+
         Storage<T> storage = Storage<T>.Instance;
         Storage<Y> storage2 = Storage<Y>.Instance;
         Storage<U> storage3 = Storage<U>.Instance;
@@ -641,15 +604,27 @@ namespace Homebrew
                 int len = length << 1;
 
                 Array.Resize(ref entities, len);
+                Array.Resize(ref component, len);
+                Array.Resize(ref component2, len);
+                Array.Resize(ref component3, len);
+                Array.Resize(ref component4, len);
+                Array.Resize(ref component5, len);
+                Array.Resize(ref component6, len);
             }
 
             indexLast = length++;
 
             entities[indexLast] = entity;
+            component[indexLast] = storage.components[entity];
+            component2[indexLast] = storage2.components[entity];
+            component3[indexLast] = storage3.components[entity];
+            component4[indexLast] = storage4.components[entity];
+            component5[indexLast] = storage5.components[entity];
+            component6[indexLast] = storage6.components[entity];
 
 
             if (Added != null)
-                Added(entity);
+                Added(indexLast);
         }
 
 
@@ -690,12 +665,24 @@ namespace Homebrew
                     int len = length << 1;
 
                     Array.Resize(ref entities, len);
+                    Array.Resize(ref component, len);
+                    Array.Resize(ref component2, len);
+                    Array.Resize(ref component3, len);
+                    Array.Resize(ref component4, len);
+                    Array.Resize(ref component5, len);
+                    Array.Resize(ref component6, len);
                 }
 
 
                 indexLast = length++;
 
                 entities[indexLast] = entityID;
+                component[indexLast] = storage.components[entityID];
+                component2[indexLast] = storage2.components[entityID];
+                component3[indexLast] = storage3.components[entityID];
+                component4[indexLast] = storage4.components[entityID];
+                component5[indexLast] = storage5.components[entityID];
+                component6[indexLast] = storage6.components[entityID];
             }
         }
 
@@ -703,7 +690,7 @@ namespace Homebrew
         protected override void RemoveAt(int i)
         {
             if (Removed != null)
-                Removed(entities[i]);
+                Removed(i);
 
             int l    = --length;
             int next = i + 1;
@@ -711,16 +698,28 @@ namespace Homebrew
 
 
             Array.Copy(entities, next, entities, i, size);
+            Array.Copy(component, next, component, i, size);
+            Array.Copy(component2, next, component2, i, size);
+            Array.Copy(component3, next, component3, i, size);
+            Array.Copy(component4, next, component4, i, size);
+            Array.Copy(component5, next, component5, i, size);
+            Array.Copy(component6, next, component6, i, size);
         }
 
 
         protected override void OnDispose()
         {
+            component = new T[EngineSettings.MinComponents];
+            component2 = new Y[EngineSettings.MinComponents];
+            component3 = new U[EngineSettings.MinComponents];
+            component4 = new I[EngineSettings.MinComponents];
+            component5 = new O[EngineSettings.MinComponents];
+            component6 = new P[EngineSettings.MinComponents];
         }
     }
 
 
-    public class Group<T, Y, U, I, O, P, A> : GroupBase where T : IComponent, new()
+    public class GroupCoherent<T, Y, U, I, O, P, A> : GroupBase where T : IComponent, new()
                                                         where Y : new()
                                                         where U : new()
                                                         where I : new()
@@ -728,6 +727,14 @@ namespace Homebrew
                                                         where P : new()
                                                         where A : new()
     {
+        public T[] component = new T[EngineSettings.MinComponents];
+        public Y[] component2 = new Y[EngineSettings.MinComponents];
+        public U[] component3 = new U[EngineSettings.MinComponents];
+        public I[] component4 = new I[EngineSettings.MinComponents];
+        public O[] component5 = new O[EngineSettings.MinComponents];
+        public P[] component6 = new P[EngineSettings.MinComponents];
+        public A[] component7 = new A[EngineSettings.MinComponents];
+
         Storage<T> storage = Storage<T>.Instance;
         Storage<Y> storage2 = Storage<Y>.Instance;
         Storage<U> storage3 = Storage<U>.Instance;
@@ -752,15 +759,29 @@ namespace Homebrew
                 int len = length << 1;
 
                 Array.Resize(ref entities, len);
+                Array.Resize(ref component, len);
+                Array.Resize(ref component2, len);
+                Array.Resize(ref component3, len);
+                Array.Resize(ref component4, len);
+                Array.Resize(ref component5, len);
+                Array.Resize(ref component6, len);
+                Array.Resize(ref component7, len);
             }
 
             indexLast = length++;
 
             entities[indexLast] = entity;
+            component[indexLast] = storage.components[entity];
+            component2[indexLast] = storage2.components[entity];
+            component3[indexLast] = storage3.components[entity];
+            component4[indexLast] = storage4.components[entity];
+            component5[indexLast] = storage5.components[entity];
+            component6[indexLast] = storage6.components[entity];
+            component7[indexLast] = storage7.components[entity];
 
 
             if (Added != null)
-                Added(entity);
+                Added(indexLast);
         }
 
 
@@ -803,12 +824,26 @@ namespace Homebrew
                     int len = length << 1;
 
                     Array.Resize(ref entities, len);
+                    Array.Resize(ref component, len);
+                    Array.Resize(ref component2, len);
+                    Array.Resize(ref component3, len);
+                    Array.Resize(ref component4, len);
+                    Array.Resize(ref component5, len);
+                    Array.Resize(ref component6, len);
+                    Array.Resize(ref component7, len);
                 }
 
 
                 indexLast = length++;
 
                 entities[indexLast] = entityID;
+                component[indexLast] = storage.components[entityID];
+                component2[indexLast] = storage2.components[entityID];
+                component3[indexLast] = storage3.components[entityID];
+                component4[indexLast] = storage4.components[entityID];
+                component5[indexLast] = storage5.components[entityID];
+                component6[indexLast] = storage6.components[entityID];
+                component7[indexLast] = storage7.components[entityID];
             }
         }
 
@@ -816,7 +851,7 @@ namespace Homebrew
         protected override void RemoveAt(int i)
         {
             if (Removed != null)
-                Removed(entities[i]);
+                Removed(i);
 
             int l    = --length;
             int next = i + 1;
@@ -824,16 +859,30 @@ namespace Homebrew
 
 
             Array.Copy(entities, next, entities, i, size);
+            Array.Copy(component, next, component, i, size);
+            Array.Copy(component2, next, component2, i, size);
+            Array.Copy(component3, next, component3, i, size);
+            Array.Copy(component4, next, component4, i, size);
+            Array.Copy(component5, next, component5, i, size);
+            Array.Copy(component6, next, component6, i, size);
+            Array.Copy(component7, next, component7, i, size);
         }
 
 
         protected override void OnDispose()
         {
+            component = new T[EngineSettings.MinComponents];
+            component2 = new Y[EngineSettings.MinComponents];
+            component3 = new U[EngineSettings.MinComponents];
+            component4 = new I[EngineSettings.MinComponents];
+            component5 = new O[EngineSettings.MinComponents];
+            component6 = new P[EngineSettings.MinComponents];
+            component7 = new A[EngineSettings.MinComponents];
         }
     }
 
 
-    public class Group<T, Y, U, I, O, P, A, S> : GroupBase where T : IComponent, new()
+    public class GroupCoherent<T, Y, U, I, O, P, A, S> : GroupBase where T : IComponent, new()
                                                            where Y : new()
                                                            where U : new()
                                                            where I : new()
@@ -842,6 +891,15 @@ namespace Homebrew
                                                            where A : new()
                                                            where S : new()
     {
+        public T[] component = new T[EngineSettings.MinComponents];
+        public Y[] component2 = new Y[EngineSettings.MinComponents];
+        public U[] component3 = new U[EngineSettings.MinComponents];
+        public I[] component4 = new I[EngineSettings.MinComponents];
+        public O[] component5 = new O[EngineSettings.MinComponents];
+        public P[] component6 = new P[EngineSettings.MinComponents];
+        public A[] component7 = new A[EngineSettings.MinComponents];
+        public S[] component8 = new S[EngineSettings.MinComponents];
+
         Storage<T> storage = Storage<T>.Instance;
         Storage<Y> storage2 = Storage<Y>.Instance;
         Storage<U> storage3 = Storage<U>.Instance;
@@ -868,15 +926,31 @@ namespace Homebrew
                 int len = length << 1;
 
                 Array.Resize(ref entities, len);
+                Array.Resize(ref component, len);
+                Array.Resize(ref component2, len);
+                Array.Resize(ref component3, len);
+                Array.Resize(ref component4, len);
+                Array.Resize(ref component5, len);
+                Array.Resize(ref component6, len);
+                Array.Resize(ref component7, len);
+                Array.Resize(ref component8, len);
             }
 
             indexLast = length++;
 
             entities[indexLast] = entity;
+            component[indexLast] = storage.components[entity];
+            component2[indexLast] = storage2.components[entity];
+            component3[indexLast] = storage3.components[entity];
+            component4[indexLast] = storage4.components[entity];
+            component5[indexLast] = storage5.components[entity];
+            component6[indexLast] = storage6.components[entity];
+            component7[indexLast] = storage7.components[entity];
+            component8[indexLast] = storage8.components[entity];
 
 
             if (Added != null)
-                Added(entity);
+                Added(indexLast);
         }
 
 
@@ -921,12 +995,28 @@ namespace Homebrew
                     int len = length << 1;
 
                     Array.Resize(ref entities, len);
+                    Array.Resize(ref component, len);
+                    Array.Resize(ref component2, len);
+                    Array.Resize(ref component3, len);
+                    Array.Resize(ref component4, len);
+                    Array.Resize(ref component5, len);
+                    Array.Resize(ref component6, len);
+                    Array.Resize(ref component7, len);
+                    Array.Resize(ref component8, len);
                 }
 
 
                 indexLast = length++;
 
                 entities[indexLast] = entityID;
+                component[indexLast] = storage.components[entityID];
+                component2[indexLast] = storage2.components[entityID];
+                component3[indexLast] = storage3.components[entityID];
+                component4[indexLast] = storage4.components[entityID];
+                component5[indexLast] = storage5.components[entityID];
+                component6[indexLast] = storage6.components[entityID];
+                component7[indexLast] = storage7.components[entityID];
+                component8[indexLast] = storage8.components[entityID];
             }
         }
 
@@ -934,7 +1024,7 @@ namespace Homebrew
         protected override void RemoveAt(int i)
         {
             if (Removed != null)
-                Removed(entities[i]);
+                Removed(i);
 
             int l    = --length;
             int next = i + 1;
@@ -942,16 +1032,32 @@ namespace Homebrew
 
 
             Array.Copy(entities, next, entities, i, size);
+            Array.Copy(component, next, component, i, size);
+            Array.Copy(component2, next, component2, i, size);
+            Array.Copy(component3, next, component3, i, size);
+            Array.Copy(component4, next, component4, i, size);
+            Array.Copy(component5, next, component5, i, size);
+            Array.Copy(component6, next, component6, i, size);
+            Array.Copy(component7, next, component7, i, size);
+            Array.Copy(component8, next, component8, i, size);
         }
 
 
         protected override void OnDispose()
         {
+            component = new T[EngineSettings.MinComponents];
+            component2 = new Y[EngineSettings.MinComponents];
+            component3 = new U[EngineSettings.MinComponents];
+            component4 = new I[EngineSettings.MinComponents];
+            component5 = new O[EngineSettings.MinComponents];
+            component6 = new P[EngineSettings.MinComponents];
+            component7 = new A[EngineSettings.MinComponents];
+            component8 = new S[EngineSettings.MinComponents];
         }
     }
 
 
-    public class Group<T, Y, U, I, O, P, A, S, D> : GroupBase where T : IComponent, new()
+    public class GroupCoherent<T, Y, U, I, O, P, A, S, D> : GroupBase where T : IComponent, new()
                                                               where Y : new()
                                                               where U : new()
                                                               where I : new()
@@ -961,6 +1067,15 @@ namespace Homebrew
                                                               where S : new()
                                                               where D : new()
     {
+        public T[] component = new T[EngineSettings.MinComponents];
+        public Y[] component2 = new Y[EngineSettings.MinComponents];
+        public U[] component3 = new U[EngineSettings.MinComponents];
+        public I[] component4 = new I[EngineSettings.MinComponents];
+        public O[] component5 = new O[EngineSettings.MinComponents];
+        public P[] component6 = new P[EngineSettings.MinComponents];
+        public A[] component7 = new A[EngineSettings.MinComponents];
+        public S[] component8 = new S[EngineSettings.MinComponents];
+        public D[] component9 = new D[EngineSettings.MinComponents];
         Storage<T> storage = Storage<T>.Instance;
         Storage<Y> storage2 = Storage<Y>.Instance;
         Storage<U> storage3 = Storage<U>.Instance;
@@ -989,15 +1104,32 @@ namespace Homebrew
                 int len = length << 1;
 
                 Array.Resize(ref entities, len);
+                Array.Resize(ref component, len);
+                Array.Resize(ref component2, len);
+                Array.Resize(ref component3, len);
+                Array.Resize(ref component4, len);
+                Array.Resize(ref component5, len);
+                Array.Resize(ref component6, len);
+                Array.Resize(ref component7, len);
+                Array.Resize(ref component8, len);
+                Array.Resize(ref component9, len);
             }
 
             indexLast = length++;
 
             entities[indexLast] = entity;
-
+            component[indexLast] = storage.components[entity];
+            component2[indexLast] = storage2.components[entity];
+            component3[indexLast] = storage3.components[entity];
+            component4[indexLast] = storage4.components[entity];
+            component5[indexLast] = storage5.components[entity];
+            component6[indexLast] = storage6.components[entity];
+            component7[indexLast] = storage7.components[entity];
+            component8[indexLast] = storage8.components[entity];
+            component9[indexLast] = storage9.components[entity];
 
             if (Added != null)
-                Added(entity);
+                Added(indexLast);
         }
 
 
@@ -1043,12 +1175,30 @@ namespace Homebrew
                     int len = length << 1;
 
                     Array.Resize(ref entities, len);
+                    Array.Resize(ref component, len);
+                    Array.Resize(ref component2, len);
+                    Array.Resize(ref component3, len);
+                    Array.Resize(ref component4, len);
+                    Array.Resize(ref component5, len);
+                    Array.Resize(ref component6, len);
+                    Array.Resize(ref component7, len);
+                    Array.Resize(ref component8, len);
+                    Array.Resize(ref component9, len);
                 }
 
 
                 indexLast = length++;
 
                 entities[indexLast] = entityID;
+                component[indexLast] = storage.components[entityID];
+                component2[indexLast] = storage2.components[entityID];
+                component3[indexLast] = storage3.components[entityID];
+                component4[indexLast] = storage4.components[entityID];
+                component5[indexLast] = storage5.components[entityID];
+                component6[indexLast] = storage6.components[entityID];
+                component7[indexLast] = storage7.components[entityID];
+                component8[indexLast] = storage8.components[entityID];
+                component9[indexLast] = storage9.components[entityID];
             }
         }
 
@@ -1056,7 +1206,7 @@ namespace Homebrew
         protected override void RemoveAt(int i)
         {
             if (Removed != null)
-                Removed(entities[i]);
+                Removed(i);
 
             int l    = --length;
             int next = i + 1;
@@ -1064,11 +1214,29 @@ namespace Homebrew
 
 
             Array.Copy(entities, next, entities, i, size);
+            Array.Copy(component, next, component, i, size);
+            Array.Copy(component2, next, component2, i, size);
+            Array.Copy(component3, next, component3, i, size);
+            Array.Copy(component4, next, component4, i, size);
+            Array.Copy(component5, next, component5, i, size);
+            Array.Copy(component6, next, component6, i, size);
+            Array.Copy(component7, next, component7, i, size);
+            Array.Copy(component8, next, component8, i, size);
+            Array.Copy(component9, next, component9, i, size);
         }
 
 
         protected override void OnDispose()
         {
+            component = new T[EngineSettings.MinComponents];
+            component2 = new Y[EngineSettings.MinComponents];
+            component3 = new U[EngineSettings.MinComponents];
+            component4 = new I[EngineSettings.MinComponents];
+            component5 = new O[EngineSettings.MinComponents];
+            component6 = new P[EngineSettings.MinComponents];
+            component7 = new A[EngineSettings.MinComponents];
+            component8 = new S[EngineSettings.MinComponents];
+            component9 = new D[EngineSettings.MinComponents];
         }
     }
 }

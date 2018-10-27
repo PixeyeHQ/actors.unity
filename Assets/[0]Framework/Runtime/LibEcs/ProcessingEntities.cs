@@ -14,10 +14,9 @@ namespace Homebrew
     internal class ProcessingEntities : IDisposable, IKernel
     {
         internal static ProcessingEntities Default;
-
         internal GroupBase[] GroupsBase = new GroupBase[64];
         internal int groupLength;
- 
+
         internal static int Create()
         {
             int id;
@@ -30,7 +29,7 @@ namespace Homebrew
                 id = Actor.lastID++;
 
 
-            Tags.AddTags(id);
+            Tags.Add(id);
 
             return id;
         }
@@ -53,7 +52,7 @@ namespace Homebrew
                 Actor.entites[Actor.lastID++] = a;
             }
 
-            Tags.AddTags(a.entity);
+            Tags.Add(a.entity);
         }
 
 
@@ -119,18 +118,21 @@ namespace Homebrew
             return GroupsBase[i];
         }
 
-        internal void CheckGroups(int entityID, bool active)
+
+        internal void CheckGroups(int entity, bool active)
         {
+            if (Toolbox.applicationIsQuitting) return;
+
             if (active)
             {
                 for (int i = 0; i < groupLength; i++)
-                    if (GroupsBase[i].CheckTags(entityID))
-                        GroupsBase[i].TryAdd(entityID);
+                    if (GroupsBase[i].CheckTags(entity))
+                        GroupsBase[i].TryAdd(entity);
             }
             else
             {
                 for (int i = 0; i < groupLength; i++)
-                    GroupsBase[i].Remove(entityID);
+                    GroupsBase[i].Remove(entity);
             }
         }
 
@@ -143,21 +145,28 @@ namespace Homebrew
 
     public struct EntityComposer
     {
-        public int id;
+        public int entity;
         private Storage[] storages;
         private int length;
+
+        public void Init(int components = 1)
+        {
+            storages = new Storage[components];
+            entity = ProcessingEntities.Create();
+            length = 0;
+        }
 
         public EntityComposer(int components = 1)
         {
             storages = new Storage[components];
-            id = ProcessingEntities.Create();
+            entity = ProcessingEntities.Create();
             length = 0;
         }
 
-        public EntityComposer(int entityID, int components = 1)
+        public EntityComposer(int entityEntity, int components = 1)
         {
             storages = new Storage[components];
-            id = entityID;
+            entity = entityEntity;
             length = 0;
         }
 
@@ -166,14 +175,14 @@ namespace Homebrew
             var storage = Storage<T>.Instance;
             storages[length++] = storage;
 
-            return storage.GetOrCreate(id);
+            return storage.GetOrCreate(entity);
         }
 
         public void Deploy()
         {
             foreach (var storage in storages)
             {
-                storage.Deploy(id);
+                storage.Deploy(entity);
             }
 
             storages = null;
@@ -183,7 +192,7 @@ namespace Homebrew
         public void Deploy(params int[] tags)
         {
             Deploy();
-            id.Add(tags);
+            entity.Add(tags);
         }
     }
 }
