@@ -116,9 +116,7 @@ namespace Homebrew
 
                 needToBeCleaned.Dispose();
             }
-
-            Get<Scripts>().Clear();
-            
+ 
             ProcessingTimer.Default.Dispose();
             ProcessingPool.Default.Dispose();
             ProcessingEntities.Default.Dispose();
