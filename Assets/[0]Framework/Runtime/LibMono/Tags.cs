@@ -63,13 +63,7 @@ namespace Homebrew
                     groups[i].TagsHaveChanged(entity);
                 }
             }
-
-            //    Action<int> action;
-            //  if (observers.TryGetValue(entity, out action))
-            // {
-            //  if (action!=null)
-            //   action(entity);
-            // }
+ 
         }
 
 

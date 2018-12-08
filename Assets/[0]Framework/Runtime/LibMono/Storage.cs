@@ -9,16 +9,20 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
+using Object = System.Object;
 
 namespace Homebrew
 {
     public abstract class Storage
     {
         public static List<Storage> all = new List<Storage>(40);
+        public static Dictionary<int, Storage> allDict = new Dictionary<int, Storage>(40, new FastComparable());
         public abstract bool HasComponent(int entity);
-        public abstract void Remove(int entity);
+        public abstract void Remove(int entity,bool raw);
         internal abstract void RemoveNoCheck(int entity);
         public abstract void Deploy(int entity);
+        public abstract void AddTech(int entity, object component, bool silence);
+        
     }
 
     public class Storage<T> : Storage where T : new()
@@ -35,6 +39,7 @@ namespace Homebrew
         public Storage()
         {
             all.Add(this);
+            allDict.Add(typeof(T).GetHashCode(), this);
             var type = typeof(T);
             var atr  = type.GetCustomAttribute<RequireTagsAttribute>();
             if (atr == null) return;
@@ -164,26 +169,28 @@ namespace Homebrew
         }
 
 
-        public override void Remove(int entity)
+        public override void Remove(int entity, bool raw)
         {
             if (Toolbox.applicationIsQuitting) return;
             if (entity >= entityHasComponent.Length) return;
             if (!entityHasComponent[entity]) return;
 
-
+            entityHasComponent[entity] = false;
             int len = groups.Count;
             for (int i = 0; i < len; i++)
             {
-                groups[i].Remove(entity);
+                groups[i].OnRemove(entity);
             }
 
             if (tags != null)
             {
+                if (!raw)
                 entity.Remove(tags);
+                else entity.RemoveTagsRaw(tags);
             }
 
 
-            entityHasComponent[entity] = false;
+         
         }
 
         internal override void RemoveNoCheck(int entity)
@@ -191,9 +198,9 @@ namespace Homebrew
             if (Toolbox.applicationIsQuitting) return;
             if (entity >= entityHasComponent.Length) return;
             if (!entityHasComponent[entity]) return;
- 
+
             entityHasComponent[entity] = false;
- 
+
             if (tags != null)
                 entity.RemoveTagsRaw(tags);
         }
@@ -224,6 +231,13 @@ namespace Homebrew
                     }
                 }
             }
+        }
+
+        public override void AddTech(int entity, object component, bool silence)
+        {
+            if (!silence)
+                Add((T) component, entity);
+            else AddWithNoCheck((T) component, entity);
         }
 
         public override bool HasComponent(int entity)

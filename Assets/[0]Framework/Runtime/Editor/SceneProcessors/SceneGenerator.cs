@@ -13,6 +13,7 @@ public class SceneGenerator
 	static SceneGenerator()
 	{
 		EditorSceneManager.newSceneCreated += SceneCreating;
+		 
 		//EditorSceneManager.sceneSaved += SceneSaved;
 	    
 	}

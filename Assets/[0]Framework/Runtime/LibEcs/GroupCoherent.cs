@@ -31,8 +31,8 @@ namespace Homebrew
             component[indexLast] = storage.components[entity];
 
 
-            if (Added != null)
-                Added(indexLast);
+            if (Add != null)
+                Add(indexLast);
         }
 
 
@@ -75,8 +75,8 @@ namespace Homebrew
 
         protected override void RemoveAt(int i)
         {
-            if (Removed != null)
-                Removed(i);
+            if (Remove != null)
+                Remove(i);
 
 
             int l = --length;
@@ -124,8 +124,8 @@ namespace Homebrew
             component2[indexLast] = storage2.components[entity];
 
 
-            if (Added != null)
-                Added(indexLast);
+            if (Add != null)
+                Add(indexLast);
         }
 
 
@@ -172,8 +172,8 @@ namespace Homebrew
 
         protected override void RemoveAt(int i)
         {
-            if (Removed != null)
-                Removed(i);
+            if (Remove != null)
+                Remove(i);
 
             int l    = --length;
             int next = i + 1;
@@ -203,8 +203,8 @@ namespace Homebrew
 
         protected override void RemoveAt(int i)
         {
-            if (Removed != null)
-                Removed(i);
+            if (Remove != null)
+                Remove(i);
 
             int l    = --length;
             int next = i + 1;
@@ -241,8 +241,8 @@ namespace Homebrew
             component2[indexLast] = storage2.components[entity];
             component3[indexLast] = storage3.components[entity];
 
-            if (Added != null)
-                Added(indexLast);
+            if (Add != null)
+                Add(indexLast);
         }
 
 
@@ -319,8 +319,8 @@ namespace Homebrew
 
         protected override void RemoveAt(int i)
         {
-            if (Removed != null)
-                Removed(i);
+            if (Remove != null)
+                Remove(i);
 
             int l    = --length;
             int next = i + 1;
@@ -361,8 +361,8 @@ namespace Homebrew
             component4[indexLast] = storage4.components[entity];
 
 
-            if (Added != null)
-                Added(indexLast);
+            if (Add != null)
+                Add(indexLast);
         }
 
 
@@ -477,8 +477,8 @@ namespace Homebrew
             component5[indexLast] = storage5.components[entity];
 
 
-            if (Added != null)
-                Added(indexLast);
+            if (Add != null)
+                Add(indexLast);
         }
 
 
@@ -540,8 +540,8 @@ namespace Homebrew
 
         protected override void RemoveAt(int i)
         {
-            if (Removed != null)
-                Removed(i);
+            if (Remove != null)
+                Remove(i);
 
             int l    = --length;
             int next = i + 1;
@@ -623,8 +623,8 @@ namespace Homebrew
             component6[indexLast] = storage6.components[entity];
 
 
-            if (Added != null)
-                Added(indexLast);
+            if (Add != null)
+                Add(indexLast);
         }
 
 
@@ -689,8 +689,8 @@ namespace Homebrew
 
         protected override void RemoveAt(int i)
         {
-            if (Removed != null)
-                Removed(i);
+            if (Remove != null)
+                Remove(i);
 
             int l    = --length;
             int next = i + 1;
@@ -780,8 +780,8 @@ namespace Homebrew
             component7[indexLast] = storage7.components[entity];
 
 
-            if (Added != null)
-                Added(indexLast);
+            if (Add != null)
+                Add(indexLast);
         }
 
 
@@ -850,8 +850,8 @@ namespace Homebrew
 
         protected override void RemoveAt(int i)
         {
-            if (Removed != null)
-                Removed(i);
+            if (Remove != null)
+                Remove(i);
 
             int l    = --length;
             int next = i + 1;
@@ -949,8 +949,8 @@ namespace Homebrew
             component8[indexLast] = storage8.components[entity];
 
 
-            if (Added != null)
-                Added(indexLast);
+            if (Add != null)
+                Add(indexLast);
         }
 
 
@@ -1023,8 +1023,8 @@ namespace Homebrew
 
         protected override void RemoveAt(int i)
         {
-            if (Removed != null)
-                Removed(i);
+            if (Remove != null)
+                Remove(i);
 
             int l    = --length;
             int next = i + 1;
@@ -1128,8 +1128,8 @@ namespace Homebrew
             component8[indexLast] = storage8.components[entity];
             component9[indexLast] = storage9.components[entity];
 
-            if (Added != null)
-                Added(indexLast);
+            if (Add != null)
+                Add(indexLast);
         }
 
 
@@ -1205,8 +1205,8 @@ namespace Homebrew
 
         protected override void RemoveAt(int i)
         {
-            if (Removed != null)
-                Removed(i);
+            if (Remove != null)
+                Remove(i);
 
             int l    = --length;
             int next = i + 1;

@@ -17,73 +17,63 @@ using Sirenix.OdinInspector;
 namespace Homebrew
 {
 // Start any game    
-    public class Starter : MonoBehaviour
-    {
-        public static bool initialized;
+	public class Starter : MonoBehaviour
+	{
+		public static bool initialized;
 
-        [FoldoutGroup("SetupData")] public List<Factory> factories;
-        [FoldoutGroup("SetupData")] public List<SceneField> ScenesToKeep;
-        [FoldoutGroup("SetupData")] public List<SceneField> SceneDependsOn;
-
-
-        void Awake()
-        {
-            ProcessingScene.Dynamic = GameObject.Find("Dynamic").transform;
-            
-            if (ProcessingUpdate.Default == null)
-            {
-                ProcessingUpdate.Create();
-            }
-
-            if (ProcessingSceneLoad.Default == null)
-                ProcessingSceneLoad.Default = Toolbox.Create<ProcessingSceneLoad>();
-
-            ProcessingSceneLoad.Default.Setup(ScenesToKeep, SceneDependsOn, this);
-        }
+		[FoldoutGroup("SetupData")] public List<FactoryBase> factories;
+		[FoldoutGroup("SetupData")] public List<SceneField> ScenesToKeep;
+		[FoldoutGroup("SetupData")] public List<SceneField> SceneDependsOn;
 
 
-        public void BindScene()
-        {
-            for (var i = 0; i < factories.Count; i++)
-            {
-                Toolbox.Add(factories[i]);
-            }
+		void Awake()
+		{
+			ProcessingScene.Dynamic = GameObject.Find("Dynamic").transform;
+
+			if (ProcessingUpdate.Default == null)
+			{
+				ProcessingUpdate.Create();
+			}
+
+			if (ProcessingSceneLoad.Default == null)
+				ProcessingSceneLoad.Default = Toolbox.Create<ProcessingSceneLoad>();
+
+			ProcessingSceneLoad.Default.Setup(ScenesToKeep, SceneDependsOn, this);
+		}
 
 
-            var poolReg = GetComponent<PoolRegister>();
-            if (poolReg) poolReg.Reigster();
+		public void BindScene()
+		{
+	 
+			var poolReg = GetComponent<PoolRegister>();
+			if (poolReg) poolReg.Reigster();
 
-            Setup();
-            initialized = true;
+			Setup();
 
-            var objs = FindObjectsOfType<MonoCached>();
+			initialized = true;
 
-            for (var i = 0; i < objs.Length; i++)
-            {
-                if (objs[i].state.requireStarter)
-                    objs[i].SetupAfterStarter();
-            }
+			var objs = FindObjectsOfType<MonoCached>();
+
+			for (var i = 0; i < objs.Length; i++)
+			{
+				if (objs[i].state.requireStarter)
+					objs[i].SetupAfterStarter();
+			}
 
 
-            Timer.Add(Time.DeltaTimeFixed * 2, () => PostSetup());
-        }
+			Timer.Add(Time.deltaFixed * 2, () =>
+			{
+				PostSetup();
+				Add<ProcessingRelease>();
+			});
+		}
 
-        protected static T Add<T>() where T : new()
-        {
-            return Toolbox.Add<T>();
-        }
+		protected static T Add<T>() where T : new() { return Toolbox.Add<T>(); }
 
-        protected virtual void Setup()
-        {
-        }
+		protected virtual void Setup() { }
 
-        protected virtual void PostSetup()
-        {
-        }
+		protected virtual void PostSetup() { }
 
-        protected virtual void OnDestroy()
-        {
-            initialized = false;
-        }
-    }
+		protected virtual void OnDestroy() { initialized = false; }
+	}
 }

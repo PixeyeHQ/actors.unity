@@ -7,6 +7,7 @@ Date:       5/14/2018  6:32 PM
 
 using System;
 using System.Collections;
+using UnityEngine;
 
 namespace Homebrew
 {
@@ -18,9 +19,9 @@ namespace Homebrew
         public Composition composition;
 
 
-        public Action<int> Added;
-        public Action<int> Removed;
-        public Action<int, int> TagsChanged;
+        public Action<int> Add;
+        public Action<int> Remove;
+        public Action<int, int> TagsChange;
 
         protected int indexLast;
 
@@ -37,8 +38,8 @@ namespace Homebrew
             }
             else
             {
-                if (TagsChanged != null)
-                    TagsChanged(index, entity);
+                if (TagsChange != null)
+                    TagsChange(index, entity);
 
                 if (!entity.Has(composition.include) || entity.HasAny(composition.exclude))
 
@@ -89,9 +90,8 @@ namespace Homebrew
         public abstract void TryAdd(int entity);
 
 
-        public void Remove(int entity)
-        {
-            
+        internal void OnRemove(int entity)
+        { 
             int i = GetIndex(entity);
             if (i == -1) return;
             RemoveAt(i);
@@ -104,8 +104,8 @@ namespace Homebrew
 
         public void Dispose()
         {
-            Added = null;
-            Removed = null;
+            Add = null;
+            Remove = null;
             length = 0;
             entities = new int[EngineSettings.MinEntities];
             OnDispose();
@@ -176,10 +176,9 @@ namespace Homebrew
             indexLast = length++;
 
             entities[indexLast] = entity;
-
-
-            if (Added != null)
-                Added(entity);
+           
+            if (Add != null)
+                Add(entity);
         }
 
 
@@ -212,16 +211,15 @@ namespace Homebrew
 
                 int entityID = e.entity;
                 indexLast = length++;
-
-
+          
                 entities[indexLast] = entityID;
             }
         }
 
         protected override void RemoveAt(int i)
         {
-            if (Removed != null)
-                Removed(entities[i]);
+            if (Remove != null)
+                Remove(entities[i]);
 
 
             int l = --length;
@@ -256,13 +254,17 @@ namespace Homebrew
             }
 
 
-            indexLast = length++;
+       
 
+         
+
+
+            if (Add != null)
+                Add(entity);
+            
+            indexLast = length++; 
             entities[indexLast] = entity;
-
-
-            if (Added != null)
-                Added(entity);
+            
         }
 
 
@@ -305,8 +307,8 @@ namespace Homebrew
 
         protected override void RemoveAt(int i)
         {
-            if (Removed != null)
-                Removed(entities[i]);
+            if (Remove != null)
+                Remove(entities[i]);
 
             int l    = --length;
             int next = i + 1;
@@ -329,8 +331,8 @@ namespace Homebrew
 
         protected override void RemoveAt(int i)
         {
-            if (Removed != null)
-                Removed(entities[i]);
+            if (Remove != null)
+                Remove(entities[i]);
 
             int l    = --length;
             int next = i + 1;
@@ -359,8 +361,8 @@ namespace Homebrew
             entities[indexLast] = entity;
 
 
-            if (Added != null)
-                Added(entity);
+            if (Add != null)
+                Add(entity);
         }
 
 
@@ -423,8 +425,8 @@ namespace Homebrew
 
         protected override void RemoveAt(int i)
         {
-            if (Removed != null)
-                Removed(entities[i]);
+            if (Remove != null)
+                Remove(entities[i]);
 
             int l    = --length;
             int next = i + 1;
@@ -453,8 +455,8 @@ namespace Homebrew
             entities[indexLast] = entity;
 
 
-            if (Added != null)
-                Added(entity);
+            if (Add != null)
+                Add(entity);
         }
 
 
@@ -541,8 +543,8 @@ namespace Homebrew
             entities[indexLast] = entity;
 
 
-            if (Added != null)
-                Added(entity);
+            if (Add != null)
+                Add(entity);
         }
 
 
@@ -594,8 +596,8 @@ namespace Homebrew
 
         protected override void RemoveAt(int i)
         {
-            if (Removed != null)
-                Removed(entities[i]);
+            if (Remove != null)
+                Remove(entities[i]);
 
             int l    = --length;
             int next = i + 1;
@@ -643,13 +645,17 @@ namespace Homebrew
                 Array.Resize(ref entities, len);
             }
 
-            indexLast = length++;
+            
 
+             
+
+
+            if (Add != null)
+                Add(entity);
+
+            indexLast = length++;
             entities[indexLast] = entity;
 
-
-            if (Added != null)
-                Added(entity);
         }
 
 
@@ -702,8 +708,8 @@ namespace Homebrew
 
         protected override void RemoveAt(int i)
         {
-            if (Removed != null)
-                Removed(entities[i]);
+            if (Remove != null)
+                Remove(entities[i]);
 
             int l    = --length;
             int next = i + 1;
@@ -759,8 +765,8 @@ namespace Homebrew
             entities[indexLast] = entity;
 
 
-            if (Added != null)
-                Added(entity);
+            if (Add != null)
+                Add(entity);
         }
 
 
@@ -815,8 +821,8 @@ namespace Homebrew
 
         protected override void RemoveAt(int i)
         {
-            if (Removed != null)
-                Removed(entities[i]);
+            if (Remove != null)
+                Remove(entities[i]);
 
             int l    = --length;
             int next = i + 1;
@@ -875,8 +881,8 @@ namespace Homebrew
             entities[indexLast] = entity;
 
 
-            if (Added != null)
-                Added(entity);
+            if (Add != null)
+                Add(entity);
         }
 
 
@@ -933,8 +939,8 @@ namespace Homebrew
 
         protected override void RemoveAt(int i)
         {
-            if (Removed != null)
-                Removed(entities[i]);
+            if (Remove != null)
+                Remove(entities[i]);
 
             int l    = --length;
             int next = i + 1;
@@ -951,7 +957,7 @@ namespace Homebrew
     }
 
 
-    public class Group<T, Y, U, I, O, P, A, S, D> : GroupBase where T : IComponent, new()
+    public class  Group<T, Y, U, I, O, P, A, S, D> : GroupBase where T : IComponent, new()
                                                               where Y : new()
                                                               where U : new()
                                                               where I : new()
@@ -996,8 +1002,8 @@ namespace Homebrew
             entities[indexLast] = entity;
 
 
-            if (Added != null)
-                Added(entity);
+            if (Add != null)
+                Add(entity);
         }
 
 
@@ -1055,8 +1061,8 @@ namespace Homebrew
 
         protected override void RemoveAt(int i)
         {
-            if (Removed != null)
-                Removed(entities[i]);
+            if (Remove != null)
+                Remove(entities[i]);
 
             int l    = --length;
             int next = i + 1;

@@ -24,7 +24,7 @@ namespace Homebrew
         [FoldoutGroup("Mono")] public float timeDestroyDelay;
         [FoldoutGroup("Mono")] public int entityParent;
         [FoldoutGroup("Mono")] public EntityState state;
-
+        [FoldoutGroup("Mono")] public GameObject parentObject;
         [HideInInspector] public Transform selfTransform;
 
         internal bool conditionSignals;

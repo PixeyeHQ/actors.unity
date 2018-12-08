@@ -81,7 +81,7 @@ namespace Homebrew
 
 
 			fStr
-				.AppendFormat("Time : {0} ms  GPU memory : {1}  Sys Memory : {2}\n", Time.DeltaTime, SystemInfo.graphicsMemorySize,
+				.AppendFormat("Time : {0} ms  GPU memory : {1}  Sys Memory : {2}\n", Time.delta, SystemInfo.graphicsMemorySize,
 					SystemInfo.systemMemorySize)
 				.AppendFormat("TotalAllocatedMemory : {0}mb	TotalReservedMemory : {1}mb	TotalUnusedReservedMemory : {2}mb\n",
 					Profiler.GetTotalAllocatedMemoryLong() / 1048576,
@@ -134,7 +134,7 @@ namespace Homebrew
 
 				fieldInput.textComponent.UpdateVertexData();
 				if (Toolbox.isQuittingOrChangingScene()) yield break;
-				yield return new WaitForSeconds(Time.DeltaTime);
+				yield return new WaitForSeconds(Time.delta);
 			}
 		}
 
@@ -196,7 +196,7 @@ namespace Homebrew
 
 		public void Tick()
 		{
-			tickDebug += Time.DeltaTime;
+			tickDebug += Time.delta;
 			if (tickDebug > 1f)
 			{
 				tickDebug = 0.0f;
@@ -204,7 +204,7 @@ namespace Homebrew
 			}
 
 
-			caretTimer += Time.DeltaTime * 10;
+			caretTimer += Time.delta * 10;
 			fieldInput.caretColor = Color.white * Mathf.Sin(caretTimer);
 
 

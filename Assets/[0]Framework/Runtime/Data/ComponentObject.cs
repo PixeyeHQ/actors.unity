@@ -9,32 +9,31 @@ using UnityEngine;
 
 namespace Homebrew
 {
-    public class ComponentObject : IComponent, IDisposable
-    {
-        public Transform transform;
-        public GameObject obj;
+	public class ComponentObject : IComponent, IDisposable
+	{
+		public Transform transform;
+		public GameObject obj;
 
-        internal Dictionary<int, Transform> cachedTransforms;
+		internal Dictionary<int, Transform> cachedTransforms;
 
-        public void Dispose()
-        {
-            transform = null;
-            obj = null;
-            cachedTransforms.Clear();
-        }
-    }
+		public void Dispose()
+		{
+			transform = null;
+			obj = null;
+			cachedTransforms.Clear();
+		}
+	}
 
-    public static partial class Game
-    {
-        public static ComponentObject ComponentObject(this int entity)
-        {
-            return Storage<ComponentObject>.Instance.components[entity];
-        }
+	public static partial class ExtensionComponentObject
+	{
+		public static ComponentObject ComponentObject(this int entity) { return Storage<ComponentObject>.Instance.components[entity]; }
 
-        public static bool TryGetComponentObject(this int entity, out ComponentObject component)
-        {
-            component = Storage<ComponentObject>.Instance.TryGet(entity);
-            return component != null;
-        }
-    }
+		public static bool TryGetComponentObject(this int entity, out ComponentObject component)
+		{
+			component = Storage<ComponentObject>.Instance.TryGet(entity);
+			return component != null;
+		}
+
+		public static bool HasComponentObject(this int entity) { return Storage<ComponentObject>.Instance.HasComponent(entity); }
+	}
 }

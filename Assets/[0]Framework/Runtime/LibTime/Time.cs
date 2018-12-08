@@ -8,47 +8,38 @@ Date:       1/31/2018  8:17 PM
 
 namespace Homebrew
 {
-
 	public class Time : ITick, IKernel, IComponent
 	{
 		public static Time Default;
-		protected const float fps = 30;
-	
+		protected const float fps = 60;
+
 		public float isActive = 1.0f;
 		public float timeScale = 1.0f;
 
-		
+
 		protected float _deltaTimeFixed;
 		protected float _deltaTime;
 		protected float _lastFrame;
- 
-		public float deltaTime => Default._deltaTime * timeScale;
 
-		public float deltaTimeFixed => Default._deltaTimeFixed * timeScale;
 
-		public static float DeltaTime => Default._deltaTime * Default.timeScale;
-
-		public static float DeltaTimeFixed => Default._deltaTimeFixed * Default.timeScale;
+		public static float delta => Default._deltaTime;
+		public static float frame;
+		public static float deltaFixed => Default._deltaTimeFixed;
 
 		public float timeScaleCached = 1;
 
 
-		public Time()
-		{
-			_deltaTimeFixed = 1 / fps;
-		}
+		public Time() { }
 
-		public void OnFocus()
-		{
-			_lastFrame = UnityEngine.Time.realtimeSinceStartup;
-		}
+		public void OnFocus() { _lastFrame = UnityEngine.Time.realtimeSinceStartup; }
 
 		public void Tick()
-		{		 
+		{
+			frame = UnityEngine.Time.frameCount;
 			var timeSinceStart = UnityEngine.Time.unscaledTime;
-			_deltaTime = UnityEngine.Time.unscaledDeltaTime * isActive;// (timeSinceStart - _lastFrame) * isActive;
+			_deltaTime = UnityEngine.Time.unscaledDeltaTime * isActive * timeScale;
+			_deltaTimeFixed = 1 / fps * timeScale;
 			_lastFrame = timeSinceStart;
 		}
-
 	}
 }

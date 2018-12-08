@@ -17,6 +17,8 @@ namespace Homebrew
         internal GroupBase[] GroupsBase = new GroupBase[64];
         internal int groupLength;
 
+ 
+
         internal static int Create()
         {
             int id;
@@ -132,9 +134,10 @@ namespace Homebrew
             else
             {
                 for (int i = 0; i < groupLength; i++)
-                    GroupsBase[i].Remove(entity);
+                    GroupsBase[i].OnRemove(entity);
             }
         }
+ 
 
         public void Dispose()
         {
@@ -142,6 +145,8 @@ namespace Homebrew
                 GroupsBase[i].Dispose();
         }
     }
+
+   
 
     public struct EntityComposer
     {

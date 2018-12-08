@@ -18,8 +18,8 @@ namespace Homebrew
         public static Box Default;
 
 
-        private Dictionary<int, Object> items = new Dictionary<int, Object>(20, new FastComparable());
-        private Dictionary<int, string> itemsPaths = new Dictionary<int, string>(20, new FastComparable());
+          Dictionary<int, Object> items = new Dictionary<int, Object>(20, new FastComparable());
+          Dictionary<int, string> itemsPaths = new Dictionary<int, string>(20, new FastComparable());
 
 
         public static int StringToHash(string val)

@@ -11,7 +11,7 @@ public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
         DontDestroyOnLoad(_instance);
     }
 
-    // ReSharper disable once StaticMemberInGenericType
+ 
     private static System.Object _lock = new System.Object();
 
     public static T Instance

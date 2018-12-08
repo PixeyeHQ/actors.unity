@@ -36,7 +36,7 @@ namespace Homebrew
             if (!hasValue) cachedObjects.Add(key, new Stack<GameObject>(amount));
 
 
-            Timer.Add(Time.DeltaTime * timeRate, () =>
+            Timer.Add(Time.delta * timeRate, () =>
             {
                 for (var i = 0; i < amountPerTick; i++)
                 {
@@ -47,7 +47,7 @@ namespace Homebrew
 
                 if (amount > 0)
                 {
-                    Timer.Add(Time.DeltaTime * timeRate, () => PopulateWith(prefab, amount, amountPerTick, timeRate));
+                    Timer.Add(Time.delta * timeRate, () => PopulateWith(prefab, amount, amountPerTick, timeRate));
                 }
             });
 

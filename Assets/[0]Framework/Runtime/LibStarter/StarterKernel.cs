@@ -10,6 +10,7 @@ using Sirenix.OdinInspector;
 #endif
 using System.Collections;
 using System.Collections.Generic;
+ 
 using UnityEngine;
 
 namespace Homebrew
@@ -28,6 +29,7 @@ namespace Homebrew
 
         private void Awake()
         {
+       
             Toolbox.Add(blueprints);
  
             Time.Default = Toolbox.Create<Time>();
