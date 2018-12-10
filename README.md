@@ -27,13 +27,21 @@ using UnityEngine;
 namespace Homebrew
 {
     [System.Serializable]
-    public class DataInputExample : IData
+    public class ComponentInputExample : IComponent
     {
         public KeyCode Up;
         public KeyCode Right;
         public KeyCode Down;
         public KeyCode Left;
     }
+
+	public static class ExtensionComponentInputExample
+	{
+		public static ComponentInputExample ComponentInputExample(this int entity) { return Storage<ComponentInputExample>.Instance.components[entity]; }
+
+		public static bool HasComponentInputExample(this int entity) { return Storage<ComponentInputExample>.Instance.HasComponent(entity); }
+	}
+
 }
 ```
 An actor is a body for an entity. The entity itself is just an incremental number. Use actors when you want to compose your entities from the inspector.
@@ -41,11 +49,11 @@ An actor is a body for an entity. The entity itself is just an incremental numbe
 ```csharp
   public class ActorExample : Actor
     {
-        [FoldoutGroup("Setup")] public DataInputExample dataInputExample;
+        [FoldoutGroup("Setup")] public ComponentInputExample componentInputExample;
 
         protected override void Setup()
         {
-            Add(dataInputExample);   
+            Add(componentInputExample);   
         }
     }
 ```
@@ -59,28 +67,29 @@ namespace Homebrew
     public class ProcessingExampleInput : ProcessingBase, ITick
     {
         // A group is a container of all entities that have certain components.
-        public Group<DataInputExample> actors;
+        public Group<ComponentInputExample, ComponentObject> groupInput;
 
         public void Tick()
         {
             // loop through group of actors
-            for (int i = 0; i < actors.length; i++)
+            foreach(var entity in groupInput)
             {
-                // get data component from group.
-                var data = actors.component[i];
+                // get component from group.
+                var cInputExample = entity.ComponentInputExample();
+                var cObject = entity.ComponentObject();
                 
-                // If you need to get game object connected to the entity you can use.GetActor(group_index) method.
-                if (Input.GetKeyDown(data.Up))
-                    Debug.Log(actors.GetActor(i).gameObject + " UP!" );
+                
+                if (Input.GetKeyDown(cInputExample.Up))
+                    Debug.Log(cObject.obj + " UP!" );
                  
-                if (Input.GetKeyDown(data.Down))
-                    Debug.Log(actors.GetActor(i).gameObject + " DOWN!" );
+                if (Input.GetKeyDown(cInputExample.Down))
+                    Debug.Log(cObject.obj + " DOWN!" );
                  
-                if (Input.GetKeyDown(data.Right))
-                    Debug.Log(actors.GetActor(i).gameObject + " RIGHT!" );
+                if (Input.GetKeyDown(cInputExample.Right))
+                    Debug.Log(cObject.obj + " RIGHT!" );
                  
-                if (Input.GetKeyDown(data.Left))
-                    Debug.Log(actors.GetActor(i).gameObject + " LEFT!" );
+                if (Input.GetKeyDown(cInputExample.Left))
+                    Debug.Log(cObject.obj + " LEFT!" );
             }
         }
     }
