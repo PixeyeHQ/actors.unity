@@ -16,12 +16,9 @@ ACTORS is a complete game framework with multiscene editing, game object pooling
 
 It is used to ease the pain of decoupling data from behaviors without tons of boilerplate code. It relies on Unity3d scripting monobehavior concept but without unnecessary overhead.
 
-# README OUTDATED
-Please, note that current readme is very old. I will refresh it soon and show all changes happed with the framework.
-
 ### Game code overivew :
 
-Data components are serializable, plain c# classes inherited from IData interface. All game variables are held in data components.
+Components are serializable, plain c# classes inherited from IComponent interface. All game variables are held in components.
 ```csharp
 using UnityEngine;
 namespace Homebrew
@@ -44,7 +41,7 @@ namespace Homebrew
 
 }
 ```
-An actor is a body for an entity. The entity itself is just an incremental number. Use actors when you want to compose your entities from the inspector.
+An actor is a body for an entity. The entity itself is just an incremental number. Use actors when you want to compose your entities from the inspector and want to have strong link with monobehavior.
 
 ```csharp
   public class ActorExample : Actor
