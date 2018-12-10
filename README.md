@@ -106,15 +106,9 @@ public class StarterLevel1 : Starter
 }
 ```
 Note that you always need to load kernel scene with starter in order to work correctly.
+![Starter](https://i.gyazo.com/9f8964dad3333abbe57a9d3f35c3cc5e.png)
 
-[![Image from Gyazo](https://i.gyazo.com/12bb8bed7fb7b8b2ddf9a5ac1f279c17.gif)](https://gyazo.com/12bb8bed7fb7b8b2ddf9a5ac1f279c17)
 
 SceneKernel must be both in scenes to keep and in scenes depends on. Also don't forget to add scenes into the build settings. The order of scenes doesn't matter.
 
 [![Image from Gyazo](https://i.gyazo.com/00c0b22d0a76651945711171cbad1372.png)](https://gyazo.com/00c0b22d0a76651945711171cbad1372)
-
-To save ID of a scene use save scenes command.
-
-[![Image from Gyazo](https://i.gyazo.com/ccd34e93f273f1c2bb72bac1dbd156f7.gif)](https://gyazo.com/ccd34e93f273f1c2bb72bac1dbd156f7)
-
-Scene ids are saved as enum type inside of Scenes.cs script.
