@@ -118,7 +118,7 @@ namespace Homebrew
 			var setupable = component as ISetup;
 			if (setupable != null)
 			{
-				setupable.Setup(this);
+				setupable.Setup(entity);
 			}
 
 			Storage<T>.Instance.AddWithNoCheck(component, entity);
@@ -130,7 +130,7 @@ namespace Homebrew
 			var setupable = component as ISetup;
 			if (setupable != null)
 			{
-				setupable.Setup(this);
+				setupable.Setup(entity);
 			}
 
 			return component;

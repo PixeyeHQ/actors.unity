@@ -16,9 +16,13 @@ namespace Homebrew
                 var cRelease = entity.ComponentRelease();
                 ComponentObject cObject;
                 cRelease.isActor = false;
-                if (entity.TryGetComponentObject(out cObject))
+                if (entity.Get(out cObject))
                 {
                     cRelease.isActor = cObject.obj.GetComponent<Actor>();
+                    if (!cRelease.isActor && cObject.poolType != -1)
+                    {
+                        cObject.obj.Release(cObject.poolType);
+                    }
                  
                 }
                 entity.ReleaseFinal(cRelease.isActor);

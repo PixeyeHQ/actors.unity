@@ -11,193 +11,214 @@ using System.Collections.Generic;
 
 namespace Homebrew
 {
-    internal class ProcessingEntities : IDisposable, IKernel
-    {
-        internal static ProcessingEntities Default;
-        internal GroupBase[] GroupsBase = new GroupBase[64];
-        internal int groupLength;
+	internal class ProcessingEntities : IDisposable, IKernel
+	{
+		internal static ProcessingEntities Default;
 
- 
-
-        internal static int Create()
-        {
-            int id;
-            if (Actor.prevID.Count > 0)
-            {
-                id = Actor.prevID.Pop();
-            }
-            else
-
-                id = Actor.lastID++;
+		//   internal List<GroupLocal> GroupLocals = new List<GroupLocal>(64);
+		internal GroupBase[] GroupsBase = new GroupBase[64];
+		internal int groupLength;
 
 
-            Tags.Add(id);
+		internal static int Create()
+		{
+			int id;
+			if (Actor.prevID.Count > 0)
+			{
+				id = Actor.prevID.Pop();
+			}
+			else
 
-            return id;
-        }
-
-        internal static void Create(Actor a)
-        {
-            int len = Actor.entites.Length;
-
-            if (Actor.lastID >= len)
-                Array.Resize(ref Actor.entites, Actor.lastID << 1);
-
-            if (Actor.prevID.Count > 0)
-            {
-                a.entity = Actor.prevID.Pop();
-                Actor.entites[a.entity] = a;
-            }
-            else
-            {
-                a.entity = Actor.lastID;
-                Actor.entites[Actor.lastID++] = a;
-            }
-
-            Tags.Add(a.entity);
-        }
+				id = Actor.lastID++;
 
 
-        internal GroupBase SetupGroup(Type groupType, Composition filter)
-        {
-            int i = groupLength - 1;
-            for (; i >= 0; i--)
-            {
-                if (GroupsBase[i].GetType() != groupType) continue;
-                if (GroupsBase[i].composition.Equals(filter))
-                {
-                    break;
-                }
-            }
+			Tags.Add(id);
 
-            if (i != -1) return GroupsBase[i];
+			return id;
+		}
 
-            i = groupLength;
+		internal static void Create(Actor a)
+		{
+			int len = Actor.entites.Length;
 
-            var group = Activator.CreateInstance(groupType, true) as GroupBase;
+			if (Actor.lastID >= len)
+				Array.Resize(ref Actor.entites, Actor.lastID << 1);
 
-            group.composition = filter;
+			if (Actor.prevID.Count > 0)
+			{
+				a.entity = Actor.prevID.Pop();
+				Actor.entites[a.entity] = a;
+			}
+			else
+			{
+				a.entity = Actor.lastID;
+				Actor.entites[Actor.lastID++] = a;
+			}
 
-            List<GroupBase> groups;
-            foreach (var tag in filter.include)
-            {
-                if (Tags.groupsInclude.TryGetValue(tag, out groups))
-                {
-                    groups.Add(group);
-                }
-                else
-                {
-                    groups = new List<GroupBase>(5);
-                    groups.Add(group);
-                    Tags.groupsInclude.Add(tag, groups);
-                }
-            }
-
-            foreach (var tag in filter.exclude)
-            {
-                if (Tags.groupsDeclude.TryGetValue(tag, out groups))
-                {
-                    groups.Add(group);
-                }
-                else
-                {
-                    groups = new List<GroupBase>(5);
-                    groups.Add(group);
-                    Tags.groupsDeclude.Add(tag, groups);
-                }
-            }
-
-            group.Populate();
+			Tags.Add(a.entity);
+		}
 
 
-            if (groupLength == GroupsBase.Length)
-            {
-                Array.Resize(ref GroupsBase, groupLength << 1);
-            }
+		internal GroupBase SetupGroup(Type groupType, Composition filter)
+		{
+			int i = groupLength - 1;
+			for (; i >= 0; i--)
+			{
+				if (GroupsBase[i].GetType() != groupType) continue;
+				if (GroupsBase[i].composition.Equals(filter))
+				{
+					break;
+				}
+			}
 
-            GroupsBase[groupLength++] = group;
+			if (i != -1) return GroupsBase[i];
 
-            return GroupsBase[i];
-        }
+			i = groupLength;
+
+			var group = Activator.CreateInstance(groupType, true) as GroupBase;
+
+			group.composition = filter;
+
+			List<GroupBase> groups;
+			foreach (var tag in filter.include)
+			{
+				if (Tags.groupsInclude.TryGetValue(tag, out groups))
+				{
+					groups.Add(group);
+				}
+				else
+				{
+					groups = new List<GroupBase>(5);
+					groups.Add(group);
+					Tags.groupsInclude.Add(tag, groups);
+				}
+			}
+
+			foreach (var tag in filter.exclude)
+			{
+				if (Tags.groupsDeclude.TryGetValue(tag, out groups))
+				{
+					groups.Add(group);
+				}
+				else
+				{
+					groups = new List<GroupBase>(5);
+					groups.Add(group);
+					Tags.groupsDeclude.Add(tag, groups);
+				}
+			}
+
+			group.Populate();
 
 
-        internal void CheckGroups(int entity, bool active)
-        {
-            if (Toolbox.applicationIsQuitting) return;
+			if (groupLength == GroupsBase.Length)
+			{
+				Array.Resize(ref GroupsBase, groupLength << 1);
+			}
 
-            if (active)
-            {
-                for (int i = 0; i < groupLength; i++)
-                    if (GroupsBase[i].CheckTags(entity))
-                        GroupsBase[i].TryAdd(entity);
-            }
-            else
-            {
-                for (int i = 0; i < groupLength; i++)
-                    GroupsBase[i].OnRemove(entity);
-            }
-        }
- 
+			GroupsBase[groupLength++] = group;
 
-        public void Dispose()
-        {
-            for (int i = 0; i < groupLength; i++)
-                GroupsBase[i].Dispose();
-        }
-    }
+			return GroupsBase[i];
+		}
 
-   
 
-    public struct EntityComposer
-    {
-        public int entity;
-        private Storage[] storages;
-        private int length;
+		internal void CheckGroups(int entity, bool active)
+		{
+			if (Toolbox.applicationIsQuitting) return;
 
-        public void Init(int components = 1)
-        {
-            storages = new Storage[components];
-            entity = ProcessingEntities.Create();
-            length = 0;
-        }
+			if (active)
+			{
+				for (int i = 0; i < groupLength; i++)
+					if (GroupsBase[i].CheckTags(entity))
+						GroupsBase[i].TryAdd(entity);
+			}
+			else
+			{
+				for (int i = 0; i < groupLength; i++)
+					GroupsBase[i].OnRemove(entity);
+			}
+		}
 
-        public EntityComposer(int components = 1)
-        {
-            storages = new Storage[components];
-            entity = ProcessingEntities.Create();
-            length = 0;
-        }
 
-        public EntityComposer(int entityEntity, int components = 1)
-        {
-            storages = new Storage[components];
-            entity = entityEntity;
-            length = 0;
-        }
+//        internal GroupLocal SetupGroupLocal(Type groupType)
+//        {
+//            var len = GroupLocals.Count;
+//            var i   = -1;
+//            for (; i < len; i++)
+//            {
+//                if (GroupLocals.GetType() == groupType)
+//                {
+//                    return GroupLocals[i];
+//                }
+//            }
+//
+//
+//            var group = Activator.CreateInstance(groupType, true) as GroupLocal;
+//
+//            GroupLocals.Add(group);
+//
+//            return group;
+//        }
+//
 
-        public T Add<T>() where T : new()
-        {
-            var storage = Storage<T>.Instance;
-            storages[length++] = storage;
+		public void Dispose()
+		{
+			for (int i = 0; i < groupLength; i++)
+				GroupsBase[i].Dispose();
+		}
+	}
 
-            return storage.GetOrCreate(entity);
-        }
 
-        public void Deploy()
-        {
-            foreach (var storage in storages)
-            {
-                storage.Deploy(entity);
-            }
+	public struct EntityComposer
+	{
+		public int entity;
+		Storage[] storages;
+		int length;
 
-            storages = null;
-            length = 0;
-        }
+		public void Init(int components = 1)
+		{
+			storages = new Storage[components];
+			entity = ProcessingEntities.Create();
+			length = 0;
+		}
 
-        public void Deploy(params int[] tags)
-        {
-            Deploy();
-            entity.Add(tags);
-        }
-    }
+		public EntityComposer(int components = 1)
+		{
+			storages = new Storage[components];
+			entity = ProcessingEntities.Create();
+			length = 0;
+		}
+
+		public EntityComposer(int entityEntity, int components = 1)
+		{
+			storages = new Storage[components];
+			entity = entityEntity;
+			length = 0;
+		}
+
+		public T Add<T>() where T : new()
+		{
+			var storage = Storage<T>.Instance;
+			storages[length++] = storage;
+
+			return storage.GetOrCreate(entity);
+		}
+
+		public void Deploy()
+		{
+			foreach (var storage in storages)
+			{
+				storage.Deploy(entity);
+			}
+
+			storages = null;
+			length = 0;
+		}
+
+		public void Deploy(params int[] tags)
+		{
+			Deploy();
+			entity.Add(tags);
+		}
+	}
 }

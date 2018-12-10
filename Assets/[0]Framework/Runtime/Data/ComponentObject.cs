@@ -13,6 +13,7 @@ namespace Homebrew
 	{
 		public Transform transform;
 		public GameObject obj;
+		public int poolType = -1;
 
 		internal Dictionary<int, Transform> cachedTransforms;
 
@@ -24,15 +25,9 @@ namespace Homebrew
 		}
 	}
 
-	public static partial class ExtensionComponentObject
+	public static class ExtensionComponentObject
 	{
 		public static ComponentObject ComponentObject(this int entity) { return Storage<ComponentObject>.Instance.components[entity]; }
-
-		public static bool TryGetComponentObject(this int entity, out ComponentObject component)
-		{
-			component = Storage<ComponentObject>.Instance.TryGet(entity);
-			return component != null;
-		}
 
 		public static bool HasComponentObject(this int entity) { return Storage<ComponentObject>.Instance.HasComponent(entity); }
 	}

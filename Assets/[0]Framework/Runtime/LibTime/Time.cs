@@ -37,7 +37,7 @@ namespace Homebrew
 		{
 			frame = UnityEngine.Time.frameCount;
 			var timeSinceStart = UnityEngine.Time.unscaledTime;
-			_deltaTime = UnityEngine.Time.unscaledDeltaTime * isActive * timeScale;
+			_deltaTime = UnityEngine.Time.deltaTime * isActive * timeScale;
 			_deltaTimeFixed = 1 / fps * timeScale;
 			_lastFrame = timeSinceStart;
 		}

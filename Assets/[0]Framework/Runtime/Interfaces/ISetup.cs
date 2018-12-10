@@ -9,7 +9,7 @@ namespace Homebrew{
 
 public interface ISetup
 {
-	void Setup(Actor actor);
+	void Setup(int entity);
 }
 
 }
