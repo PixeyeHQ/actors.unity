@@ -169,7 +169,7 @@ namespace Homebrew
 	}
 
 
-	public struct EntityComposer
+	 public struct EntityComposer
 	{
 		public int entity;
 		Storage[] storages;
@@ -196,6 +196,14 @@ namespace Homebrew
 			length = 0;
 		}
 
+		public T Add<T>(T component)where T : new()
+		{
+			var storage = Storage<T>.Instance;
+			storages[length++] = storage;
+			return Storage<T>.Instance.AddWithNoCheck(component, entity);
+		}
+		
+		
 		public T Add<T>() where T : new()
 		{
 			var storage = Storage<T>.Instance;
@@ -203,11 +211,14 @@ namespace Homebrew
 
 			return storage.GetOrCreate(entity);
 		}
+		
+		
 
 		public void Deploy()
 		{
 			foreach (var storage in storages)
 			{
+		 
 				storage.Deploy(entity);
 			}
 
