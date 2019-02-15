@@ -35,7 +35,7 @@ namespace Homebrew
 
         protected virtual void Awake()
         {
-            selfTransform = transform;
+            selfTransform = selfTransform ?? transform;
 
             state.enabled = false;
             state.initialized = false;

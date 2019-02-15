@@ -9,12 +9,12 @@ using Homebrew;
 using Sirenix.OdinInspector;
 #endif
 
- 
+
 
 [System.Serializable]
 public struct EntityState
 {
-    [InfoBox("Object states. Do not touch if you don't know what exactly you want. Toggle RequireActorParent if you're sure that this script should initialize after a parent.", InfoMessageType.Info)] 
+    [InfoBox("Object states. Do not touch if you don't know what exactly you want. Toggle RequireActorParent if you're sure that this script should initialize after a parent.", InfoMessageType.Info)]
     public bool visible;
     public bool active;
     public bool enabled;
@@ -22,5 +22,6 @@ public struct EntityState
     public bool requireStarter;
     public bool requireActorParent;
     public bool initialized;
-    
+    public bool manualDeploy;
+    public bool awaked;
 }
