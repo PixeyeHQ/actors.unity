@@ -10,15 +10,15 @@ using UnityEngine;
 
 namespace Homebrew
 {
-	public class TagFilterAttribute : PropertyAttribute
-	{
-		private System.Type tagType;
+    public class TagFilterAttribute : PropertyAttribute
+    {
+        private System.Type[] tagType;
 
-		public System.Type Type => tagType;
+        public System.Type[] Type => tagType;
 
-		public TagFilterAttribute(System.Type type)
-		{
-			tagType = type;
-		}
-	}
+        public TagFilterAttribute(params System.Type[] type)
+        {
+            tagType = type;
+        }
+    }
 }
