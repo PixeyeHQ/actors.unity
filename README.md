@@ -7,7 +7,7 @@
 [![Twitter Follow](https://img.shields.io/badge/twitter-%40dimmPixeye-blue.svg?style=flat-square&label=Follow)](https://twitter.com/dimmPixeye)
 [![license](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](https://github.com/dimmpixeye/Actors-Unity3d-Framework/blob/master/LICENSE)
 
-# ACTORS - Simple Entity Component System framework for Unity
+# ACTORS - Entity Component System framework for Unity
 * [EN](https://github.com/dimmpixeye/Actors-Unity3d-Framework/blob/Actor2.0/README.md)
 * [WIKI](https://github.com/dimmpixeye/Actors-Unity3d-Framework/wiki)
 
