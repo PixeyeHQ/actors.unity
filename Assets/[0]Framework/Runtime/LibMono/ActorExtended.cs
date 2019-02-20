@@ -20,7 +20,11 @@ namespace Homebrew
 			#if UNITY_EDITOR
 			if (!Application.isPlaying)
 			{
+				#if UNITY_2018_3_OR_NEWER
 				bool isPrefabInstance = PrefabUtility.GetCorrespondingObjectFromSource(gameObject) == null;
+				#else
+				 bool isPrefabInstance = PrefabUtility.GetPrefabObject(gameObject) == null;
+			    #endif
 				if (isPrefabInstance) return;
 				if (prefabID != -1) return;
 				var starter = FindObjectOfType<Starter>();

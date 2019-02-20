@@ -22,7 +22,7 @@ namespace Homebrew
 	public abstract class Actor : MonoEntity, IRequireStarter
 	{
 		[HideInInspector]
-		public int prefabID;
+		public int prefabID = -1;
 
 		[FoldoutGroup("Main"), TagFilter(typeof(Pool))]
 		public int pool;
@@ -37,7 +37,12 @@ namespace Homebrew
 			#if UNITY_EDITOR
 			if (!Application.isPlaying)
 			{
+
+				#if UNITY_2018_3_OR_NEWER
 				bool isPrefabInstance = PrefabUtility.GetCorrespondingObjectFromSource(gameObject) == null;
+				#else
+				 bool isPrefabInstance = PrefabUtility.GetPrefabObject(gameObject) == null;
+			    #endif
 				if (isPrefabInstance) return;
 				if (prefabID != -1) return;
 				var starter = FindObjectOfType<Starter>();
