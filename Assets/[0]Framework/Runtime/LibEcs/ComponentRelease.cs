@@ -5,17 +5,13 @@
 
 namespace Homebrew
 {
-    [System.Serializable]
-    public class ComponentRelease : IComponent
-    {
-        public bool isActor;
-    }
+	[System.Serializable]
+	public class ComponentRelease : IComponent
+	{
+	}
 
-    public static partial class ExtensionComponentRelease
-    {
-        public static ComponentRelease ComponentRelease(this int entity)
-        {
-            return Storage<ComponentRelease>.Instance.components[entity];
-        }
-    }
+	public static partial class ExtensionComponentRelease
+	{
+		public static ComponentRelease ComponentRelease(this int entity) { return Storage<ComponentRelease>.Instance.components[entity]; }
+	}
 }

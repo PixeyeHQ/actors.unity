@@ -19,7 +19,8 @@ namespace Homebrew
 		public static Dictionary<int, Storage> allDict = new Dictionary<int, Storage>(40, new FastComparable());
 		public abstract bool HasComponent(int entity);
 		public abstract void Remove(int entity, bool raw);
-		internal abstract void RemoveNoCheck(int entity);
+		public abstract void RemoveNoCheck(int entity);
+
 		public abstract void Deploy(int entity);
 		//public abstract void AddTech(int entity, object component, bool silence);
 	}
@@ -34,6 +35,8 @@ namespace Homebrew
 		public bool[] entityHasComponent = new bool[EngineSettings.MinComponents];
 
 		public bool requireSetup;
+
+		//	public bool conditionSingle;
 		public List<GroupBase> groups = new List<GroupBase>(3);
 
 		public Storage()
@@ -42,7 +45,11 @@ namespace Homebrew
 			allDict.Add(typeof(T).GetHashCode(), this);
 			var type = typeof(T);
 
-			requireSetup = type.GetInterface(typeof(ISetup).FullName) != null;
+			requireSetup = type.GetInterface("Homebrew.ISetup") != null;
+			//conditionSingle = type.GetInterface("Homebrew.ISingle") != null;
+
+			//	components = new T[conditionSingle ? 1 : EngineSettings.MinComponents];
+
 
 			var atr = type.GetCustomAttribute<RequireTagsAttribute>();
 			if (atr == null) return;
@@ -51,6 +58,8 @@ namespace Homebrew
 
 		internal T AddWithNoCheck(T component, int entityID)
 		{
+			//if (conditionSingle) entityID = 0;
+
 			if (entityID >= components.Length)
 			{
 				var l = entityID << 1;
@@ -64,7 +73,6 @@ namespace Homebrew
 				entityID.AddTagsRaw(tags);
 			}
 
-			 
 
 			components[entityID] = component;
 			entityHasComponent[entityID] = true;
@@ -91,7 +99,7 @@ namespace Homebrew
 				entity.Add(tags);
 			}
 
-			 
+
 			int len = groups.Count;
 			for (int i = 0; i < len; i++)
 			{
@@ -171,7 +179,7 @@ namespace Homebrew
 			{
 				entity.AddTagsRaw(tags);
 			}
- 
+
 
 			return components[entity];
 		}
@@ -198,7 +206,7 @@ namespace Homebrew
 			}
 		}
 
-		internal override void RemoveNoCheck(int entity)
+		public override void RemoveNoCheck(int entity)
 		{
 			if (Toolbox.applicationIsQuitting) return;
 			if (entity >= entityHasComponent.Length) return;
@@ -215,6 +223,17 @@ namespace Homebrew
 		{
 			int len = groups.Count;
 
+//			if (conditionSingle)
+//			{
+//				entity = 0;
+//			}
+
+			if (requireSetup)
+			{
+				var handle = (ISetup) components[entity];
+				handle.Setup(entity);
+			}
+
 			if (tags != null)
 			{
 				foreach (var tag in tags)
@@ -223,12 +242,7 @@ namespace Homebrew
 				}
 			}
 
-			if (requireSetup)
-			{
-				var handle = (ISetup) components[entity];
-				handle.Setup(entity);
-			}
-
+			if (!entity.CheckMonoConditions()) return;
 
 			for (int i = 0; i < len; i++)
 			{
@@ -245,7 +259,6 @@ namespace Homebrew
 			}
 		}
 
-		 
 
 		public override bool HasComponent(int entity) { return entity >= components.Length ? false : entityHasComponent[entity]; }
 
@@ -253,18 +266,30 @@ namespace Homebrew
 
 		public T GetOrCreate(int entity)
 		{
+//			if (conditionSingle)
+//			{
+//				entity = 0;
+//			}
+
 			if (entity >= components.Length)
-				return CreateAndResize(entity);
-			if (components[entity] == null)
-				return Create(entity);
-
-			entityHasComponent[entity] = true;
-
-			if (tags != null)
 			{
-				entity.AddTagsRaw(tags);
+				return CreateAndResize(entity);
 			}
 
+			if (components[entity] == null)
+			{
+				return Create(entity);
+			}
+
+			if (!entityHasComponent[entity])
+			{
+				entityHasComponent[entity] = true;
+
+				if (tags != null)
+				{
+					entity.AddTagsRaw(tags);
+				}
+			}
 
 			return components[entity];
 		}

@@ -26,36 +26,10 @@ namespace Homebrew
 		private FoldoutGroupAttribute prevFold;
 		private GUIStyle style;
 
-		private void Awake()
-		{
-			var uiTex_in = Resources.Load<Texture2D>("IN foldout focus-6510");
-			var uiTex_in_on = Resources.Load<Texture2D>("IN foldout focus on-5718");
-
-
-			var c_on = Color.white;
-            
-			style = new GUIStyle(EditorStyles.foldout);
-
-			style.overflow = new RectOffset(-10, 0, 3, 0);
-			style.padding = new RectOffset(25, 0, -3, 0);
-
-			style.active.textColor = c_on;
-			style.active.background = uiTex_in;
-			style.onActive.textColor = c_on;
-			style.onActive.background = uiTex_in_on;
-
-			style.focused.textColor = c_on;
-			style.focused.background = uiTex_in;
-			style.onFocused.textColor = c_on;
-			style.onFocused.background = uiTex_in_on;	
-			
-		 
-			
-		}
+		private void Awake() { }
 
 		void OnEnable()
 		{
-  
 			bool pro = EditorGUIUtility.isProSkin;
 			if (!pro)
 			{
@@ -71,20 +45,21 @@ namespace Homebrew
 				colors.col1 = new Color(1, 1, 1, 0.1f);
 				colors.col2 = new Color(0.25f, 0.25f, 0.25f, 1f);
 			}
-			
-			var t = target.GetType();
+
+			var t        = target.GetType();
 			var typeTree = t.GetTypeTree();
-			objectFields = target.GetType().GetFields(BindingFlags.Public | BindingFlags.NonPublic |
-			                                          BindingFlags.Instance)
-				.OrderByDescending(x => typeTree.IndexOf(x.DeclaringType)).ToList();
+			objectFields = target.GetType()
+					.GetFields(BindingFlags.Public | BindingFlags.NonPublic |
+						BindingFlags.Instance)
+					.OrderByDescending(x => typeTree.IndexOf(x.DeclaringType))
+					.ToList();
 
 
 			length = objectFields.Count;
-			
-			
+
+
 			Repaint();
 			initialized = false;
-		 
 		}
 
 		private void OnDisable()
@@ -103,6 +78,28 @@ namespace Homebrew
 
 			if (!initialized)
 			{
+				var uiTex_in    = Resources.Load<Texture2D>("IN foldout focus-6510");
+				var uiTex_in_on = Resources.Load<Texture2D>("IN foldout focus on-5718");
+
+
+				var c_on = Color.white;
+
+				style = new GUIStyle(EditorStyles.foldout);
+
+				style.overflow = new RectOffset(-10, 0, 3, 0);
+				style.padding = new RectOffset(25, 0, -3, 0);
+
+				style.active.textColor = c_on;
+				style.active.background = uiTex_in;
+				style.onActive.textColor = c_on;
+				style.onActive.background = uiTex_in_on;
+
+				style.focused.textColor = c_on;
+				style.focused.background = uiTex_in;
+				style.onFocused.textColor = c_on;
+				style.onFocused.background = uiTex_in_on;
+
+
 				for (var i = 0; i < length; i++)
 				{
 					var fold = Attribute.GetCustomAttribute(objectFields[i], typeof(FoldoutGroupAttribute)) as FoldoutGroupAttribute;
@@ -138,7 +135,7 @@ namespace Homebrew
 
 
 				var property = serializedObject.GetIterator();
-				var next = property.NextVisible(true);
+				var next     = property.NextVisible(true);
 				if (next)
 				{
 					do

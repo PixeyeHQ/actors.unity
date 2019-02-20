@@ -5,7 +5,11 @@ Company:    Homebrew
 Date:       7/25/2018 11:32 AM
 ================================================================*/
 
-using System.Collections.Generic;
+
+using System;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 #if ODIN_INSPECTOR
 using Sirenix.OdinInspector;
 #endif
@@ -14,104 +18,119 @@ using UnityEngine;
 
 namespace Homebrew
 {
-	public class Actor : MonoCached, IPoolable
+	[ExecuteInEditMode]
+	public abstract class Actor : MonoEntity, IRequireStarter
 	{
-		public static Actor[] entites = new Actor[EngineSettings.MinEntities];
-		public static Stack<int> prevID = new Stack<int>(100);
-		public static int lastID;
+		[HideInInspector]
+		public int prefabID;
 
-		[InfoBox("An actor is a body for an entity. The entity itself is just an incremental number." +
-		         "Use actors when you want to compose your entities from the inspector.", InfoMessageType.Info)]
+		[FoldoutGroup("Main"), TagFilter(typeof(Pool))]
+		public int pool;
 
-		#region FIELDS
-
-		[FoldoutGroup("Actor")]
-		public int entity;
-
-		#endregion
+		[NonSerialized]
+		public bool conditionManualDeploy;
 
 		#region METHODS
 
-		protected override void Awake()
+		protected virtual void Awake()
 		{
-			ProcessingEntities.Create(this);
-			#if ACTORS_DEBUG
-            var name = gameObject.name.Split('(')[0];
-            gameObject.name = name + "_" + id;
-            #endif
-			AddGo();
-			base.Awake();
-		}
-
-		internal override void SetupAfterStarter()
-		{
-			base.SetupAfterStarter();
-
-			var childs = GetComponentsInChildren<MonoCached>();
-
-			for (int i = 1; i < childs.Length; i++)
+			#if UNITY_EDITOR
+			if (!Application.isPlaying)
 			{
-				childs[i].entityParent = entity;
-				childs[i].SetupAfterActor();
+				bool isPrefabInstance = PrefabUtility.GetCorrespondingObjectFromSource(gameObject) == null;
+				if (isPrefabInstance) return;
+				if (prefabID != -1) return;
+				var starter = FindObjectOfType<Starter>();
+				var o       = Resources.Load<GameObject>("Prefabs/" + gameObject.name);
+
+
+				prefabID = starter.AddToNode(o, gameObject, pool);
+				return;
 			}
+			#endif
+
+			ProcessingEntities.Create(this);
+			conditionManualDeploy = this is IManualDeploy;
+			var cObject = Add<ComponentObject>();
+			cObject.transform = transform;
+			Setup();
 		}
 
-		public override void OnEnable()
+		protected abstract void Setup();
+
+
+		public void SetupAfterStarter()
 		{
-			if (state.requireStarter || state.requireActorParent) return;
+			if (conditionManualDeploy) return;
+			OnEnable();
+		}
 
-
-			state.released = false;
-			state.enabled = true;
-
-			HandleEnable();
+		public virtual void OnEnable()
+		{
+			#if UNITY_EDITOR
+			if (!Application.isPlaying)
+			{
+				return;
+			}
+			#endif
+			if (Starter.initialized == false) return;
+			if (conditionManualDeploy) return;
+			conditionEnabled = true;
 			ProcessingEntities.Default.CheckGroups(entity, true);
 		}
 
-		public override void OnDisable()
+		public virtual void OnDisable()
 		{
-			state.enabled = false;
-			state.released = true;
-
-
+			#if UNITY_EDITOR
+			if (!Application.isPlaying)
+			{
+				return;
+			}
+			#endif
+			conditionEnabled = false;
 			ProcessingEntities.Default.CheckGroups(entity, false);
-
-			HandleDisable();
 		}
 
 		protected void OnDestroy()
 		{
+			#if UNITY_EDITOR
+			if (!Application.isPlaying)
+			{
+				var starter = FindObjectOfType<Starter>();
+				if (starter == null) return;
+				starter.RemoveFromNode(prefabID, gameObject);
+				return;
+			}
+			#endif
 			int len = Storage.all.Count;
-			entity.ComponentObject().cachedTransforms?.Clear();
+
 			for (int j = 0; j < len; j++)
 			{
 				Storage.all[j].RemoveNoCheck(entity);
 			}
 
 			Tags.Clear(entity);
-			prevID.Push(entity);
+			ProcessingEntities.prevID.Push(entity);
+		}
+
+		public override void Release()
+		{
+			if (pool == Pool.None)
+			{
+				Destroy(gameObject, 0.03f);
+				return;
+			}
+
+			gameObject.Release(pool);
 		}
 
 		#endregion
 
 		#region ADD/REMOVE
 
-		public void Add(int key, string path)
-		{
-			var cObject = entity.ComponentObject();
-			if (cObject.cachedTransforms == null) cObject.cachedTransforms = new Dictionary<int, Transform>(2, new FastComparable());
-			cObject.cachedTransforms.Add(key, selfTransform.Find(path));
-		}
+		protected void Add(int tags) { Tags.AddTagsRaw(entity, tags); }
 
-		protected void Add(int tags)
-		{
-			Tags.AddTagsRaw(entity, tags);
-		}
-
-		protected void Add(params int[] tags)
-		{
-			Tags.AddTagsRaw(entity, tags);
-		}
+		protected void Add(params int[] tags) { Tags.AddTagsRaw(entity, tags); }
 
 		protected void Add<T>(T component) where T : IComponent, new()
 		{
@@ -134,36 +153,6 @@ namespace Homebrew
 			}
 
 			return component;
-		}
-
-		protected void Remove<T>() where T : new()
-		{
-			Storage<T>.Instance.Remove(entity, false);
-		}
-
-		void AddGo()
-		{
-			var component = Storage<ComponentObject>.Instance.GetOrCreate(entity);
-			component.transform = transform;
-			component.obj = gameObject;
-			component.cachedTransforms?.Clear();
-			Storage<ComponentObject>.Instance.AddWithNoCheck(component, entity);
-		}
-
-		#endregion
-
-		#region POOL
-
-		public void Spawn()
-		{
-			AddGo();
-			OnEnable();
-			OnSpawned();
-		}
-
-
-		protected virtual void OnSpawned()
-		{
 		}
 
 		#endregion

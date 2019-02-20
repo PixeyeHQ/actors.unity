@@ -87,7 +87,7 @@ namespace Homebrew
 					Profiler.GetTotalAllocatedMemoryLong() / 1048576,
 					Profiler.GetTotalReservedMemoryLong() / 1048576,
 					Profiler.GetTotalUnusedReservedMemoryLong() / 1048576)
-				.AppendFormat("Actors : {0}	Ticks : {1}", Actor.lastID,
+				.AppendFormat("Actors : {0}	Ticks : {1}", ProcessingEntities.lastID,
 					Toolbox.Get<ProcessingUpdate>().GetTicksCount());
 			labelDebug.text = fStr.ToString();
 		}

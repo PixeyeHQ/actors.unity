@@ -6,6 +6,6 @@
 namespace Homebrew
 {
     public static class Tag
-    {
+    { 
     }
 }

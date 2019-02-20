@@ -8,28 +8,34 @@
 
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Homebrew
 {
-	internal class ProcessingEntities : IDisposable, IKernel
+	public class ProcessingEntities : IDisposable, IKernel
 	{
-		internal static ProcessingEntities Default;
+		public static MonoEntity[] storageActor = new MonoEntity[EngineSettings.MinEntities];
+		public static Stack<int> prevID = new Stack<int>(100);
+		public static int lastID;
+
+
+		public static ProcessingEntities Default;
 
 		//   internal List<GroupLocal> GroupLocals = new List<GroupLocal>(64);
 		internal GroupBase[] GroupsBase = new GroupBase[64];
 		internal int groupLength;
 
 
-		internal static int Create()
+		public static int Create()
 		{
 			int id;
-			if (Actor.prevID.Count > 0)
+			if (prevID.Count > 0)
 			{
-				id = Actor.prevID.Pop();
+				id = prevID.Pop();
 			}
 			else
 
-				id = Actor.lastID++;
+				id = lastID++;
 
 
 			Tags.Add(id);
@@ -37,22 +43,22 @@ namespace Homebrew
 			return id;
 		}
 
-		internal static void Create(Actor a)
+		public static void Create(MonoEntity a)
 		{
-			int len = Actor.entites.Length;
+			int len = storageActor.Length;
 
-			if (Actor.lastID >= len)
-				Array.Resize(ref Actor.entites, Actor.lastID << 1);
+			if (lastID >= len)
+				Array.Resize(ref storageActor, lastID << 1);
 
-			if (Actor.prevID.Count > 0)
+			if (prevID.Count > 0)
 			{
-				a.entity = Actor.prevID.Pop();
-				Actor.entites[a.entity] = a;
+				a.entity = prevID.Pop();
+				storageActor[a.entity] = a;
 			}
 			else
 			{
-				a.entity = Actor.lastID;
-				Actor.entites[Actor.lastID++] = a;
+				a.entity = lastID;
+				storageActor[lastID++] = a;
 			}
 
 			Tags.Add(a.entity);
@@ -122,7 +128,7 @@ namespace Homebrew
 		}
 
 
-		internal void CheckGroups(int entity, bool active)
+		public void CheckGroups(int entity, bool active)
 		{
 			if (Toolbox.applicationIsQuitting) return;
 
@@ -196,6 +202,14 @@ namespace Homebrew
 			length = 0;
 		}
 
+		public T Add<T>(T component) where T : new()
+		{
+			var storage = Storage<T>.Instance;
+			storages[length++] = storage;
+			return Storage<T>.Instance.AddWithNoCheck(component, entity);
+		}
+
+
 		public T Add<T>() where T : new()
 		{
 			var storage = Storage<T>.Instance;
@@ -203,6 +217,7 @@ namespace Homebrew
 
 			return storage.GetOrCreate(entity);
 		}
+
 
 		public void Deploy()
 		{
@@ -217,8 +232,9 @@ namespace Homebrew
 
 		public void Deploy(params int[] tags)
 		{
+			entity.AddTagsRaw(tags);
 			Deploy();
-			entity.Add(tags);
+	 
 		}
 	}
 }

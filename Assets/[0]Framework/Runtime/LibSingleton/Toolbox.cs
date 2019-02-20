@@ -11,136 +11,133 @@ using UnityEngine;
 
 namespace Homebrew
 {
-    public class Toolbox : Singleton<Toolbox>
-    {
-        [SerializeField] private Dictionary<int, object> data = new Dictionary<int, object>(5, new FastComparable());
+	public class Toolbox : Singleton<Toolbox>
+	{
+		[SerializeField] Dictionary<int, object> data = new Dictionary<int, object>(5, new FastComparable());
 
 
-        public static bool Contains<T>()
-        {
-            return Instance.data.ContainsKey(typeof(T).GetHashCode());
-        }
+		public static bool Contains<T>() { return Instance.data.ContainsKey(typeof(T).GetHashCode()); }
 
 
-        public static T Create<T>() where T : new()
-        {
-            var created = new T();
-            InitializeObject(created);
-            return created;
-        }
+		public static T Create<T>() where T : new()
+		{
+			var created  = new T();
+			var awakeble = created as IAwake;
+			if (awakeble != null) awakeble.OnAwake();
+			return created;
+		}
 
 
-        public static T Add<T>(Type type = null) where T : new()
-        {
-            object o;
-            var hash = type == null ? typeof(T).GetHashCode() : type.GetHashCode();
-            if (Instance.data.TryGetValue(hash, out o))
-            {
-                InitializeObject(o);
-                return (T) o;
-            }
+		public static T Add<T>(Type type = null) where T : new()
+		{
+			object o;
+			var    hash = type == null ? typeof(T).GetHashCode() : type.GetHashCode();
+			if (Instance.data.TryGetValue(hash, out o))
+			{
+				InitializeObject(o);
+				return (T) o;
+			}
 
-            var created = new T();
+			var created = new T();
 
-            InitializeObject(created);
-            Instance.data.Add(hash, created);
+			InitializeObject(created);
+			Instance.data.Add(hash, created);
 
-            return created;
-        }
-
-
-        public static object Get(Type t)
-        {
-            object resolve;
-            Instance.data.TryGetValue(t.GetHashCode(), out resolve);
-            return resolve;
-        }
-
-        public static object Add(object obj)
-        {
-            object possibleObj;
-            if (Instance.data.TryGetValue(obj.GetType().GetHashCode(), out possibleObj))
-            {
-                InitializeObject(possibleObj);
-                return possibleObj;
-            }
-
-            var add = obj;
-            var scriptable = obj as ScriptableObject;
-            if (scriptable) add = Instantiate(scriptable);
-            InitializeObject(obj);
+			return created;
+		}
 
 
-            Instance.data.Add(obj.GetType().GetHashCode(), add);
-            return add;
-        }
+		public static object Get(Type t)
+		{
+			object resolve;
+			Instance.data.TryGetValue(t.GetHashCode(), out resolve);
+			return resolve;
+		}
 
-        public static void Remove(object obj)
-        {
-            if (applicationIsQuitting) return;
-            Instance.data.Remove(obj.GetType().GetHashCode());
-        }
+		public static object Add(object obj)
+		{
+			object possibleObj;
+			if (Instance.data.TryGetValue(obj.GetType().GetHashCode(), out possibleObj))
+			{
+				InitializeObject(possibleObj);
+				return possibleObj;
+			}
 
-        public static void InitializeObject(object obj)
-        {
-            var awakeble = obj as IAwake;
-            if (awakeble != null) awakeble.OnAwake();
-            ProcessingUpdate.Default.Add(obj);
-        }
+			var add        = obj;
+			var scriptable = obj as ScriptableObject;
+			if (scriptable) add = Instantiate(scriptable);
+			InitializeObject(obj);
 
 
-        public static T Get<T>()
-        {
-            object resolve;
+			Instance.data.Add(obj.GetType().GetHashCode(), add);
+			return add;
+		}
 
-            var hasValue = Instance.data.TryGetValue(typeof(T).GetHashCode(), out resolve);
+		public static void Remove(object obj)
+		{
+			if (applicationIsQuitting) return;
+			Instance.data.Remove(obj.GetType().GetHashCode());
+		}
 
-            if (!hasValue)
-                Instance.data.TryGetValue(typeof(T).GetHashCode(), out resolve);
-            return (T) resolve;
-        }
+		public static void InitializeObject(object obj)
+		{
+			var awakeble = obj as IAwake;
+			if (awakeble != null) awakeble.OnAwake();
+			ProcessingUpdate.Default.Add(obj);
+		}
 
-        public void ClearSessionData()
-        {
-            if (applicationIsQuitting) return;
 
-            var toWipe = new List<int>();
+		public static T Get<T>()
+		{
+			object resolve;
 
-            foreach (var pair in data)
-            {
-                var isKernel = pair.Value as IKernel;
-                if (isKernel == null) toWipe.Add(pair.Key);
+			var hasValue = Instance.data.TryGetValue(typeof(T).GetHashCode(), out resolve);
 
-                var needToBeCleaned = pair.Value as IDisposable;
-                if (needToBeCleaned == null) continue;
+			if (!hasValue)
+				Instance.data.TryGetValue(typeof(T).GetHashCode(), out resolve);
+			return (T) resolve;
+		}
 
-                needToBeCleaned.Dispose();
-            }
+		public void ClearSessionData()
+		{
+			if (applicationIsQuitting) return;
 
-            Get<Scripts>().Clear();
-            
-            ProcessingTimer.Default.Dispose();
-            ProcessingPool.Default.Dispose();
-            ProcessingEntities.Default.Dispose();
-            ProcessingScene.Default.Dispose();
-            ProcessingUpdate.Default.Dispose();
-            Box.Default.Dispose();
+			var toWipe = new List<int>();
 
-            for (var i = 0; i < toWipe.Count; i++)
-            {
-                data.Remove(toWipe[i]);
-            }
-        }
+			foreach (var pair in data)
+			{
+				var isKernel = pair.Value as IKernel;
+				if (isKernel == null) toWipe.Add(pair.Key);
 
-        public static void DisposeObject(object obj)
-        {
-            if (isQuittingOrChangingScene()) return;
+				var needToBeCleaned = pair.Value as IDisposable;
+				if (needToBeCleaned == null) continue;
 
-            var disposable = obj as IDisposable;
-            if (disposable != null)
-            {
-                disposable.Dispose();
-            }
-        }
-    }
+				needToBeCleaned.Dispose();
+			}
+
+
+			ProcessingTimer.Default.Dispose();
+			ProcessingPool.Default.Dispose();
+			ProcessingEntities.Default.Dispose();
+			ProcessingScene.Default.Dispose();
+			ProcessingUpdate.Default.Dispose();
+			Box.Default.Dispose();
+
+			for (var i = 0; i < toWipe.Count; i++)
+			{
+				data.Remove(toWipe[i]);
+			}
+		}
+
+		public static void DisposeObject(object obj)
+		{
+			if (isQuittingOrChangingScene()) return;
+
+			var disposable = obj as IDisposable;
+			if (disposable != null)
+			{
+				disposable.Dispose();
+			}
+		}
+	}
 }

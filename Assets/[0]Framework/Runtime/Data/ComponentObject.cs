@@ -12,17 +12,9 @@ namespace Homebrew
 	public class ComponentObject : IComponent, IDisposable
 	{
 		public Transform transform;
-		public GameObject obj;
 		public int poolType = -1;
 
-		internal Dictionary<int, Transform> cachedTransforms;
-
-		public void Dispose()
-		{
-			transform = null;
-			obj = null;
-			cachedTransforms.Clear();
-		}
+		public void Dispose() { transform = null; }
 	}
 
 	public static class ExtensionComponentObject

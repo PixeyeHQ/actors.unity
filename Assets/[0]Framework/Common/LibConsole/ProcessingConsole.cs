@@ -16,6 +16,9 @@ namespace Homebrew
 {
     public class ProcessingConsole : ITick, IDisposable, IKernel
     {
+        public Action consoleOpened;
+        public Action consoleClosed;
+        
         private CommandsConsole commands;
         private ComponentConsole console;
 
@@ -162,6 +165,7 @@ namespace Homebrew
 
         void ConsoleClose()
         {
+            consoleClosed();
             console.ActivateConsole(false);
         }
 
@@ -174,6 +178,7 @@ namespace Homebrew
                 console.gameObject.SetActive(false);
             }
 
+            consoleOpened();
             console.ActivateConsole(true);
         }
 

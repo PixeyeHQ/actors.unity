@@ -11,1070 +11,1032 @@ using UnityEngine;
 
 namespace Homebrew
 {
-    public abstract class GroupBase : IEnumerable, IDisposable
-    {
-        public int length;
+	public abstract class GroupBase : IEnumerable, IDisposable
+	{
+		public int length;
 
-        public int[] entities = new int[EngineSettings.MinEntities];
-        public Composition composition;
-
+		public int[] entities = new int[EngineSettings.MinEntities];
+		public Composition composition;
 
-        public Action<int> Add;
-        public Action<int> Remove;
-        public Action<int, int> TagsChange;
-
-        protected int indexLast;
-
-        internal void TagsHaveChanged(int entity)
-        {
-            int index = GetIndex(entity);
-
-            if (index == -1)
-            {
-                if (!entity.Has(composition.include)) return;
-                if (entity.HasAny(composition.exclude)) return;
 
-                TryAdd(entity);
-            }
-            else
-            {
-                if (TagsChange != null)
-                    TagsChange(index, entity);
-
-                if (!entity.Has(composition.include) || entity.HasAny(composition.exclude))
-
-                    RemoveAt(index);
-            }
-        }
-        public bool Has (int entity)
-        {
-            for (int i = 0; i < length; i++)
-            {
-                if (entities[i] != entity) continue;
-                return true;
-            }
-
-            return false;
-        }
+		public Action<int> Add;
+		public Action<int> Remove;
+		public Action<int, int> TagsChange;
 
-        public int GetIndex(int entity)
-        {
-            for (int i = 0; i < length; i++)
-            {
-                if (entities[i] != entity) continue;
-                return i;
-            }
+		protected int indexLast;
 
-            return -1;
-        }
+		internal void TagsHaveChanged(int entity)
+		{
+			int index = GetIndex(entity);
 
-        public int GetEntity(int index)
-        {
-            return entities[index];
-        }
+			if (index == -1)
+			{
+				if (!entity.Has(composition.include)) return;
+				if (entity.HasAny(composition.exclude)) return;
 
-        public Actor GetActor(int entity)
-        {
-            return Actor.entites[entity];
-        }
+				TryAdd(entity);
+			}
+			else
+			{
+				if (TagsChange != null)
+					TagsChange(index, entity);
 
-        public bool CheckTags(int entity)
-        {
-            if (!entity.Has(composition.include))
-                return false;
+				if (!entity.Has(composition.include) || entity.HasAny(composition.exclude))
 
-            return !entity.HasAny(composition.exclude);
-        }
+					RemoveAt(index);
+			}
+		}
 
+		public bool Has(int entity)
+		{
+			for (int i = 0; i < length; i++)
+			{
+				if (entities[i] != entity) continue;
+				return true;
+			}
 
-        public abstract void TryAdd(int entity);
+			return false;
+		}
 
+		public int GetIndex(int entity)
+		{
+			for (int i = 0; i < length; i++)
+			{
+				if (entities[i] != entity) continue;
+				return i;
+			}
 
-        internal void OnRemove(int entity)
-        { 
-            int i = GetIndex(entity);
-            if (i == -1) return;
-            RemoveAt(i);
-        }
+			return -1;
+		}
 
+		public int GetEntity(int index) { return entities[index]; }
 
-        public abstract void Populate();
-        protected abstract void RemoveAt(int i);
+	//	public MonoEntity GetActor(int entity) { return ProcessingEntities.storage[entity]; }
 
+		public bool CheckTags(int entity)
+		{
+			if (!entity.Has(composition.include))
+				return false;
 
-        public void Dispose()
-        {
-            Add = null;
-            Remove = null;
-            length = 0;
-            entities = new int[EngineSettings.MinEntities];
-            OnDispose();
-        }
+			return !entity.HasAny(composition.exclude);
+		}
 
-        protected abstract void OnDispose();
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+		public abstract void TryAdd(int entity);
 
-        public EntityEnumerator GetEnumerator()
-        {
-            return new EntityEnumerator(entities, length);
-        }
-    }
 
-    public struct EntityEnumerator : IEnumerator
-    {
-        public int[] entities;
+		internal void OnRemove(int entity)
+		{
+			int i = GetIndex(entity);
+			if (i == -1) return;
+			RemoveAt(i);
+		}
 
 
-        int position;
-        private int length;
+		public abstract void Populate();
+		protected abstract void RemoveAt(int i);
 
-        public EntityEnumerator(int[] list, int length)
-        {
-            entities = list;
-            position = -1;
-            this.length = length;
-        }
 
-        public bool MoveNext()
-        {
-            position++;
-            return position < length;
-        }
+		public void Dispose()
+		{
+			Add = null;
+			Remove = null;
+			length = 0;
+			entities = new int[EngineSettings.MinEntities];
+			OnDispose();
+		}
 
-        public void Reset()
-        {
-            position = -1;
-        }
+		protected abstract void OnDispose();
 
-        object IEnumerator.Current => Current;
+		IEnumerator IEnumerable.GetEnumerator() { return GetEnumerator(); }
 
-        public int Current => entities[position];
-    }
+		public EntityEnumerator GetEnumerator() { return new EntityEnumerator(entities, length); }
 
 
-    public class Group<T> : GroupBase where T : IComponent, new()
-    {
-        private Storage<T> storage = Storage<T>.Instance;
+		public T Get<T>() where T : IComponent, new() { return 0.Get<T>(); }
+	}
 
+	public struct EntityEnumerator : IEnumerator
+	{
+		public int[] entities;
 
-        public override void TryAdd(int entity)
-        {
-            if (!storage.HasComponent(entity)) return;
 
+		int position;
+		private int length;
 
-            if (entities.Length <= length)
-            {
-                int len = length << 1;
-                Array.Resize(ref entities, len);
-            }
+		public EntityEnumerator(int[] list, int length)
+		{
+			entities = list;
+			position = -1;
+			this.length = length;
+		}
 
+		public bool MoveNext()
+		{
+			position++;
+			return position < length;
+		}
 
-            indexLast = length++;
+		public void Reset() { position = -1; }
 
-            entities[indexLast] = entity;
-           
-            if (Add != null)
-                Add(entity);
-        }
+		object IEnumerator.Current => Current;
 
+		public int Current => entities[position];
+	}
 
-        public override void Populate()
-        {
-            storage.groups.Add(this);
 
-            for (int i = 0; i < Actor.lastID; i++)
-            {
-                var e = Actor.entites[i];
-                if (e == null || !e.state.enabled) continue;
+	public class Group<T> : GroupBase where T : IComponent, new()
+	{
+		private Storage<T> storage = Storage<T>.Instance;
 
-                if (composition.include.Length > 0)
-                    if (!e.entity.Has(composition.include))
-                        continue;
 
-                if (composition.exclude.Length > 0)
-                    if (e.entity.HasAny(composition.exclude))
-                        continue;
+		public override void TryAdd(int entity)
+		{
+			if (!storage.HasComponent(entity)) return;
 
 
-                if (!storage.HasComponent(e.entity)) continue;
+			if (entities.Length <= length)
+			{
+				int len = length << 1;
+				Array.Resize(ref entities, len);
+			}
 
 
-                if (length == entities.Length)
-                {
-                    int len = length << 1;
-                    Array.Resize(ref entities, len);
-                }
+			indexLast = length++;
 
-                int entityID = e.entity;
-                indexLast = length++;
-          
-                entities[indexLast] = entityID;
-            }
-        }
+			entities[indexLast] = entity;
 
-        protected override void RemoveAt(int i)
-        {
-            if (Remove != null)
-                Remove(entities[i]);
+			if (Add != null)
+				Add(entity);
+		}
 
 
-            int l = --length;
+		public override void Populate()
+		{
+			storage.groups.Add(this);
 
-            int next = i + 1;
-            int size = l - i;
+			for (int i = 0; i < ProcessingEntities.lastID; i++)
+			{
+				var e = ProcessingEntities.storageActor[i];
+				if (e == null || !e.conditionEnabled) continue;
 
+				if (composition.include.Length > 0)
+					if (!e.entity.Has(composition.include))
+						continue;
 
-            Array.Copy(entities, next, entities, i, size);
-        }
+				if (composition.exclude.Length > 0)
+					if (e.entity.HasAny(composition.exclude))
+						continue;
 
 
-        protected override void OnDispose()
-        {
-        }
-    }
+				if (!storage.HasComponent(e.entity)) continue;
 
-    public class Group<T, Y> : GroupBase where T : IComponent, new() where Y : new()
-    {
-        Storage<T> storage = Storage<T>.Instance;
-        Storage<Y> storage2 = Storage<Y>.Instance;
 
+				if (length == entities.Length)
+				{
+					int len = length << 1;
+					Array.Resize(ref entities, len);
+				}
 
-        public override void TryAdd(int entity)
-        {
-            if (!storage.HasComponent(entity) || !storage2.HasComponent(entity)) return;
-            if (entities.Length <= length)
-            {
-                int len = length << 1;
+				int entityID = e.entity;
+				indexLast = length++;
 
-                Array.Resize(ref entities, len);
-            }
+				entities[indexLast] = entityID;
+			}
+		}
 
+		protected override void RemoveAt(int i)
+		{
+			if (Remove != null)
+				Remove(entities[i]);
 
-       
 
-         
+			int l = --length;
 
+			int next = i + 1;
+			int size = l - i;
 
-            if (Add != null)
-                Add(entity);
-            
-            indexLast = length++; 
-            entities[indexLast] = entity;
-            
-        }
 
+			Array.Copy(entities, next, entities, i, size);
+		}
 
-        public override void Populate()
-        {
-            storage.groups.Add(this);
-            storage2.groups.Add(this);
 
+		protected override void OnDispose() { }
+	}
 
-            for (int i = 0; i < Actor.lastID; i++)
-            {
-                var e = Actor.entites[i];
-                if (e == null || !e.state.enabled) continue;
-                if (composition.include.Length > 0)
-                    if (!e.entity.Has(composition.include))
-                        continue;
+	public class Group<T, Y> : GroupBase where T : IComponent, new() where Y : new()
+	{
+		Storage<T> storage = Storage<T>.Instance;
+		Storage<Y> storage2 = Storage<Y>.Instance;
 
-                if (composition.exclude.Length > 0)
-                    if (e.entity.HasAny(composition.exclude))
-                        continue;
 
+		public override void TryAdd(int entity)
+		{
+			if (!storage.HasComponent(entity) || !storage2.HasComponent(entity)) return;
 
-                if (!storage.HasComponent(e.entity) || !storage2.HasComponent(e.entity)) continue;
+			if (entities.Length <= length)
+			{
+				int len = length << 1;
 
+				Array.Resize(ref entities, len);
+			}
 
-                if (length == entities.Length)
-                {
-                    int len = length << 1;
 
-                    Array.Resize(ref entities, len);
-                }
+			if (Add != null)
+				Add(entity);
 
-                int entityID = e.entity;
-                indexLast = length++;
+			indexLast = length++;
+			entities[indexLast] = entity;
+		}
 
 
-                entities[indexLast] = entityID;
-            }
-        }
+		public override void Populate()
+		{
+			storage.groups.Add(this);
+			storage2.groups.Add(this);
 
-        protected override void RemoveAt(int i)
-        {
-            if (Remove != null)
-                Remove(entities[i]);
 
-            int l    = --length;
-            int next = i + 1;
-            int size = l - i;
+			for (int i = 0; i < ProcessingEntities.lastID; i++)
+			{
+				var e = ProcessingEntities.storageActor[i];
+				if (e == null || !e.conditionEnabled) continue;
+				
+				if (composition.include.Length > 0)
+					if (!e.entity.Has(composition.include))
+						continue;
 
-            Array.Copy(entities, next, entities, i, size);
-        }
+				if (composition.exclude.Length > 0)
+					if (e.entity.HasAny(composition.exclude))
+						continue;
 
 
-        protected override void OnDispose()
-        {
-        }
-    }
+				if (!storage.HasComponent(e.entity) || !storage2.HasComponent(e.entity)) continue;
 
-    public class Group<T, Y, U> : GroupBase where T : IComponent, new() where Y : new() where U : new()
-    {
-        Storage<T> storage = Storage<T>.Instance;
-        Storage<Y> storage2 = Storage<Y>.Instance;
-        Storage<U> storage3 = Storage<U>.Instance;
 
-        protected override void RemoveAt(int i)
-        {
-            if (Remove != null)
-                Remove(entities[i]);
+				if (length == entities.Length)
+				{
+					int len = length << 1;
 
-            int l    = --length;
-            int next = i + 1;
-            int size = l - i;
+					Array.Resize(ref entities, len);
+				}
 
-            Array.Copy(entities, next, entities, i, size);
-        }
+				int entityID = e.entity;
+				indexLast = length++;
 
-        public override void TryAdd(int entity)
-        {
-            if (!storage.HasComponent(entity) ||
-                !storage2.HasComponent(entity) ||
-                !storage3.HasComponent(entity)
-            ) return;
 
+				entities[indexLast] = entityID;
+			}
+		}
 
-            if (entities.Length <= length)
-            {
-                int len = length << 1;
-                Array.Resize(ref entities, len);
-            }
+		protected override void RemoveAt(int i)
+		{
+			if (Remove != null)
+				Remove(entities[i]);
 
+			int l    = --length;
+			int next = i + 1;
+			int size = l - i;
 
-            indexLast = length++;
+			Array.Copy(entities, next, entities, i, size);
+		}
 
-            entities[indexLast] = entity;
 
+		protected override void OnDispose() { }
+	}
 
-            if (Add != null)
-                Add(entity);
-        }
+	public class Group<T, Y, U> : GroupBase where T : IComponent, new() where Y : new() where U : new()
+	{
+		Storage<T> storage = Storage<T>.Instance;
+		Storage<Y> storage2 = Storage<Y>.Instance;
+		Storage<U> storage3 = Storage<U>.Instance;
 
+		protected override void RemoveAt(int i)
+		{
+			if (Remove != null)
+				Remove(entities[i]);
 
-        public override void Populate()
-        {
-            storage.groups.Add(this);
-            storage2.groups.Add(this);
-            storage3.groups.Add(this);
+			int l    = --length;
+			int next = i + 1;
+			int size = l - i;
 
+			Array.Copy(entities, next, entities, i, size);
+		}
 
-            for (int i = 0; i < Actor.lastID; i++)
-            {
-                var e = Actor.entites[i];
-                if (e == null || !e.state.enabled) continue;
+		public override void TryAdd(int entity)
+		{
+			if (!storage.HasComponent(entity) ||
+				!storage2.HasComponent(entity) ||
+				!storage3.HasComponent(entity)
+			) return;
 
-                if (composition.include.Length > 0)
-                    if (!e.entity.Has(composition.include))
-                        continue;
 
-                if (composition.exclude.Length > 0)
-                    if (e.entity.HasAny(composition.exclude))
-                        continue;
+			if (entities.Length <= length)
+			{
+				int len = length << 1;
+				Array.Resize(ref entities, len);
+			}
 
-                int entityID = e.entity;
 
-                if (!storage.HasComponent(entityID) ||
-                    !storage2.HasComponent(entityID) ||
-                    !storage3.HasComponent(entityID)
-                ) continue;
+			indexLast = length++;
 
+			entities[indexLast] = entity;
 
-                if (length == entities.Length)
-                {
-                    int len = length << 1;
 
-                    Array.Resize(ref entities, len);
-                }
+			if (Add != null)
+				Add(entity);
+		}
 
-                indexLast = length++;
 
-                entities[indexLast] = entityID;
-            }
-        }
+		public override void Populate()
+		{
+			storage.groups.Add(this);
+			storage2.groups.Add(this);
+			storage3.groups.Add(this);
 
 
-        protected override void OnDispose()
-        {
-        }
-    }
+			for (int i = 0; i < ProcessingEntities.lastID; i++)
+			{
+				var e = ProcessingEntities.storageActor[i];
+				if (e == null || !e.conditionEnabled) continue;
 
-    public class Group<T, Y, U, I> : GroupBase where T : IComponent, new()
-                                               where Y : new()
-                                               where U : new()
-                                               where I : new()
-    {
-        Storage<T> storage = Storage<T>.Instance;
-        Storage<Y> storage2 = Storage<Y>.Instance;
-        Storage<U> storage3 = Storage<U>.Instance;
-        Storage<I> storage4 = Storage<I>.Instance;
+				if (composition.include.Length > 0)
+					if (!e.entity.Has(composition.include))
+						continue;
 
-        protected override void RemoveAt(int i)
-        {
-            if (Remove != null)
-                Remove(entities[i]);
+				if (composition.exclude.Length > 0)
+					if (e.entity.HasAny(composition.exclude))
+						continue;
 
-            int l    = --length;
-            int next = i + 1;
-            int size = l - i;
+				int entityID = e.entity;
 
-            Array.Copy(entities, next, entities, i, size);
-        }
+				if (!storage.HasComponent(entityID) ||
+					!storage2.HasComponent(entityID) ||
+					!storage3.HasComponent(entityID)
+				) continue;
 
-        public override void TryAdd(int entity)
-        {
-            if (!storage.HasComponent(entity) ||
-                !storage2.HasComponent(entity) ||
-                !storage3.HasComponent(entity) ||
-                !storage4.HasComponent(entity)
-            ) return;
 
-            if (entities.Length <= length)
-            {
-                int len = length << 1;
+				if (length == entities.Length)
+				{
+					int len = length << 1;
 
-                Array.Resize(ref entities, len);
-            }
+					Array.Resize(ref entities, len);
+				}
 
-            indexLast = length++;
+				indexLast = length++;
 
-            entities[indexLast] = entity;
+				entities[indexLast] = entityID;
+			}
+		}
 
 
-            if (Add != null)
-                Add(entity);
-        }
+		protected override void OnDispose() { }
+	}
 
+	public class Group<T, Y, U, I> : GroupBase where T : IComponent, new()
+			where Y : new()
+			where U : new()
+			where I : new()
+	{
+		Storage<T> storage = Storage<T>.Instance;
+		Storage<Y> storage2 = Storage<Y>.Instance;
+		Storage<U> storage3 = Storage<U>.Instance;
+		Storage<I> storage4 = Storage<I>.Instance;
 
-        public override void Populate()
-        {
-            storage.groups.Add(this);
-            storage2.groups.Add(this);
-            storage3.groups.Add(this);
-            storage4.groups.Add(this);
+		protected override void RemoveAt(int i)
+		{
+			if (Remove != null)
+				Remove(entities[i]);
 
-            for (int i = 0; i < Actor.lastID; i++)
-            {
-                var e = Actor.entites[i];
-                if (e == null || !e.state.enabled) continue;
+			int l    = --length;
+			int next = i + 1;
+			int size = l - i;
 
+			Array.Copy(entities, next, entities, i, size);
+		}
 
-                int entityID = e.entity;
-                if (!storage.HasComponent(entityID) ||
-                    !storage2.HasComponent(entityID) ||
-                    !storage3.HasComponent(entityID) ||
-                    !storage4.HasComponent(entityID)
-                ) continue;
+		public override void TryAdd(int entity)
+		{
+			if (!storage.HasComponent(entity) ||
+				!storage2.HasComponent(entity) ||
+				!storage3.HasComponent(entity) ||
+				!storage4.HasComponent(entity)
+			) return;
 
+			if (entities.Length <= length)
+			{
+				int len = length << 1;
 
-                if (composition.include.Length > 0)
-                    if (!e.entity.Has(composition.include))
-                        continue;
+				Array.Resize(ref entities, len);
+			}
 
-                if (composition.exclude.Length > 0)
-                    if (e.entity.HasAny(composition.exclude))
-                        continue;
+			indexLast = length++;
 
+			entities[indexLast] = entity;
 
-                if (length == entities.Length)
-                {
-                    int len = length << 1;
 
-                    Array.Resize(ref entities, len);
-                }
+			if (Add != null)
+				Add(entity);
+		}
 
-                indexLast = length++;
 
-                entities[indexLast] = entityID;
-            }
-        }
+		public override void Populate()
+		{
+			storage.groups.Add(this);
+			storage2.groups.Add(this);
+			storage3.groups.Add(this);
+			storage4.groups.Add(this);
 
+			for (int i = 0; i < ProcessingEntities.lastID; i++)
+			{
+				var e = ProcessingEntities.storageActor[i];
+				if (e == null || !e.conditionEnabled) continue;
 
-        protected override void OnDispose()
-        {
-        }
-    }
 
-    public class Group<T, Y, U, I, O> : GroupBase where T : IComponent, new()
-                                                  where Y : new()
-                                                  where U : new()
-                                                  where I : new()
-                                                  where O : new()
-    {
-        Storage<T> storage = Storage<T>.Instance;
-        Storage<Y> storage2 = Storage<Y>.Instance;
-        Storage<U> storage3 = Storage<U>.Instance;
-        Storage<I> storage4 = Storage<I>.Instance;
-        Storage<O> storage5 = Storage<O>.Instance;
+				int entityID = e.entity;
+				if (!storage.HasComponent(entityID) ||
+					!storage2.HasComponent(entityID) ||
+					!storage3.HasComponent(entityID) ||
+					!storage4.HasComponent(entityID)
+				) continue;
 
 
-        public override void TryAdd(int entity)
-        {
-            if (!storage.HasComponent(entity) ||
-                !storage2.HasComponent(entity) ||
-                !storage3.HasComponent(entity) ||
-                !storage4.HasComponent(entity) ||
-                !storage5.HasComponent(entity)
-            ) return;
+				if (composition.include.Length > 0)
+					if (!e.entity.Has(composition.include))
+						continue;
 
-            if (entities.Length <= length)
-            {
-                int len = entity == 0 ? EngineSettings.MinComponents : length << 1;
+				if (composition.exclude.Length > 0)
+					if (e.entity.HasAny(composition.exclude))
+						continue;
 
-                Array.Resize(ref entities, len);
-            }
 
-            indexLast = length++;
+				if (length == entities.Length)
+				{
+					int len = length << 1;
 
-            entities[indexLast] = entity;
+					Array.Resize(ref entities, len);
+				}
 
+				indexLast = length++;
 
-            if (Add != null)
-                Add(entity);
-        }
+				entities[indexLast] = entityID;
+			}
+		}
 
 
-        public override void Populate()
-        {
-            storage.groups.Add(this);
-            storage2.groups.Add(this);
-            storage3.groups.Add(this);
-            storage4.groups.Add(this);
-            storage5.groups.Add(this);
+		protected override void OnDispose() { }
+	}
 
+	public class Group<T, Y, U, I, O> : GroupBase where T : IComponent, new()
+			where Y : new()
+			where U : new()
+			where I : new()
+			where O : new()
+	{
+		Storage<T> storage = Storage<T>.Instance;
+		Storage<Y> storage2 = Storage<Y>.Instance;
+		Storage<U> storage3 = Storage<U>.Instance;
+		Storage<I> storage4 = Storage<I>.Instance;
+		Storage<O> storage5 = Storage<O>.Instance;
 
-            for (int i = 0; i < Actor.lastID; i++)
-            {
-                var e = Actor.entites[i];
 
-                if (e == null || !e.state.enabled) continue;
+		public override void TryAdd(int entity)
+		{
+			if (!storage.HasComponent(entity) ||
+				!storage2.HasComponent(entity) ||
+				!storage3.HasComponent(entity) ||
+				!storage4.HasComponent(entity) ||
+				!storage5.HasComponent(entity)
+			) return;
 
-                if (composition.include.Length > 0)
-                    if (!e.entity.Has(composition.include))
-                        continue;
+			if (entities.Length <= length)
+			{
+				int len = entity == 0 ? EngineSettings.MinComponents : length << 1;
 
-                if (composition.exclude.Length > 0)
-                    if (e.entity.HasAny(composition.exclude))
-                        continue;
-                int entityID = e.entity;
-                if (!storage.HasComponent(entityID) ||
-                    !storage2.HasComponent(entityID) ||
-                    !storage3.HasComponent(entityID) ||
-                    !storage4.HasComponent(entityID) ||
-                    !storage5.HasComponent(entityID)
-                ) continue;
+				Array.Resize(ref entities, len);
+			}
 
+			indexLast = length++;
 
-                if (length == entities.Length)
-                {
-                    int len = length << 1;
+			entities[indexLast] = entity;
 
-                    Array.Resize(ref entities, len);
-                }
 
+			if (Add != null)
+				Add(entity);
+		}
 
-                indexLast = length++;
 
-                entities[indexLast] = entityID;
-            }
-        }
+		public override void Populate()
+		{
+			storage.groups.Add(this);
+			storage2.groups.Add(this);
+			storage3.groups.Add(this);
+			storage4.groups.Add(this);
+			storage5.groups.Add(this);
 
 
-        protected override void RemoveAt(int i)
-        {
-            if (Remove != null)
-                Remove(entities[i]);
+			for (int i = 0; i < ProcessingEntities.lastID; i++)
+			{
+				var e = ProcessingEntities.storageActor[i];
 
-            int l    = --length;
-            int next = i + 1;
-            int size = l - i;
+				if (e == null || !e.conditionEnabled) continue;
 
-            Array.Copy(entities, next, entities, i, size);
-        }
+				if (composition.include.Length > 0)
+					if (!e.entity.Has(composition.include))
+						continue;
 
+				if (composition.exclude.Length > 0)
+					if (e.entity.HasAny(composition.exclude))
+						continue;
+				int entityID = e.entity;
+				if (!storage.HasComponent(entityID) ||
+					!storage2.HasComponent(entityID) ||
+					!storage3.HasComponent(entityID) ||
+					!storage4.HasComponent(entityID) ||
+					!storage5.HasComponent(entityID)
+				) continue;
 
-        protected override void OnDispose()
-        {
-        }
-    }
 
+				if (length == entities.Length)
+				{
+					int len = length << 1;
 
-    public class Group<T, Y, U, I, O, P> : GroupBase where T : IComponent, new()
-                                                     where Y : new()
-                                                     where U : new()
-                                                     where I : new()
-                                                     where O : new()
-                                                     where P : new()
-    {
-        Storage<T> storage = Storage<T>.Instance;
-        Storage<Y> storage2 = Storage<Y>.Instance;
-        Storage<U> storage3 = Storage<U>.Instance;
-        Storage<I> storage4 = Storage<I>.Instance;
-        Storage<O> storage5 = Storage<O>.Instance;
-        Storage<P> storage6 = Storage<P>.Instance;
+					Array.Resize(ref entities, len);
+				}
 
 
-        public override void TryAdd(int entity)
-        {
-            if (!storage.HasComponent(entity) ||
-                !storage2.HasComponent(entity) ||
-                !storage3.HasComponent(entity) ||
-                !storage4.HasComponent(entity) ||
-                !storage5.HasComponent(entity) ||
-                !storage6.HasComponent(entity)
-            ) return;
+				indexLast = length++;
 
-            if (entities.Length <= length)
-            {
-                int len = length << 1;
+				entities[indexLast] = entityID;
+			}
+		}
 
-                Array.Resize(ref entities, len);
-            }
 
-            
+		protected override void RemoveAt(int i)
+		{
+			if (Remove != null)
+				Remove(entities[i]);
 
-             
+			int l    = --length;
+			int next = i + 1;
+			int size = l - i;
 
+			Array.Copy(entities, next, entities, i, size);
+		}
 
-            if (Add != null)
-                Add(entity);
 
-            indexLast = length++;
-            entities[indexLast] = entity;
+		protected override void OnDispose() { }
+	}
 
-        }
 
+	public class Group<T, Y, U, I, O, P> : GroupBase where T : IComponent, new()
+			where Y : new()
+			where U : new()
+			where I : new()
+			where O : new()
+			where P : new()
+	{
+		Storage<T> storage = Storage<T>.Instance;
+		Storage<Y> storage2 = Storage<Y>.Instance;
+		Storage<U> storage3 = Storage<U>.Instance;
+		Storage<I> storage4 = Storage<I>.Instance;
+		Storage<O> storage5 = Storage<O>.Instance;
+		Storage<P> storage6 = Storage<P>.Instance;
 
-        public override void Populate()
-        {
-            storage.groups.Add(this);
-            storage2.groups.Add(this);
-            storage3.groups.Add(this);
-            storage4.groups.Add(this);
-            storage5.groups.Add(this);
-            storage6.groups.Add(this);
 
-            for (int i = 0; i < Actor.lastID; i++)
-            {
-                var e = Actor.entites[i];
+		public override void TryAdd(int entity)
+		{
+			if (!storage.HasComponent(entity) ||
+				!storage2.HasComponent(entity) ||
+				!storage3.HasComponent(entity) ||
+				!storage4.HasComponent(entity) ||
+				!storage5.HasComponent(entity) ||
+				!storage6.HasComponent(entity)
+			) return;
 
-                if (e == null || !e.state.enabled) continue;
+			if (entities.Length <= length)
+			{
+				int len = length << 1;
 
-                if (composition.include.Length > 0)
-                    if (!e.entity.Has(composition.include))
-                        continue;
+				Array.Resize(ref entities, len);
+			}
 
-                if (composition.exclude.Length > 0)
-                    if (e.entity.HasAny(composition.exclude))
-                        continue;
-                int entityID = e.entity;
-                if (!storage.HasComponent(entityID) ||
-                    !storage2.HasComponent(entityID) ||
-                    !storage3.HasComponent(entityID) ||
-                    !storage4.HasComponent(entityID) ||
-                    !storage5.HasComponent(entityID) ||
-                    !storage6.HasComponent(entityID)
-                ) continue;
 
+			if (Add != null)
+				Add(entity);
 
-                if (length == entities.Length)
-                {
-                    int len = length << 1;
+			indexLast = length++;
+			entities[indexLast] = entity;
+		}
 
-                    Array.Resize(ref entities, len);
-                }
 
+		public override void Populate()
+		{
+			storage.groups.Add(this);
+			storage2.groups.Add(this);
+			storage3.groups.Add(this);
+			storage4.groups.Add(this);
+			storage5.groups.Add(this);
+			storage6.groups.Add(this);
 
-                indexLast = length++;
+			for (int i = 0; i < ProcessingEntities.lastID; i++)
+			{
+				var e = ProcessingEntities.storageActor[i];
 
-                entities[indexLast] = entityID;
-            }
-        }
+				if (e == null || !e.conditionEnabled) continue;
 
+				if (composition.include.Length > 0)
+					if (!e.entity.Has(composition.include))
+						continue;
 
-        protected override void RemoveAt(int i)
-        {
-            if (Remove != null)
-                Remove(entities[i]);
+				if (composition.exclude.Length > 0)
+					if (e.entity.HasAny(composition.exclude))
+						continue;
+				int entityID = e.entity;
+				if (!storage.HasComponent(entityID) ||
+					!storage2.HasComponent(entityID) ||
+					!storage3.HasComponent(entityID) ||
+					!storage4.HasComponent(entityID) ||
+					!storage5.HasComponent(entityID) ||
+					!storage6.HasComponent(entityID)
+				) continue;
 
-            int l    = --length;
-            int next = i + 1;
-            int size = l - i;
 
+				if (length == entities.Length)
+				{
+					int len = length << 1;
 
-            Array.Copy(entities, next, entities, i, size);
-        }
+					Array.Resize(ref entities, len);
+				}
 
 
-        protected override void OnDispose()
-        {
-        }
-    }
+				indexLast = length++;
 
+				entities[indexLast] = entityID;
+			}
+		}
 
-    public class Group<T, Y, U, I, O, P, A> : GroupBase where T : IComponent, new()
-                                                        where Y : new()
-                                                        where U : new()
-                                                        where I : new()
-                                                        where O : new()
-                                                        where P : new()
-                                                        where A : new()
-    {
-        Storage<T> storage = Storage<T>.Instance;
-        Storage<Y> storage2 = Storage<Y>.Instance;
-        Storage<U> storage3 = Storage<U>.Instance;
-        Storage<I> storage4 = Storage<I>.Instance;
-        Storage<O> storage5 = Storage<O>.Instance;
-        Storage<P> storage6 = Storage<P>.Instance;
-        Storage<A> storage7 = Storage<A>.Instance;
 
-        public override void TryAdd(int entity)
-        {
-            if (!storage.HasComponent(entity) ||
-                !storage2.HasComponent(entity) ||
-                !storage3.HasComponent(entity) ||
-                !storage4.HasComponent(entity) ||
-                !storage5.HasComponent(entity) ||
-                !storage6.HasComponent(entity) ||
-                !storage7.HasComponent(entity)
-            ) return;
+		protected override void RemoveAt(int i)
+		{
+			if (Remove != null)
+				Remove(entities[i]);
 
-            if (entities.Length <= length)
-            {
-                int len = length << 1;
+			int l    = --length;
+			int next = i + 1;
+			int size = l - i;
 
-                Array.Resize(ref entities, len);
-            }
 
-            indexLast = length++;
+			Array.Copy(entities, next, entities, i, size);
+		}
 
-            entities[indexLast] = entity;
 
+		protected override void OnDispose() { }
+	}
 
-            if (Add != null)
-                Add(entity);
-        }
 
+	public class Group<T, Y, U, I, O, P, A> : GroupBase where T : IComponent, new()
+			where Y : new()
+			where U : new()
+			where I : new()
+			where O : new()
+			where P : new()
+			where A : new()
+	{
+		Storage<T> storage = Storage<T>.Instance;
+		Storage<Y> storage2 = Storage<Y>.Instance;
+		Storage<U> storage3 = Storage<U>.Instance;
+		Storage<I> storage4 = Storage<I>.Instance;
+		Storage<O> storage5 = Storage<O>.Instance;
+		Storage<P> storage6 = Storage<P>.Instance;
+		Storage<A> storage7 = Storage<A>.Instance;
 
-        public override void Populate()
-        {
-            storage.groups.Add(this);
-            storage2.groups.Add(this);
-            storage3.groups.Add(this);
-            storage4.groups.Add(this);
-            storage5.groups.Add(this);
-            storage6.groups.Add(this);
-            storage7.groups.Add(this);
+		public override void TryAdd(int entity)
+		{
+			if (!storage.HasComponent(entity) ||
+				!storage2.HasComponent(entity) ||
+				!storage3.HasComponent(entity) ||
+				!storage4.HasComponent(entity) ||
+				!storage5.HasComponent(entity) ||
+				!storage6.HasComponent(entity) ||
+				!storage7.HasComponent(entity)
+			) return;
 
-            for (int i = 0; i < Actor.lastID; i++)
-            {
-                var e = Actor.entites[i];
+			if (entities.Length <= length)
+			{
+				int len = length << 1;
 
-                if (e == null || !e.state.enabled) continue;
+				Array.Resize(ref entities, len);
+			}
 
-                if (composition.include.Length > 0)
-                    if (!e.entity.Has(composition.include))
-                        continue;
+			indexLast = length++;
 
-                if (composition.exclude.Length > 0)
-                    if (e.entity.HasAny(composition.exclude))
-                        continue;
-                int entityID = e.entity;
-                if (!storage.HasComponent(entityID) ||
-                    !storage2.HasComponent(entityID) ||
-                    !storage3.HasComponent(entityID) ||
-                    !storage4.HasComponent(entityID) ||
-                    !storage5.HasComponent(entityID) ||
-                    !storage6.HasComponent(entityID) ||
-                    !storage7.HasComponent(entityID)
-                ) continue;
+			entities[indexLast] = entity;
 
 
-                if (length == entities.Length)
-                {
-                    int len = length << 1;
+			if (Add != null)
+				Add(entity);
+		}
 
-                    Array.Resize(ref entities, len);
-                }
 
+		public override void Populate()
+		{
+			storage.groups.Add(this);
+			storage2.groups.Add(this);
+			storage3.groups.Add(this);
+			storage4.groups.Add(this);
+			storage5.groups.Add(this);
+			storage6.groups.Add(this);
+			storage7.groups.Add(this);
 
-                indexLast = length++;
+			for (int i = 0; i < ProcessingEntities.lastID; i++)
+			{
+				var e = ProcessingEntities.storageActor[i];
 
-                entities[indexLast] = entityID;
-            }
-        }
+				if (e == null || !e.conditionEnabled) continue;
 
+				if (composition.include.Length > 0)
+					if (!e.entity.Has(composition.include))
+						continue;
 
-        protected override void RemoveAt(int i)
-        {
-            if (Remove != null)
-                Remove(entities[i]);
+				if (composition.exclude.Length > 0)
+					if (e.entity.HasAny(composition.exclude))
+						continue;
+				int entityID = e.entity;
+				if (!storage.HasComponent(entityID) ||
+					!storage2.HasComponent(entityID) ||
+					!storage3.HasComponent(entityID) ||
+					!storage4.HasComponent(entityID) ||
+					!storage5.HasComponent(entityID) ||
+					!storage6.HasComponent(entityID) ||
+					!storage7.HasComponent(entityID)
+				) continue;
 
-            int l    = --length;
-            int next = i + 1;
-            int size = l - i;
 
+				if (length == entities.Length)
+				{
+					int len = length << 1;
 
-            Array.Copy(entities, next, entities, i, size);
-        }
+					Array.Resize(ref entities, len);
+				}
 
 
-        protected override void OnDispose()
-        {
-        }
-    }
+				indexLast = length++;
 
+				entities[indexLast] = entityID;
+			}
+		}
 
-    public class Group<T, Y, U, I, O, P, A, S> : GroupBase where T : IComponent, new()
-                                                           where Y : new()
-                                                           where U : new()
-                                                           where I : new()
-                                                           where O : new()
-                                                           where P : new()
-                                                           where A : new()
-                                                           where S : new()
-    {
-        Storage<T> storage = Storage<T>.Instance;
-        Storage<Y> storage2 = Storage<Y>.Instance;
-        Storage<U> storage3 = Storage<U>.Instance;
-        Storage<I> storage4 = Storage<I>.Instance;
-        Storage<O> storage5 = Storage<O>.Instance;
-        Storage<P> storage6 = Storage<P>.Instance;
-        Storage<A> storage7 = Storage<A>.Instance;
-        Storage<S> storage8 = Storage<S>.Instance;
 
-        public override void TryAdd(int entity)
-        {
-            if (!storage.HasComponent(entity) ||
-                !storage2.HasComponent(entity) ||
-                !storage3.HasComponent(entity) ||
-                !storage4.HasComponent(entity) ||
-                !storage5.HasComponent(entity) ||
-                !storage6.HasComponent(entity) ||
-                !storage7.HasComponent(entity) ||
-                !storage8.HasComponent(entity)
-            ) return;
+		protected override void RemoveAt(int i)
+		{
+			if (Remove != null)
+				Remove(entities[i]);
 
-            if (entities.Length <= length)
-            {
-                int len = length << 1;
+			int l    = --length;
+			int next = i + 1;
+			int size = l - i;
 
-                Array.Resize(ref entities, len);
-            }
 
-            indexLast = length++;
+			Array.Copy(entities, next, entities, i, size);
+		}
 
-            entities[indexLast] = entity;
 
+		protected override void OnDispose() { }
+	}
 
-            if (Add != null)
-                Add(entity);
-        }
 
+	public class Group<T, Y, U, I, O, P, A, S> : GroupBase where T : IComponent, new()
+			where Y : new()
+			where U : new()
+			where I : new()
+			where O : new()
+			where P : new()
+			where A : new()
+			where S : new()
+	{
+		Storage<T> storage = Storage<T>.Instance;
+		Storage<Y> storage2 = Storage<Y>.Instance;
+		Storage<U> storage3 = Storage<U>.Instance;
+		Storage<I> storage4 = Storage<I>.Instance;
+		Storage<O> storage5 = Storage<O>.Instance;
+		Storage<P> storage6 = Storage<P>.Instance;
+		Storage<A> storage7 = Storage<A>.Instance;
+		Storage<S> storage8 = Storage<S>.Instance;
 
-        public override void Populate()
-        {
-            storage.groups.Add(this);
-            storage2.groups.Add(this);
-            storage3.groups.Add(this);
-            storage4.groups.Add(this);
-            storage5.groups.Add(this);
-            storage6.groups.Add(this);
-            storage7.groups.Add(this);
-            storage8.groups.Add(this);
+		public override void TryAdd(int entity)
+		{
+			if (!storage.HasComponent(entity) ||
+				!storage2.HasComponent(entity) ||
+				!storage3.HasComponent(entity) ||
+				!storage4.HasComponent(entity) ||
+				!storage5.HasComponent(entity) ||
+				!storage6.HasComponent(entity) ||
+				!storage7.HasComponent(entity) ||
+				!storage8.HasComponent(entity)
+			) return;
 
-            for (int i = 0; i < Actor.lastID; i++)
-            {
-                var e = Actor.entites[i];
+			if (entities.Length <= length)
+			{
+				int len = length << 1;
 
-                if (e == null || !e.state.enabled) continue;
+				Array.Resize(ref entities, len);
+			}
 
-                if (composition.include.Length > 0)
-                    if (!e.entity.Has(composition.include))
-                        continue;
+			indexLast = length++;
 
-                if (composition.exclude.Length > 0)
-                    if (e.entity.HasAny(composition.exclude))
-                        continue;
-                int entityID = e.entity;
-                if (!storage.HasComponent(entityID) ||
-                    !storage2.HasComponent(entityID) ||
-                    !storage3.HasComponent(entityID) ||
-                    !storage4.HasComponent(entityID) ||
-                    !storage5.HasComponent(entityID) ||
-                    !storage6.HasComponent(entityID) ||
-                    !storage7.HasComponent(entityID) ||
-                    !storage8.HasComponent(entityID)
-                ) continue;
+			entities[indexLast] = entity;
 
 
-                if (length == entities.Length)
-                {
-                    int len = length << 1;
+			if (Add != null)
+				Add(entity);
+		}
 
-                    Array.Resize(ref entities, len);
-                }
 
+		public override void Populate()
+		{
+			storage.groups.Add(this);
+			storage2.groups.Add(this);
+			storage3.groups.Add(this);
+			storage4.groups.Add(this);
+			storage5.groups.Add(this);
+			storage6.groups.Add(this);
+			storage7.groups.Add(this);
+			storage8.groups.Add(this);
 
-                indexLast = length++;
+			for (int i = 0; i < ProcessingEntities.lastID; i++)
+			{
+				var e = ProcessingEntities.storageActor[i];
 
-                entities[indexLast] = entityID;
-            }
-        }
+				if (e == null || !e.conditionEnabled) continue;
 
+				if (composition.include.Length > 0)
+					if (!e.entity.Has(composition.include))
+						continue;
 
-        protected override void RemoveAt(int i)
-        {
-            if (Remove != null)
-                Remove(entities[i]);
+				if (composition.exclude.Length > 0)
+					if (e.entity.HasAny(composition.exclude))
+						continue;
+				int entityID = e.entity;
+				if (!storage.HasComponent(entityID) ||
+					!storage2.HasComponent(entityID) ||
+					!storage3.HasComponent(entityID) ||
+					!storage4.HasComponent(entityID) ||
+					!storage5.HasComponent(entityID) ||
+					!storage6.HasComponent(entityID) ||
+					!storage7.HasComponent(entityID) ||
+					!storage8.HasComponent(entityID)
+				) continue;
 
-            int l    = --length;
-            int next = i + 1;
-            int size = l - i;
 
+				if (length == entities.Length)
+				{
+					int len = length << 1;
 
-            Array.Copy(entities, next, entities, i, size);
-        }
+					Array.Resize(ref entities, len);
+				}
 
 
-        protected override void OnDispose()
-        {
-        }
-    }
+				indexLast = length++;
 
+				entities[indexLast] = entityID;
+			}
+		}
 
-    public class  Group<T, Y, U, I, O, P, A, S, D> : GroupBase where T : IComponent, new()
-                                                              where Y : new()
-                                                              where U : new()
-                                                              where I : new()
-                                                              where O : new()
-                                                              where P : new()
-                                                              where A : new()
-                                                              where S : new()
-                                                              where D : new()
-    {
-        Storage<T> storage = Storage<T>.Instance;
-        Storage<Y> storage2 = Storage<Y>.Instance;
-        Storage<U> storage3 = Storage<U>.Instance;
-        Storage<I> storage4 = Storage<I>.Instance;
-        Storage<O> storage5 = Storage<O>.Instance;
-        Storage<P> storage6 = Storage<P>.Instance;
-        Storage<A> storage7 = Storage<A>.Instance;
-        Storage<S> storage8 = Storage<S>.Instance;
-        Storage<D> storage9 = Storage<D>.Instance;
 
-        public override void TryAdd(int entity)
-        {
-            if (!storage.HasComponent(entity) ||
-                !storage2.HasComponent(entity) ||
-                !storage3.HasComponent(entity) ||
-                !storage4.HasComponent(entity) ||
-                !storage5.HasComponent(entity) ||
-                !storage6.HasComponent(entity) ||
-                !storage7.HasComponent(entity) ||
-                !storage8.HasComponent(entity) ||
-                !storage9.HasComponent(entity)
-            ) return;
+		protected override void RemoveAt(int i)
+		{
+			if (Remove != null)
+				Remove(entities[i]);
 
-            if (entities.Length <= length)
-            {
-                int len = length << 1;
+			int l    = --length;
+			int next = i + 1;
+			int size = l - i;
 
-                Array.Resize(ref entities, len);
-            }
 
-            indexLast = length++;
+			Array.Copy(entities, next, entities, i, size);
+		}
 
-            entities[indexLast] = entity;
 
+		protected override void OnDispose() { }
+	}
 
-            if (Add != null)
-                Add(entity);
-        }
 
+	public class Group<T, Y, U, I, O, P, A, S, D> : GroupBase where T : IComponent, new()
+			where Y : new()
+			where U : new()
+			where I : new()
+			where O : new()
+			where P : new()
+			where A : new()
+			where S : new()
+			where D : new()
+	{
+		Storage<T> storage = Storage<T>.Instance;
+		Storage<Y> storage2 = Storage<Y>.Instance;
+		Storage<U> storage3 = Storage<U>.Instance;
+		Storage<I> storage4 = Storage<I>.Instance;
+		Storage<O> storage5 = Storage<O>.Instance;
+		Storage<P> storage6 = Storage<P>.Instance;
+		Storage<A> storage7 = Storage<A>.Instance;
+		Storage<S> storage8 = Storage<S>.Instance;
+		Storage<D> storage9 = Storage<D>.Instance;
 
-        public override void Populate()
-        {
-            storage.groups.Add(this);
-            storage2.groups.Add(this);
-            storage3.groups.Add(this);
-            storage4.groups.Add(this);
-            storage5.groups.Add(this);
-            storage6.groups.Add(this);
-            storage7.groups.Add(this);
-            storage8.groups.Add(this);
-            storage9.groups.Add(this);
-            for (int i = 0; i < Actor.lastID; i++)
-            {
-                var e = Actor.entites[i];
+		public override void TryAdd(int entity)
+		{
+			if (!storage.HasComponent(entity) ||
+				!storage2.HasComponent(entity) ||
+				!storage3.HasComponent(entity) ||
+				!storage4.HasComponent(entity) ||
+				!storage5.HasComponent(entity) ||
+				!storage6.HasComponent(entity) ||
+				!storage7.HasComponent(entity) ||
+				!storage8.HasComponent(entity) ||
+				!storage9.HasComponent(entity)
+			) return;
 
-                if (e == null || !e.state.enabled) continue;
+			if (entities.Length <= length)
+			{
+				int len = length << 1;
 
-                if (composition.include.Length > 0)
-                    if (!e.entity.Has(composition.include))
-                        continue;
+				Array.Resize(ref entities, len);
+			}
 
-                if (composition.exclude.Length > 0)
-                    if (e.entity.HasAny(composition.exclude))
-                        continue;
-                int entityID = e.entity;
-                if (!storage.HasComponent(entityID) ||
-                    !storage2.HasComponent(entityID) ||
-                    !storage3.HasComponent(entityID) ||
-                    !storage4.HasComponent(entityID) ||
-                    !storage5.HasComponent(entityID) ||
-                    !storage6.HasComponent(entityID) ||
-                    !storage7.HasComponent(entityID) ||
-                    !storage8.HasComponent(entityID) ||
-                    !storage9.HasComponent(entityID)
-                ) continue;
+			indexLast = length++;
 
+			entities[indexLast] = entity;
 
-                if (length == entities.Length)
-                {
-                    int len = length << 1;
 
-                    Array.Resize(ref entities, len);
-                }
+			if (Add != null)
+				Add(entity);
+		}
 
 
-                indexLast = length++;
+		public override void Populate()
+		{
+			storage.groups.Add(this);
+			storage2.groups.Add(this);
+			storage3.groups.Add(this);
+			storage4.groups.Add(this);
+			storage5.groups.Add(this);
+			storage6.groups.Add(this);
+			storage7.groups.Add(this);
+			storage8.groups.Add(this);
+			storage9.groups.Add(this);
+			for (int i = 0; i < ProcessingEntities.lastID; i++)
+			{
+				var e = ProcessingEntities.storageActor[i];
 
-                entities[indexLast] = entityID;
-            }
-        }
+				if (e == null || !e.conditionEnabled) continue;
 
+				if (composition.include.Length > 0)
+					if (!e.entity.Has(composition.include))
+						continue;
 
-        protected override void RemoveAt(int i)
-        {
-            if (Remove != null)
-                Remove(entities[i]);
+				if (composition.exclude.Length > 0)
+					if (e.entity.HasAny(composition.exclude))
+						continue;
+				int entityID = e.entity;
+				if (!storage.HasComponent(entityID) ||
+					!storage2.HasComponent(entityID) ||
+					!storage3.HasComponent(entityID) ||
+					!storage4.HasComponent(entityID) ||
+					!storage5.HasComponent(entityID) ||
+					!storage6.HasComponent(entityID) ||
+					!storage7.HasComponent(entityID) ||
+					!storage8.HasComponent(entityID) ||
+					!storage9.HasComponent(entityID)
+				) continue;
 
-            int l    = --length;
-            int next = i + 1;
-            int size = l - i;
 
+				if (length == entities.Length)
+				{
+					int len = length << 1;
 
-            Array.Copy(entities, next, entities, i, size);
-        }
+					Array.Resize(ref entities, len);
+				}
 
 
-        protected override void OnDispose()
-        {
-        }
-    }
+				indexLast = length++;
+
+				entities[indexLast] = entityID;
+			}
+		}
+
+
+		protected override void RemoveAt(int i)
+		{
+			if (Remove != null)
+				Remove(entities[i]);
+
+			int l    = --length;
+			int next = i + 1;
+			int size = l - i;
+
+
+			Array.Copy(entities, next, entities, i, size);
+		}
+
+
+		protected override void OnDispose() { }
+	}
 }

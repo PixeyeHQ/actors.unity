@@ -19,7 +19,7 @@ namespace Homebrew
     {
         
       
-        [FoldoutGroup("SetupData")] public Blueprints blueprints;
+       // [FoldoutGroup("SetupData")] public Blueprints blueprints;
  
         [FoldoutGroup("SetupData")] public DataGame dataGameSettings;
         [FoldoutGroup("SetupData")] public DataGame dataGameSession;
@@ -30,7 +30,7 @@ namespace Homebrew
         private void Awake()
         {
        
-            Toolbox.Add(blueprints);
+           // Toolbox.Add(blueprints);
  
             Time.Default = Toolbox.Create<Time>();
             ProcessingTimer.Default = Toolbox.Create<ProcessingTimer>();

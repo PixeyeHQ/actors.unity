@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
+using UnityEditor;
 using UnityEngine;
 
 namespace Homebrew
@@ -115,11 +116,10 @@ namespace Homebrew
 
 		#region ACTORS
 
-		public static void Release(this int entity, bool isActor = false)
+		public static void Release(this int entity)
 		{
 			var composer = new EntityComposer(entity, 1);
-			var cRelease = composer.Add<ComponentRelease>();
-			cRelease.isActor = isActor;
+			composer.Add<ComponentRelease>();
 			composer.Deploy();
 		}
 
@@ -128,7 +128,7 @@ namespace Homebrew
 		{
 			if (isActor)
 			{
-				Actor.entites[entity].Release();
+				ProcessingEntities.storageActor[entity].Release();
 				return;
 			}
 
@@ -139,35 +139,41 @@ namespace Homebrew
 			}
 
 			Tags.Clear(entity);
-			Actor.prevID.Push(entity);
+			ProcessingEntities.prevID.Push(entity);
 		}
 
+		public static MonoEntity GetMonoEntity(this int entity) { return entity.ComponentObject().transform.GetComponent<MonoEntity>(); }
 
-		public static Actor GetActor(this int entity) { return Actor.entites[entity]; }
-
-
-		public static GameObject GameObject(this int entity) { return entity.ComponentObject().obj; }
+		public static GameObject GameObject(this int entity) { return entity.ComponentObject().transform.gameObject; }
 
 		public static Transform Transform(this int entity) { return entity.ComponentObject().transform; }
 
 		public static T Create<T>(this int entity) where T : IComponent, new() { return Storage<T>.Instance.GetOrCreate(entity); }
 
-		public static T Get<T>(this ComponentObject component, int hash) { return component.cachedTransforms[hash].GetComponent<T>(); }
-
 		public static T Get<T>(this ComponentObject component, string path) { return component.transform.Find(path).GetComponent<T>(); }
 
-		public static GameObject Get(this int entity, int hash) { return entity.ComponentObject().cachedTransforms[hash].gameObject; }
-
-		public static T Get<T>(this int entity, int hash) { return entity.ComponentObject().cachedTransforms[hash].GetComponent<T>(); }
-
 		public static T Get<T>(this int entity, string path) { return entity.ComponentObject().transform.Find(path).GetComponent<T>(); }
-
 
 		public static bool Has<T>(this int entity) where T : IComponent, new() { return Storage<T>.Instance.HasComponent(entity); }
 
 		public static void Add<T>(this int entity, T component) where T : new() { Storage<T>.Instance.Add(component, entity); }
 
-		public static T Add<T>(this int entity) where T : new() { return Storage<T>.Instance.Add(entity); }
+		public static T Add<T>(this int entity) where T : new() { return entity.CheckMonoConditions() ? Storage<T>.Instance.Add(entity) : Storage<T>.Instance.GetOrCreate(entity); }
+
+
+		public static bool CheckMonoConditions(this int entity)
+		{
+			var storage = ProcessingEntities.storageActor;
+			var mono    = storage.Length > entity ? storage[entity] : null;
+			return mono != null ? mono.conditionEnabled : true;
+		}
+
+		public static void ForceDeploy(this Actor a)
+		{
+			a.conditionManualDeploy = false;
+			a.conditionEnabled = true;
+			ProcessingEntities.Default.CheckGroups(a.entity, true);
+		}
 
 		public static void Remove<T>(this Actor a) where T : new() { Storage<T>.Instance.Remove(a.entity, false); }
 
@@ -621,6 +627,24 @@ namespace Homebrew
 		#endregion
 
 		#region TRANSFORMS
+
+		public static T AddGet<T>(this GameObject co) where T : Component
+		{
+			var c = co.GetComponent<T>();
+			if (c == null)
+				c = co.AddComponent<T>();
+
+			return c;
+		}
+
+		public static T AddGet<T>(this Transform co) where T : Component
+		{
+			var c = co.GetComponent<T>();
+			if (c == null)
+				c = co.gameObject.AddComponent<T>();
+
+			return c;
+		}
 
 		public static T Find<T>(this GameObject go, string path) { return go.transform.Find(path).GetComponent<T>(); }
 

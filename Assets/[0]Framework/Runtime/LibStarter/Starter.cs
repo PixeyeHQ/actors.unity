@@ -16,15 +16,19 @@ using Sirenix.OdinInspector;
 
 namespace Homebrew
 {
-// Start any game    
+// Start any game  
+
 	public class Starter : MonoBehaviour
 	{
 		public static bool initialized;
 
-		[FoldoutGroup("SetupData")] public List<FactoryBase> factories;
-		[FoldoutGroup("SetupData")] public List<SceneField> ScenesToKeep;
-		[FoldoutGroup("SetupData")] public List<SceneField> SceneDependsOn;
 
+		[FoldoutGroup("Setup")] public List<FactoryBase> factories;
+		[FoldoutGroup("Setup")] public List<SceneField> ScenesToKeep;
+		[FoldoutGroup("Setup")] public List<SceneField> SceneDependsOn;
+
+		[FoldoutGroup("Actors Pool Cache")]
+		public List<PoolNode> nodes = new List<PoolNode>();
 
 		void Awake()
 		{
@@ -41,23 +45,67 @@ namespace Homebrew
 			ProcessingSceneLoad.Default.Setup(ScenesToKeep, SceneDependsOn, this);
 		}
 
+		#if UNITY_EDITOR
+		public void CheckNodes() { nodes.RemoveAll(n => n.prefab == null); }
+
+		public int AddToNode(GameObject prefab, GameObject instance, int pool)
+		{
+			var id = prefab.GetInstanceID();
+		 
+			var node = nodes.Find(n => n.id == id);
+			if (node == null)
+			{
+				node = new PoolNode();
+				node.id = id;
+				node.prefab = prefab;
+				node.pool = pool;
+				node.createdObjs = new List<GameObject>();
+				node.createdObjs.Add(instance.gameObject);
+				nodes.Add(node);
+			}
+			else
+			{
+				node.createdObjs.Add(instance.gameObject);
+			}
+
+			return id;
+		}
+
+		public void RemoveFromNode(int id, GameObject instance)
+		{
+			var node = nodes.Find(n => n.id == id);
+			if (node == null)
+			{
+			}
+			else
+			{
+				node.createdObjs.Remove(instance);
+			}
+		}
+		#endif
 
 		public void BindScene()
 		{
-	 
-			var poolReg = GetComponent<PoolRegister>();
-			if (poolReg) poolReg.Reigster();
-
+			for (int i = 0; i < nodes.Count; i++)
+			{
+				nodes[i].Populate();
+			}
+            
+			 
 			Setup();
 
 			initialized = true;
 
-			var objs = FindObjectsOfType<MonoCached>();
+			var objs = FindObjectsOfType<MonoBehaviour>();
 
 			for (var i = 0; i < objs.Length; i++)
 			{
-				if (objs[i].state.requireStarter)
-					objs[i].SetupAfterStarter();
+				var obj  = objs[i];
+				var ireq = obj as IRequireStarter;
+				if (ireq != null)
+				{
+					ireq.SetupAfterStarter();
+				}
 			}
 
 
@@ -69,6 +117,7 @@ namespace Homebrew
 		}
 
 		protected static T Add<T>() where T : new() { return Toolbox.Add<T>(); }
+
 
 		protected virtual void Setup() { }
 
