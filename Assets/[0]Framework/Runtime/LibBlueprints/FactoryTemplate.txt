@@ -2,8 +2,8 @@
 using UnityEngine;
 namespace Homebrew{
 [CreateAssetMenu(fileName = "Factory &NAME&", menuName = "Actors/Factories/&NAME&")]
-public class ##NAME## : Factory
+public class ##NAME## : Factory<##NAME##>
 {
-     
+     	 
 }
 }

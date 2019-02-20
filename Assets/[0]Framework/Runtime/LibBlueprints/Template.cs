@@ -11,7 +11,13 @@ public abstract class Template : ScriptableObject, IComponent
 {
 	Dictionary<int, object> storage = new Dictionary<int, object>();
 
-	protected virtual void OnEnable() { storage.Clear(); }
+	protected void OnEnable()
+	{
+		storage.Clear();
+		Setup();
+	}
+
+	protected abstract void Setup();
 
 	public T Get<T>()
 	{
