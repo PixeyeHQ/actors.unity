@@ -14,7 +14,7 @@ namespace Homebrew
 	{
 		bool conditionSignals;
 
-	 
+
 		protected override void Awake()
 		{
 			#if UNITY_EDITOR
@@ -38,7 +38,7 @@ namespace Homebrew
 
 			conditionSignals = ProcessingSignals.Check(this);
 			conditionManualDeploy = this is IManualDeploy;
-			
+
 			ProcessingEntities.Create(this);
 
 			var cObject = Add<ComponentObject>();
@@ -55,14 +55,14 @@ namespace Homebrew
 			}
 			#endif
 
-			if (Starter.initialized == false)
+			if (Starter.initialized == false) return;
 			if (conditionManualDeploy) return;
-			
-				ProcessingUpdate.Default.Add(this);
+
+			ProcessingUpdate.Default.Add(this);
 
 			if (conditionSignals)
 				ProcessingSignals.Default.Add(this);
- 
+
 			ProcessingEntities.Default.CheckGroups(entity, true);
 		}
 
@@ -77,9 +77,8 @@ namespace Homebrew
 
 			if (conditionSignals)
 				ProcessingSignals.Default.Remove(this);
-			
-		 
-			
+
+
 			ProcessingUpdate.Default.Remove(this);
 			ProcessingEntities.Default.CheckGroups(entity, false);
 		}
