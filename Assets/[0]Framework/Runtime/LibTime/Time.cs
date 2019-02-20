@@ -6,6 +6,8 @@ Date:       1/31/2018  8:17 PM
 ================================================================*/
 
 
+using UnityEngine;
+
 namespace Homebrew
 {
 	public class Time : ITick, IKernel, IComponent
@@ -29,7 +31,7 @@ namespace Homebrew
 		public float timeScaleCached = 1;
 
 
-		public Time() { }
+		public Time() { ProcessingUpdate.Default.Add(this); }
 
 		public void OnFocus() { _lastFrame = UnityEngine.Time.realtimeSinceStartup; }
 
