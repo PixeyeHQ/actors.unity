@@ -152,6 +152,8 @@ namespace Homebrew
 
 		public static T Get<T>(this ComponentObject component, string path) { return component.transform.Find(path).GetComponent<T>(); }
 
+		public static T Get<T>(this ComponentObject component) { return component.transform.gameObject.GetComponent<T>(); }
+
 		public static T Get<T>(this int entity, string path) { return entity.ComponentObject().transform.Find(path).GetComponent<T>(); }
 
 		public static bool Has<T>(this int entity) where T : IComponent, new() { return Storage<T>.Instance.HasComponent(entity); }
