@@ -23,7 +23,7 @@ public class TagRegistrator : MonoBehaviour
 #if UNITY_EDITOR    
     void Awake()
     {
-        if(Application.isPlaying) return;
+        if (Application.isPlaying) return;
         Execute();
     }
 #endif
@@ -133,7 +133,13 @@ public class TagRegistrator : MonoBehaviour
                         // Находим свободный id
                         int l_int = 0;
                         if (freeIdTags.Count == 0)
-                            l_int = ++lastIndex;
+                        {
+                            do
+                            {
+                                l_int = ++lastIndex;
+                            } while (idTags.Contains(l_int));
+
+                        }
                         else
                         {
                             l_int = freeIdTags[0];
