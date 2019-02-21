@@ -55,28 +55,28 @@ namespace Homebrew
 			return transform;
 		}
 
-		public void Add(Actor me)
+		public void Add(Actor actor)
 		{
-			me.conditionManualDeploy = manualDeploy;
-			EntityComposer entityComposer = new EntityComposer(me.entity, components.Length);
+			actor.conditionManualDeploy = manualDeploy;
+			EntityComposer entityComposer = new EntityComposer(actor.entity, components.Length);
 			for (int i = 0; i < components.Length; i++)
 			{
 				components[i].AsClone(ref entityComposer);
 			}
 
-			Tags.AddTagsRaw(me.entity, tags);
+			Tags.AddTagsRaw(actor.entity, tags);
 		}
 
-		public void Setup(Actor me)
+		public void Setup(Actor actor)
 		{
-			EntityComposer entityComposer = new EntityComposer(me.entity, components.Length);
+			EntityComposer entityComposer = new EntityComposer(actor.entity, components.Length);
 			for (int i = 0; i < components.Length; i++)
 			{
 				components[i].AsClone(ref entityComposer);
 			}
 
-			Tags.Clear(me.entity);
-			Tags.AddTagsRaw(me.entity, tags);
+			Tags.Clear(actor.entity);
+			Tags.AddTagsRaw(actor.entity, tags);
 		}
 	}
 }
