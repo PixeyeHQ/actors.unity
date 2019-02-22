@@ -62,12 +62,8 @@ public class TagRegistrator : MonoBehaviour
                     while (!sr.EndOfStream)
                     {
                         var str = sr.ReadLine();
-                        // Debug.Log(str);
-                        // if (str != "")
-                        // {
                         var e = int.Parse(str);
                         freeIdTags.Add(e);
-                        // }
                     }
                 }
             }
@@ -101,7 +97,6 @@ public class TagRegistrator : MonoBehaviour
 
     static void TagRegist()
     {
-        // Debug.Log(freeIdTags.Count);
         string[] Files = Directory.GetFiles(path, "*.cs");
 
         int count = 0;
@@ -138,7 +133,6 @@ public class TagRegistrator : MonoBehaviour
                             {
                                 l_int = ++lastIndex;
                             } while (idTags.Contains(l_int));
-
                         }
                         else
                         {
@@ -155,6 +149,7 @@ public class TagRegistrator : MonoBehaviour
                         string line = lines[i].Substring(ind);
                         line = line.Remove(line.LastIndexOf(';'));
                         int idTag = int.Parse(line);
+                        if (idTags.Contains(idTag)) Debug.LogWarning("Теги имеют одинаковый Id: " + idTag);
                         idTags.Add(idTag);
                     }
                 }
@@ -177,7 +172,6 @@ public class TagRegistrator : MonoBehaviour
                 freeIdTags.Add(i);
         }
 
-        // Debug.Log("Count "+ freeIdTags.Count);
         Save();
 
         isReset = false;
