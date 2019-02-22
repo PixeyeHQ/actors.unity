@@ -105,10 +105,7 @@ public class StarterLevel1 : Starter
 
 }
 ```
-Note that you always need to load kernel scene with starter in order to work correctly.
-![Starter](https://i.gyazo.com/9f8964dad3333abbe57a9d3f35c3cc5e.png)
 
-
-SceneKernel must be both in scenes to keep and in scenes depends on. Also don't forget to add scenes into the build settings. The order of scenes doesn't matter.
-
-[![Image from Gyazo](https://i.gyazo.com/00c0b22d0a76651945711171cbad1372.png)](https://gyazo.com/00c0b22d0a76651945711171cbad1372)
+## More info
+* [Examples](https://github.com/dimmpixeye/ecs-Examples)
+ 
