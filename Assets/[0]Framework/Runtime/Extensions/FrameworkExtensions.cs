@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
-using UnityEditor;
 using UnityEngine;
 
 namespace Homebrew
@@ -116,6 +115,43 @@ namespace Homebrew
 
 		#region ACTORS
 
+		public static List<int> FindValidNodes(this List<PoolNode> list, int id)
+		{
+			var l = new List<int>();
+			for (int i = 0; i < list.Count; i++)
+			{
+				if (list[i].id == id)
+					l.Add(i);
+			}
+
+			return l;
+		}
+
+		public static int FindValidNode(this List<PoolNode> list, int id, int pool)
+		{
+			for (int i = 0; i < list.Count; i++)
+			{
+				var l = list[i];
+				if (l.id == id && l.pool == pool)
+					return i;
+			}
+
+			return -1;
+		}
+
+		public static int FindInstanceID<T>(this List<T> list, T target) where T : UnityEngine.Object
+		{
+			int targetID = target.GetInstanceID();
+
+			for (int i = 0; i < list.Count; i++)
+			{
+				if (list[i].GetInstanceID() == targetID)
+					return i;
+			}
+
+			return -1;
+		}
+
 		public static void Release(this int entity)
 		{
 			var composer = new EntityComposer(entity, 1);
@@ -150,9 +186,9 @@ namespace Homebrew
 
 		public static T Create<T>(this int entity) where T : IComponent, new() { return Storage<T>.Instance.GetOrCreate(entity); }
 
-		public static T Get<T>(this ComponentObject component, string path) { return component.transform.Find(path).GetComponent<T>(); }
-
 		public static T Get<T>(this ComponentObject component) { return component.transform.gameObject.GetComponent<T>(); }
+
+		public static T Get<T>(this ComponentObject component, string path) { return component.transform.Find(path).GetComponent<T>(); }
 
 		public static T Get<T>(this int entity, string path) { return entity.ComponentObject().transform.Find(path).GetComponent<T>(); }
 
@@ -180,6 +216,12 @@ namespace Homebrew
 		public static void Remove<T>(this Actor a) where T : new() { Storage<T>.Instance.Remove(a.entity, false); }
 
 		public static void Remove<T>(this int entity) where T : new() { Storage<T>.Instance.Remove(entity, false); }
+
+		public static void Remove(this int entity, Type t)
+		{
+			var storage = Storage.allDict[t.GetHashCode()];
+			storage.Remove(entity, false);
+		}
 
 		public static T DeepClone<T>(this T obj)
 		{

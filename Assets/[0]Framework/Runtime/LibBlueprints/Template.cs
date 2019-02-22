@@ -17,7 +17,7 @@ public abstract class Template : ScriptableObject, IComponent
 		Setup();
 	}
 
-	protected abstract void Setup();
+	protected virtual void Setup() { }
 
 	public T Get<T>()
 	{

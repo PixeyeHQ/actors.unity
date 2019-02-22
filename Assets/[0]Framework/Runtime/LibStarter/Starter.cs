@@ -7,7 +7,13 @@ Date:       12/09/2017 16:10
 
 
 using System.Collections.Generic;
+using System.Linq;
+using TMPro;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 using UnityEngine;
+
 #if ODIN_INSPECTOR
 using Sirenix.OdinInspector;
 
@@ -23,7 +29,7 @@ namespace Homebrew
 		public static bool initialized;
 
 
-		[FoldoutGroup("Setup")] public List<FactoryBase> factories;
+		[FoldoutGroup("Setup")] public List<Factory> factories;
 		[FoldoutGroup("Setup")] public List<SceneField> ScenesToKeep;
 		[FoldoutGroup("Setup")] public List<SceneField> SceneDependsOn;
 
@@ -46,42 +52,99 @@ namespace Homebrew
 		}
 
 		#if UNITY_EDITOR
-		public void CheckNodes() { nodes.RemoveAll(n => n.prefab == null); }
 
-		public int AddToNode(GameObject prefab, GameObject instance, int pool)
+		public void ClearNodes()
 		{
-			var id = prefab.GetInstanceID();
-		 
-			var node = nodes.Find(n => n.id == id);
-			if (node == null)
+			for (int i = 0; i < nodes.Count; i++)
 			{
-				node = new PoolNode();
+				var n = nodes[i];
+				n.createdObjs.Clear();
+				n.prefab = null;
+			}
+
+			nodes.Clear();
+		}
+
+
+		public void AddToNode(GameObject prefab, GameObject instance, int pool)
+		{
+			var       id                  = prefab.GetInstanceID();
+			var       nodesValid          = nodes.FindValidNodes(id);
+			var       conditionNodeCreate = true;
+			List<int> nodesToKill         = new List<int>();
+
+
+			for (int i = 0; i < nodesValid.Count; i++)
+			{
+				var node = nodes[nodesValid[i]];
+
+				var index = node.createdObjs.FindInstanceID(instance);
+				if (index != -1 && pool != node.pool)
+				{
+					node.createdObjs.RemoveAt(index);
+				}
+				else if (index == -1 && pool == node.pool)
+				{
+					conditionNodeCreate = false;
+					node.createdObjs.Add(instance);
+				}
+
+				if (index != -1 && pool == node.pool)
+				{
+					conditionNodeCreate = false;
+				}
+
+
+				if (node.createdObjs.Count == 0)
+				{
+					node.prefab = null;
+					nodesToKill.Add(nodesValid[i]);
+				}
+			}
+
+			for (int i = 0; i < nodesToKill.Count; i++)
+			{
+				nodes.RemoveAt(nodesToKill[i]);
+			}
+
+			if (conditionNodeCreate)
+			{
+				var node = new PoolNode();
 				node.id = id;
 				node.prefab = prefab;
 				node.pool = pool;
 				node.createdObjs = new List<GameObject>();
-				node.createdObjs.Add(instance.gameObject);
+				node.createdObjs.Add(instance);
 				nodes.Add(node);
 			}
-			else
-			{
-				node.createdObjs.Add(instance.gameObject);
-			}
-
-			return id;
 		}
 
-		public void RemoveFromNode(int id, GameObject instance)
+		public void RemoveFromNode(GameObject instance, int pool)
 		{
-			var node = nodes.Find(n => n.id == id);
-			if (node == null)
+			GameObject prefab;
+			#if UNITY_2018_3_OR_NEWER
+			prefab = PrefabUtility.GetCorrespondingObjectFromSource(instance);
+			#else
+			prefab = PrefabUtility.GetPrefabObject(instance);
+		    #endif
+
+			if (prefab == null) return;
+			var id    = prefab.GetInstanceID();
+			var index = nodes.FindValidNode(id, pool);
+			if (index != -1)
 			{
-			}
-			else
-			{
-				node.createdObjs.Remove(instance);
+				var n = nodes[index];
+
+				n.createdObjs.Remove(instance);
+				if (n.createdObjs.Count == 0)
+				{
+					n.prefab = null;
+					nodes.RemoveAt(index);
+				}
 			}
 		}
+
+
 		#endif
 
 		public void BindScene()
@@ -90,8 +153,12 @@ namespace Homebrew
 			{
 				nodes[i].Populate();
 			}
-            
-			 
+
+			foreach (var factory in factories)
+			{
+				Toolbox.Add(factory);
+			}
+
 			Setup();
 
 			initialized = true;

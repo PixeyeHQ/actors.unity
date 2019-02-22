@@ -2,12 +2,7 @@
 //  Contacts : Pixeye - info@pixeye.games 
 //      Date : 10/16/2018
 
-using System;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
-using UnityEngine;
-
+ 
 namespace Homebrew
 {
 	public abstract class ActorExtended : Actor
@@ -17,25 +12,6 @@ namespace Homebrew
 
 		protected override void Awake()
 		{
-			#if UNITY_EDITOR
-			if (!Application.isPlaying)
-			{
-				#if UNITY_2018_3_OR_NEWER
-				bool isPrefabInstance = PrefabUtility.GetCorrespondingObjectFromSource(gameObject) == null;
-				#else
-				 bool isPrefabInstance = PrefabUtility.GetPrefabObject(gameObject) == null;
-			    #endif
-				if (isPrefabInstance) return;
-				if (prefabID != -1) return;
-				var starter = FindObjectOfType<Starter>();
-				var o       = Resources.Load<GameObject>("Prefabs/" + gameObject.name);
-
-
-				prefabID = starter.AddToNode(o, gameObject, pool);
-				return;
-			}
-			#endif
-
 			conditionSignals = ProcessingSignals.Check(this);
 			conditionManualDeploy = this is IManualDeploy;
 
@@ -48,15 +24,9 @@ namespace Homebrew
 
 		public override void OnEnable()
 		{
-			#if UNITY_EDITOR
-			if (!Application.isPlaying)
-			{
-				return;
-			}
-			#endif
-
 			if (Starter.initialized == false) return;
-			if (conditionManualDeploy) return;
+			if (conditionManualDeploy)
+				return;
 
 			ProcessingUpdate.Default.Add(this);
 
@@ -68,13 +38,6 @@ namespace Homebrew
 
 		public override void OnDisable()
 		{
-			#if UNITY_EDITOR
-			if (!Application.isPlaying)
-			{
-				return;
-			}
-			#endif
-
 			if (conditionSignals)
 				ProcessingSignals.Default.Remove(this);
 
