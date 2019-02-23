@@ -8,7 +8,7 @@ using UnityEngine;
 namespace Homebrew
 {
 	[CreateAssetMenu(fileName = "Template Module", menuName = "Actors/Templates/Module")]
-	public class TemplateActor : TemplateSerialized
+	public class TemplateActor : SerializedScriptableObject
 	{
 		public GameObject model;
 		public bool manualDeploy;
@@ -16,22 +16,7 @@ namespace Homebrew
 
 		[TagFilter(typeof(Tag))]
 		public int[] tags = new int[0];
-
-
-		protected override void OnEnable()
-		{
-			base.OnEnable();
-
-			for (int i = 0; i < components.Length; i++)
-			{
-				var component = components[i];
-				var type      = component.GetType();
-
-				Add(type, component);
-			}
-		}
-
-
+ 
 		public Transform Spawn()
 		{
 			var transform = this.Populate(model);
