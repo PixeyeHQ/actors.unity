@@ -52,7 +52,10 @@ namespace Homebrew
 				var tagField    = Attribute.GetCustomAttribute(objectFields[i], typeof(TagFieldAttribute)) as TagFieldAttribute;
 
 				if (tagField == null) continue;
-				fs.Append(tagField.categoryName).Append("/").Append(myFieldInfo.Name);
+                var nameF = myFieldInfo.Name;
+                var className = tagField.className != null ? tagField.className + "/" : "";
+                var catName = tagField.categoryName != null ? tagField.categoryName + "/" : "";
+                fs.Append(className + catName + nameF);
 				listNames.Add(fs.ToString());
 				fs.Clear();
 				fields.Add(myFieldInfo);
@@ -128,23 +131,25 @@ namespace Homebrew
 		}
  
 
-		static FieldInfo[] ReturnConst(Type t)
-		{
-			var constants = new ArrayList();
+        static FieldInfo[] ReturnConst(Type[] t)
+        {
+            var constants = new ArrayList();
+            List<FieldInfo[]> fieldInfos = new List<FieldInfo[]>();
+            for (int i = 0; i < t.Length; i++)
+            {
+                fieldInfos.Add(t[i].GetFields(
+                BindingFlags.Public | BindingFlags.Static |
+                BindingFlags.FlattenHierarchy));
+            }
+            foreach (var item in fieldInfos)
+                foreach (var fi in item)
+                {
+                    if (fi.IsLiteral && !fi.IsInitOnly)
+                        constants.Add(fi);
+                }
 
-			var fieldInfos = t.GetFields(
-				BindingFlags.Public | BindingFlags.Static |
-				BindingFlags.FlattenHierarchy);
-
-
-			foreach (var fi in fieldInfos)
-
-				if (fi.IsLiteral && !fi.IsInitOnly)
-					constants.Add(fi);
-
-
-			return constants.ToArray(typeof(FieldInfo)) as FieldInfo[];
-		}
+            return constants.ToArray(typeof(FieldInfo)) as FieldInfo[];
+        }
 
 		 
 	}
