@@ -7,8 +7,6 @@ Date:       12/09/2017 16:10
 
 
 using System.Collections.Generic;
-using System.Linq;
-using TMPro;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -16,7 +14,6 @@ using UnityEngine;
 
 #if ODIN_INSPECTOR
 using Sirenix.OdinInspector;
-
 #endif
 
 

@@ -16,12 +16,7 @@ namespace Homebrew
 
 	class AssetCheckPools : AssetPostprocessor, IPreprocessBuildWithReport
 	{
-//		static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths)
-//		{
-//			var starter = GameObject.FindObjectOfType<Starter>();
-//			if (starter != null)
-//				starter.CheckNodes();
-//		}
+ 
 
 		public int callbackOrder => 0;
 

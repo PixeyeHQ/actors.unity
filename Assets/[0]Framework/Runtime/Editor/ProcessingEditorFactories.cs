@@ -12,7 +12,7 @@ using static System.Char;
 public class ProcessingEditorFactories : EndNameEditAction
 {
     public const string PATH_TO_TEMPLATE = @"Assets\[0]Framework\Runtime\LibBlueprints\FactoryTemplate.txt";
-    private const int MENU_ITEM_PRIORITY = 80;
+    private const int MENU_ITEM_PRIORITY = 0;
     private static Texture2D scriptIcon = (EditorGUIUtility.IconContent("cs Script Icon").image as Texture2D);
 
     [MenuItem("Tools/Actors/Add/Factory", false, MENU_ITEM_PRIORITY)]

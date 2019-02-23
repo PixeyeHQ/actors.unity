@@ -1,9 +1,10 @@
-//   Project : Battlecruiser3.0
-//  Contacts : Pixeye - info@pixeye.games 
-//      Date : 8/16/2018
+//   Project : ACTORS
+//   Contacts : Pixeye - info@pixeye.games 
 namespace Homebrew
 {
-    public static class Tag
-    { 
-    }
+	public static class Tag
+	{
+		[TagField(categoryName = "States")]
+		public const int StateNone = -1;
+	}
 }

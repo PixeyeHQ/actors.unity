@@ -13,7 +13,7 @@ using static System.Char;
 public class ProcessingEditorSamples : EndNameEditAction
 {
     public const string PATH_TO_TEMPLATE = @"Assets\[0]Framework\Runtime\LibBlueprints\SampleTemplate.txt";
-    private const int MENU_ITEM_PRIORITY = 60;
+    private const int MENU_ITEM_PRIORITY = 0;
     private static Texture2D scriptIcon = (EditorGUIUtility.IconContent("cs Script Icon").image as Texture2D);
 
     [MenuItem("Tools/Actors/Add/Template", false, MENU_ITEM_PRIORITY)]
