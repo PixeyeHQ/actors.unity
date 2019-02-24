@@ -1,0 +1,16 @@
+{
+    "name": "Homebrew.Framework.Editor",
+    "references": [
+        "Homebrew.Game"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": []
+}

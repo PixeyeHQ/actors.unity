@@ -1,0 +1,20 @@
+/*===============================================================
+Product:    Cryoshock
+Developer:  Dimitry Pixeye - pixeye@hbrew.store
+Company:    Homebrew - http://hbrew.store
+Date:       2/17/2018  9:27 PM
+================================================================*/
+
+namespace Pixeye
+{
+ 
+
+	public interface IReceive<T> : IReceive
+	{
+		void HandleSignal(ref T arg);
+	}
+
+	public interface IReceive
+	{
+	}
+}
