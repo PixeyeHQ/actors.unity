@@ -1,6 +1,5 @@
-//   Project : FrameworkSandBox
-//  Contacts : Pixeye - info@pixeye.games 
-//      Date : 9/16/2018
+//  Project  : ACTORS
+//  Contacts : Pixeye - ask@pixeye.games
 
 namespace Pixeye
 {

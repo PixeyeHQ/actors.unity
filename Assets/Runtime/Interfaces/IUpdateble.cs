@@ -1,10 +1,5 @@
-/*===============================================================
-Product:    Unity3dTools
-Developer:  Dimitry Pixeye - info@pixeye,games
-Company:    Homebrew
-Date:       5/6/2018 2:02 PM
-================================================================*/
-
+//  Project  : ACTORS
+//  Contacts : Pixeye - ask@pixeye.games
 
 namespace Pixeye
 {

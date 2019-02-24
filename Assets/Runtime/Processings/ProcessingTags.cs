@@ -1,9 +1,5 @@
-/*===============================================================
-Product:    Shoot off their lumps
-Developer:  Dimitry Pixeye - pixeye@hbrew.store
-Company:    Homebrew - http://hbrew.store
-Date:       19/12/2017 19:44
-================================================================*/
+//  Project  : ACTORS
+//  Contacts : Pixeye - ask@pixeye.games
 
 
 using System;

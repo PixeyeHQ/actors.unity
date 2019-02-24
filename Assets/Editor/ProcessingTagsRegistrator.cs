@@ -19,8 +19,8 @@ namespace Pixeye
 		static readonly string debugLog2 = "Tags amount: {0} Last ID: <color=#66cc33ff>{1}</color>";
 
 
-		static string pathWithMeta => EditorActors.Data.pathTags + EditorActors.Data.pathTagsMeta;
-		static string path => EditorActors.Data.pathTags;
+		//	static string pathWithMeta => DataFramework.pathTags + DataFramework.pathTagsMeta;
+		static string path => DataFramework.pathTags;
 
 
 		[MenuItem("Tools/Actors/Tags/Register", false, 1)]
@@ -49,9 +49,9 @@ namespace Pixeye
 		{
 			try
 			{
-				if (File.Exists(pathWithMeta))
+				if (File.Exists(path))
 				{
-					using (StreamReader sr = new StreamReader(pathWithMeta, System.Text.Encoding.Default))
+					using (StreamReader sr = new StreamReader(path, System.Text.Encoding.Default))
 					{
 						lastIndex = int.Parse(sr.ReadLine());
 						while (!sr.EndOfStream)
@@ -69,27 +69,27 @@ namespace Pixeye
 			}
 		}
 
-		static void Save()
-		{
-			StreamWriter sr;
-			if (!File.Exists(pathWithMeta))
-			{
-				sr = File.CreateText(pathWithMeta);
-			}
-			else
-			{
-				sr = new StreamWriter(pathWithMeta, false, System.Text.Encoding.Default);
-			}
-
-			using (sr)
-			{
-				sr.WriteLine(lastIndex);
-				for (int i = 0; i < freeIdTags.Count; i++)
-				{
-					sr.WriteLine(freeIdTags[i]);
-				}
-			}
-		}
+//		static void Save()
+//		{
+//			StreamWriter sr;
+//			if (!File.Exists(pathWithMeta))
+//			{
+//				sr = File.CreateText(pathWithMeta);
+//			}
+//			else
+//			{
+//				sr = new StreamWriter(pathWithMeta, false, System.Text.Encoding.Default);
+//			}
+//
+//			using (sr)
+//			{
+//				sr.WriteLine(lastIndex);
+//				for (int i = 0; i < freeIdTags.Count; i++)
+//				{
+//					sr.WriteLine(freeIdTags[i]);
+//				}
+//			}
+//		}
 
 		static void TagRegist()
 		{
@@ -174,7 +174,7 @@ namespace Pixeye
 			if (idTags.Count > 0)
 				Debug.Log(string.Format(debugLog2, idTags.Count, idTags[idTags.Count - 1]));
 
-		//	Save();
+
 			isReset = false;
 			idTags.Clear();
 			freeIdTags.Clear();

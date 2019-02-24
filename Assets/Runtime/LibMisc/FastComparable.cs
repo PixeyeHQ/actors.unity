@@ -1,6 +1,5 @@
-//   Project : Battlecruiser3.0
-//  Contacts : Pixeye - info@pixeye.games 
-//      Date : 8/22/2018
+//  Project  : ACTORS
+//  Contacts : Pixeye - ask@pixeye.games
 
 using System.Collections.Generic;
 

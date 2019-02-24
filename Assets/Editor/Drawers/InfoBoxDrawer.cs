@@ -1,6 +1,5 @@
-//   Project : Cryoshock
-//  Contacts : Pixeye - info@pixeye.games 
-//      Date : 9/9/2018
+//  Project  : ACTORS
+//  Contacts : Pixeye - ask@pixeye.games
 #if!ODIN_INSPECTOR
 
 using UnityEditor;

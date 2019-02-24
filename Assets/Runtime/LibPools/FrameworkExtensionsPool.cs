@@ -55,7 +55,7 @@ namespace Pixeye
 		public static Transform Populate(this object o, string prefabID, Vector3 startPosition, Quaternion startRotation)
 
 		{
-			var prefab = Box.GetPrefab<GameObject>(prefabID);
+			var prefab = Box.Get<GameObject>(prefabID);
 			var go     = Object.Instantiate(prefab, ProcessingScene.Dynamic).transform;
 			go.localPosition = startPosition;
 			go.localRotation = startRotation;
@@ -65,7 +65,7 @@ namespace Pixeye
 		public static T Populate<T>(this object o, string prefabID, Vector3 startPosition, Quaternion startRotation)
 
 		{
-			var prefab = Box.GetPrefab<GameObject>(prefabID);
+			var prefab = Box.Get<GameObject>(prefabID);
 			var go     = Object.Instantiate(prefab, ProcessingScene.Dynamic).transform;
 			go.localPosition = startPosition;
 			go.localRotation = startRotation;
@@ -82,7 +82,7 @@ namespace Pixeye
 
 		public static Transform Populate(this object o, int poolID, string prefabID, Vector3 startPosition, Quaternion startRotation)
 		{
-			var prefab = Box.GetPrefab<GameObject>(prefabID);
+			var prefab = Box.Get<GameObject>(prefabID);
 			var go     = ProcessingPool.pools[poolID].Spawn(prefab, ProcessingScene.Dynamic).transform;
 			go.localPosition = startPosition;
 			go.localRotation = startRotation;
@@ -91,7 +91,7 @@ namespace Pixeye
 
 		public static T Populate<T>(this object o, int poolID, string prefabID, Vector3 startPosition, Quaternion startRotation)
 		{
-			var prefab = Box.GetPrefab<GameObject>(prefabID);
+			var prefab = Box.Get<GameObject>(prefabID);
 			var go     = ProcessingPool.pools[poolID].Spawn(prefab, ProcessingScene.Dynamic).transform;
 			go.localPosition = startPosition;
 			go.localRotation = startRotation;
@@ -155,7 +155,7 @@ namespace Pixeye
 		                                 WorldParenters parenters = WorldParenters.Level)
 		{
 			var parenter = parent ?? ProcessingScene.Default.Get(parenters);
-			var prefab   = Box.GetPrefab<GameObject>(prefabID);
+			var prefab   = Box.Get<GameObject>(prefabID);
 
 			var go = poolID == Pool.None
 					? Object.Instantiate(prefab, parenter).transform
@@ -215,7 +215,7 @@ namespace Pixeye
 		                                 WorldParenters parenters = WorldParenters.Level)
 		{
 			var parenter = parent ?? ProcessingScene.Default.Get(parenters);
-			var prefab   = Box.GetPrefab<GameObject>(prefabID);
+			var prefab   = Box.Get<GameObject>(prefabID);
 
 			var go = poolID == Pool.None
 					? Object.Instantiate(prefab, parenter).transform

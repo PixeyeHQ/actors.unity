@@ -1,7 +1,7 @@
 {
-    "name": "Homebrew.Framework.Editor",
+    "name": "Pixeye.Framework.Editor",
     "references": [
-        "Homebrew.Game"
+        "Pixeye.Framework"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [

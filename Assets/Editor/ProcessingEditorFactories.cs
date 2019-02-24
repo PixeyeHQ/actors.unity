@@ -1,6 +1,5 @@
-//   Project : Battlecruiser3.0
-//  Contacts : Pixeye - info@pixeye.games 
-//      Date : 8/23/2018
+//  Project  : ACTORS
+//  Contacts : Pixeye - ask@pixeye.games
 
 using System.IO;
 using System.Text;
@@ -11,7 +10,7 @@ using static System.Char;
 
 public class ProcessingEditorFactories : EndNameEditAction
 {
-    public const string PATH_TO_TEMPLATE = @"Assets\[0]Framework\Runtime\LibBlueprints\FactoryTemplate.txt";
+    public const string PATH_TO_TEMPLATE = @"Assets\Editor\Templates\FactoryTemplate.txt";
     private const int MENU_ITEM_PRIORITY = 0;
     private static Texture2D scriptIcon = (EditorGUIUtility.IconContent("cs Script Icon").image as Texture2D);
 
@@ -24,6 +23,7 @@ public class ProcessingEditorFactories : EndNameEditAction
 
     public static void CreateFromTemplate(string name, string pathName)
     {
+        Debug.Log(pathName);
         ProjectWindowUtil.StartNameEditingIfProjectWindowExists(
             0,
             CreateInstance<ProcessingEditorFactories>(),
@@ -35,6 +35,7 @@ public class ProcessingEditorFactories : EndNameEditAction
     public static object CreateScript(string pathName, string templatePath)
     {
         var filePath = Path.GetFullPath(pathName);
+ 
         var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(pathName);
         var className = fileNameWithoutExtension.Replace(" ", string.Empty);
         var templateContents = string.Empty;

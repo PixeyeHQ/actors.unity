@@ -1,6 +1,5 @@
-//   Project : Battlecruiser3.0
-//  Contacts : Pixeye - info@pixeye.games 
-//      Date : 8/23/2018
+//  Project  : ACTORS
+//  Contacts : Pixeye - ask@pixeye.games
 
 using System.IO;
 using System.Text;
@@ -12,7 +11,7 @@ using static System.Char;
 
 public class ProcessingEditorSamples : EndNameEditAction
 {
-    public const string PATH_TO_TEMPLATE = @"Assets\[0]Framework\Runtime\LibBlueprints\SampleTemplate.txt";
+    public const string PATH_TO_TEMPLATE = @"Assets\Editor\Templates\SampleTemplate.txt";
     private const int MENU_ITEM_PRIORITY = 0;
     private static Texture2D scriptIcon = (EditorGUIUtility.IconContent("cs Script Icon").image as Texture2D);
 

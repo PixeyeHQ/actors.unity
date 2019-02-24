@@ -21,6 +21,7 @@ namespace Pixeye
 		/// </summary>
 		public static Box Default = new Box();
 
+		public static readonly string path = "/{0}";
 
 		Dictionary<int, Object> items = new Dictionary<int, Object>(20, new FastComparable());
 		Dictionary<int, string> itemsPaths = new Dictionary<int, string>(20, new FastComparable());
@@ -35,9 +36,6 @@ namespace Pixeye
 
 		public static T Get<T>(string id) where T : Object
 		{
-			#if HOMEBREW_EDIT
-			return Resources.Load<T>(id);
-            #else
 			Object obj;
 			var    key      = id.GetHashCode();
 			var    hasValue = Default.items.TryGetValue(key, out obj);
@@ -48,21 +46,10 @@ namespace Pixeye
 			}
 
 			return obj as T;
-			#endif
 		}
 
-		public static T GetPrefab<T>(string id) where T : Object
-		{
-			Object obj;
-			var    key      = id.GetHashCode();
-			var    hasValue = Default.items.TryGetValue(key, out obj);
-			if (hasValue) return obj as T;
-			obj = Resources.Load("Prefabs/" + id) as GameObject;
-			Default.items.Add(key, obj);
-			return obj as T;
-		}
 
-		public static T GetPrefab<T>(int id) where T : Object
+		public static T Get<T>(int id) where T : Object
 		{
 			Object obj;
 			var    hasValue = Default.items.TryGetValue(id, out obj);

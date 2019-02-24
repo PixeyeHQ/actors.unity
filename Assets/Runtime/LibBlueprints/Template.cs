@@ -1,43 +1,43 @@
-//   Project : Battlecruiser3.0
-//  Contacts : Pixeye - info@pixeye.games 
-//      Date : 8/23/2018
-
+//  Project  : ACTORS
+//  Contacts : Pixeye - ask@pixeye.games
 
 using System.Collections.Generic;
-using Pixeye;
 using UnityEngine;
 
-public abstract class Template : ScriptableObject, IComponent
+namespace Pixeye
 {
-	Dictionary<int, object> storage = new Dictionary<int, object>();
-
-	protected void OnEnable()
+	public abstract class Template : ScriptableObject, IComponent
 	{
-		storage.Clear();
-		Setup();
-	}
+		Dictionary<int, object> storage = new Dictionary<int, object>();
 
-	protected virtual void Setup() { }
-
-	public T Get<T>()
-	{
-		object ob;
-		storage.TryGetValue(typeof(T).GetHashCode(), out ob);
-		return (T) ob;
-	}
-
-	public bool TryGet<T>(out T val)
-	{
-		object v;
-		if (storage.TryGetValue(typeof(T).GetHashCode(), out v))
+		protected void OnEnable()
 		{
-			val = (T) v;
-			return true;
+			storage.Clear();
+			Setup();
 		}
 
-		val = default(T);
-		return false;
-	}
+		protected virtual void Setup() { }
 
-	public void Add<T>(T obj) { storage.Add(typeof(T).GetHashCode(), obj); }
+		public T Get<T>()
+		{
+			object ob;
+			storage.TryGetValue(typeof(T).GetHashCode(), out ob);
+			return (T) ob;
+		}
+
+		public bool TryGet<T>(out T val)
+		{
+			object v;
+			if (storage.TryGetValue(typeof(T).GetHashCode(), out v))
+			{
+				val = (T) v;
+				return true;
+			}
+
+			val = default(T);
+			return false;
+		}
+
+		public void Add<T>(T obj) { storage.Add(typeof(T).GetHashCode(), obj); }
+	}
 }

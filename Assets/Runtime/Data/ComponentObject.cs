@@ -1,6 +1,5 @@
-//   Project : Cryoshock
-//  Contacts : Pixeye - info@pixeye.games 
-//      Date : 10/13/2018
+//  Project  : ACTORS
+//  Contacts : Pixeye - ask@pixeye.games
 
 
 using System;

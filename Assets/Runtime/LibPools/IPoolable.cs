@@ -1,4 +1,7 @@
-public interface IPoolable
+namespace Pixeye
 {
-	void Spawn();
+	public interface IPoolable
+	{
+		void Spawn();
+	}
 }

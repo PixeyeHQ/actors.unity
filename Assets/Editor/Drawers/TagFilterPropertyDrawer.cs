@@ -1,9 +1,5 @@
-/*===============================================================
-Product:    BattlecruiserPrototype
-Developer:  Dimitry Pixeye - info@pixeye,games
-Company:    Homebrew
-Date:       4/28/2018 5:50 PM
-================================================================*/
+//  Project  : ACTORS
+//  Contacts : Pixeye - ask@pixeye.games
 
 
 using System;

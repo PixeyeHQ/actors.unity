@@ -1,6 +1,5 @@
-//   Project : Battlecruiser3.0
-//  Contacts : Pixeye - info@pixeye.games 
-//      Date : 8/23/2018
+//  Project  : ACTORS
+//  Contacts : Pixeye - ask@pixeye.games
 
 
 using System.IO;
@@ -51,7 +50,7 @@ public static class DataSceneWindow
 		get
 		{
 			#if UNITY_EDITOR
-			return EditorPrefs.GetString("dsw_path", "Assets/[2]Content/Scenes/");
+			return EditorPrefs.GetString("dsw_path", "Assets/Scenes/");
 			#else
             return false;
 #endif
@@ -70,7 +69,7 @@ public static class DataSceneWindow
 		get
 		{
 			#if UNITY_EDITOR
-			return EditorPrefs.GetString("dsw_name", "sceneDefault");
+			return EditorPrefs.GetString("dsw_name", "scene");
 			#else
             return false;
          #endif

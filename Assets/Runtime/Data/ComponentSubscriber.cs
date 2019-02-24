@@ -1,10 +1,5 @@
-/*===============================================================
-Product:    Cryoshock
-Developer:  Dimitry Pixeye - pixeye@hbrew.store
-Company:    Homebrew - http://hbrew.store
-Date:       2/2/2018  7:54 AM
-================================================================*/
-
+//  Project  : ACTORS
+//  Contacts : Pixeye - ask@pixeye.games
  
 namespace Pixeye{
 [System.Serializable]

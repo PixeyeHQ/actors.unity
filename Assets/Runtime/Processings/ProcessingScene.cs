@@ -1,9 +1,5 @@
-/*===============================================================
-Product:    Battlecruiser
-Developer:  Dimitry Pixeye - pixeye@hbrew.store
-Company:    Homebrew - http://hbrew.store
-Date:       11/10/2017 21:22
-================================================================*/
+//  Project  : ACTORS
+//  Contacts : Pixeye - ask@pixeye.games
 
 using System;
 using System.Collections.Generic;
