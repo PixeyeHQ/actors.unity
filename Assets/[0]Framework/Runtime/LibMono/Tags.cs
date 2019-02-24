@@ -1,6 +1,5 @@
-//   Project : Cryoshock
-//  Contacts : Pixeye - info@pixeye.games 
-//      Date : 9/16/2018
+//  Project  : ACTORS
+//  Contacts : Pixeye - ask@pixeye.games
 
 
 using System;
@@ -10,14 +9,16 @@ using UnityEngine;
 
 namespace Homebrew
 {
+	/// <summary>
+	/// <para>Tags of the entities.</para>
+	/// </summary>
 	public static class Tags
 	{
 		internal static Dictionary<int, int>[] tags = new Dictionary<int, int>[EngineSettings.MinEntities];
 		internal static Dictionary<int, List<GroupBase>> groupsInclude = new Dictionary<int, List<GroupBase>>(10, new FastComparable());
 
 		internal static Dictionary<int, List<GroupBase>> groupsDeclude = new Dictionary<int, List<GroupBase>>(10, new FastComparable());
-		//   internal static Dictionary<int, Action<int>> observers = new Dictionary<int, Action<int>>(10, new FastComparable());
-
+		 
 		static internal int length = -1;
 
 		static internal void Add(int entityID)

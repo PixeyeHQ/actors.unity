@@ -1,9 +1,5 @@
-/*===============================================================
-Product:    Battlecruiser
-Developer:  Dimitry Pixeye - pixeye@hbrew.store
-Company:    Homebrew - http://hbrew.store
-Date:       14/09/2017 03:45
-================================================================*/
+//  Project  : ACTORS
+//  Contacts : Pixeye - ask@pixeye.games
 
 using System;
 using System.Collections.Generic;
@@ -11,6 +7,9 @@ using UnityEngine;
 
 namespace Homebrew
 {
+	/// <summary>
+	/// <para>Service locator</para>
+	/// </summary>
 	public class Toolbox : Singleton<Toolbox>
 	{
 		[SerializeField] Dictionary<int, object> data = new Dictionary<int, object>(5, new FastComparable());
@@ -19,7 +18,7 @@ namespace Homebrew
 		public static bool Contains<T>() { return Instance.data.ContainsKey(typeof(T).GetHashCode()); }
 
 
-		public static T Create<T>() where T : new()
+		internal static T Create<T>() where T : new()
 		{
 			var created  = new T();
 			var awakeble = created as IAwake;
@@ -27,7 +26,9 @@ namespace Homebrew
 			return created;
 		}
 
-
+		/// <summary>
+		/// <para>Creates an object to the toolbox by type.</para> 
+		/// </summary>
 		public static T Add<T>(Type type = null) where T : new()
 		{
 			object o;
@@ -53,14 +54,15 @@ namespace Homebrew
 			Instance.data.TryGetValue(t.GetHashCode(), out resolve);
 			return resolve;
 		}
-
-		public static object Add(object obj)
+		/// <summary>
+		/// <para>Adds an object to the toolbox</para>
+		/// </summary>
+		public static void Add(object obj)
 		{
 			object possibleObj;
 			if (Instance.data.TryGetValue(obj.GetType().GetHashCode(), out possibleObj))
 			{
 				InitializeObject(possibleObj);
-				return possibleObj;
 			}
 
 			var add        = obj;
@@ -70,7 +72,6 @@ namespace Homebrew
 
 
 			Instance.data.Add(obj.GetType().GetHashCode(), add);
-			return add;
 		}
 
 		public static void Remove(object obj)
@@ -86,7 +87,9 @@ namespace Homebrew
 			ProcessingUpdate.Default.Add(obj);
 		}
 
-
+		/// <summary>
+		/// <para>Gets an object from the toolbox by type</para>
+		/// </summary>
 		public static T Get<T>()
 		{
 			object resolve;
@@ -98,7 +101,7 @@ namespace Homebrew
 			return (T) resolve;
 		}
 
-		public void ClearSessionData()
+		internal void ClearSessionData()
 		{
 			if (applicationIsQuitting) return;
 

@@ -1,9 +1,5 @@
-/*===============================================================
-Product:    Battlecruiser
-Developer:  Dimitry Pixeye - pixeye@hbrew.store
-Company:    Homebrew - http://hbrew.store
-Date:       12/09/2017 23:42
-================================================================*/
+//  Project  : ACTORS
+//  Contacts : Pixeye - ask@pixeye.games
 
 using System;
 using System.Collections.Generic;
@@ -46,20 +42,47 @@ namespace Homebrew
 
 		#region SIGNALS
 
+		/// <summary>
+		/// <para>Send a signal to the Frameworks default Signal processor.</para>
+		/// </summary>
+		/// <param name="signal"></param>
+		/// <typeparam name="T"></typeparam>
 		public static void Send<T>(ref T signal) where T : struct { ProcessingSignals.Send(ref signal); }
 
 		#endregion
 
 		#region ENTITIES
 
+		/// <summary>
+		/// <para>Safely gets the component by type from the entity.</para>
+		/// </summary>
+		/// <param name="entity"></param>
+		/// <typeparam name="T"></typeparam>
+		/// <returns>Returns component.</returns>
 		public static T Get<T>(this int entity) where T : IComponent, new() { return Storage<T>.Instance.TryGet(entity); }
 
+		/// <summary>
+		/// <para>Safely gets the component by type from the entity.</para>
+		/// </summary>
+		/// <param name="entity"></param>
+		/// <param name="arg0"></param>
+		/// <typeparam name="T"></typeparam>
+		/// <returns>Returns true if the entity has this component.</returns>
 		public static bool Get<T>(this int entity, out T arg0) where T : IComponent, new()
 		{
 			arg0 = default(T);
 			return (arg0 = Storage<T>.Instance.TryGet(entity)) != null;
 		}
 
+		/// <summary>
+		/// <para>Safely gets the components by type from the entity.</para>
+		/// </summary>
+		/// <param name="entity"></param>
+		/// <param name="arg0"></param>
+		/// <param name="arg1"></param>
+		/// <typeparam name="T"></typeparam>
+		/// <typeparam name="Y"></typeparam>
+		/// <returns>Returns true if the entity has these components.</returns>
 		public static bool Get<T, Y>(this int entity, out T arg0, out Y arg1) where T : new() where Y : new()
 		{
 			arg0 = default(T);
@@ -71,6 +94,17 @@ namespace Homebrew
 			return true;
 		}
 
+		/// <summary>
+		/// <para>Safely gets the components by type from the entity.</para>
+		/// </summary>
+		/// <param name="entity"></param>
+		/// <param name="arg0"></param>
+		/// <param name="arg1"></param>
+		/// <param name="arg2"></param>
+		/// <typeparam name="T"></typeparam>
+		/// <typeparam name="Y"></typeparam>
+		/// <typeparam name="U"></typeparam>
+		/// <returns>Returns true if the entity has these components.</returns>
 		public static bool Get<T, Y, U>(this int entity, out T arg0, out Y arg1, out U arg2) where T : new() where Y : new() where U : new()
 		{
 			arg0 = default(T);
@@ -83,6 +117,19 @@ namespace Homebrew
 			return true;
 		}
 
+		/// <summary>
+		/// <para>Safely gets the components by type from the entity.</para>
+		/// </summary>
+		/// <param name="entity"></param>
+		/// <param name="arg0"></param>
+		/// <param name="arg1"></param>
+		/// <param name="arg2"></param>
+		/// <param name="arg3"></param>
+		/// <typeparam name="T"></typeparam>
+		/// <typeparam name="Y"></typeparam>
+		/// <typeparam name="U"></typeparam>
+		/// <typeparam name="I"></typeparam>
+		/// <returns>Returns true if the entity has these components.</returns>
 		public static bool Get<T, Y, U, I>(this int entity, out T arg0, out Y arg1, out U arg2, out I arg3) where T : new() where Y : new() where U : new() where I : new()
 		{
 			arg0 = default(T);
@@ -96,6 +143,21 @@ namespace Homebrew
 			return true;
 		}
 
+		/// <summary>
+		/// Safely gets the components by type from the entity.
+		/// </summary>
+		/// <param name="entity"></param>
+		/// <param name="arg0"></param>
+		/// <param name="arg1"></param>
+		/// <param name="arg2"></param>
+		/// <param name="arg3"></param>
+		/// <param name="arg4"></param>
+		/// <typeparam name="T"></typeparam>
+		/// <typeparam name="Y"></typeparam>
+		/// <typeparam name="U"></typeparam>
+		/// <typeparam name="I"></typeparam>
+		/// <typeparam name="O"></typeparam>
+		/// <returns>Returns true if the entity has these components.</returns>
 		public static bool Get<T, Y, U, I, O>(this int entity, out T arg0, out Y arg1, out U arg2, out I arg3, out O arg4) where T : new() where Y : new() where U : new() where I : new() where O : new()
 		{
 			arg0 = default(T);
@@ -178,13 +240,26 @@ namespace Homebrew
 			ProcessingEntities.prevID.Push(entity);
 		}
 
+		/// <summary>
+		/// <para>Returns the MonoEntity component linked to the entity.</para>
+		/// </summary>
+		/// <param name="entity"></param>
+		/// <returns>Returns the MonoEntity component linked to the entity.</returns>
 		public static MonoEntity GetMonoEntity(this int entity) { return entity.ComponentObject().transform.GetComponent<MonoEntity>(); }
 
+		/// <summary>
+		/// <para>Returns the game object linked to the entity.</para>
+		/// </summary>
+		/// <param name="entity"></param>
+		/// <returns>Returns the game object linked to the entity.</returns>
 		public static GameObject GameObject(this int entity) { return entity.ComponentObject().transform.gameObject; }
 
+		/// <summary>
+		/// <para>Returns the transform linked to the entity.</para>
+		/// </summary>
+		/// <param name="entity"></param>
+		/// <returns>Returns the transform linked to the entity.</returns>
 		public static Transform Transform(this int entity) { return entity.ComponentObject().transform; }
-
-		public static T Create<T>(this int entity) where T : IComponent, new() { return Storage<T>.Instance.GetOrCreate(entity); }
 
 		public static T Get<T>(this ComponentObject component) { return component.transform.gameObject.GetComponent<T>(); }
 

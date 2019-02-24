@@ -1,6 +1,5 @@
-//  Project : Battlecruiser
-// Contacts : Pixeye - info@pixeye.games
-//     Date : 2/19/2019 
+//  Project  : ACTORS
+//  Contacts : Pixeye - ask@pixeye.games
 
  
 #if ODIN_INSPECTOR
@@ -10,6 +9,9 @@ using UnityEngine;
 
 namespace Homebrew
 {
+	/// <summary>
+	/// <para>Links a game object with specific entity.</para>
+	/// </summary>
 	public class MonoEntity : MonoBehaviour
 	{
 		[FoldoutGroup("Main"),ReadOnly]

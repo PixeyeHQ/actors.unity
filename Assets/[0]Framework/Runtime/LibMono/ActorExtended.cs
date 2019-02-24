@@ -1,10 +1,12 @@
-//   Project : Cryoshock
-//  Contacts : Pixeye - info@pixeye.games 
-//      Date : 10/16/2018
+//  Project  : ACTORS
+//  Contacts : Pixeye - ask@pixeye.games
 
  
 namespace Homebrew
 {
+	/// <summary>
+	/// <para>An extended class of mono entity composer with update and signals.</para>
+	/// </summary>
 	public abstract class ActorExtended : Actor
 	{
 		bool conditionSignals;

@@ -1,9 +1,5 @@
-/*===============================================================
-Product:    Battlecruiser
-Developer:  Dimitry Pixeye - pixeye@hbrew.store
-Company:    Homebrew - http://hbrew.store
-Date:       12/09/2017 16:10
-================================================================*/
+//  Project  : ACTORS
+//  Contacts : Pixeye - ask@pixeye.games
 
 
 using System.Collections.Generic;
@@ -19,8 +15,10 @@ using Sirenix.OdinInspector;
 
 namespace Homebrew
 {
-// Start any game  
-
+ 
+	/// <summary>
+	/// <para>A scene point of entry. The developer defines here scene dependencies and processing that will work on the scene.</para> 
+	/// </summary>
 	public class Starter : MonoBehaviour
 	{
 		public static bool initialized;
@@ -46,6 +44,9 @@ namespace Homebrew
 				ProcessingSceneLoad.Default = Toolbox.Create<ProcessingSceneLoad>();
 
 			ProcessingSceneLoad.Default.Setup(ScenesToKeep, SceneDependsOn, this);
+
+		 
+
 		}
 
 		#if UNITY_EDITOR
@@ -180,6 +181,11 @@ namespace Homebrew
 			});
 		}
 
+		/// <summary>
+		/// <para>Adds an object to the toolbox by type. It is mainly used to add processing scripts.</para>
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <returns></returns>
 		protected static T Add<T>() where T : new() { return Toolbox.Add<T>(); }
 
 

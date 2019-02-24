@@ -1,6 +1,5 @@
-//  Project : Battlecruiser
-// Contacts : Pixeye - info@pixeye.games
-//     Date : 2/18/2019 
+//  Project  : ACTORS
+//  Contacts : Pixeye - ask@pixeye.games
 
 namespace Homebrew
 {
