@@ -1,9 +1,0 @@
-
-using UnityEngine;
-namespace Homebrew{
-[CreateAssetMenu(fileName = "Template &NAME&", menuName = "Actors/Templates/&NAME&")]
-public class ##NAME## : Template
-{
-  protected override void Setup() { }   
-}
-}
