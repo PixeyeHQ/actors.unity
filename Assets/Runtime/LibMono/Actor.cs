@@ -30,6 +30,8 @@ namespace Pixeye
 			conditionManualDeploy = this is IManualDeploy;
 			var cObject = Add<ComponentObject>();
 			cObject.transform = transform;
+			if (Starter.initialized == false) return;
+			Setup();
 		}
 
 
