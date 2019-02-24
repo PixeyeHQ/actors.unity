@@ -5,11 +5,12 @@ namespace Homebrew
 {
 	public class Time : ITick, IKernel, IComponent
 	{
+		protected const float fps = 60;
 		/// <summary>
 		/// <para> Default Framework Time. Use it for independent timing</para>
 		/// </summary>
 		public static Time Default;
-		protected const float fps = 60;
+		public static int frame => UnityEngine.Time.frameCount;
 	 
 		/// <summary>
 		///   <para> The scale at which the time is passing. This can be used for slow motion effects.</para>
