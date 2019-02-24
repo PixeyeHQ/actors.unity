@@ -7,7 +7,6 @@ using UnityEditor;
 /// Contributor : Dark-A-l https://github.com/Dark-A-l
 namespace Homebrew
 {
-	[InitializeOnLoad]
 	public class ProcessingTagsRegistrator
 	{
 		static int lastIndex;
@@ -16,19 +15,13 @@ namespace Homebrew
 
 		static bool isReset;
 
-		static readonly string debugLog1 = "Tags have same ID: <color=red>{0}</color>";
+		static readonly string debugLog1 = "Two or more tags use one ID: <color=red>{0}</color>";
 		static readonly string debugLog2 = "Tags amount: {0} Last ID: <color=#66cc33ff>{1}</color>";
 
 
 		static string pathWithMeta => EditorActors.Data.pathTags + EditorActors.Data.pathTagsMeta;
 		static string path => EditorActors.Data.pathTags;
 
-
-		static ProcessingTagsRegistrator()
-		{
-			if (EditorApplication.isPlayingOrWillChangePlaymode && !Application.isPlaying)
-				Execute();
-		}
 
 		[MenuItem("Tools/Actors/Tags/Register", false, 1)]
 		static public void Execute()
@@ -101,14 +94,11 @@ namespace Homebrew
 		static void TagRegist()
 		{
 			string[] Files = Directory.GetFiles(path, "*.cs");
-
-			int count = 0;
-
+			int      count = 0;
 			for (int f = 0; f < Files.Length; f++)
 			{
-				var readPath = Files[f];
-
-				string text = String.Empty;
+				var    readPath = Files[f];
+				string text     = String.Empty;
 				try
 				{
 					using (StreamReader sr = new StreamReader(readPath, System.Text.Encoding.Default))
@@ -117,21 +107,20 @@ namespace Homebrew
 					}
 
 					var lines = text.Split(new[] {'\n', '\r'}, StringSplitOptions.RemoveEmptyEntries);
-
 					for (int i = 0; i < lines.Length; i++)
 					{
 						var atr = lines[i].LastIndexOf('[');
 						if (atr >= 0) continue;
-						int ind = lines[i].LastIndexOf('=');
+						var ind = lines[i].LastIndexOf('=');
 						if (ind <= 0) continue;
 
-						//if (lines[i][0]=='[') continue;
+
 						if (lines[i][ind + 1] == ' ') ind += 2;
 						else ind++;
 						if (lines[i][ind] == '0' | isReset)
 						{
 							count++;
-							// free id required
+// free id required
 							int l_int = 0;
 							if (freeIdTags.Count == 0)
 							{
@@ -155,7 +144,11 @@ namespace Homebrew
 							string line = lines[i].Substring(ind);
 							line = line.Remove(line.LastIndexOf(';'));
 							int idTag = int.Parse(line);
-							if (idTags.Contains(idTag)) Debug.LogWarning(string.Format(debugLog1, idTag));
+							if (idTags.Contains(idTag))
+							{
+								Debug.LogWarning(string.Format(debugLog1, idTag));
+							}
+
 							idTags.Add(idTag);
 						}
 					}
@@ -178,15 +171,11 @@ namespace Homebrew
 					freeIdTags.Add(i);
 			}
 
-
 			if (idTags.Count > 0)
 				Debug.Log(string.Format(debugLog2, idTags.Count, idTags[idTags.Count - 1]));
 
-
 			Save();
-
 			isReset = false;
-
 			idTags.Clear();
 			freeIdTags.Clear();
 		}

@@ -7,15 +7,14 @@ using System.Collections.Generic;
 using UnityEditor;
 #endif
 using UnityEngine;
-
 #if ODIN_INSPECTOR
 using Sirenix.OdinInspector;
+
 #endif
 
 
 namespace Homebrew
 {
- 
 	/// <summary>
 	/// <para>A scene point of entry. The developer defines here scene dependencies and processing that will work on the scene.</para> 
 	/// </summary>
@@ -40,13 +39,7 @@ namespace Homebrew
 				ProcessingUpdate.Create();
 			}
 
-			if (ProcessingSceneLoad.Default == null)
-				ProcessingSceneLoad.Default = Toolbox.Create<ProcessingSceneLoad>();
-
 			ProcessingSceneLoad.Default.Setup(ScenesToKeep, SceneDependsOn, this);
-
-		 
-
 		}
 
 		#if UNITY_EDITOR

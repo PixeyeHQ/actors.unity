@@ -12,7 +12,7 @@ namespace Homebrew
 {
     public class ProcessingSignals : IComponent, IDisposable, IKernel
     {
-        public static ProcessingSignals Default;
+        public static ProcessingSignals Default = new ProcessingSignals();
         public readonly Dictionary<int, List<IReceive>> signals = new Dictionary<int, List<IReceive>>(new FastComparable());
 
         #region LOGIC

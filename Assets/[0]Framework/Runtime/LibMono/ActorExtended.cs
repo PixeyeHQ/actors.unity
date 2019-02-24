@@ -21,7 +21,7 @@ namespace Homebrew
 
 			var cObject = Add<ComponentObject>();
 			cObject.transform = transform;
-			Setup();
+		 
 		}
 
 		public override void OnEnable()

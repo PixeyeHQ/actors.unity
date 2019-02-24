@@ -30,7 +30,6 @@ namespace Homebrew
 			conditionManualDeploy = this is IManualDeploy;
 			var cObject = Add<ComponentObject>();
 			cObject.transform = transform;
-			Setup();
 		}
 
 
@@ -42,6 +41,7 @@ namespace Homebrew
 
 		public void SetupAfterStarter()
 		{
+			Setup();
 			if (conditionManualDeploy) return;
 			OnEnable();
 		}

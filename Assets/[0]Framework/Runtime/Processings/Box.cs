@@ -19,7 +19,7 @@ namespace Homebrew
 		/// <para>Caches / return assets that Developer takes from the Resources folder.
 		/// Box cleans cache when scene reloads.</para>
 		/// </summary>
-		public static Box Default;
+		public static Box Default = new Box();
 
 
 		Dictionary<int, Object> items = new Dictionary<int, Object>(20, new FastComparable());

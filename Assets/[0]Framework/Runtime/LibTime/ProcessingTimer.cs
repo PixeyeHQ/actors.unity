@@ -13,7 +13,7 @@ namespace Homebrew
 {
 	public class ProcessingTimer : IDisposable, IKernel
 	{
-		public static ProcessingTimer Default;
+		public static ProcessingTimer Default = new ProcessingTimer();
 		public readonly List<Timer> allWorkingTimers = new List<Timer>();
 		public void Dispose()
 		{

@@ -13,7 +13,7 @@ namespace Homebrew
 {
 	public class ProcessingScene : IDisposable, IKernel
 	{
-		public static ProcessingScene Default;
+		public static ProcessingScene Default = new ProcessingScene();
 
 		protected readonly Dictionary<string, Transform> sceneObjs = new Dictionary<string, Transform>();
 

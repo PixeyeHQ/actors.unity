@@ -28,6 +28,7 @@ namespace Homebrew
 		{
 			selfTransform = transform;
 			conditionSignals = ProcessingSignals.Check(this);
+			
 		}
 
 

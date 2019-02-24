@@ -18,14 +18,6 @@ namespace Homebrew
 		public static bool Contains<T>() { return Instance.data.ContainsKey(typeof(T).GetHashCode()); }
 
 
-		internal static T Create<T>() where T : new()
-		{
-			var created  = new T();
-			var awakeble = created as IAwake;
-			if (awakeble != null) awakeble.OnAwake();
-			return created;
-		}
-
 		/// <summary>
 		/// <para>Creates an object to the toolbox by type.</para> 
 		/// </summary>
@@ -54,6 +46,7 @@ namespace Homebrew
 			Instance.data.TryGetValue(t.GetHashCode(), out resolve);
 			return resolve;
 		}
+
 		/// <summary>
 		/// <para>Adds an object to the toolbox</para>
 		/// </summary>
@@ -85,6 +78,16 @@ namespace Homebrew
 			var awakeble = obj as IAwake;
 			if (awakeble != null) awakeble.OnAwake();
 			ProcessingUpdate.Default.Add(obj);
+		}
+
+		public static T GetCreate<T>()
+		{
+			object resolve;
+			var    hasValue = Instance.data.TryGetValue(typeof(T).GetHashCode(), out resolve);
+
+			if (!hasValue)
+				Instance.data.TryGetValue(typeof(T).GetHashCode(), out resolve);
+			return (T) resolve;
 		}
 
 		/// <summary>

@@ -19,7 +19,7 @@ namespace Homebrew
 		public static int lastID;
 
 
-		public static ProcessingEntities Default;
+		public static ProcessingEntities Default = new ProcessingEntities();
 
 		//   internal List<GroupLocal> GroupLocals = new List<GroupLocal>(64);
 		internal GroupBase[] GroupsBase = new GroupBase[64];

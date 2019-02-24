@@ -15,7 +15,7 @@ namespace Homebrew
 {
 	public class ProcessingSceneLoad : IKernel
 	{
-		public static ProcessingSceneLoad Default;
+		public static ProcessingSceneLoad Default = new ProcessingSceneLoad();
 
 		private List<string> scenesToKeep = new List<string>();
 		private List<string> sceneDependsOn = new List<string>();
