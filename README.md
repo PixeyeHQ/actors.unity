@@ -16,6 +16,11 @@ ACTORS is a complete game framework with multiscene editing, game object pooling
 
 It is used to ease the pain of decoupling data from behaviors without tons of boilerplate code and without unnecessary overhead.
 
+### How to Install from Unity
+* Create a new Unity Project
+* Open the manifest.json file in the Packages folder inside of the Project
+* Add ```"com.pixeye.ecs": "https://github.com/dimmpixeye/ecs.unity.git",```
+
 ### Game code overivew :
 
 Components are serializable, plain c# classes inherited from IComponent interface. All game variables are held in components.
