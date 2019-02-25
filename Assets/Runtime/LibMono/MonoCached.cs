@@ -28,6 +28,8 @@ namespace Pixeye
 		{
 			selfTransform = transform;
 			conditionSignals = ProcessingSignals.Check(this);
+			if (Starter.initialized == false) return;
+			Setup();
 			
 		}
 

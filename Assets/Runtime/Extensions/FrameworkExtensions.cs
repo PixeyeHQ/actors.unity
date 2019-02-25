@@ -54,6 +54,16 @@ namespace Pixeye
 		#region ENTITIES
 
 		/// <summary>
+		/// <para>Checks if MonoEntity exist and enabled</para>
+		/// </summary>
+		/// <param name="mono"></param>
+		/// <returns>Returns true if exist and enabled</returns>
+		public static bool IsActive(this MonoEntity mono)
+		{
+			return mono != null && mono.conditionEnabled;
+		}
+		
+		/// <summary>
 		/// <para>Safely gets the component by type from the entity.</para>
 		/// </summary>
 		/// <param name="entity"></param>

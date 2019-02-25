@@ -27,7 +27,7 @@ namespace Pixeye
 					}
 				}
 
-				Storage<ComponentRelease>.Instance.RemoveNoCheck(entity);
+			 
 				entity.ReleaseFinal(isActor);
 				;
 			};
