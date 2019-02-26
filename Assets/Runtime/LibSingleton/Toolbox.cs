@@ -80,28 +80,15 @@ namespace Pixeye
 			ProcessingUpdate.Default.Add(obj);
 		}
 
-		public static T GetCreate<T>()
-		{
-			object resolve;
-			var    hasValue = Instance.data.TryGetValue(typeof(T).GetHashCode(), out resolve);
-
-			if (!hasValue)
-				Instance.data.TryGetValue(typeof(T).GetHashCode(), out resolve);
-			return (T) resolve;
-		}
-
+ 
 		/// <summary>
 		/// <para>Gets an object from the toolbox by type</para>
 		/// </summary>
 		public static T Get<T>()
 		{
 			object resolve;
-
 			var hasValue = Instance.data.TryGetValue(typeof(T).GetHashCode(), out resolve);
-
-			if (!hasValue)
-				Instance.data.TryGetValue(typeof(T).GetHashCode(), out resolve);
-			return (T) resolve;
+			return hasValue ? (T) resolve : default(T);
 		}
 
 		internal void ClearSessionData()
