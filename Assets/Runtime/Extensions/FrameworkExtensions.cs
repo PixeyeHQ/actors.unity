@@ -232,23 +232,7 @@ namespace Pixeye
 		}
 
 
-		public static void ReleaseFinal(this int entity, bool isActor)
-		{
-			if (isActor)
-			{
-				ProcessingEntities.storageActor[entity].Release();
-				return;
-			}
-
-			int len = Storage.all.Count;
-			for (int j = 0; j < len; j++)
-			{
-				Storage.all[j].Remove(entity, true);
-			}
-
-			Tags.Clear(entity);
-			ProcessingEntities.prevID.Push(entity);
-		}
+	 
 
 		/// <summary>
 		/// <para>Returns the MonoEntity component linked to the entity.</para>

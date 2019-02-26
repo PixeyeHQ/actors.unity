@@ -14,23 +14,39 @@ namespace Pixeye
 			{
 				ComponentObject cObject;
 
-				var isActor = false;
+				 
 
 				if (entity.Get(out cObject))
 				{
-					var obj = cObject.transform.GetComponent<MonoCached>();
-					isActor = obj;
-
-					if (!isActor)
+					var mono = cObject.transform.GetComponent<MonoEntity>();
+					if (mono != null)
+					{
+						mono.Release();
+						return;
+					}
+					else
 					{
 						cObject.transform.gameObject.Release(cObject.poolType);
 					}
+		 
 				}
 
-			 
-				entity.ReleaseFinal(isActor);
-				;
+				Release(entity);
+				 
+				 
 			};
 		}
+		
+		    void Release(  int entity)
+		{
+			int len = Storage.all.Count;
+			for (int j = 0; j < len; j++)
+			{
+				Storage.all[j].Remove(entity, false);
+			}
+			Tags.Clear(entity);
+			ProcessingEntities.prevID.Push(entity);
+		}
+		
 	}
 }

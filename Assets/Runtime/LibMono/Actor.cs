@@ -16,12 +16,11 @@ namespace Pixeye
 	/// </summary>
 	public abstract class Actor : MonoEntity, IRequireStarter
 	{
-		[FoldoutGroup("Main"), TagFilter(typeof(Pool))]
-		public int pool;
-
+	 
+		 
 		[NonSerialized]
 		public bool conditionManualDeploy;
-
+ 
 		#region METHODS
 
 		protected virtual void Awake()
@@ -49,46 +48,16 @@ namespace Pixeye
 		}
 
 
-		public virtual void OnEnable()
+		public override void OnEnable()
 		{
 			if (Starter.initialized == false) return;
 			if (conditionManualDeploy) return;
 			conditionEnabled = true;
+		 
 			ProcessingEntities.Default.CheckGroups(entity, true);
 		}
-
-		public virtual void OnDisable()
-		{
-			conditionEnabled = false;
-			ProcessingEntities.Default.CheckGroups(entity, false);
-		}
-
-		protected void OnDestroy()
-		{
-			int len = Storage.all.Count;
-
-			for (int j = 0; j < len; j++)
-			{
-				Storage.all[j].RemoveNoCheck(entity);
-			}
-
-			Tags.Clear(entity);
-			ProcessingEntities.prevID.Push(entity);
-		}
-
-		/// <summary>
-		/// <para>Destroys the object. If the poolID is defined, deactivates the object instead.</para>
-		/// </summary>
-		public override void Release()
-		{
-			if (pool == Pool.None)
-			{
-				Destroy(gameObject, 0.03f);
-				return;
-			}
-
-			gameObject.Release(pool);
-		}
+ 
+ 	 
 
 		#endregion
 

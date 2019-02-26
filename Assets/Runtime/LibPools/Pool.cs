@@ -6,7 +6,7 @@ namespace Pixeye
     public static class Pool
     {
         [TagField(categoryName = "Pool")]
-        public const int None = 0;
+        public const int None = -1;
         [TagField(categoryName = "Pool")]
         public const int Entities = 1;
         [TagField(categoryName = "Pool")]
