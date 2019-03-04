@@ -38,6 +38,7 @@ namespace Pixeye
 		{
 			ProcessingUpdate.Default.Add(this);
 			_deltaTimeFixed = 1 / fps;
+			_deltaTime = _deltaTimeFixed;
 		}
 
 

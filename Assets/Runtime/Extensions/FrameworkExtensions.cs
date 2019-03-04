@@ -595,6 +595,32 @@ namespace Pixeye
 
 		#region RANDOM
 
+		public static int Select(this float[] vals)
+		{
+			var total = 0f;
+			var probs = new float[vals.Length];
+
+
+			for (int i = 0; i < probs.Length; i++)
+			{
+				probs[i] = vals[i];
+				total += probs[i];
+			}
+
+
+			var randomPoint = (float) _r.NextDouble() * total;
+     
+
+			for (int i = 0; i < probs.Length; i++)
+			{
+				if (randomPoint < probs[i])
+					return i;
+				randomPoint -= probs[i];
+			}
+
+			return 0;
+		}
+		
 		public static float Between(this Vector2 v) { return UnityEngine.Random.value > 0.5f ? v.x : v.y; }
 
 
