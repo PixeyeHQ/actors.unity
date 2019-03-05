@@ -232,6 +232,10 @@ namespace Pixeye
 		}
 
 
+		public static void Destroy(this GameObject obj)
+		{
+			UnityEngine.GameObject.Destroy(obj);
+		}
 	 
 
 		/// <summary>
