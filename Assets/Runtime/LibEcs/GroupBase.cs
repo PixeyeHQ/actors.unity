@@ -93,10 +93,9 @@ namespace Pixeye
 		{
 			if (Add != null)
 			{
-				if (entities.Length <= ProcessingEntities.actionsOnAdd.Length)
+				if (entities.Length >= ProcessingEntities.actionsOnAdd.Length)
 				{
-					int len = ProcessingEntities.actionsOnAdd.Length << 1;
-
+					int len = entities.Length << 1;
 					Array.Resize(ref ProcessingEntities.actionsOnAdd, len);
 				}
 			
