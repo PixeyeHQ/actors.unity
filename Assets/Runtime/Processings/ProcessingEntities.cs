@@ -233,6 +233,11 @@ namespace Pixeye
 				storage.Deploy(entity);
 			}
 
+			for (int i = 0; i < ProcessingEntities.actionsOnAddLength; i++)
+				ProcessingEntities.actionsOnAdd[i](entity);
+
+			ProcessingEntities.actionsOnAddLength = 0;
+			
 			storages = null;
 			length = 0;
 		}
