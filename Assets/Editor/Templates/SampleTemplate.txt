@@ -1,0 +1,9 @@
+
+using UnityEngine;
+namespace Pixeye{
+[CreateAssetMenu(fileName = "Template &NAME&", menuName = "Actors/Templates/&NAME&")]
+public class ##NAME## : Template
+{
+  protected override void Setup() { }   
+}
+}
