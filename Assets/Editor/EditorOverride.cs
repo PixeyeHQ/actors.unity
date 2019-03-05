@@ -50,7 +50,7 @@ namespace Pixeye
 			var typeTree = t.GetTypeTree();
 			objectFields = target.GetType()
 					.GetFields(BindingFlags.Public | BindingFlags.NonPublic |
-						BindingFlags.Instance)
+					           BindingFlags.Instance)
 					.OrderByDescending(x => typeTree.IndexOf(x.DeclaringType))
 					.ToList();
 
@@ -168,13 +168,13 @@ namespace Pixeye
 				EditorGUILayout.Space();
 
 				EditorGUI.DrawRect(new Rect(rect.x - 1, rect.y - 1, rect.width + 1, rect.height + 1),
-					colors.col0);
+						colors.col0);
 
 				EditorGUI.DrawRect(new Rect(rect.x - 1, rect.y - 1, rect.width + 1, rect.height + 1), colors.col1);
 
 
 				pair.Value.expanded = EditorGUILayout.Foldout(pair.Value.expanded, pair.Value.atr.name, true,
-					style != null ? style : EditorStyles.foldout);
+						style != null ? style : EditorStyles.foldout);
 
 
 				EditorGUILayout.EndVertical();
@@ -182,7 +182,7 @@ namespace Pixeye
 				rect = EditorGUILayout.BeginVertical();
 
 				EditorGUI.DrawRect(new Rect(rect.x - 1, rect.y - 1, rect.width + 1, rect.height + 1),
-					colors.col2);
+						colors.col2);
 
 				if (pair.Value.expanded)
 				{
@@ -193,7 +193,7 @@ namespace Pixeye
 							EditorGUI.indentLevel = 1;
 
 							EditorGUILayout.PropertyField(pair.Value.props[i],
-								new GUIContent(pair.Value.props[i].name.FirstLetterToUpperCase()), true);
+									new GUIContent(pair.Value.props[i].name.FirstLetterToUpperCase()), true);
 							if (i == pair.Value.props.Count - 1)
 								EditorGUILayout.Space();
 						}
@@ -239,14 +239,14 @@ namespace Pixeye
 		}
 
 
-		private struct Colors
+		struct Colors
 		{
 			public Color col0;
 			public Color col1;
 			public Color col2;
 		}
 
-		private class Cache
+		class Cache
 		{
 			public HashSet<string> types = new HashSet<string>();
 			public List<SerializedProperty> props = new List<SerializedProperty>();

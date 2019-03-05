@@ -15,8 +15,8 @@ namespace Pixeye
 		public Composition composition;
 
 
-		public Action<int> Add;
-		public Action<int> Remove;
+		public ActionEntity Add;
+		public ActionEntity Remove;
 		public Action<int, int> TagsChange;
 
 		protected int indexLast;
@@ -65,9 +65,10 @@ namespace Pixeye
 			return -1;
 		}
 
-		public int GetEntity(int index) { return entities[index]; }
-
-	//	public MonoEntity GetActor(int entity) { return ProcessingEntities.storage[entity]; }
+		public int GetEntity(int index)
+		{
+			return entities[index];
+		}
 
 		public bool CheckTags(int entity)
 		{
@@ -88,8 +89,22 @@ namespace Pixeye
 			RemoveAt(i);
 		}
 
+		internal void HandleAddEvents()
+		{
+			if (Add != null)
+			{
+				if (entities.Length <= ProcessingEntities.actionsOnAdd.Length)
+				{
+					int len = ProcessingEntities.actionsOnAdd.Length << 1;
 
-		public abstract void Populate();
+					Array.Resize(ref ProcessingEntities.actionsOnAdd, len);
+				}
+			
+				ProcessingEntities.actionsOnAdd[ProcessingEntities.actionsOnAddLength++] = Add;
+			}
+		}
+
+		public abstract    void Populate();
 		protected abstract void RemoveAt(int i);
 
 
@@ -104,12 +119,21 @@ namespace Pixeye
 
 		protected abstract void OnDispose();
 
-		IEnumerator IEnumerable.GetEnumerator() { return GetEnumerator(); }
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return GetEnumerator();
+		}
 
-		public EntityEnumerator GetEnumerator() { return new EntityEnumerator(entities, length); }
+		public EntityEnumerator GetEnumerator()
+		{
+			return new EntityEnumerator(entities, length);
+		}
 
 
-		public T Get<T>() where T : IComponent, new() { return 0.Get<T>(); }
+		public T Get<T>() where T : IComponent, new()
+		{
+			return 0.Get<T>();
+		}
 	}
 
 	public struct EntityEnumerator : IEnumerator
@@ -133,7 +157,10 @@ namespace Pixeye
 			return position < length;
 		}
 
-		public void Reset() { position = -1; }
+		public void Reset()
+		{
+			position = -1;
+		}
 
 		object IEnumerator.Current => Current;
 
@@ -162,8 +189,7 @@ namespace Pixeye
 
 			entities[indexLast] = entity;
 
-			if (Add != null)
-				Add(entity);
+			HandleAddEvents();
 		}
 
 
@@ -238,11 +264,10 @@ namespace Pixeye
 			}
 
 
-			if (Add != null)
-				Add(entity);
-
 			indexLast = length++;
 			entities[indexLast] = entity;
+
+			HandleAddEvents();
 		}
 
 
@@ -256,7 +281,7 @@ namespace Pixeye
 			{
 				var e = ProcessingEntities.storageActor[i];
 				if (e == null || !e.conditionEnabled) continue;
-				
+
 				if (composition.include.Length > 0)
 					if (!e.entity.Has(composition.include))
 						continue;
@@ -321,8 +346,8 @@ namespace Pixeye
 		public override void TryAdd(int entity)
 		{
 			if (!storage.HasComponent(entity) ||
-				!storage2.HasComponent(entity) ||
-				!storage3.HasComponent(entity)
+			    !storage2.HasComponent(entity) ||
+			    !storage3.HasComponent(entity)
 			) return;
 
 
@@ -338,8 +363,7 @@ namespace Pixeye
 			entities[indexLast] = entity;
 
 
-			if (Add != null)
-				Add(entity);
+			HandleAddEvents();
 		}
 
 
@@ -366,8 +390,8 @@ namespace Pixeye
 				int entityID = e.entity;
 
 				if (!storage.HasComponent(entityID) ||
-					!storage2.HasComponent(entityID) ||
-					!storage3.HasComponent(entityID)
+				    !storage2.HasComponent(entityID) ||
+				    !storage3.HasComponent(entityID)
 				) continue;
 
 
@@ -389,9 +413,9 @@ namespace Pixeye
 	}
 
 	public class Group<T, Y, U, I> : GroupBase where T : IComponent, new()
-			where Y : new()
-			where U : new()
-			where I : new()
+	                                           where Y : new()
+	                                           where U : new()
+	                                           where I : new()
 	{
 		Storage<T> storage = Storage<T>.Instance;
 		Storage<Y> storage2 = Storage<Y>.Instance;
@@ -413,9 +437,9 @@ namespace Pixeye
 		public override void TryAdd(int entity)
 		{
 			if (!storage.HasComponent(entity) ||
-				!storage2.HasComponent(entity) ||
-				!storage3.HasComponent(entity) ||
-				!storage4.HasComponent(entity)
+			    !storage2.HasComponent(entity) ||
+			    !storage3.HasComponent(entity) ||
+			    !storage4.HasComponent(entity)
 			) return;
 
 			if (entities.Length <= length)
@@ -430,8 +454,7 @@ namespace Pixeye
 			entities[indexLast] = entity;
 
 
-			if (Add != null)
-				Add(entity);
+			HandleAddEvents();
 		}
 
 
@@ -450,9 +473,9 @@ namespace Pixeye
 
 				int entityID = e.entity;
 				if (!storage.HasComponent(entityID) ||
-					!storage2.HasComponent(entityID) ||
-					!storage3.HasComponent(entityID) ||
-					!storage4.HasComponent(entityID)
+				    !storage2.HasComponent(entityID) ||
+				    !storage3.HasComponent(entityID) ||
+				    !storage4.HasComponent(entityID)
 				) continue;
 
 
@@ -483,10 +506,10 @@ namespace Pixeye
 	}
 
 	public class Group<T, Y, U, I, O> : GroupBase where T : IComponent, new()
-			where Y : new()
-			where U : new()
-			where I : new()
-			where O : new()
+	                                              where Y : new()
+	                                              where U : new()
+	                                              where I : new()
+	                                              where O : new()
 	{
 		Storage<T> storage = Storage<T>.Instance;
 		Storage<Y> storage2 = Storage<Y>.Instance;
@@ -498,10 +521,10 @@ namespace Pixeye
 		public override void TryAdd(int entity)
 		{
 			if (!storage.HasComponent(entity) ||
-				!storage2.HasComponent(entity) ||
-				!storage3.HasComponent(entity) ||
-				!storage4.HasComponent(entity) ||
-				!storage5.HasComponent(entity)
+			    !storage2.HasComponent(entity) ||
+			    !storage3.HasComponent(entity) ||
+			    !storage4.HasComponent(entity) ||
+			    !storage5.HasComponent(entity)
 			) return;
 
 			if (entities.Length <= length)
@@ -516,8 +539,7 @@ namespace Pixeye
 			entities[indexLast] = entity;
 
 
-			if (Add != null)
-				Add(entity);
+			HandleAddEvents();
 		}
 
 
@@ -545,10 +567,10 @@ namespace Pixeye
 						continue;
 				int entityID = e.entity;
 				if (!storage.HasComponent(entityID) ||
-					!storage2.HasComponent(entityID) ||
-					!storage3.HasComponent(entityID) ||
-					!storage4.HasComponent(entityID) ||
-					!storage5.HasComponent(entityID)
+				    !storage2.HasComponent(entityID) ||
+				    !storage3.HasComponent(entityID) ||
+				    !storage4.HasComponent(entityID) ||
+				    !storage5.HasComponent(entityID)
 				) continue;
 
 
@@ -585,11 +607,11 @@ namespace Pixeye
 
 
 	public class Group<T, Y, U, I, O, P> : GroupBase where T : IComponent, new()
-			where Y : new()
-			where U : new()
-			where I : new()
-			where O : new()
-			where P : new()
+	                                                 where Y : new()
+	                                                 where U : new()
+	                                                 where I : new()
+	                                                 where O : new()
+	                                                 where P : new()
 	{
 		Storage<T> storage = Storage<T>.Instance;
 		Storage<Y> storage2 = Storage<Y>.Instance;
@@ -602,11 +624,11 @@ namespace Pixeye
 		public override void TryAdd(int entity)
 		{
 			if (!storage.HasComponent(entity) ||
-				!storage2.HasComponent(entity) ||
-				!storage3.HasComponent(entity) ||
-				!storage4.HasComponent(entity) ||
-				!storage5.HasComponent(entity) ||
-				!storage6.HasComponent(entity)
+			    !storage2.HasComponent(entity) ||
+			    !storage3.HasComponent(entity) ||
+			    !storage4.HasComponent(entity) ||
+			    !storage5.HasComponent(entity) ||
+			    !storage6.HasComponent(entity)
 			) return;
 
 			if (entities.Length <= length)
@@ -617,11 +639,10 @@ namespace Pixeye
 			}
 
 
-			if (Add != null)
-				Add(entity);
-
 			indexLast = length++;
 			entities[indexLast] = entity;
+
+			HandleAddEvents();
 		}
 
 
@@ -649,11 +670,11 @@ namespace Pixeye
 						continue;
 				int entityID = e.entity;
 				if (!storage.HasComponent(entityID) ||
-					!storage2.HasComponent(entityID) ||
-					!storage3.HasComponent(entityID) ||
-					!storage4.HasComponent(entityID) ||
-					!storage5.HasComponent(entityID) ||
-					!storage6.HasComponent(entityID)
+				    !storage2.HasComponent(entityID) ||
+				    !storage3.HasComponent(entityID) ||
+				    !storage4.HasComponent(entityID) ||
+				    !storage5.HasComponent(entityID) ||
+				    !storage6.HasComponent(entityID)
 				) continue;
 
 
@@ -691,12 +712,12 @@ namespace Pixeye
 
 
 	public class Group<T, Y, U, I, O, P, A> : GroupBase where T : IComponent, new()
-			where Y : new()
-			where U : new()
-			where I : new()
-			where O : new()
-			where P : new()
-			where A : new()
+	                                                    where Y : new()
+	                                                    where U : new()
+	                                                    where I : new()
+	                                                    where O : new()
+	                                                    where P : new()
+	                                                    where A : new()
 	{
 		Storage<T> storage = Storage<T>.Instance;
 		Storage<Y> storage2 = Storage<Y>.Instance;
@@ -709,12 +730,12 @@ namespace Pixeye
 		public override void TryAdd(int entity)
 		{
 			if (!storage.HasComponent(entity) ||
-				!storage2.HasComponent(entity) ||
-				!storage3.HasComponent(entity) ||
-				!storage4.HasComponent(entity) ||
-				!storage5.HasComponent(entity) ||
-				!storage6.HasComponent(entity) ||
-				!storage7.HasComponent(entity)
+			    !storage2.HasComponent(entity) ||
+			    !storage3.HasComponent(entity) ||
+			    !storage4.HasComponent(entity) ||
+			    !storage5.HasComponent(entity) ||
+			    !storage6.HasComponent(entity) ||
+			    !storage7.HasComponent(entity)
 			) return;
 
 			if (entities.Length <= length)
@@ -728,9 +749,7 @@ namespace Pixeye
 
 			entities[indexLast] = entity;
 
-
-			if (Add != null)
-				Add(entity);
+			HandleAddEvents();
 		}
 
 
@@ -759,12 +778,12 @@ namespace Pixeye
 						continue;
 				int entityID = e.entity;
 				if (!storage.HasComponent(entityID) ||
-					!storage2.HasComponent(entityID) ||
-					!storage3.HasComponent(entityID) ||
-					!storage4.HasComponent(entityID) ||
-					!storage5.HasComponent(entityID) ||
-					!storage6.HasComponent(entityID) ||
-					!storage7.HasComponent(entityID)
+				    !storage2.HasComponent(entityID) ||
+				    !storage3.HasComponent(entityID) ||
+				    !storage4.HasComponent(entityID) ||
+				    !storage5.HasComponent(entityID) ||
+				    !storage6.HasComponent(entityID) ||
+				    !storage7.HasComponent(entityID)
 				) continue;
 
 
@@ -802,13 +821,13 @@ namespace Pixeye
 
 
 	public class Group<T, Y, U, I, O, P, A, S> : GroupBase where T : IComponent, new()
-			where Y : new()
-			where U : new()
-			where I : new()
-			where O : new()
-			where P : new()
-			where A : new()
-			where S : new()
+	                                                       where Y : new()
+	                                                       where U : new()
+	                                                       where I : new()
+	                                                       where O : new()
+	                                                       where P : new()
+	                                                       where A : new()
+	                                                       where S : new()
 	{
 		Storage<T> storage = Storage<T>.Instance;
 		Storage<Y> storage2 = Storage<Y>.Instance;
@@ -822,13 +841,13 @@ namespace Pixeye
 		public override void TryAdd(int entity)
 		{
 			if (!storage.HasComponent(entity) ||
-				!storage2.HasComponent(entity) ||
-				!storage3.HasComponent(entity) ||
-				!storage4.HasComponent(entity) ||
-				!storage5.HasComponent(entity) ||
-				!storage6.HasComponent(entity) ||
-				!storage7.HasComponent(entity) ||
-				!storage8.HasComponent(entity)
+			    !storage2.HasComponent(entity) ||
+			    !storage3.HasComponent(entity) ||
+			    !storage4.HasComponent(entity) ||
+			    !storage5.HasComponent(entity) ||
+			    !storage6.HasComponent(entity) ||
+			    !storage7.HasComponent(entity) ||
+			    !storage8.HasComponent(entity)
 			) return;
 
 			if (entities.Length <= length)
@@ -842,9 +861,7 @@ namespace Pixeye
 
 			entities[indexLast] = entity;
 
-
-			if (Add != null)
-				Add(entity);
+			HandleAddEvents();
 		}
 
 
@@ -874,13 +891,13 @@ namespace Pixeye
 						continue;
 				int entityID = e.entity;
 				if (!storage.HasComponent(entityID) ||
-					!storage2.HasComponent(entityID) ||
-					!storage3.HasComponent(entityID) ||
-					!storage4.HasComponent(entityID) ||
-					!storage5.HasComponent(entityID) ||
-					!storage6.HasComponent(entityID) ||
-					!storage7.HasComponent(entityID) ||
-					!storage8.HasComponent(entityID)
+				    !storage2.HasComponent(entityID) ||
+				    !storage3.HasComponent(entityID) ||
+				    !storage4.HasComponent(entityID) ||
+				    !storage5.HasComponent(entityID) ||
+				    !storage6.HasComponent(entityID) ||
+				    !storage7.HasComponent(entityID) ||
+				    !storage8.HasComponent(entityID)
 				) continue;
 
 
@@ -918,14 +935,14 @@ namespace Pixeye
 
 
 	public class Group<T, Y, U, I, O, P, A, S, D> : GroupBase where T : IComponent, new()
-			where Y : new()
-			where U : new()
-			where I : new()
-			where O : new()
-			where P : new()
-			where A : new()
-			where S : new()
-			where D : new()
+	                                                          where Y : new()
+	                                                          where U : new()
+	                                                          where I : new()
+	                                                          where O : new()
+	                                                          where P : new()
+	                                                          where A : new()
+	                                                          where S : new()
+	                                                          where D : new()
 	{
 		Storage<T> storage = Storage<T>.Instance;
 		Storage<Y> storage2 = Storage<Y>.Instance;
@@ -940,14 +957,14 @@ namespace Pixeye
 		public override void TryAdd(int entity)
 		{
 			if (!storage.HasComponent(entity) ||
-				!storage2.HasComponent(entity) ||
-				!storage3.HasComponent(entity) ||
-				!storage4.HasComponent(entity) ||
-				!storage5.HasComponent(entity) ||
-				!storage6.HasComponent(entity) ||
-				!storage7.HasComponent(entity) ||
-				!storage8.HasComponent(entity) ||
-				!storage9.HasComponent(entity)
+			    !storage2.HasComponent(entity) ||
+			    !storage3.HasComponent(entity) ||
+			    !storage4.HasComponent(entity) ||
+			    !storage5.HasComponent(entity) ||
+			    !storage6.HasComponent(entity) ||
+			    !storage7.HasComponent(entity) ||
+			    !storage8.HasComponent(entity) ||
+			    !storage9.HasComponent(entity)
 			) return;
 
 			if (entities.Length <= length)
@@ -961,9 +978,7 @@ namespace Pixeye
 
 			entities[indexLast] = entity;
 
-
-			if (Add != null)
-				Add(entity);
+			HandleAddEvents();
 		}
 
 
@@ -993,14 +1008,14 @@ namespace Pixeye
 						continue;
 				int entityID = e.entity;
 				if (!storage.HasComponent(entityID) ||
-					!storage2.HasComponent(entityID) ||
-					!storage3.HasComponent(entityID) ||
-					!storage4.HasComponent(entityID) ||
-					!storage5.HasComponent(entityID) ||
-					!storage6.HasComponent(entityID) ||
-					!storage7.HasComponent(entityID) ||
-					!storage8.HasComponent(entityID) ||
-					!storage9.HasComponent(entityID)
+				    !storage2.HasComponent(entityID) ||
+				    !storage3.HasComponent(entityID) ||
+				    !storage4.HasComponent(entityID) ||
+				    !storage5.HasComponent(entityID) ||
+				    !storage6.HasComponent(entityID) ||
+				    !storage7.HasComponent(entityID) ||
+				    !storage8.HasComponent(entityID) ||
+				    !storage9.HasComponent(entityID)
 				) continue;
 
 

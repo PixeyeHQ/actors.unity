@@ -14,6 +14,9 @@ namespace Pixeye
 		public static Stack<int> prevID = new Stack<int>(100);
 		public static int lastID;
 
+		public static ActionEntity[] actionsOnAdd = new ActionEntity[100];
+		public static int actionsOnAddLength = 0;
+	 
 
 		public static ProcessingEntities Default = new ProcessingEntities();
 
@@ -139,6 +142,13 @@ namespace Pixeye
 				for (int i = 0; i < groupLength; i++)
 					GroupsBase[i].OnRemove(entity);
 			}
+
+			
+			for (int i = 0; i < actionsOnAddLength; i++)
+				actionsOnAdd[i](entity);
+
+			actionsOnAddLength = 0;
+
 		}
 
 
@@ -170,7 +180,8 @@ namespace Pixeye
 		}
 	}
 
-
+	public delegate void ActionEntity(int entity);
+	
 	public struct EntityComposer
 	{
 		public int entity;
@@ -230,7 +241,6 @@ namespace Pixeye
 		{
 			entity.AddTagsRaw(tags);
 			Deploy();
-	 
 		}
 	}
 }
