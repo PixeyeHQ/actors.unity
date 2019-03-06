@@ -58,7 +58,7 @@ namespace Pixeye
 		/// </summary>
 		/// <param name="mono"></param>
 		/// <returns>Returns true if exist and enabled</returns>
-		public static bool IsActive(this MonoEntity mono)
+		public static bool Exists(this MonoEntity mono)
 		{
 			return mono != null && mono.conditionEnabled;
 		}

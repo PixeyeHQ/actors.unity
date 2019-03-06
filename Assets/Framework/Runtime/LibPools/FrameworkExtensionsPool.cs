@@ -23,12 +23,12 @@ namespace Pixeye
 			else ProcessingPool.Despawn(poolID, o);
 		}
 
-		#region NO POOLS
+		 #region NO POOLS
 
 		public static Transform Populate(this object o, GameObject prefab, Transform parent, Vector3 startPosition = default(Vector3), Quaternion startRotation = default(Quaternion))
 		{
 			var go = Object.Instantiate(prefab, parent).transform;
-			go.localPosition = startPosition;
+			go.position = startPosition;
 			go.localRotation = startRotation;
 			go.localScale = Vector3.one;
 			return go;
@@ -37,7 +37,7 @@ namespace Pixeye
 		public static T Populate<T>(this object o, GameObject prefab, Transform parent, Vector3 startPosition = default(Vector3), Quaternion startRotation = default(Quaternion))
 		{
 			var go = Object.Instantiate(prefab, parent).transform;
-			go.localPosition = startPosition;
+			go.position = startPosition;
 			go.localRotation = startRotation;
 			go.localScale = Vector3.one;
 			return go.GetComponentInChildren<T>();
@@ -47,7 +47,7 @@ namespace Pixeye
 		{
 			var prefab = Box.Get<GameObject>(prefabID);
 			var go     = Object.Instantiate(prefab, parent).transform;
-			go.localPosition = startPosition;
+			go.position = startPosition;
 			go.localRotation = startRotation;
 			go.localScale = Vector3.one;
 			return go;
@@ -57,7 +57,7 @@ namespace Pixeye
 		{
 			var prefab = Box.Get<GameObject>(prefabID);
 			var go     = Object.Instantiate(prefab, parent).transform;
-			go.localPosition = startPosition;
+			go.position = startPosition;
 			go.localRotation = startRotation;
 			go.localScale = Vector3.one;
 			return go.GetComponentInChildren<T>();
@@ -68,7 +68,7 @@ namespace Pixeye
 		{
 			var parent = ProcessingScene.Get(parentID);
 			var go     = Object.Instantiate(prefab, parent).transform;
-			go.localPosition = startPosition;
+			go.position = startPosition;
 			go.localRotation = startRotation;
 			go.localScale = Vector3.one;
 			return go;
@@ -78,7 +78,7 @@ namespace Pixeye
 		{
 			var parent = ProcessingScene.Get(parentID);
 			var go     = Object.Instantiate(prefab, parent).transform;
-			go.localPosition = startPosition;
+			go.position = startPosition;
 			go.localRotation = startRotation;
 			go.localScale = Vector3.one;
 			return go.GetComponentInChildren<T>();
@@ -89,7 +89,7 @@ namespace Pixeye
 			var parent = ProcessingScene.Get(parentID);
 			var prefab = Box.Get<GameObject>(prefabID);
 			var go     = Object.Instantiate(prefab, parent).transform;
-			go.localPosition = startPosition;
+			go.position = startPosition;
 			go.localRotation = startRotation;
 			go.localScale = Vector3.one;
 			return go;
@@ -100,7 +100,7 @@ namespace Pixeye
 			var parent = ProcessingScene.Get(parentID);
 			var prefab = Box.Get<GameObject>(prefabID);
 			var go     = Object.Instantiate(prefab, parent).transform;
-			go.localPosition = startPosition;
+			go.position = startPosition;
 			go.localRotation = startRotation;
 			go.localScale = Vector3.one;
 			return go.GetComponentInChildren<T>();
@@ -149,7 +149,7 @@ namespace Pixeye
 		public static Transform Populate(this object o, int poolID, GameObject prefab, Transform parent, Vector3 startPosition = default(Vector3), Quaternion startRotation = default(Quaternion))
 		{
 			var go = ProcessingPool.pools[poolID].Spawn(prefab, parent).transform;
-			go.localPosition = startPosition;
+			go.position = startPosition;
 			go.localRotation = startRotation;
 			go.localScale = Vector3.one;
 			return go;
@@ -158,7 +158,7 @@ namespace Pixeye
 		public static T Populate<T>(this object o, int poolID, GameObject prefab, Transform parent, Vector3 startPosition = default(Vector3), Quaternion startRotation = default(Quaternion))
 		{
 			var go = ProcessingPool.pools[poolID].Spawn(prefab, parent).transform;
-			go.localPosition = startPosition;
+			go.position = startPosition;
 			go.localRotation = startRotation;
 			go.localScale = Vector3.one;
 			return go.GetComponentInChildren<T>();
@@ -168,7 +168,7 @@ namespace Pixeye
 		{
 			var prefab = Box.Get<GameObject>(prefabID);
 			var go = ProcessingPool.pools[poolID].Spawn(prefab, parent).transform;
-			go.localPosition = startPosition;
+			go.position = startPosition;
 			go.localRotation = startRotation;
 			go.localScale = Vector3.one;
 			return go;
@@ -178,7 +178,7 @@ namespace Pixeye
 		{
 			var prefab = Box.Get<GameObject>(prefabID);
 			var go = ProcessingPool.pools[poolID].Spawn(prefab, parent).transform;
-			go.localPosition = startPosition;
+			go.position = startPosition;
 			go.localRotation = startRotation;
 			go.localScale = Vector3.one;
 			return go.GetComponentInChildren<T>();
@@ -189,7 +189,7 @@ namespace Pixeye
 		{
 			var parent = ProcessingScene.Get(parentID);
 			var go = ProcessingPool.pools[poolID].Spawn(prefab, parent).transform;
-			go.localPosition = startPosition;
+			go.position = startPosition;
 			go.localRotation = startRotation;
 			go.localScale = Vector3.one;
 			return go;
@@ -199,7 +199,7 @@ namespace Pixeye
 		{
 			var parent = ProcessingScene.Get(parentID);
 			var go = ProcessingPool.pools[poolID].Spawn(prefab, parent).transform;
-			go.localPosition = startPosition;
+			go.position = startPosition;
 			go.localRotation = startRotation;
 			go.localScale = Vector3.one;
 			return go.GetComponentInChildren<T>();
@@ -210,7 +210,7 @@ namespace Pixeye
 			var parent = ProcessingScene.Get(parentID);
 			var prefab = Box.Get<GameObject>(prefabID);
 			var go = ProcessingPool.pools[poolID].Spawn(prefab, parent).transform;
-			go.localPosition = startPosition;
+			go.position = startPosition;
 			go.localRotation = startRotation;
 			go.localScale = Vector3.one;
 			return go;
@@ -221,7 +221,7 @@ namespace Pixeye
 			var parent = ProcessingScene.Get(parentID);
 			var prefab = Box.Get<GameObject>(prefabID);
 			var go = ProcessingPool.pools[poolID].Spawn(prefab, parent).transform;
-			go.localPosition = startPosition;
+			go.position = startPosition;
 			go.localRotation = startRotation;
 			go.localScale = Vector3.one;
 			return go.GetComponentInChildren<T>();
