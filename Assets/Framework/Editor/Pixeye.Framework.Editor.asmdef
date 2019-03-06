@@ -1,0 +1,16 @@
+{
+    "name": "Pixeye.Framework.Editor",
+    "references": [
+        "Pixeye.Framework"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": []
+}
