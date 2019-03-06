@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using UnityEditor;
 #endif
 using UnityEngine;
+
 #if ODIN_INSPECTOR
 using Sirenix.OdinInspector;
 #endif
@@ -22,16 +23,21 @@ namespace Pixeye
 		public static bool initialized;
 
 
-		[FoldoutGroup("Setup")] public List<Factory> factories;
-		[FoldoutGroup("Setup")] public List<SceneField> ScenesToKeep;
-		[FoldoutGroup("Setup")] public List<SceneField> SceneDependsOn;
+		[FoldoutGroup("Setup")]
+		public List<Factory> factories;
+
+		[FoldoutGroup("Setup")]
+		public List<SceneField> ScenesToKeep;
+
+		[FoldoutGroup("Setup")]
+		public List<SceneField> SceneDependsOn;
 
 		[FoldoutGroup("Actors Pool Cache")]
 		public List<PoolNode> nodes = new List<PoolNode>();
 
 		void Awake()
 		{
-		//	ProcessingScene.Dynamic = GameObject.Find("Dynamic").transform;
+			//	ProcessingScene.Dynamic = GameObject.Find("Dynamic").transform;
 
 			if (ProcessingUpdate.Default == null)
 			{
@@ -115,8 +121,8 @@ namespace Pixeye
 			#if UNITY_2018_3_OR_NEWER
 			prefab = PrefabUtility.GetCorrespondingObjectFromSource(instance);
 			#else
-			prefab = PrefabUtility.GetPrefabObject(instance);
-		    #endif
+			prefab = (GameObject)PrefabUtility.GetPrefabObject(instance);
+			#endif
 
 			if (prefab == null) return;
 			var id    = prefab.GetInstanceID();
@@ -166,8 +172,7 @@ namespace Pixeye
 			}
 
 
-			Timer.Add(Time.deltaFixed * 2, () =>
-			{
+			Timer.Add(Time.deltaFixed * 2, () => {
 				PostSetup();
 				Add<ProcessingRelease>();
 			});
@@ -178,13 +183,19 @@ namespace Pixeye
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
 		/// <returns></returns>
-		protected static T Add<T>() where T : new() { return Toolbox.Add<T>(); }
+		protected static T Add<T>() where T : new()
+		{
+			return Toolbox.Add<T>();
+		}
 
 
 		protected virtual void Setup() { }
 
 		protected virtual void PostSetup() { }
 
-		protected virtual void OnDestroy() { initialized = false; }
+		protected virtual void OnDestroy()
+		{
+			initialized = false;
+		}
 	}
 }

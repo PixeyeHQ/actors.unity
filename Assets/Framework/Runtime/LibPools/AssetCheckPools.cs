@@ -77,8 +77,9 @@ namespace Pixeye
 			GameObject prefab;
 			#if UNITY_2018_3_OR_NEWER
 			prefab = PrefabUtility.GetCorrespondingObjectFromSource(gameObject);
+			 
 			#else
-				prefab = PrefabUtility.GetPrefabObject(gameObject);
+			prefab = (GameObject) PrefabUtility.GetPrefabObject(gameObject);
 		    #endif
 			if (prefab == null) return;
 			starter.AddToNode(prefab, gameObject, pool);
