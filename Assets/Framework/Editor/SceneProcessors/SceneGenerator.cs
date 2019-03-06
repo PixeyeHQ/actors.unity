@@ -30,9 +30,8 @@ public class SceneGenerator
 
 		GameObject.DestroyImmediate(camGO);
 		new GameObject("-- SETUP --");
-		var s = new GameObject("-- SCENE --");
-	//	var d = new GameObject("Dynamic");
-	//	d.transform.parent = s.transform;
+		new GameObject("-- SCENE --");
+ 
 		Debug.Log("New scene created!");
 	}
 }
