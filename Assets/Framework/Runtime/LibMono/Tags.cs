@@ -16,9 +16,8 @@ namespace Pixeye
 	{
 		internal static Dictionary<int, int>[] tags = new Dictionary<int, int>[EngineSettings.MinEntities];
 		internal static Dictionary<int, List<GroupBase>> groupsInclude = new Dictionary<int, List<GroupBase>>(10, new FastComparable());
-
 		internal static Dictionary<int, List<GroupBase>> groupsDeclude = new Dictionary<int, List<GroupBase>>(10, new FastComparable());
-		 
+
 		static internal int length = -1;
 
 		static internal void Add(int entityID)
@@ -36,7 +35,10 @@ namespace Pixeye
 			tags[entityID] = new Dictionary<int, int>(4, new FastComparable());
 		}
 
-		public static void Clear(int id) { tags[id].Clear(); }
+		public static void Clear(int id)
+		{
+			tags[id].Clear();
+		}
 
 		static internal void HandleChange(int entity, int tag)
 		{
@@ -63,24 +65,13 @@ namespace Pixeye
 					groups[i].TagsHaveChanged(entity);
 				}
 			}
-		 
-			
-			ProcessingRelease.HandleTagEvents = () => {
-							for (int i = 0; i < ProcessingEntities.actionsOnAddLength; i++)
-				ProcessingEntities.actionsOnAdd[i](entity);
 
-			ProcessingEntities.actionsOnAddLength = 0;
-			};
-			ProcessingRelease.valid = false;
-
-
+			ProcessingActors.valid = false;
 		}
 
 
 		#region TAGS
 
-		
-		
 		public static void Remove(this int entityID, int tagID)
 		{
 			var dict = tags[entityID];
@@ -127,7 +118,7 @@ namespace Pixeye
 			}
 		}
 
- 
+
 		public static void Add(this int entityID, int tagId)
 		{
 			var dict = tags[entityID];

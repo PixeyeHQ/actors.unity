@@ -1,19 +1,20 @@
 //  Project  : ACTORS
 //  Contacts : Pixeye - ask@pixeye.games
 
-using System;
 
 namespace Pixeye
 {
-	public class ProcessingRelease : ProcessingBase, ITick
+	public class ProcessingActors : ProcessingBase, ITick
 	{
-		public static Action HandleTagEvents;
 		public static bool valid = true;
+		public static int AddEventsLength;
+		public static DelayAddEvent[] AddEvents = new DelayAddEvent[10];
+
 
 		public Group<ComponentRelease> groupRelease;
 
 
-		public ProcessingRelease()
+		public ProcessingActors()
 		{
 			groupRelease.Add += entity => {
 				ComponentObject cObject;
@@ -51,9 +52,21 @@ namespace Pixeye
 		{
 			if (!valid)
 			{
-				HandleTagEvents();
+				for (int i = 0; i < AddEventsLength; i++)
+				{
+					var ev = AddEvents[i];
+					ev.action(ev.entity);
+				}
+
+				AddEventsLength = 0;
 				valid = true;
 			}
 		}
+	}
+
+	public struct DelayAddEvent
+	{
+		public int entity;
+		public ActionEntity action;
 	}
 }

@@ -14,13 +14,11 @@ namespace Pixeye
 		public static Stack<int> prevID = new Stack<int>(100);
 		public static int lastID;
 
-		public static ActionEntity[] actionsOnAdd = new ActionEntity[100];
-		public static int actionsOnAddLength = 0;
-	 
+
 
 		public static ProcessingEntities Default = new ProcessingEntities();
 
-		//   internal List<GroupLocal> GroupLocals = new List<GroupLocal>(64);
+
 		internal GroupBase[] GroupsBase = new GroupBase[64];
 		internal int groupLength;
 
@@ -129,6 +127,7 @@ namespace Pixeye
 
 		public void CheckGroups(int entity, bool active)
 		{
+	 
 			if (Toolbox.applicationIsQuitting) return;
 
 			if (active)
@@ -143,35 +142,10 @@ namespace Pixeye
 					GroupsBase[i].OnRemove(entity);
 			}
 
-			
-			for (int i = 0; i < actionsOnAddLength; i++)
-				actionsOnAdd[i](entity);
 
-			actionsOnAddLength = 0;
-
+		ProcessingActors.valid = false;
 		}
 
-
-//        internal GroupLocal SetupGroupLocal(Type groupType)
-//        {
-//            var len = GroupLocals.Count;
-//            var i   = -1;
-//            for (; i < len; i++)
-//            {
-//                if (GroupLocals.GetType() == groupType)
-//                {
-//                    return GroupLocals[i];
-//                }
-//            }
-//
-//
-//            var group = Activator.CreateInstance(groupType, true) as GroupLocal;
-//
-//            GroupLocals.Add(group);
-//
-//            return group;
-//        }
-//
 
 		public void Dispose()
 		{
@@ -233,11 +207,8 @@ namespace Pixeye
 				storage.Deploy(entity);
 			}
 
-			for (int i = 0; i < ProcessingEntities.actionsOnAddLength; i++)
-				ProcessingEntities.actionsOnAdd[i](entity);
 
-			ProcessingEntities.actionsOnAddLength = 0;
-			
+			ProcessingActors.valid = false;
 			storages = null;
 			length = 0;
 		}

@@ -13,7 +13,7 @@ namespace Pixeye
 	/// <para>Links a game object with specific entity.</para>
 	/// </summary>
 	public class MonoEntity : MonoBehaviour
-	{
+	{ 
 		 
 		[FoldoutGroup("Main"), TagFilter(typeof(Pool))]
 		public int pool = -1;

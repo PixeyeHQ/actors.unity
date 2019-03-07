@@ -154,7 +154,10 @@ namespace Pixeye
 			{
 				Toolbox.Add(factory);
 			}
-
+	 
+			
+			 
+			
 			Setup();
 
 			initialized = true;
@@ -171,10 +174,11 @@ namespace Pixeye
 				}
 			}
 
+			
 
 			Timer.Add(Time.deltaFixed * 2, () => {
 				PostSetup();
-				Add<ProcessingRelease>();
+				Add<ProcessingActors>();
 			});
 		}
 
