@@ -63,12 +63,17 @@ namespace Pixeye
 					groups[i].TagsHaveChanged(entity);
 				}
 			}
+		 
 			
-			for (int i = 0; i < ProcessingEntities.actionsOnAddLength; i++)
+			ProcessingRelease.HandleTagEvents = () => {
+							for (int i = 0; i < ProcessingEntities.actionsOnAddLength; i++)
 				ProcessingEntities.actionsOnAdd[i](entity);
 
 			ProcessingEntities.actionsOnAddLength = 0;
-			
+			};
+			ProcessingRelease.valid = false;
+
+
 		}
 
 

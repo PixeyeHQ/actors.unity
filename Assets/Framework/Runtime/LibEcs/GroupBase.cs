@@ -93,12 +93,12 @@ namespace Pixeye
 		{
 			if (Add != null)
 			{
-				if (entities.Length >= ProcessingEntities.actionsOnAdd.Length)
+				if (ProcessingEntities.actionsOnAdd.Length <= ProcessingEntities.actionsOnAddLength)
 				{
-					int len = entities.Length << 1;
+					int len = ProcessingEntities.actionsOnAddLength << 1;
 					Array.Resize(ref ProcessingEntities.actionsOnAdd, len);
 				}
-			
+
 				ProcessingEntities.actionsOnAdd[ProcessingEntities.actionsOnAddLength++] = Add;
 			}
 		}
