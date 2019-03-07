@@ -143,7 +143,7 @@ namespace Pixeye
 			}
 
 
-		ProcessingActors.valid = false;
+			ProcessingActorsAdd.valid = false;
 		}
 
 
@@ -208,7 +208,7 @@ namespace Pixeye
 			}
 
 
-			ProcessingActors.valid = false;
+			ProcessingActorsAdd.valid = false;
 			storages = null;
 			length = 0;
 		}

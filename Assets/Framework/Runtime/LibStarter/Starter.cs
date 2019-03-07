@@ -154,10 +154,10 @@ namespace Pixeye
 			{
 				Toolbox.Add(factory);
 			}
-	 
-			
-			 
-			
+
+
+			Add<ProcessingActorsAdd>();
+
 			Setup();
 
 			initialized = true;
@@ -174,11 +174,10 @@ namespace Pixeye
 				}
 			}
 
-			
 
 			Timer.Add(Time.deltaFixed * 2, () => {
 				PostSetup();
-				Add<ProcessingActors>();
+				Add<ProcessingActorsRemove>();
 			});
 		}
 

@@ -66,7 +66,7 @@ namespace Pixeye
 				}
 			}
 
-			ProcessingActors.valid = false;
+			ProcessingActorsAdd.valid = false;
 		}
 
 

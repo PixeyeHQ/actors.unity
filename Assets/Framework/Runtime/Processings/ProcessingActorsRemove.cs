@@ -4,17 +4,15 @@
 
 namespace Pixeye
 {
-	public class ProcessingActors : ProcessingBase, ITick
+	public class ProcessingActorsRemove : ProcessingBase
 	{
-		public static bool valid = true;
-		public static int AddEventsLength;
-		public static DelayAddEvent[] AddEvents = new DelayAddEvent[10];
+ 
 
 
 		public Group<ComponentRelease> groupRelease;
 
 
-		public ProcessingActors()
+		public ProcessingActorsRemove()
 		{
 			groupRelease.Add += entity => {
 				ComponentObject cObject;
@@ -48,25 +46,8 @@ namespace Pixeye
 			ProcessingEntities.prevID.Push(entity);
 		}
 
-		public void Tick()
-		{
-			if (!valid)
-			{
-				for (int i = 0; i < AddEventsLength; i++)
-				{
-					var ev = AddEvents[i];
-					ev.action(ev.entity);
-				}
-
-				AddEventsLength = 0;
-				valid = true;
-			}
-		}
+		 
 	}
 
-	public struct DelayAddEvent
-	{
-		public int entity;
-		public ActionEntity action;
-	}
+	 
 }
