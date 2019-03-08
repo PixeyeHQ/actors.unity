@@ -32,15 +32,15 @@ public static class ProcessingPatchFramework
 		{
 			var line = lines[i];
 
-			if (!line.Contains("\"com.pixeye.ecs\": {")) continue;
+			if (!line.Contains("\"lock\": {")) continue;
 
-			lineIndex = i - 2;
+			lineIndex = i;
 			break;
 		}
 
-		lines[lineIndex] = "}";
-		lines.RemoveRange(lineIndex + 1, 6);
-
+		lines[lineIndex-1] = "}";
+		lines.RemoveRange(lineIndex, lines.Count-1-lineIndex);
+  
 		len = lines.Count;
 		using (StreamWriter sr = new StreamWriter(path))
 		{
