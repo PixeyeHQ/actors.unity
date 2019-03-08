@@ -1,5 +1,6 @@
 //  Project  : ACTORS
 //  Contacts : Pixeye - ask@pixeye.games
+//  Author: Michael Garforth / http://wiki.unity3d.com/index.php/Profiler
 
 using System;
 using System.Collections.Generic;
