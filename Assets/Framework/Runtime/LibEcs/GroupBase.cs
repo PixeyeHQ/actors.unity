@@ -97,15 +97,60 @@ namespace Pixeye
 				ev.action = Add;
 				ev.entity = entities[indexLast];
 
-				if (ProcessingActorsAdd.AddEvents.Length <= ProcessingActorsAdd.AddEventsLength)
+				if (ProcessingActorsAdd.addEvents.Length <= ProcessingActorsAdd.lenAddEvents)
 				{
-					int len = ProcessingActorsAdd.AddEventsLength << 1;
-					Array.Resize(ref ProcessingActorsAdd.AddEvents, len);
+					int len = ProcessingActorsAdd.lenAddEvents << 1;
+					Array.Resize(ref ProcessingActorsAdd.addEvents, len);
 				}
 
 
-				ProcessingActorsAdd.AddEvents[ProcessingActorsAdd.AddEventsLength++] = ev;
+				ProcessingActorsAdd.addEvents[ProcessingActorsAdd.lenAddEvents++] = ev;
 			}
+		}
+
+
+		internal void HandleAddEntity(int entity)
+		{
+			DelayChangeGroup dcg;
+			dcg.entity = entity;
+			dcg.groupToChange = this;
+
+
+			if (ProcessingActorsAdd.groupsToChange.Length <= ProcessingActorsAdd.lenGroupsToChange)
+			{
+				int len = ProcessingActorsAdd.lenGroupsToChange << 1;
+				Array.Resize(ref ProcessingActorsAdd.groupsToChange, len);
+			}
+
+			ProcessingActorsAdd.groupsToChange[ProcessingActorsAdd.lenGroupsToChange++] = dcg;
+
+			if (Add != null)
+			{
+				DelayAddEvent ev;
+				ev.action = Add;
+				ev.entity = entity;
+
+				if (ProcessingActorsAdd.addEvents.Length <= ProcessingActorsAdd.lenAddEvents)
+				{
+					int len = ProcessingActorsAdd.lenAddEvents << 1;
+					Array.Resize(ref ProcessingActorsAdd.addEvents, len);
+				}
+
+
+				ProcessingActorsAdd.addEvents[ProcessingActorsAdd.lenAddEvents++] = ev;
+			}
+		}
+
+		internal void HandleAddEntityFinalize(int entity)
+		{
+			if (entities.Length <= length)
+			{
+				int len = length << 1;
+				Array.Resize(ref entities, len);
+			}
+
+			indexLast = length++;
+			entities[indexLast] = entity;
 		}
 
 		public abstract    void Populate();
@@ -132,12 +177,6 @@ namespace Pixeye
 		{
 			return new EntityEnumerator(entities, length);
 		}
-
-
-		public T Get<T>() where T : IComponent, new()
-		{
-			return 0.Get<T>();
-		}
 	}
 
 	public struct EntityEnumerator : IEnumerator
@@ -146,7 +185,7 @@ namespace Pixeye
 
 
 		int position;
-		private int length;
+		int length;
 
 		public EntityEnumerator(int[] list, int length)
 		{
@@ -174,26 +213,13 @@ namespace Pixeye
 
 	public class Group<T> : GroupBase where T : IComponent, new()
 	{
-		private Storage<T> storage = Storage<T>.Instance;
+		Storage<T> storage = Storage<T>.Instance;
 
 
 		public override void TryAdd(int entity)
 		{
 			if (!storage.HasComponent(entity)) return;
-
-
-			if (entities.Length <= length)
-			{
-				int len = length << 1;
-				Array.Resize(ref entities, len);
-			}
-
-
-			indexLast = length++;
-
-			entities[indexLast] = entity;
-
-			HandleAddEvents();
+			HandleAddEntity(entity);
 		}
 
 
@@ -259,19 +285,7 @@ namespace Pixeye
 		public override void TryAdd(int entity)
 		{
 			if (!storage.HasComponent(entity) || !storage2.HasComponent(entity)) return;
-
-			if (entities.Length <= length)
-			{
-				int len = length << 1;
-
-				Array.Resize(ref entities, len);
-			}
-
-
-			indexLast = length++;
-			entities[indexLast] = entity;
-
-			HandleAddEvents();
+			HandleAddEntity(entity);
 		}
 
 
@@ -354,20 +368,7 @@ namespace Pixeye
 			    !storage3.HasComponent(entity)
 			) return;
 
-
-			if (entities.Length <= length)
-			{
-				int len = length << 1;
-				Array.Resize(ref entities, len);
-			}
-
-
-			indexLast = length++;
-
-			entities[indexLast] = entity;
-
-
-			HandleAddEvents();
+			HandleAddEntity(entity);
 		}
 
 
@@ -446,19 +447,7 @@ namespace Pixeye
 			    !storage4.HasComponent(entity)
 			) return;
 
-			if (entities.Length <= length)
-			{
-				int len = length << 1;
-
-				Array.Resize(ref entities, len);
-			}
-
-			indexLast = length++;
-
-			entities[indexLast] = entity;
-
-
-			HandleAddEvents();
+			HandleAddEntity(entity);
 		}
 
 
@@ -531,19 +520,7 @@ namespace Pixeye
 			    !storage5.HasComponent(entity)
 			) return;
 
-			if (entities.Length <= length)
-			{
-				int len = entity == 0 ? EngineSettings.MinComponents : length << 1;
-
-				Array.Resize(ref entities, len);
-			}
-
-			indexLast = length++;
-
-			entities[indexLast] = entity;
-
-
-			HandleAddEvents();
+			HandleAddEntity(entity);
 		}
 
 
@@ -635,18 +612,7 @@ namespace Pixeye
 			    !storage6.HasComponent(entity)
 			) return;
 
-			if (entities.Length <= length)
-			{
-				int len = length << 1;
-
-				Array.Resize(ref entities, len);
-			}
-
-
-			indexLast = length++;
-			entities[indexLast] = entity;
-
-			HandleAddEvents();
+			HandleAddEntity(entity);
 		}
 
 
@@ -742,18 +708,7 @@ namespace Pixeye
 			    !storage7.HasComponent(entity)
 			) return;
 
-			if (entities.Length <= length)
-			{
-				int len = length << 1;
-
-				Array.Resize(ref entities, len);
-			}
-
-			indexLast = length++;
-
-			entities[indexLast] = entity;
-
-			HandleAddEvents();
+			HandleAddEntity(entity);
 		}
 
 
@@ -854,18 +809,7 @@ namespace Pixeye
 			    !storage8.HasComponent(entity)
 			) return;
 
-			if (entities.Length <= length)
-			{
-				int len = length << 1;
-
-				Array.Resize(ref entities, len);
-			}
-
-			indexLast = length++;
-
-			entities[indexLast] = entity;
-
-			HandleAddEvents();
+			HandleAddEntity(entity);
 		}
 
 
@@ -971,18 +915,7 @@ namespace Pixeye
 			    !storage9.HasComponent(entity)
 			) return;
 
-			if (entities.Length <= length)
-			{
-				int len = length << 1;
-
-				Array.Resize(ref entities, len);
-			}
-
-			indexLast = length++;
-
-			entities[indexLast] = entity;
-
-			HandleAddEvents();
+			HandleAddEntity(entity);
 		}
 
 

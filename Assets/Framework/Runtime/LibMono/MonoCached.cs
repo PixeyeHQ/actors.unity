@@ -68,6 +68,6 @@ namespace Pixeye
 
 		protected virtual void HandleDisable() { }
 
-		protected abstract void Setup();
+		protected virtual void Setup() { }
 	}
 }
