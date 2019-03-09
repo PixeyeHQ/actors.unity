@@ -143,7 +143,7 @@ namespace Pixeye
 			}
 
 
-			ProcessingActorsAdd.valid = false;
+		//	ProcessingActorsAdd.valid = false;
 		}
 
 
@@ -204,11 +204,12 @@ namespace Pixeye
 		{
 			foreach (var storage in storages)
 			{
-				storage.Deploy(entity);
+				storage.Deploy(entity); 
+				
 			}
 
 
-			ProcessingActorsAdd.valid = false;
+		//	ProcessingActorsAdd.valid = false;
 			storages = null;
 			length = 0;
 		}

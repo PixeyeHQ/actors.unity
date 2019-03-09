@@ -46,27 +46,20 @@ namespace Pixeye
 
 			if (!entity.CheckMonoConditions()) return;
 
-			List<GroupBase> groups;
-			if (groupsInclude.TryGetValue(tag, out groups))
+	 
+			
+			DelayTagEvent dte;
+			dte.entity = entity;
+			dte.tag = tag;
+
+			if (ProcessingActorsAdd.tagsToChange.Length <= ProcessingActorsAdd.lenTagsToChange)
 			{
-				var len = groups.Count;
-
-				for (int i = 0; i < len; i++)
-				{
-					groups[i].TagsHaveChanged(entity);
-				}
+				int len = ProcessingActorsAdd.lenTagsToChange << 1;
+				Array.Resize(ref ProcessingActorsAdd.tagsToChange, len);
 			}
-
-			if (groupsDeclude.TryGetValue(tag, out groups))
-			{
-				var len = groups.Count;
-				for (int i = 0; i < len; i++)
-				{
-					groups[i].TagsHaveChanged(entity);
-				}
-			}
-
-			ProcessingActorsAdd.valid = false;
+			ProcessingActorsAdd.tagsToChange[ProcessingActorsAdd.lenTagsToChange++] = dte;
+			
+	 
 		}
 
 

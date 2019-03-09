@@ -8,6 +8,12 @@ namespace Pixeye
 {
 	public static class Log
 	{
+
+		public static void Show(object content)
+		{
+			Debug.Log(content);
+		}
+		
 		public static void Show(string context, params object[] args)
 		{
 			var final = string.Format(context, args);

@@ -89,60 +89,10 @@ namespace Pixeye
 			RemoveAt(i);
 		}
 
-		internal void HandleAddEvents()
-		{
-			if (Add != null)
-			{
-				DelayAddEvent ev;
-				ev.action = Add;
-				ev.entity = entities[indexLast];
-
-				if (ProcessingActorsAdd.addEvents.Length <= ProcessingActorsAdd.lenAddEvents)
-				{
-					int len = ProcessingActorsAdd.lenAddEvents << 1;
-					Array.Resize(ref ProcessingActorsAdd.addEvents, len);
-				}
-
-
-				ProcessingActorsAdd.addEvents[ProcessingActorsAdd.lenAddEvents++] = ev;
-			}
-		}
-
 
 		internal void HandleAddEntity(int entity)
 		{
-			DelayChangeGroup dcg;
-			dcg.entity = entity;
-			dcg.groupToChange = this;
 
-
-			if (ProcessingActorsAdd.groupsToChange.Length <= ProcessingActorsAdd.lenGroupsToChange)
-			{
-				int len = ProcessingActorsAdd.lenGroupsToChange << 1;
-				Array.Resize(ref ProcessingActorsAdd.groupsToChange, len);
-			}
-
-			ProcessingActorsAdd.groupsToChange[ProcessingActorsAdd.lenGroupsToChange++] = dcg;
-
-			if (Add != null)
-			{
-				DelayAddEvent ev;
-				ev.action = Add;
-				ev.entity = entity;
-
-				if (ProcessingActorsAdd.addEvents.Length <= ProcessingActorsAdd.lenAddEvents)
-				{
-					int len = ProcessingActorsAdd.lenAddEvents << 1;
-					Array.Resize(ref ProcessingActorsAdd.addEvents, len);
-				}
-
-
-				ProcessingActorsAdd.addEvents[ProcessingActorsAdd.lenAddEvents++] = ev;
-			}
-		}
-
-		internal void HandleAddEntityFinalize(int entity)
-		{
 			if (entities.Length <= length)
 			{
 				int len = length << 1;
@@ -151,7 +101,12 @@ namespace Pixeye
 
 			indexLast = length++;
 			entities[indexLast] = entity;
+
+ 			 if (Add != null)
+  			 	Add(entity);
+
 		}
+ 
 
 		public abstract    void Populate();
 		protected abstract void RemoveAt(int i);

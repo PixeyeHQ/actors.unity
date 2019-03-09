@@ -2,51 +2,52 @@
 // Contacts : Pix - info@pixeye.games
 //     Date : 3/7/2019 
 
-
+using System.Collections;
+using System.Collections.Generic;
 namespace Pixeye
 {
 	public class ProcessingActorsAdd : ProcessingBase, ITick
 	{
-		public static bool valid = true;
-		public static int lenAddEvents;
-		public static DelayAddEvent[] addEvents = new DelayAddEvent[10];
-
-		public static int lenGroupsToChange;
-		public static DelayChangeGroup[] groupsToChange = new DelayChangeGroup[10];
-
-
+		public static int lenTagsToChange;
+		public static DelayTagEvent[] tagsToChange = new DelayTagEvent[10];
+		static List<GroupBase> groups;
 		public void Tick()
 		{
-			if (!valid)
+			for (int i = 0; i < lenTagsToChange; i++)
 			{
-				for (int i = 0; i < lenGroupsToChange; i++)
+				var ev = tagsToChange[i];
+				var e = ev.entity;
+				var t = ev.tag;
+
+				 if (Tags.groupsInclude.TryGetValue(t, out groups))
 				{
-					var ev = groupsToChange[i];
-					ev.groupToChange.HandleAddEntityFinalize(ev.entity);
+					var len = groups.Count;
+
+					for (int j = 0; j < len; j++)
+					{
+						 groups[j].TagsHaveChanged(e);
+					}
 				}
 
-				for (int i = 0; i < lenAddEvents; i++)
+				if (Tags.groupsDeclude.TryGetValue(t, out groups))
 				{
-					var ev = addEvents[i];
-					ev.action(ev.entity);
+					var len = groups.Count;
+					for (int j = 0; j < len; j++)
+					{
+						 groups[j].TagsHaveChanged(e);
+					}
 				}
 
-				lenAddEvents = 0;
-				lenGroupsToChange = 0;
-				valid = true;
 			}
+			lenTagsToChange = 0;
 		}
 	}
 
-	public struct DelayAddEvent
+	public struct DelayTagEvent
 	{
 		public int entity;
-		public ActionEntity action;
+		public int tag;
 	}
+	
 
-	public struct DelayChangeGroup
-	{
-		public int entity;
-		public GroupBase groupToChange;
-	}
 }
