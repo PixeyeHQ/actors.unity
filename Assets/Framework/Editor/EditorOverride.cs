@@ -21,8 +21,10 @@ namespace Pixeye
 		Type type;
 		int length;
 		List<FieldInfo> objectFields;
+
 		bool initialized;
-		Colors colors;
+
+		//	Colors colors;
 		FoldoutGroupAttribute prevFold;
 		GUIStyle style;
 
@@ -30,20 +32,20 @@ namespace Pixeye
 		void OnEnable()
 		{
 			bool pro = EditorGUIUtility.isProSkin;
-			if (!pro)
-			{
-				colors = new Colors();
-				colors.col0 = new Color(0.2f, 0.2f, 0.2f, 1f);
-				colors.col1 = new Color(1, 1, 1, 0.55f);
-				colors.col2 = new Color(0.7f, 0.7f, 0.7f, 1f);
-			}
-			else
-			{
-				colors = new Colors();
-				colors.col0 = new Color(0.2f, 0.2f, 0.2f, 1f);
-				colors.col1 = new Color(1, 1, 1, 0.1f);
-				colors.col2 = new Color(0.25f, 0.25f, 0.25f, 1f);
-			}
+//			if (!pro)
+//			{
+//				colors = new Colors();
+//				colors.col0 = new Color(0.2f, 0.2f, 0.2f, 1f);
+//				colors.col1 = new Color(1, 1, 1, 0.55f);
+//				colors.col2 = new Color(0.7f, 0.7f, 0.7f, 1f);
+//			}
+//			else
+//			{
+//				colors = new Colors();
+//				colors.col0 = new Color(0.2f, 0.2f, 0.2f, 1f);
+//				colors.col1 = new Color(1, 1, 1, 0.1f);
+//				colors.col2 = new Color(0.25f, 0.25f, 0.25f, 1f);
+//			}
 
 			var t        = target.GetType();
 			var typeTree = t.GetTypeTree();
@@ -158,50 +160,28 @@ namespace Pixeye
 				EditorGUILayout.PropertyField(props[0], true);
 			}
 
-			EditorGUILayout.Space();
-
 			foreach (var pair in cache)
 			{
-				var rect = EditorGUILayout.BeginVertical();
+				this.UseVerticalBoxLayout(() => {
+					pair.Value.expanded = EditorGUILayout.Foldout(pair.Value.expanded, pair.Value.atr.name, true,
+							style != null ? style : EditorStyles.foldout);
 
-				EditorGUILayout.Space();
-
-				EditorGUI.DrawRect(new Rect(rect.x - 1, rect.y - 1, rect.width + 1, rect.height + 1),
-						colors.col0);
-
-				EditorGUI.DrawRect(new Rect(rect.x - 1, rect.y - 1, rect.width + 1, rect.height + 1), colors.col1);
-
-
-				pair.Value.expanded = EditorGUILayout.Foldout(pair.Value.expanded, pair.Value.atr.name, true,
-						style != null ? style : EditorStyles.foldout);
-
-
-				EditorGUILayout.EndVertical();
-
-				rect = EditorGUILayout.BeginVertical();
-
-				EditorGUI.DrawRect(new Rect(rect.x - 1, rect.y - 1, rect.width + 1, rect.height + 1),
-						colors.col2);
-
-				if (pair.Value.expanded)
-				{
-					EditorGUILayout.Space();
+					if (pair.Value.expanded)
 					{
+						EditorGUI.indentLevel = 1;
 						for (int i = 0; i < pair.Value.props.Count; i++)
 						{
-							EditorGUI.indentLevel = 1;
+							this.UseVerticalBoxLayout(() => {
+								EditorGUILayout.PropertyField(pair.Value.props[i],
+										new GUIContent(pair.Value.props[i].name.FirstLetterToUpperCase()), true);
 
-							EditorGUILayout.PropertyField(pair.Value.props[i],
-									new GUIContent(pair.Value.props[i].name.FirstLetterToUpperCase()), true);
-							if (i == pair.Value.props.Count - 1)
-								EditorGUILayout.Space();
+								//if (i == pair.Value.props.Count - 1)
+								//EditorGUILayout.Space();
+							}, EditorUIStyles.boxChild);
 						}
 					}
-				}
-
+				}, EditorUIStyles.box);
 				EditorGUI.indentLevel = 0;
-				EditorGUILayout.EndVertical();
-				EditorGUILayout.Space();
 			}
 
 
@@ -237,13 +217,6 @@ namespace Pixeye
 			}
 		}
 
-
-		struct Colors
-		{
-			public Color col0;
-			public Color col1;
-			public Color col2;
-		}
 
 		class Cache
 		{
