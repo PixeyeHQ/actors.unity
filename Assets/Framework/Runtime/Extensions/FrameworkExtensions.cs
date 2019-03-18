@@ -12,6 +12,8 @@ namespace Pixeye
 {
 	public static partial class FrameworkExtensions
 	{
+		#region MATH
+
 		static System.Random _r = new System.Random();
 
 		public static bool Every(this float step, float time)
@@ -34,10 +36,52 @@ namespace Pixeye
 			return false;
 		}
 
-		public static float Plus(this float arg0, float val, float clamp = 1f) { return Math.Min(clamp, arg0 + val); }
-		public static float Minus(this float arg0, float val, float clamp = 0f) { return Math.Max(clamp, arg0 - val); }
-		public static int Plus(this int arg0, int val, int clamp = 1) { return Math.Min(clamp, arg0 + val); }
-		public static int Minus(this int arg0, int val, int clamp = 0) { return Math.Max(clamp, arg0 - val); }
+
+		public static float Plus(this float arg0, float val, float clamp = 1f)
+		{
+			return Math.Min(clamp, arg0 + val);
+		}
+
+		public static float Minus(this float arg0, float val, float clamp = 0f)
+		{
+			return Math.Max(clamp, arg0 - val);
+		}
+
+		public static int Plus(this int arg0, int val, int clamp = 1)
+		{
+			return Math.Min(clamp, arg0 + val);
+		}
+
+		public static int Minus(this int arg0, int val, int clamp = 0)
+		{
+			return Math.Max(clamp, arg0 - val);
+		}
+
+		#endregion
+
+		#region BITS
+
+		public static int BitOn(this int bitToTurnOn, int value)
+		{
+			return bitToTurnOn | value;
+		}
+
+		public static int BitOff(this int bitToTurnOff, int value)
+		{
+			return bitToTurnOff & ~value;
+		}
+
+		public static int BitFlip(this int bitToFlip, int value)
+		{
+			return value ^ bitToFlip;
+		}
+
+		public static bool BitCheck(this int bits, int value)
+		{
+			return (bits & value) == value;
+		}
+
+		#endregion
 
 
 		#region SIGNALS
@@ -47,143 +91,13 @@ namespace Pixeye
 		/// </summary>
 		/// <param name="signal"></param>
 		/// <typeparam name="T"></typeparam>
-		public static void Send<T>(ref T signal) where T : struct { ProcessingSignals.Send(ref signal); }
-
-		#endregion
-
-		#region ENTITIES
-
-		/// <summary>
-		/// <para>Checks if MonoEntity exist and enabled</para>
-		/// </summary>
-		/// <param name="mono"></param>
-		/// <returns>Returns true if exist and enabled</returns>
-		public static bool Exists(this MonoEntity mono)
+		public static void Send<T>(ref T signal) where T : struct
 		{
-			return mono != null && mono.conditionEnabled;
-		}
-		
-		/// <summary>
-		/// <para>Safely gets the component by type from the entity.</para>
-		/// </summary>
-		/// <param name="entity"></param>
-		/// <typeparam name="T"></typeparam>
-		/// <returns>Returns component.</returns>
-		public static T Get<T>(this int entity) where T : IComponent, new() { return Storage<T>.Instance.TryGet(entity); }
-
-		/// <summary>
-		/// <para>Safely gets the component by type from the entity.</para>
-		/// </summary>
-		/// <param name="entity"></param>
-		/// <param name="arg0"></param>
-		/// <typeparam name="T"></typeparam>
-		/// <returns>Returns true if the entity has this component.</returns>
-		public static bool Get<T>(this int entity, out T arg0) where T : IComponent, new()
-		{
-			arg0 = default(T);
-			return (arg0 = Storage<T>.Instance.TryGet(entity)) != null;
-		}
-
-		/// <summary>
-		/// <para>Safely gets the components by type from the entity.</para>
-		/// </summary>
-		/// <param name="entity"></param>
-		/// <param name="arg0"></param>
-		/// <param name="arg1"></param>
-		/// <typeparam name="T"></typeparam>
-		/// <typeparam name="Y"></typeparam>
-		/// <returns>Returns true if the entity has these components.</returns>
-		public static bool Get<T, Y>(this int entity, out T arg0, out Y arg1) where T : new() where Y : new()
-		{
-			arg0 = default(T);
-			arg1 = default(Y);
-			if ((arg0 = Storage<T>.Instance.TryGet(entity)) == null) return false;
-			if ((arg1 = Storage<Y>.Instance.TryGet(entity)) == null) return false;
-
-
-			return true;
-		}
-
-		/// <summary>
-		/// <para>Safely gets the components by type from the entity.</para>
-		/// </summary>
-		/// <param name="entity"></param>
-		/// <param name="arg0"></param>
-		/// <param name="arg1"></param>
-		/// <param name="arg2"></param>
-		/// <typeparam name="T"></typeparam>
-		/// <typeparam name="Y"></typeparam>
-		/// <typeparam name="U"></typeparam>
-		/// <returns>Returns true if the entity has these components.</returns>
-		public static bool Get<T, Y, U>(this int entity, out T arg0, out Y arg1, out U arg2) where T : new() where Y : new() where U : new()
-		{
-			arg0 = default(T);
-			arg1 = default(Y);
-			arg2 = default(U);
-			if ((arg0 = Storage<T>.Instance.TryGet(entity)) == null) return false;
-			if ((arg1 = Storage<Y>.Instance.TryGet(entity)) == null) return false;
-			if ((arg2 = Storage<U>.Instance.TryGet(entity)) == null) return false;
-
-			return true;
-		}
-
-		/// <summary>
-		/// <para>Safely gets the components by type from the entity.</para>
-		/// </summary>
-		/// <param name="entity"></param>
-		/// <param name="arg0"></param>
-		/// <param name="arg1"></param>
-		/// <param name="arg2"></param>
-		/// <param name="arg3"></param>
-		/// <typeparam name="T"></typeparam>
-		/// <typeparam name="Y"></typeparam>
-		/// <typeparam name="U"></typeparam>
-		/// <typeparam name="I"></typeparam>
-		/// <returns>Returns true if the entity has these components.</returns>
-		public static bool Get<T, Y, U, I>(this int entity, out T arg0, out Y arg1, out U arg2, out I arg3) where T : new() where Y : new() where U : new() where I : new()
-		{
-			arg0 = default(T);
-			arg1 = default(Y);
-			arg2 = default(U);
-			arg3 = default(I);
-			if ((arg0 = Storage<T>.Instance.TryGet(entity)) == null) return false;
-			if ((arg1 = Storage<Y>.Instance.TryGet(entity)) == null) return false;
-			if ((arg2 = Storage<U>.Instance.TryGet(entity)) == null) return false;
-			if ((arg3 = Storage<I>.Instance.TryGet(entity)) == null) return false;
-			return true;
-		}
-
-		/// <summary>
-		/// Safely gets the components by type from the entity.
-		/// </summary>
-		/// <param name="entity"></param>
-		/// <param name="arg0"></param>
-		/// <param name="arg1"></param>
-		/// <param name="arg2"></param>
-		/// <param name="arg3"></param>
-		/// <param name="arg4"></param>
-		/// <typeparam name="T"></typeparam>
-		/// <typeparam name="Y"></typeparam>
-		/// <typeparam name="U"></typeparam>
-		/// <typeparam name="I"></typeparam>
-		/// <typeparam name="O"></typeparam>
-		/// <returns>Returns true if the entity has these components.</returns>
-		public static bool Get<T, Y, U, I, O>(this int entity, out T arg0, out Y arg1, out U arg2, out I arg3, out O arg4) where T : new() where Y : new() where U : new() where I : new() where O : new()
-		{
-			arg0 = default(T);
-			arg1 = default(Y);
-			arg2 = default(U);
-			arg3 = default(I);
-			arg4 = default(O);
-			if ((arg0 = Storage<T>.Instance.TryGet(entity)) == null) return false;
-			if ((arg1 = Storage<Y>.Instance.TryGet(entity)) == null) return false;
-			if ((arg2 = Storage<U>.Instance.TryGet(entity)) == null) return false;
-			if ((arg3 = Storage<I>.Instance.TryGet(entity)) == null) return false;
-			if ((arg4 = Storage<O>.Instance.TryGet(entity)) == null) return false;
-			return true;
+			ProcessingSignals.Send(in signal);
 		}
 
 		#endregion
+
 
 		#region ACTORS
 
@@ -224,80 +138,53 @@ namespace Pixeye
 			return -1;
 		}
 
-		public static void Release(this int entity)
-		{
-			var composer = new EntityComposer(entity, 1);
-			composer.Add<ComponentRelease>();
-			composer.Deploy();
-		}
+	 
 
 
 		public static void Destroy(this GameObject obj)
 		{
-			UnityEngine.GameObject.Destroy(obj);
+			GameObject.Destroy(obj);
 		}
+
 		public static void Destroy(this Transform tr)
 		{
-			UnityEngine.GameObject.Destroy(tr.gameObject);
+			GameObject.Destroy(tr.gameObject);
 		}
 
-		/// <summary>
-		/// <para>Returns the MonoEntity component linked to the entity.</para>
-		/// </summary>
-		/// <param name="entity"></param>
-		/// <returns>Returns the MonoEntity component linked to the entity.</returns>
-		public static MonoEntity GetMonoEntity(this int entity) { return entity.ComponentObject().transform.GetComponent<MonoEntity>(); }
+//		public static void Add<T>(this ent entity, T component) where T : new()
+//		{
+//			Storage<T>.Instance.Add(component, entity);
+//		}
 
-		/// <summary>
-		/// <para>Returns the game object linked to the entity.</para>
-		/// </summary>
-		/// <param name="entity"></param>
-		/// <returns>Returns the game object linked to the entity.</returns>
-		public static GameObject GameObject(this int entity) { return entity.ComponentObject().transform.gameObject; }
-
-		/// <summary>
-		/// <para>Returns the transform linked to the entity.</para>
-		/// </summary>
-		/// <param name="entity"></param>
-		/// <returns>Returns the transform linked to the entity.</returns>
-		public static Transform Transform(this int entity) { return entity.ComponentObject().transform; }
-
-		public static T Get<T>(this ComponentObject component) { return component.transform.gameObject.GetComponent<T>(); }
-
-		public static T Get<T>(this ComponentObject component, string path) { return component.transform.Find(path).GetComponent<T>(); }
-
-		public static T Get<T>(this int entity, string path) { return entity.ComponentObject().transform.Find(path).GetComponent<T>(); }
-
-		public static bool Has<T>(this int entity) where T : IComponent, new() { return Storage<T>.Instance.HasComponent(entity); }
-
-		public static void Add<T>(this int entity, T component) where T : new() { Storage<T>.Instance.Add(component, entity); }
-
-		public static T Add<T>(this int entity) where T : new() { return entity.CheckMonoConditions() ? Storage<T>.Instance.Add(entity) : Storage<T>.Instance.GetOrCreate(entity); }
+//		public static T Add<T>(this in ent entity) where T : new()
+//		{
+//			return entity.CheckMonoConditions() ? Storage<T>.Instance.Add(entity) : Storage<T>.Instance.GetOrCreate(entity);
+//		}
 
 
-		public static bool CheckMonoConditions(this int entity)
-		{
-			var storage = ProcessingEntities.storageActor;
-			var mono    = storage.Length > entity ? storage[entity] : null;
-			return mono != null ? mono.conditionEnabled : true;
-		}
+//		public static bool CheckMonoConditions(this ent entity)
+//		{
+//			return EntityReferencesDepr.entityRefs[entity].state.Check(ent.isEnabled);
+//		}
 
 		public static void ForceDeploy(this Actor a)
 		{
 			a.conditionManualDeploy = false;
-			a.conditionEnabled = true;
+			//	EntityReferencesDepr.entityRefs[a.entity].state.TurnBitOn(ent.isEnabled);
+			//	a.conditionEnabled = true;
 			ProcessingEntities.Default.CheckGroups(a.entity, true);
 		}
 
-		public static void Remove<T>(this Actor a) where T : new() { Storage<T>.Instance.Remove(a.entity, false); }
-
-		public static void Remove<T>(this int entity) where T : new() { Storage<T>.Instance.Remove(entity, false); }
-
-		public static void Remove(this int entity, Type t)
+		public static void Remove<T>(this Actor a) where T : new()
 		{
-			var storage = Storage.allDict[t.GetHashCode()];
-			storage.Remove(entity, false);
+			Storage<T>.Instance.Remove(a.entity);
 		}
+
+		public static void Remove<T>(this in ent entity) where T : new()
+		{
+			Storage<T>.Instance.Remove(entity);
+		}
+
 
 		public static T DeepClone<T>(this T obj)
 		{
@@ -310,11 +197,25 @@ namespace Pixeye
 				return (T) formatter.Deserialize(ms);
 			}
 		}
+		
+	 
+		
 
 		#endregion
 
 		#region ARRAYS
 
+		public static T[,] ResizeArray<T>(this T[,] original, in int rows, in int cols)
+		{
+			var newArray = new T[rows,cols];
+			int minRows  = Math.Min(rows, original.GetLength(0));
+			int minCols  = Math.Min(cols, original.GetLength(1));
+			for(int i = 0; i < minRows; i++)
+			for(int j = 0; j < minCols; j++)
+				newArray[i, j] = original[i, j];
+			return newArray;
+		}
+		
 		public static void InsertCheck(this int[] a, int id, ref int length, ref int indexLast)
 		{
 			if (length == 0)
@@ -364,9 +265,7 @@ namespace Pixeye
 				{
 					length++;
 
-					if (id < a[indexLast - 1])
-					{
-					}
+					if (id < a[indexLast - 1]) { }
 					else
 					{
 						int indexPrev = indexLast;
@@ -400,8 +299,8 @@ namespace Pixeye
 
 				length++;
 				Array.Copy(a, 0, a, 1, length - 1);
-				a[0] = id;
-				idLast = id;
+				a[0]      = id;
+				idLast    = id;
 				indexLast = 0;
 			}
 			else if (id > a[length - 1])
@@ -409,8 +308,8 @@ namespace Pixeye
 				if (length == a.Length)
 					Array.Resize(ref a, (length << 1) + 1);
 
-				idLast = id;
-				indexLast = length;
+				idLast      = id;
+				indexLast   = length;
 				a[length++] = id;
 			}
 			else
@@ -425,8 +324,8 @@ namespace Pixeye
 					if (id < a[indexLast + 1])
 					{
 						Array.Copy(a, indexLast + 1, a, indexLast + 2, length - indexLast - 1);
-						idLast = id;
-						indexLast = indexLast + 1;
+						idLast       = id;
+						indexLast    = indexLast + 1;
 						a[indexLast] = id;
 					}
 					else
@@ -437,8 +336,8 @@ namespace Pixeye
 							if (id < a[indexNext])
 							{
 								Array.Copy(a, indexNext, a, indexNext + 1, length - indexNext - 1);
-								idLast = id;
-								indexLast = indexNext;
+								idLast       = id;
+								indexLast    = indexNext;
 								a[indexLast] = id;
 								break;
 							}
@@ -457,8 +356,8 @@ namespace Pixeye
 					if (id > a[indexLast - 1])
 					{
 						Array.Copy(a, indexLast, a, indexLast + 1, length - indexLast - 1);
-						idLast = id;
-						indexLast = indexLast - 1;
+						idLast       = id;
+						indexLast    = indexLast - 1;
 						a[indexLast] = id;
 					}
 					else
@@ -469,8 +368,8 @@ namespace Pixeye
 							if (id > a[indexPrev])
 							{
 								Array.Copy(a, indexPrev, a, indexPrev + 1, length - indexPrev - 1);
-								idLast = id;
-								indexLast = indexPrev;
+								idLast       = id;
+								indexLast    = indexPrev;
 								a[indexLast] = id;
 								break;
 							}
@@ -557,7 +456,7 @@ namespace Pixeye
 		{
 			int tmp = array[right];
 			array[right] = array[left];
-			array[left] = tmp;
+			array[left]  = tmp;
 		}
 
 		public static int SearchLinear(this int[] array, int value)
@@ -589,12 +488,12 @@ namespace Pixeye
 				if (array[middleIndex] > value)
 				{
 					leftIndex = middleIndex + 1;
-					prev = middleIndex;
+					prev      = middleIndex;
 					continue;
 				}
 
 				rightIndex = middleIndex - 1;
-				prev = middleIndex;
+				prev       = middleIndex;
 			}
 		}
 
@@ -610,13 +509,13 @@ namespace Pixeye
 
 			for (int i = 0; i < probs.Length; i++)
 			{
-				probs[i] = vals[i];
-				total += probs[i];
+				probs[i] =  vals[i];
+				total    += probs[i];
 			}
 
 
 			var randomPoint = (float) _r.NextDouble() * total;
-     
+
 
 			for (int i = 0; i < probs.Length; i++)
 			{
@@ -627,13 +526,22 @@ namespace Pixeye
 
 			return 0;
 		}
-		
-		public static float Between(this Vector2 v) { return UnityEngine.Random.value > 0.5f ? v.x : v.y; }
+
+		public static float Between(this Vector2 v)
+		{
+			return UnityEngine.Random.value > 0.5f ? v.x : v.y;
+		}
 
 
-		public static int Between(this object o, int a, int b, float chance = 0.5f) { return UnityEngine.Random.value > chance ? a : b; }
+		public static int Between(this object o, int a, int b, float chance = 0.5f)
+		{
+			return UnityEngine.Random.value > chance ? a : b;
+		}
 
-		public static float Between(this object o, float a, float b, float chance = 0.5f) { return UnityEngine.Random.value > chance ? a : b; }
+		public static float Between(this object o, float a, float b, float chance = 0.5f)
+		{
+			return UnityEngine.Random.value > chance ? a : b;
+		}
 
 		public static T RandomExcept<T>(this T[] list, T exceptVal)
 		{
@@ -680,8 +588,8 @@ namespace Pixeye
 
 			for (int i = 0; i < probs.Length; i++)
 			{
-				probs[i] = vals[i].returnChance;
-				total += probs[i];
+				probs[i] =  vals[i].returnChance;
+				total    += probs[i];
 			}
 
 
@@ -706,8 +614,8 @@ namespace Pixeye
 
 			for (int i = 0; i < probs.Length; i++)
 			{
-				probs[i] = vals[i].returnChance;
-				total += probs[i];
+				probs[i] =  vals[i].returnChance;
+				total    += probs[i];
 			}
 
 
@@ -738,8 +646,8 @@ namespace Pixeye
 
 			for (int i = 0; i < probs.Length; i++)
 			{
-				probs[i] = vals[i].returnChance;
-				total += probs[i];
+				probs[i] =  vals[i].returnChance;
+				total    += probs[i];
 			}
 
 
@@ -760,7 +668,10 @@ namespace Pixeye
 			return vals[0];
 		}
 
-		public static T Random<T>(this T[] vals) { return vals[UnityEngine.Random.Range(0, vals.Length)]; }
+		public static T Random<T>(this T[] vals)
+		{
+			return vals[UnityEngine.Random.Range(0, vals.Length)];
+		}
 
 		public static T RandomDequeue<T>(this List<T> vals)
 		{
@@ -792,7 +703,10 @@ namespace Pixeye
 			return c;
 		}
 
-		public static T Find<T>(this GameObject go, string path) { return go.transform.Find(path).GetComponent<T>(); }
+		public static T Find<T>(this GameObject go, string path)
+		{
+			return go.transform.Find(path).GetComponent<T>();
+		}
 
 		public static Transform FindDeep(this Transform obj, string id)
 		{

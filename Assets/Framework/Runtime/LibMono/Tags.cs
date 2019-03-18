@@ -14,7 +14,7 @@ namespace Pixeye
 	/// </summary>
 	public static class Tags
 	{
-		internal static Dictionary<int, int>[] tags = new Dictionary<int, int>[EngineSettings.MinEntities];
+		internal static Dictionary<int, int>[] tags = new Dictionary<int, int>[EngineSettings.SizeEntities];
 		internal static Dictionary<int, List<GroupBase>> groupsInclude = new Dictionary<int, List<GroupBase>>(10, new FastComparable());
 		internal static Dictionary<int, List<GroupBase>> groupsDeclude = new Dictionary<int, List<GroupBase>>(10, new FastComparable());
 
@@ -32,6 +32,7 @@ namespace Pixeye
 			}
 
 			length++;
+
 			tags[entityID] = new Dictionary<int, int>(4, new FastComparable());
 		}
 
@@ -40,14 +41,10 @@ namespace Pixeye
 			tags[id].Clear();
 		}
 
-		static internal void HandleChange(int entity, int tag)
+		static internal void HandleChange(in ent entity, int tag)
 		{
 			if (Toolbox.isQuittingOrChangingScene()) return;
 
-			if (!entity.CheckMonoConditions()) return;
-
-	 
-			
 			DelayTagEvent dte;
 			dte.entity = entity;
 			dte.tag = tag;
@@ -57,15 +54,14 @@ namespace Pixeye
 				int len = ProcessingActorsAdd.lenTagsToChange << 1;
 				Array.Resize(ref ProcessingActorsAdd.tagsToChange, len);
 			}
+
 			ProcessingActorsAdd.tagsToChange[ProcessingActorsAdd.lenTagsToChange++] = dte;
-			
-	 
 		}
 
 
 		#region TAGS
 
-		public static void Remove(this int entityID, int tagID)
+		public static void Remove(this in ent entityID, int tagID)
 		{
 			var dict = tags[entityID];
 			int val;
@@ -81,7 +77,7 @@ namespace Pixeye
 			else dict[tagID] = val;
 		}
 
-		public static void Remove(this int entityID, params int[] tagIds)
+		public static void Remove(this in ent entityID, params int[] tagIds)
 		{
 			var dict = tags[entityID];
 
@@ -100,7 +96,7 @@ namespace Pixeye
 			}
 		}
 
-		public static void RemoveAll(this int entityID, params int[] tagIds)
+		public static void RemoveAll(this in ent entityID, params int[] tagIds)
 		{
 			var dict = tags[entityID];
 			foreach (int index in tagIds)
@@ -112,9 +108,9 @@ namespace Pixeye
 		}
 
 
-		public static void Add(this int entityID, int tagId)
+		public static void Add(this in ent entity, int tagId)
 		{
-			var dict = tags[entityID];
+			var dict = tags[entity];
 			if (dict.ContainsKey(tagId))
 			{
 				dict[tagId] += 1;
@@ -124,12 +120,12 @@ namespace Pixeye
 			dict.Add(tagId, 1);
 
 
-			HandleChange(entityID, tagId);
+			HandleChange(entity, tagId);
 		}
 
-		public static void Add(this int entityID, params int[] tagIds)
+		public static void Add(this in ent entity, params int[] tagIds)
 		{
-			var dict = tags[entityID];
+			var dict = tags[entity];
 			foreach (int index in tagIds)
 			{
 				if (dict.ContainsKey(index))
@@ -140,13 +136,26 @@ namespace Pixeye
 
 
 				dict.Add(index, 1);
-				HandleChange(entityID, index);
+				HandleChange(entity, index);
 			}
 		}
 
-		public static void AddTagsRaw(this int entityID, params int[] tagIds)
+		public static void AddRaw(this in ent entity, int tagId)
 		{
-			var dict = tags[entityID];
+			var dict = tags[entity];
+			if (dict.ContainsKey(tagId))
+			{
+				dict[tagId] += 1;
+				return;
+			}
+
+			dict.Add(tagId, 1);
+		}
+
+		public static void AddTagsRaw(this in ent entity, params int[] tagIds)
+		{
+			var dict = tags[entity];
+
 			foreach (int index in tagIds)
 			{
 				if (dict.ContainsKey(index))
@@ -160,9 +169,9 @@ namespace Pixeye
 			}
 		}
 
-		internal static void RemoveTagsRaw(this int entityID, params int[] tagIds)
+		internal static void RemoveTagsRaw(this in ent entity, params int[] tagIds)
 		{
-			var dict = tags[entityID];
+			var dict = tags[entity];
 			foreach (int index in tagIds)
 			{
 				if (!dict.ContainsKey(index)) continue;
@@ -171,16 +180,15 @@ namespace Pixeye
 		}
 
 
-		public static bool Has(this int entityID, int filter)
+		public static bool Has(this in ent entity, int filter)
 		{
-			var container = tags[entityID];
+			var container = tags[entity];
 			return container.ContainsKey(filter);
 		}
 
-
-		public static bool Has(this int entityID, params int[] filter)
+		internal static bool HasRaw(this in ent entity, in int[] filter)
 		{
-			var container = tags[entityID];
+			var container = tags[entity];
 
 			for (int i = 0; i < filter.Length; i++)
 			{
@@ -190,7 +198,32 @@ namespace Pixeye
 			return true;
 		}
 
-		public static bool HasAny(this int entityID, params int[] filter)
+		public static bool Has(this in ent entity, params int[] filter)
+		{
+			var container = tags[entity];
+
+			for (int i = 0; i < filter.Length; i++)
+			{
+				if (!container.ContainsKey(filter[i])) return false;
+			}
+
+			return true;
+		}
+
+		public static bool HasAnyRaw(this in ent entityID, in int[] filter)
+		{
+			var container = tags[entityID];
+
+			for (int i = 0; i < filter.Length; i++)
+			{
+				if (container.ContainsKey(filter[i]))
+					return true;
+			}
+
+			return false;
+		}
+
+		public static bool HasAny(this in ent entityID, params int[] filter)
 		{
 			var container = tags[entityID];
 

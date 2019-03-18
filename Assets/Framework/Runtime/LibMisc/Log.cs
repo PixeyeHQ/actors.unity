@@ -25,5 +25,12 @@ namespace Pixeye
 			var final = string.Format(context, args);
 			Debug.Log(final, o);
 		}
+
+		public static void print(this object o, object content)
+		{
+			Debug.Log(content);
+		}
+
+		
 	}
 }

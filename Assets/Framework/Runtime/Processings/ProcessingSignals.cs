@@ -13,12 +13,12 @@ namespace Pixeye
 
         #region LOGIC
 
-        public static void Send<T>(ref T val)
+        public static void Send<T>(in T val)
         {
-            Default.Dispatch(ref val);
+            Default.Dispatch(in val);
         }
 
-        public void Dispatch<T>(ref T val)
+        public void Dispatch<T>(in T val)
         {
             List<IReceive> cachedSignals;
 
@@ -28,7 +28,7 @@ namespace Pixeye
 
             for (var i = 0; i < len; i++)
             {
-                (cachedSignals[i] as IReceive<T>).HandleSignal(ref val);
+                (cachedSignals[i] as IReceive<T>).HandleSignal(in val);
             }
         }
 

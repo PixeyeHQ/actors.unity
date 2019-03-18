@@ -4,7 +4,7 @@ namespace Pixeye{
 
 public interface ISetup
 {
-	void Setup(int entity);
+	void Setup(in ent entity);
 }
 
 }

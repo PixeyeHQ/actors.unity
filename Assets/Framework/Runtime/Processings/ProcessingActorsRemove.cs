@@ -4,50 +4,76 @@
 
 namespace Pixeye
 {
-	public class ProcessingActorsRemove : ProcessingBase
+	public class ProcessingActorsRemove : ProcessingBase, ITick
 	{
- 
-
-
 		public Group<ComponentRelease> groupRelease;
 
 
 		public ProcessingActorsRemove()
 		{
-			groupRelease.Add += entity => {
-				ComponentObject cObject;
-
-
-				if (entity.Get(out cObject))
-				{
-					var mono = cObject.transform.GetComponent<MonoEntity>();
-					if (mono != null)
-					{
-						mono.Release();
-						return;
-					}
-
-					cObject.transform.gameObject.Release(cObject.poolType);
-				}
-
-				Release(entity);
-			};
+			groupRelease.Add += Release;
 		}
 
-		void Release(int entity)
+		void Release(ent entity)
 		{
-			int len = Storage.all.Count;
-			for (int j = 0; j < len; j++)
+			RefEntity.isAlive[entity] = false; //&= ~ent.isAlive;
+
+			if (entity < RefEntity.transforms.Length)
 			{
-				Storage.all[j].Remove(entity, false);
+				var tr = RefEntity.transforms[entity];
+
+				if (tr != null)
+				{
+					var poolID = RefEntity.poolIDS[entity];
+					var isMono = tr.GetComponent<MonoEntity>(); //RefEntity.states[entity].BitCheck(ent.isMono);
+					tr.gameObject.Release(poolID);
+					if (isMono) return;
+				}
 			}
+
+
+			for (int j = 0; j < Storage.lastID; j++)
+				Storage.all[j].Remove(entity);
 
 			Tags.Clear(entity);
 			ProcessingEntities.prevID.Push(entity);
 		}
 
-		 
-	}
+		float t;
 
-	 
+		public void Tick()
+		{
+//			t += Time.delta;
+//			if (t >= Time.delta)
+//			{
+//				if (groupRelease.length > 0)
+//					ReleaseFinal(groupRelease.entities[0]);
+//
+//				t -= Time.delta;
+//			}
+		}
+
+		void ReleaseFinal(ent entity)
+		{
+			if (entity < RefEntity.transforms.Length)
+			{
+				var tr = RefEntity.transforms[entity];
+
+				if (tr != null)
+				{
+					var poolID = RefEntity.poolIDS[entity];
+					var isMono = tr.GetComponent<MonoEntity>();
+					tr.gameObject.Release(poolID);
+					if (isMono) return;
+				}
+			}
+
+
+			for (int j = 0; j < Storage.lastID; j++)
+				Storage.all[j].Remove(entity);
+
+			Tags.Clear(entity);
+			ProcessingEntities.prevID.Push(entity);
+		}
+	}
 }

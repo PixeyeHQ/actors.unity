@@ -1,7 +1,9 @@
 //  Project  : ACTORS
 //  Contacts : Pixeye - ask@pixeye.games
 
- 
+
+using UnityEngine;
+
 namespace Pixeye
 {
 	/// <summary>
@@ -17,11 +19,22 @@ namespace Pixeye
 			conditionSignals = ProcessingSignals.Check(this);
 			conditionManualDeploy = this is IManualDeploy;
 
-			ProcessingEntities.Create(this);
+			var entityID = ProcessingEntities.Create();
+			entity = entityID;
+			entity.AddReference(transform);
+			 
+	
+			#if UNITY_EDITOR
+			_entity = entity;
+			#endif
 
-			var cObject = Add<ComponentObject>();
-			cObject.transform = transform;
-		 
+			if (pool > 0)
+				entity.AddPool(pool);
+
+			conditionManualDeploy = this is IManualDeploy;
+
+			if (Starter.initialized == false) return;
+			Setup();
 		}
 
 		public override void OnEnable()
@@ -30,12 +43,13 @@ namespace Pixeye
 			if (conditionManualDeploy)
 				return;
 
+
+			RefEntity.isAlive[entity] = true;
+			ProcessingEntities.Default.CheckGroups(entity, true);
 			ProcessingUpdate.Default.Add(this);
 
 			if (conditionSignals)
 				ProcessingSignals.Default.Add(this);
-
-			ProcessingEntities.Default.CheckGroups(entity, true);
 		}
 
 		public override void OnDisable()
@@ -43,7 +57,7 @@ namespace Pixeye
 			if (conditionSignals)
 				ProcessingSignals.Default.Remove(this);
 
-
+			RefEntity.isAlive[entity] = false;
 			ProcessingUpdate.Default.Remove(this);
 			ProcessingEntities.Default.CheckGroups(entity, false);
 		}

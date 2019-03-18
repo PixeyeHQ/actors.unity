@@ -3,9 +3,10 @@
 
 
 using System;
+using UnityEngine;
+
 #if ODIN_INSPECTOR
 using Sirenix.OdinInspector;
-
 #endif
 
 
@@ -16,19 +17,31 @@ namespace Pixeye
 	/// </summary>
 	public abstract class Actor : MonoEntity, IRequireStarter
 	{
-	 
-		 
+		[FoldoutGroup("Main"), TagFilter(typeof(Pool))]
+		public int pool;
+
 		[NonSerialized]
 		public bool conditionManualDeploy;
- 
+
 		#region METHODS
 
 		protected virtual void Awake()
 		{
-			ProcessingEntities.Create(this);
+			var entityID = ProcessingEntities.Create();
+			entity = entityID;
+			entity.AddReference(transform);
+
+
+			#if UNITY_EDITOR
+			_entity = entity;
+			#endif
+
+			if (pool > 0)
+				entity.AddPool(pool);
+
 			conditionManualDeploy = this is IManualDeploy;
-			var cObject = Add<ComponentObject>();
-			cObject.transform = transform;
+
+
 			if (Starter.initialized == false) return;
 			Setup();
 		}
@@ -52,12 +65,9 @@ namespace Pixeye
 		{
 			if (Starter.initialized == false) return;
 			if (conditionManualDeploy) return;
-			conditionEnabled = true;
-		 
+			RefEntity.isAlive[entity] = true;
 			ProcessingEntities.Default.CheckGroups(entity, true);
 		}
- 
- 	 
 
 		#endregion
 
@@ -67,13 +77,19 @@ namespace Pixeye
 		/// <para>Adds the tag to the entity.</para>
 		/// </summary>
 		/// <param name="tags"></param>
-		protected void Add(int tags) { Tags.AddTagsRaw(entity, tags); }
+		protected void Add(int tags)
+		{
+			entity.AddTagsRaw(tags);
+		}
 
 		/// <summary>
 		/// <para>Adds tags to the entity.</para>
 		/// </summary>
 		/// <param name="tags"></param>
-		protected void Add(params int[] tags) { Tags.AddTagsRaw(entity, tags); }
+		protected void Add(params int[] tags)
+		{
+			entity.AddTagsRaw(tags);
+		}
 
 		/// <summary>
 		/// <para>Adds the component to the entity. Triggers Setup method on the components inherited from ISetup.</para>
@@ -82,13 +98,7 @@ namespace Pixeye
 		/// <typeparam name="T"></typeparam>
 		protected void Add<T>(T component) where T : IComponent, new()
 		{
-			var setupable = component as ISetup;
-			if (setupable != null)
-			{
-				setupable.Setup(entity);
-			}
-
-			Storage<T>.Instance.AddWithNoCheck(component, entity);
+			Storage<T>.Instance.AddNoCheck(component, entity);
 		}
 
 		/// <summary>
@@ -98,14 +108,23 @@ namespace Pixeye
 		/// <returns>Returns created component.</returns>
 		protected T Add<T>() where T : IComponent, new()
 		{
-			var component = Storage<T>.Instance.GetOrCreate(entity);
-			var setupable = component as ISetup;
-			if (setupable != null)
-			{
-				setupable.Setup(entity);
-			}
-
+			var component = Storage<T>.Instance.AddNoCheck(entity);
 			return component;
+		}
+
+		protected void AddRef<T>() where T : Component
+		{
+			entity.RefComponent(transform.GetComponent<T>());
+		}
+
+		protected void AddRef<T>(string path) where T : Component
+		{
+			entity.RefComponent(transform.Find(path).GetComponent<T>(), path);
+		}
+
+		protected void AddRef<T>(string path, string name) where T : Component
+		{
+			entity.RefComponent(transform.Find(path).GetComponent<T>(), name);
 		}
 
 		#endregion

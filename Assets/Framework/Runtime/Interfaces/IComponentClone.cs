@@ -7,11 +7,15 @@ namespace Pixeye
 	{
 		void AsClone(ref EntityComposer c);
 		void AsRef(ref EntityComposer c);
+	 
 	}
 
 	public interface IDataClone
 	{
 		
 	}
+	
+	
+	
 	
 }

@@ -8,17 +8,15 @@ using UnityEngine;
 
 namespace Pixeye
 {
+	public delegate void taskEntity(ent entity);
+	public delegate void taskEntityTick(ent entity, float tick);
+
+	
 	public class ProcessingEntities : IDisposable, IKernel
 	{
-		public static MonoEntity[] storageActor = new MonoEntity[EngineSettings.MinEntities];
-		public static Stack<int> prevID = new Stack<int>(100);
-		public static int lastID;
-
-
-
 		public static ProcessingEntities Default = new ProcessingEntities();
-
-
+		internal static Stack<int> prevID = new Stack<int>(100);
+		internal static int lastID;
 		internal GroupBase[] GroupsBase = new GroupBase[64];
 		internal int groupLength;
 
@@ -34,33 +32,9 @@ namespace Pixeye
 
 				id = lastID++;
 
-
 			Tags.Add(id);
-
 			return id;
 		}
-
-		public static void Create(MonoEntity a)
-		{
-			int len = storageActor.Length;
-
-			if (lastID >= len)
-				Array.Resize(ref storageActor, lastID << 1);
-
-			if (prevID.Count > 0)
-			{
-				a.entity = prevID.Pop();
-				storageActor[a.entity] = a;
-			}
-			else
-			{
-				a.entity = lastID;
-				storageActor[lastID++] = a;
-			}
-
-			Tags.Add(a.entity);
-		}
-
 
 		internal GroupBase SetupGroup(Type groupType, Composition filter)
 		{
@@ -75,13 +49,9 @@ namespace Pixeye
 			}
 
 			if (i != -1) return GroupsBase[i];
-
 			i = groupLength;
-
 			var group = Activator.CreateInstance(groupType, true) as GroupBase;
-
 			group.composition = filter;
-
 			List<GroupBase> groups;
 			foreach (var tag in filter.include)
 			{
@@ -111,7 +81,7 @@ namespace Pixeye
 				}
 			}
 
-			group.Populate();
+			group.Initialize();
 
 
 			if (groupLength == GroupsBase.Length)
@@ -125,25 +95,22 @@ namespace Pixeye
 		}
 
 
-		public void CheckGroups(int entity, bool active)
+		public void CheckGroups(in ent entity, bool active)
 		{
-	 
+			
 			if (Toolbox.applicationIsQuitting) return;
-
+			
 			if (active)
 			{
 				for (int i = 0; i < groupLength; i++)
-					if (GroupsBase[i].CheckTags(entity))
-						GroupsBase[i].TryAdd(entity);
+					GroupsBase[i].TryAdd(entity);
 			}
 			else
 			{
 				for (int i = 0; i < groupLength; i++)
 					GroupsBase[i].OnRemove(entity);
 			}
-
-
-		//	ProcessingActorsAdd.valid = false;
+			
 		}
 
 
@@ -154,32 +121,25 @@ namespace Pixeye
 		}
 	}
 
-	public delegate void ActionEntity(int entity);
-	
 	public struct EntityComposer
 	{
-		public int entity;
+		public ent entity;
 		Storage[] storages;
 		int length;
 
-		public void Init(int components = 1)
-		{
-			storages = new Storage[components];
-			entity = ProcessingEntities.Create();
-			length = 0;
-		}
 
 		public EntityComposer(int components = 1)
 		{
 			storages = new Storage[components];
 			entity = ProcessingEntities.Create();
+
 			length = 0;
 		}
 
-		public EntityComposer(int entityEntity, int components = 1)
+		public EntityComposer(in ent entity, int components = 1)
 		{
 			storages = new Storage[components];
-			entity = entityEntity;
+			this.entity = entity;
 			length = 0;
 		}
 
@@ -187,29 +147,36 @@ namespace Pixeye
 		{
 			var storage = Storage<T>.Instance;
 			storages[length++] = storage;
-			return Storage<T>.Instance.AddWithNoCheck(component, entity);
+			return Storage<T>.Instance.AddNoCheck(component, entity);
 		}
-
 
 		public T Add<T>() where T : new()
 		{
 			var storage = Storage<T>.Instance;
 			storages[length++] = storage;
 
-			return storage.GetOrCreate(entity);
+			return storage.AddNoCheck(entity);
 		}
 
+		public Transform AddReference(Transform transform)
+		{
+			entity.AddReference(transform);
+			return transform;
+		}
+
+		public Transform AddReferenceMono(Transform transform)
+		{
+			entity.AddReferenceMono(transform);
+			return transform;
+		}
 
 		public void Deploy()
 		{
 			foreach (var storage in storages)
 			{
-				storage.Deploy(entity); 
-				
+				storage.Deploy(entity);
 			}
 
-
-		//	ProcessingActorsAdd.valid = false;
 			storages = null;
 			length = 0;
 		}
@@ -217,6 +184,12 @@ namespace Pixeye
 		public void Deploy(params int[] tags)
 		{
 			entity.AddTagsRaw(tags);
+			Deploy();
+		}
+
+		public void Deploy(int tag)
+		{
+			entity.AddTagsRaw(tag);
 			Deploy();
 		}
 	}

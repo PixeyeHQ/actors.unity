@@ -6,12 +6,13 @@
 namespace Pixeye
 {
 	[System.Serializable]
-	public class ComponentRelease : IComponent
-	{
-	}
+	public class ComponentRelease : IComponent { }
 
-	public static partial class ExtensionComponentRelease
+	public static class ExtensionComponentRelease
 	{
-		public static ComponentRelease ComponentRelease(this int entity) { return Storage<ComponentRelease>.Instance.components[entity]; }
+		public static ComponentRelease ComponentRelease(this int entity)
+		{
+			return Storage<ComponentRelease>.Instance.components[entity];
+		}
 	}
 }
