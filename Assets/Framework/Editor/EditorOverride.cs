@@ -15,18 +15,17 @@ namespace Pixeye
 	[CanEditMultipleObjects]
 	public class EditorOverride : Editor
 	{
-		private Dictionary<string, Cache> cache = new Dictionary<string, Cache>();
-		private List<SerializedProperty> props = new List<SerializedProperty>();
-		private SerializedProperty propScript;
-		private Type type;
-		private int length;
-		private List<FieldInfo> objectFields;
-		private bool initialized;
-		private Colors colors;
-		private FoldoutGroupAttribute prevFold;
-		private GUIStyle style;
+		Dictionary<string, Cache> cache = new Dictionary<string, Cache>();
+		List<SerializedProperty> props = new List<SerializedProperty>();
+		SerializedProperty propScript;
+		Type type;
+		int length;
+		List<FieldInfo> objectFields;
+		bool initialized;
+		Colors colors;
+		FoldoutGroupAttribute prevFold;
+		GUIStyle style;
 
-		private void Awake() { }
 
 		void OnEnable()
 		{
@@ -263,7 +262,7 @@ namespace Pixeye
 	}
 
 
-	public static partial class FrameworkExtensions
+	public static class FrameworkExtensions
 	{
 		public static string FirstLetterToUpperCase(this string s)
 		{
