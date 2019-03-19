@@ -162,7 +162,7 @@ MonoBehaviour:
     m_SceneName: Scene Kernel
   nodes: []
   go: {fileID: 623484221}
-  amount: 400
+  amount: 500
 --- !u!4 &1227113332
 Transform:
   m_ObjectHideFlags: 0
