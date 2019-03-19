@@ -109,8 +109,8 @@ using System;
  
          public void Stop()
          {
-             ProcessingUpdate.Default.Remove(this);
-             ProcessingTimer.Default.allWorkingTimers.Remove(this);
+             ProcUpdate.Default.Remove(this);
+             ProcTimer.Default.allWorkingTimers.Remove(this);
              IsRunning = false;
              timer = 0.0f;
          }
@@ -125,8 +125,8 @@ using System;
          {
              timer = 0.0f;
              IsRunning = true;
-             ProcessingTimer.Default.allWorkingTimers.Add(this);
-             ProcessingUpdate.Default.Add(this);
+             ProcTimer.Default.allWorkingTimers.Add(this);
+             ProcUpdate.Default.Add(this);
              return this;
          }
  
@@ -144,8 +144,8 @@ using System;
  
              timer = 0.0f;
              IsRunning = true;
-             ProcessingTimer.Default.allWorkingTimers.Add(this);
-             ProcessingUpdate.Default.Add(this);
+             ProcTimer.Default.allWorkingTimers.Add(this);
+             ProcUpdate.Default.Add(this);
              return this;
          }
  
@@ -176,8 +176,8 @@ using System;
              if (isAutoKill) Release();
              else
              {
-                 ProcessingUpdate.Default.Remove(this);
-                 ProcessingTimer.Default.allWorkingTimers.Remove(this);
+                 ProcUpdate.Default.Remove(this);
+                 ProcTimer.Default.allWorkingTimers.Remove(this);
              }
          }
  
@@ -190,8 +190,8 @@ using System;
  
          public void Dispose()
          {
-             ProcessingUpdate.Default.Remove(this);
-             ProcessingTimer.Default.allWorkingTimers.Remove(this);
+             ProcUpdate.Default.Remove(this);
+             ProcTimer.Default.allWorkingTimers.Remove(this);
              timer = 0.0f;
              IsRunning = false;
              isAutoKill = true;

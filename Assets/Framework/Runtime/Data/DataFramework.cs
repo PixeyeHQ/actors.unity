@@ -12,6 +12,12 @@ namespace Pixeye
 	{
 		//public static readonly string pathTagsMeta = @"\MetaTags.txt";
 
+		public static string nameSpace
+		{
+			get { return EditorPrefs.GetString("hba.data.namespace", "Pixeye"); }
+			set { EditorPrefs.SetString("hba.data.namespace", value); }
+		}
+
 		public static string pathPrefabsEditor
 		{
 			get { return EditorPrefs.GetString("hba.path.prefabs", ""); }

@@ -21,7 +21,7 @@ namespace Pixeye
 		public void Populate()
 		{
 			if (pool == Pool.None) return;
-			var poolStash = ProcessingPool.pools[pool];
+			var poolStash = ProcPool.pools[pool];
 			poolStash.RegisterObject(prefab);
 
 			for (var i = 0; i < createdObjs.Count; i++)

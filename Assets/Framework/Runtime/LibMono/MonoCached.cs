@@ -27,7 +27,7 @@ namespace Pixeye
 		void Awake()
 		{
 			selfTransform = transform;
-			conditionSignals = ProcessingSignals.Check(this);
+			conditionSignals = ProcSignals.Check(this);
 			if (Starter.initialized == false) return;
 			Setup();
 			
@@ -42,16 +42,16 @@ namespace Pixeye
 			HandleEnable();
 
 			if (conditionSignals)
-				ProcessingSignals.Default.Add(this);
+				ProcSignals.Default.Add(this);
 
-			ProcessingUpdate.Default.Add(this);
+			ProcUpdate.Default.Add(this);
 		}
 
 		void OnDisable()
 		{
 			if (conditionSignals)
-				ProcessingSignals.Default.Remove(this);
-			ProcessingUpdate.Default.Remove(this);
+				ProcSignals.Default.Remove(this);
+			ProcUpdate.Default.Remove(this);
 
 			HandleDisable();
 		}

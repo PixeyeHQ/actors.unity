@@ -29,7 +29,7 @@ namespace Pixeye
 			Toolbox.Add(dataGameSession);
 			Toolbox.Add(dataGameSettings);
 
-			ProcessingFastPool<Timer>.Instance.Populate(50);
+			ProcFastPool<Timer>.Instance.Populate(50);
 		}
 
 

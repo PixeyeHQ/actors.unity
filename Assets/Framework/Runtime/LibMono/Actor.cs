@@ -27,7 +27,7 @@ namespace Pixeye
 
 		protected virtual void Awake()
 		{
-			var entityID = ProcessingEntities.Create();
+			var entityID = ProcEntities.Create();
 			entity = entityID;
 			entity.AddReference(transform);
 
@@ -66,7 +66,7 @@ namespace Pixeye
 			if (Starter.initialized == false) return;
 			if (conditionManualDeploy) return;
 			RefEntity.isAlive[entity] = true;
-			ProcessingEntities.Default.CheckGroups(entity, true);
+			ProcEntities.Default.CheckGroups(entity, true);
 		}
 
 		#endregion

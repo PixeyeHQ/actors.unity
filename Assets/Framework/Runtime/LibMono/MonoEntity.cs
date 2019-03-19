@@ -36,7 +36,7 @@ namespace Pixeye
 			//EntityReferencesDepr.entityRefs[entity].TurnBitOn(ent.isEnabled|ent.isAlive);
 
 			//conditionEnabled = true;
-			ProcessingEntities.Default.CheckGroups(entity, true);
+			ProcEntities.Default.CheckGroups(entity, true);
 		}
 
 		public virtual void OnDisable()
@@ -44,7 +44,7 @@ namespace Pixeye
 			RefEntity.isAlive[entity] = false; //&= ~ent.isEnabled | ent.isAlive;
 			//EntityReferencesDepr.entityRefs[entity].TurnBitOff(ent.isEnabled|ent.isAlive);
 			//conditionEnabled = false;
-			ProcessingEntities.Default.CheckGroups(entity, false);
+			ProcEntities.Default.CheckGroups(entity, false);
 		}
 
 		protected void OnDestroy()
@@ -57,7 +57,7 @@ namespace Pixeye
 				Storage.all[j].RemoveNoCheck(entity);
 
 			Tags.Clear(entity);
-			ProcessingEntities.prevID.Push(entity);
+			ProcEntities.prevID.Push(entity);
 		}
 
 		public void CollectAllReferences()

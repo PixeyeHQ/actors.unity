@@ -49,13 +49,13 @@ namespace Pixeye
 			dte.entity = entity;
 			dte.tag = tag;
 
-			if (ProcessingActorsAdd.tagsToChange.Length <= ProcessingActorsAdd.lenTagsToChange)
+			if (ProcActorsAdd.tagsToChange.Length <= ProcActorsAdd.lenTagsToChange)
 			{
-				int len = ProcessingActorsAdd.lenTagsToChange << 1;
-				Array.Resize(ref ProcessingActorsAdd.tagsToChange, len);
+				int len = ProcActorsAdd.lenTagsToChange << 1;
+				Array.Resize(ref ProcActorsAdd.tagsToChange, len);
 			}
 
-			ProcessingActorsAdd.tagsToChange[ProcessingActorsAdd.lenTagsToChange++] = dte;
+			ProcActorsAdd.tagsToChange[ProcActorsAdd.lenTagsToChange++] = dte;
 		}
 
 

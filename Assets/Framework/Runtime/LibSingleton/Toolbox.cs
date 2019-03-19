@@ -77,7 +77,7 @@ namespace Pixeye
 		{
 			var awakeble = obj as IAwake;
 			if (awakeble != null) awakeble.OnAwake();
-			ProcessingUpdate.Default.Add(obj);
+			ProcUpdate.Default.Add(obj);
 		}
 
  
@@ -109,11 +109,11 @@ namespace Pixeye
 			}
 
 
-			ProcessingTimer.Default.Dispose();
-			ProcessingPool.Default.Dispose();
-			ProcessingEntities.Default.Dispose();
-			ProcessingScene.Default.Dispose();
-			ProcessingUpdate.Default.Dispose();
+			ProcTimer.Default.Dispose();
+			ProcPool.Default.Dispose();
+			ProcEntities.Default.Dispose();
+			ProcLevel.Default.Dispose();
+			ProcUpdate.Default.Dispose();
 			Box.Default.Dispose();
 
 			for (var i = 0; i < toWipe.Count; i++)

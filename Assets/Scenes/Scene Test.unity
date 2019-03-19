@@ -155,11 +155,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   factories: []
   ScenesToKeep:
-  - m_SceneAsset: {fileID: 102900000, guid: b1c1e3eb1cede744db636d5f7c880773, type: 3}
-    m_SceneName: Scene Kernel
+  - m_SceneName: Scene Kernel
   SceneDependsOn:
-  - m_SceneAsset: {fileID: 102900000, guid: b1c1e3eb1cede744db636d5f7c880773, type: 3}
-    m_SceneName: Scene Kernel
+  - m_SceneName: Scene Kernel
   nodes: []
   go: {fileID: 623484221}
   amount: 500
@@ -186,6 +184,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1849851635}
+  - component: {fileID: 1849851636}
   m_Layer: 0
   m_Name: -- SCENE --
   m_TagString: Untagged
@@ -208,6 +207,22 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1849851636
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1849851634}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 181480fa06174be79d39b99b6bb271be, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _entity: -1
+  pool: 0
+  cTest:
+    go: {fileID: 0}
 --- !u!1001 &7036862283644799362
 PrefabInstance:
   m_ObjectHideFlags: 0

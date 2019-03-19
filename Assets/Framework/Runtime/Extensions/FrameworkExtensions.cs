@@ -93,7 +93,7 @@ namespace Pixeye
 		/// <typeparam name="T"></typeparam>
 		public static void Send<T>(ref T signal) where T : struct
 		{
-			ProcessingSignals.Send(in signal);
+			ProcSignals.Send(in signal);
 		}
 
 		#endregion
@@ -172,7 +172,7 @@ namespace Pixeye
 			a.conditionManualDeploy = false;
 			//	EntityReferencesDepr.entityRefs[a.entity].state.TurnBitOn(ent.isEnabled);
 			//	a.conditionEnabled = true;
-			ProcessingEntities.Default.CheckGroups(a.entity, true);
+			ProcEntities.Default.CheckGroups(a.entity, true);
 		}
 
 		public static void Remove<T>(this Actor a) where T : new()

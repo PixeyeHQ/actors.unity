@@ -37,14 +37,13 @@ namespace Pixeye
 
 		void Awake()
 		{
-			//	ProcessingScene.Dynamic = GameObject.Find("Dynamic").transform;
-
-			if (ProcessingUpdate.Default == null)
+	 
+			if (ProcUpdate.Default == null)
 			{
-				ProcessingUpdate.Create();
+				ProcUpdate.Create();
 			}
 
-			ProcessingSceneLoad.Default.Setup(ScenesToKeep, SceneDependsOn, this);
+			ProcLevel.Default.Setup(ScenesToKeep, SceneDependsOn, this);
 		}
 
 		#if UNITY_EDITOR
@@ -156,7 +155,7 @@ namespace Pixeye
 			}
 
 
-			Add<ProcessingActorsAdd>();
+			Add<ProcActorsAdd>();
 
 			Setup();
 
@@ -177,7 +176,7 @@ namespace Pixeye
 
 			Timer.Add(Time.deltaFixed * 2, () => {
 				PostSetup();
-				Add<ProcessingActorsRemove>();
+				Add<ProcActorsRemove>();
 			});
 		}
 

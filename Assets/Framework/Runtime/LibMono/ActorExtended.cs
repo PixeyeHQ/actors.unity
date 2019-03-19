@@ -16,10 +16,10 @@ namespace Pixeye
 
 		protected override void Awake()
 		{
-			conditionSignals = ProcessingSignals.Check(this);
+			conditionSignals = ProcSignals.Check(this);
 			conditionManualDeploy = this is IManualDeploy;
 
-			var entityID = ProcessingEntities.Create();
+			var entityID = ProcEntities.Create();
 			entity = entityID;
 			entity.AddReference(transform);
 			 
@@ -45,21 +45,21 @@ namespace Pixeye
 
 
 			RefEntity.isAlive[entity] = true;
-			ProcessingEntities.Default.CheckGroups(entity, true);
-			ProcessingUpdate.Default.Add(this);
+			ProcEntities.Default.CheckGroups(entity, true);
+			ProcUpdate.Default.Add(this);
 
 			if (conditionSignals)
-				ProcessingSignals.Default.Add(this);
+				ProcSignals.Default.Add(this);
 		}
 
 		public override void OnDisable()
 		{
 			if (conditionSignals)
-				ProcessingSignals.Default.Remove(this);
+				ProcSignals.Default.Remove(this);
 
 			RefEntity.isAlive[entity] = false;
-			ProcessingUpdate.Default.Remove(this);
-			ProcessingEntities.Default.CheckGroups(entity, false);
+			ProcUpdate.Default.Remove(this);
+			ProcEntities.Default.CheckGroups(entity, false);
 		}
 	}
 }
