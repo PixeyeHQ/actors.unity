@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Pixeye
 {
-	public abstract class Template : ScriptableObject, IComponent
+	public abstract class Template : ScriptableObject
 	{
 		Dictionary<int, object> storage = new Dictionary<int, object>();
 

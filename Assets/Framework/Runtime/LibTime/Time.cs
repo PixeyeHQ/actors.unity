@@ -3,7 +3,7 @@
 
 namespace Pixeye
 {
-	public class Time : ITick, IKernel, IComponent
+	public class Time : ITick, IKernel
 	{
 		protected const float fps = 60;
 		

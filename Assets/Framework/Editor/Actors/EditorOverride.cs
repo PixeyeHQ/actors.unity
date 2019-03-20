@@ -30,7 +30,7 @@ namespace Pixeye
 		void OnDisable()
 		{
 			if (Toolbox.isQuittingOrChangingScene()) return;
-
+      if (target!=null)
 			foreach (var c in cacheFolds)
 			{
 				EditorPrefs.SetBool(string.Format($"{c.Value.atr.name}{c.Value.props[0].name}{target.name}"), c.Value.expanded);
@@ -75,7 +75,7 @@ namespace Pixeye
 				{
 					foreach (var pair in cacheFolds)
 					{
-						this.UseVerticalBoxLayout(() => Foldout(pair.Value), EditorUIStyles.box);
+						this.UseVerticalLayout(() => Foldout(pair.Value), EditorUIStyles.box);
 						EditorGUI.indentLevel = 0;
 					}
 
@@ -107,7 +107,7 @@ namespace Pixeye
 					EditorGUI.indentLevel = 1;
 					for (int i = 0; i < cache.props.Count; i++)
 					{
-						this.UseVerticalBoxLayout(() => Child(i), EditorUIStyles.boxChild);
+						this.UseVerticalLayout(() => Child(i), EditorUIStyles.boxChild);
 					}
 				}
 

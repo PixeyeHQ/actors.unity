@@ -23,7 +23,7 @@ namespace Pixeye.Data
 		public static int settings(this ent e)
 		{
 			return 0;
-			//return e.ComponentData().source;
+	 
 		}
 	}
 }

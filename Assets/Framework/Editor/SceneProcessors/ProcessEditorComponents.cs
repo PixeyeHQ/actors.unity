@@ -1,10 +1,8 @@
 //  Project : ecs
 // Contacts : Pix - ask@pixeye.games
 
-
 //  Project  : ACTORS
 //  Contacts : Pixeye - ask@pixeye.games
-
 
 using System;
 using System.IO;
@@ -18,9 +16,15 @@ namespace Pixeye
 {
 	public class ProcessEditorComponents : EndNameEditAction
 	{
+
 		public const string PATH_TO_TEMPLATE = @"Assets\Source\Editor\Templates\TmpComponent.txt";
 		const int MENU_ITEM_PRIORITY = 0;
-		static Texture2D scriptIcon = (EditorGUIUtility.IconContent("cs Script Icon").image as Texture2D);
+		static Texture2D scriptIcon;
+
+		void OnEnable()
+		{
+			scriptIcon = (EditorGUIUtility.IconContent("cs Script Icon").image as Texture2D);
+		}
 
 		[MenuItem("Tools/Actors/Add/Component", false, MENU_ITEM_PRIORITY)]
 		public static void CreateSample()
@@ -58,9 +62,9 @@ namespace Pixeye
 				templateContents = t.ReadToEnd();
 			}
 
-			templateContents = templateContents.Replace("##NAMESPACE##", DataFramework.nameSpace != "Pixeye" ? string.Format($"using Pixeye;{Environment.NewLine}namespace {DataFramework.nameSpace}") : string.Format($"{Environment.NewLine}namespace {DataFramework.nameSpace}"));
+			templateContents = templateContents.Replace("##NAMESPACE##",
+					DataFramework.nameSpace != "Pixeye" ? string.Format($"using Pixeye;{Environment.NewLine}namespace {DataFramework.nameSpace}") : string.Format($"{Environment.NewLine}namespace {DataFramework.nameSpace}"));
 			templateContents = templateContents.Replace("##NAME##", className);
-
 
 			var encoding = new UTF8Encoding(true, false);
 
@@ -69,10 +73,8 @@ namespace Pixeye
 				tc.WriteLine(templateContents);
 			}
 
-
 			AssetDatabase.ImportAsset(pathName);
 			AssetDatabase.Refresh();
-
 
 			return (MonoScript) AssetDatabase.LoadAssetAtPath(pathName, typeof(MonoScript));
 		}
@@ -83,5 +85,6 @@ namespace Pixeye
 			ProjectWindowUtil.ShowCreatedAsset((Object) o);
 			AssetDatabase.Refresh();
 		}
+
 	}
 }
