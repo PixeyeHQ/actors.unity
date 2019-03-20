@@ -35,6 +35,7 @@ namespace Pixeye
 
 		int namespaceIndex = -1;
 
+		string[] allTypes;
 		string[] currentTypes;
 
 		IEnumerable<Type> GetByNamespace(int index)
@@ -56,7 +57,7 @@ namespace Pixeye
 				}
 			}
 
-			//	len = namespaces.Count;
+			allTypes = componentTypes.Select(s => s.Name).ToArray();
 		}
 
 		public override void OnInspectorGUI()
@@ -91,23 +92,6 @@ namespace Pixeye
 					state = stateMain;
 				}
 			});
-
-			//EditorGUILayout.LabelField(string.Format($"Components: {0} ", EditorStyles.label));
-
-//			this.UseHorizontalLayout(() =>
-//			{
-//				this.UseLabel(string.Format($"Components: {0} "), EditorStyles.label);
-//				if (this.UseUIButton("Add Component", EditorUIStyles.button, 16, 300)) state = stateFind;
-//				if (showComponents && this.UseUIButton("▸", EditorUIStyles.button, 24))
-//				{
-//					showComponents = false;
-//				}
-//
-//				if (!showComponents && this.UseUIButton("▾", EditorUIStyles.button, 24))
-//				{
-//					showComponents = true;
-//				}
-//			}, Style.Header);
 		}
 		void HandleStateFind()
 		{
@@ -116,9 +100,11 @@ namespace Pixeye
 
 			Style.Header.UseHorizontalLayout(() =>
 			{
-
-				searchString = EditorStyles.foldoutPreDrop.UseTextInput("Find: ", searchString);
-				
+				EditorStyles.label.UseLabel("Find: ", 64);
+				var col = GUI.backgroundColor;
+				GUI.backgroundColor = Style.colDark;
+				searchString = Style.Search.UseTextInput("", searchString);
+				GUI.backgroundColor = col;
 				//EditorStyles.label.UseLabel("Choose Namespace");
 
 				if (state == stateFind && this.UseButton("Back", Style.Button))
@@ -137,7 +123,36 @@ namespace Pixeye
 
 			void StateShowNamespaces()
 			{
-				if (namespaceIndex == -1)
+				if (searchString.Length > 0)
+				{
+					var contents = allTypes.Where(p => p.Contains(searchString));
+					var len      = contents.Count();
+					var rowIndex = 0;
+				 
+						Style.Header.UseVerticalLayout(() =>
+						{
+							scrollPos = EditorGUILayout.BeginScrollView(scrollPos, GUILayout.Width(EditorGUIUtility.currentViewWidth - 31f), GUILayout.Height(Mathf.Clamp(len * 26, 32, 400)));
+
+							foreach ( var c in contents )
+							{
+								GUI.backgroundColor = rowIndex++ % 2 == 0 ? Style.colDark : Style.colLight;
+
+								Style.ButtonSearch.UseHorizontalLayout(() =>
+								{
+									if (this.UseButton(c, Style.Row, 21))
+									{
+									}
+								});
+								GUILayout.Space(1f);
+							}
+							
+						 
+
+							EditorGUILayout.EndScrollView();
+						});
+				 
+				}
+				else if (namespaceIndex == -1)
 				{
 					Style.Header.UseVerticalLayout(() =>
 					{
@@ -174,19 +189,13 @@ namespace Pixeye
 						scrollPos = EditorGUILayout.BeginScrollView(scrollPos, GUILayout.Width(EditorGUIUtility.currentViewWidth - 31f), GUILayout.Height(Mathf.Clamp(currentTypes.Length * 26, 32, 400)));
 						for ( int i = 0; i < currentTypes.Length; i++ )
 						{
-//						if (currentTypes[i].Contains(searchString))
-//						{
-
 							GUI.backgroundColor = i % 2 == 0 ? Style.colDark : Style.colLight;
 
 							Style.ButtonSearch.UseHorizontalLayout(() =>
 							{
 								if (this.UseButton(currentTypes[i], Style.Row, 21))
 								{
-									//Debug.Log(currentTypes[i]);
 								}
-
-								//}
 							});
 							GUILayout.Space(1f);
 						}
@@ -288,6 +297,7 @@ namespace Pixeye
 			public static GUIStyle Input;
 			public static GUIStyle Arrow;
 			public static GUIStyle Row;
+			public static GUIStyle Search;
 			static Style()
 			{
 				var uiTex_in    = Resources.Load<Texture2D>("IN foldout focus-6510");
@@ -323,7 +333,23 @@ namespace Pixeye
 				Row = new GUIStyle(EditorStyles.label);
 				Row.padding = new RectOffset(3, 3, 3, 3);
 				Row.active.textColor = Color.white;
-				//		Row.active.background = Texture2D.whiteTexture;
+
+				Search = new GUIStyle(Row);
+				Search.normal.background = Texture2D.whiteTexture;
+				Search.active.background = Texture2D.whiteTexture;
+				Search.hover.background = Texture2D.whiteTexture;
+				Search.focused.background = Texture2D.whiteTexture;
+
+				Search.active.textColor = Color.white;
+				Search.hover.textColor = Color.white;
+				Search.focused.textColor = Color.white;
+				Search.onActive.textColor = Color.white;
+				Search.onFocused.textColor = Color.white;
+				Search.onHover.textColor = Color.white;
+				Search.onNormal.textColor = Color.white;
+				//	Search.normal.textColor = Color.white;
+
+				Search.padding = new RectOffset(3, 3, 1, 1);
 			}
 
 		}

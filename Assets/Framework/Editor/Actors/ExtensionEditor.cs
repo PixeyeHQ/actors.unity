@@ -62,10 +62,13 @@ namespace Pixeye
 		{
 			EditorGUILayout.LabelField(label, style);
 		}
+		
 		public static void UseLabel(this GUIStyle style, in string label, float width)
 		{
-			EditorGUILayout.LabelField(label, style, GUILayout.Width(width));
+			EditorGUILayout.LabelField(label, style, GUILayout.ExpandWidth(false), GUILayout.Width(width));
 		}
+		
+	 
 		
 
 		public static string UseTextInput(this GUIStyle style, in string label, in string input)
