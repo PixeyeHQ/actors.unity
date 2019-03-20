@@ -12,3 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15a5d8953b1b469bb55b88cb14bedd21, type: 3}
   m_Name: Blueprint Module
   m_EditorClassIdentifier: 
+  components: []

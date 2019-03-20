@@ -21,11 +21,11 @@ namespace Pixeye
 		const int MENU_ITEM_PRIORITY = 0;
 		static Texture2D scriptIcon;
 
-		void OnEnable()
+		public override void OnEnable()
 		{
+			base.OnEnable();
 			scriptIcon = (EditorGUIUtility.IconContent("cs Script Icon").image as Texture2D);
 		}
-
 		[MenuItem("Tools/Actors/Add/Component", false, MENU_ITEM_PRIORITY)]
 		public static void CreateSample()
 		{

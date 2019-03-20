@@ -20,7 +20,8 @@ namespace Pixeye
 		const int stateFind = 1;
 		const int stateMainShow = 2;
 
-		public bool showComponents;
+		Blueprint blueprint;
+
 		public int state = stateMain;
 		Vector2 scrollPos;
 
@@ -30,13 +31,14 @@ namespace Pixeye
 
 		readonly List<string> namespaces = new List<string>();
 
-		bool addingComponents = false;
-		string searchString = "Enter component";
-
+		string searchString = "";
 		int namespaceIndex = -1;
 
 		string[] allTypes;
 		string[] currentTypes;
+		IEnumerable<string> contents;
+		int lenContents;
+		int prevCache;
 
 		IEnumerable<Type> GetByNamespace(int index)
 		{
@@ -46,6 +48,8 @@ namespace Pixeye
 
 		void OnEnable()
 		{
+			blueprint = target as Blueprint;
+
 			var list = componentTypes.ToList();
 			var len  = list.Count;
 			for ( int i = 0; i < len; i++ )
@@ -73,7 +77,7 @@ namespace Pixeye
 
 			Style.Header.UseHorizontalLayout(() =>
 			{
-				EditorStyles.label.UseLabel(string.Format($"Components: {0} "));
+				EditorStyles.label.UseLabel(string.Format($"Components: {blueprint.components.Count} "));
 
 				if (this.UseButton("Add Component", Style.Button))
 				{
@@ -96,21 +100,26 @@ namespace Pixeye
 		void HandleStateFind()
 		{
 			if (state != stateFind) return;
-			var index = -1;
+
+			var name = namespaceIndex != -1 && prevCache > 0 ? "X" : "Back";
 
 			Style.Header.UseHorizontalLayout(() =>
 			{
 				EditorStyles.label.UseLabel("Find: ", 64);
 				var col = GUI.backgroundColor;
 				GUI.backgroundColor = Style.colDark;
-				searchString = Style.Search.UseTextInput("", searchString);
-				GUI.backgroundColor = col;
-				//EditorStyles.label.UseLabel("Choose Namespace");
 
-				if (state == stateFind && this.UseButton("Back", Style.Button))
+				searchString = Style.Search.UseTextInput("", searchString);
+				GUI.SetNextControlName("search");
+				GUI.backgroundColor = col;
+
+				if (state == stateFind && this.UseButton(name, Style.Button))
 				{
-					if (namespaceIndex > -1)
+					if (namespaceIndex != -1)
 					{
+						searchString = "";
+						GUI.FocusControl("search");
+
 						namespaceIndex = -1;
 						return;
 					}
@@ -123,34 +132,55 @@ namespace Pixeye
 
 			void StateShowNamespaces()
 			{
-				if (searchString.Length > 0)
+				if (searchString.Length != prevCache)
 				{
-					var contents = allTypes.Where(p => p.Contains(searchString));
-					var len      = contents.Count();
+					prevCache = searchString.Length;
+					if (prevCache > 0)
+					{
+						contents = allTypes.Where(p => p.Contains(searchString));
+						lenContents = contents.Count();
+						if (lenContents == 0) namespaceIndex = -2;
+						else namespaceIndex = 0;
+					}
+					else
+						namespaceIndex = -1;
+				}
+
+				if (namespaceIndex == -2)
+				{
+					EditorStyles.label.UseLabel("Nothing Found", EditorGUIUtility.currentViewWidth / 2);
+				}
+				else if (lenContents > 0 && searchString.Length > 0)
+				{
+					namespaceIndex = 0;
 					var rowIndex = 0;
-				 
-						Style.Header.UseVerticalLayout(() =>
+
+					if (Event.current.isKey)
+					{
+						if (Event.current.keyCode == KeyCode.Tab)
 						{
-							scrollPos = EditorGUILayout.BeginScrollView(scrollPos, GUILayout.Width(EditorGUIUtility.currentViewWidth - 31f), GUILayout.Height(Mathf.Clamp(len * 26, 32, 400)));
+						}
+					}
 
-							foreach ( var c in contents )
+					Style.Header.UseVerticalLayout(() =>
+					{
+						scrollPos = EditorGUILayout.BeginScrollView(scrollPos, GUILayout.Width(EditorGUIUtility.currentViewWidth - 31f), GUILayout.Height(Mathf.Clamp(lenContents * 26, 32, 400)));
+
+						foreach ( var c in contents )
+						{
+							GUI.backgroundColor = rowIndex++ % 2 == 0 ? Style.colDark : Style.colLight;
+
+							Style.ButtonSearch.UseHorizontalLayout(() =>
 							{
-								GUI.backgroundColor = rowIndex++ % 2 == 0 ? Style.colDark : Style.colLight;
-
-								Style.ButtonSearch.UseHorizontalLayout(() =>
+								if (this.UseButton(c, Style.Row, 21))
 								{
-									if (this.UseButton(c, Style.Row, 21))
-									{
-									}
-								});
-								GUILayout.Space(1f);
-							}
-							
-						 
-
-							EditorGUILayout.EndScrollView();
-						});
-				 
+									AddComponent(c);
+								}
+							});
+							GUILayout.Space(1f);
+						}
+						EditorGUILayout.EndScrollView();
+					});
 				}
 				else if (namespaceIndex == -1)
 				{
@@ -195,6 +225,7 @@ namespace Pixeye
 							{
 								if (this.UseButton(currentTypes[i], Style.Row, 21))
 								{
+									AddComponent(currentTypes[i]);
 								}
 							});
 							GUILayout.Space(1f);
@@ -203,88 +234,14 @@ namespace Pixeye
 						EditorGUILayout.EndScrollView();
 					});
 				}
-//			var index = -1;
-//			searchString = EditorGUILayout.TextField(searchString, EditorStyles.toolbarTextField);
-//
-//			if (namespaceIndex == -1)
-//			{
-//				var len = namespaces.Count;
-//				for ( int i = 0; i < len; i++ )
-//				{
-//					if (this.UseUIButton(namespaces[i], EditorStyles.label, 12, EditorGUIUtility.currentViewWidth - 100))
-//					{
-//						namespaceIndex = i;
-//						var types = GetByNamespace(i);
-////						Debug.Log(types.ToArray().Length);
-////						var v = types.Select(x => x.Name).ToArray();
-//						currentTypes = types.Select(x => x.Name).ToArray();
-//					}
-//				}
-//			}
-//			else
-//			{
-//				for ( int i = 0; i < currentTypes.Length; i++ )
-//				{
-//					if (currentTypes[i].Contains(searchString))
-//					{
-//						if (this.UseUIButton(currentTypes[i], EditorStyles.label, 12, EditorGUIUtility.currentViewWidth - 100))
-//						{
-//							Debug.Log(currentTypes[i]);
-//						}
-//					}
-//				}
-//			}
-
-				//	this.UseLabel(string.Format($"→ {searchString} "), EditorStyles.label);
-
-//			this.UseHorizontalLayout(() =>
-//			{
-//				this.UseHorizontalLayout(() =>
-//				{
-//					this.UseLabel("Find →", EditorStyles.label);
-//
-//					// 	this.UseLabel(string.Format($"→ {searchString} "), EditorUIStyles.text);
-//				}, EditorUIStyles.box);
-//
-//				searchString = EditorGUILayout.TextField(searchString, EditorStyles.toolbarTextField);
-//			}, EditorStyles.label);
-
-//			if (this.UseUIButtonExtended("Add New Component", EditorUIStyles.button, 16))
-//			{
-//				addingComponents = true;
-//			}
-
-				//	if (addingComponents)
-				//{
-
-				//	index = EditorGUILayout.Popup("Add Component", index, types);
-
-				// Do comparison here. For example
-//
-//			if (index >= 0)
-//			{
-//			}
-
-//				var availableTypes = allComponentTypes
-//						.Where(x => !_entityView.Entity.Components.Select(y => y.GetType()).Contains(x))
-//						.ToArray();
-//
-//				var types = availableTypes.Select(x => string.Format("{0} [{1}]", x.Name, x.Namespace)).ToArray();
-//				var index = -1;
-//			index = EditorGUILayout.Popup("Add Component", index, types);
-//			if (index >= 0)
-//			{
-//				addingComponents = false;
-//			}
-
-//					var component = (IComponent)Activator.CreateInstance(availableTypes[index]);
-//					_entityView.Entity.AddComponents(component);
-//				}
-//			}
-				//}
 			}
 		}
 
+		void AddComponent(string id)
+		{
+			 blueprint.components.Add(Activator.CreateInstance<ComponentRelease>());
+		}
+ 
 		static class Style
 		{
 
@@ -300,9 +257,6 @@ namespace Pixeye
 			public static GUIStyle Search;
 			static Style()
 			{
-				var uiTex_in    = Resources.Load<Texture2D>("IN foldout focus-6510");
-				var uiTex_in_on = Resources.Load<Texture2D>("IN foldout focus on-5718");
-
 				Header = new GUIStyle(GUI.skin.box);
 				Header.padding = new RectOffset(6, 6, 6, 6);
 				Header.richText = true;
@@ -323,9 +277,9 @@ namespace Pixeye
 
 				Arrow.fontSize = 14;
 				Arrow.normal.textColor = colNormal;
-				Arrow.normal.background = uiTex_in;
+
 				Arrow.active.textColor = colNormal;
-				Arrow.active.background = uiTex_in;
+
 				// 
 
 				Input = new GUIStyle(GUI.skin.textField);
