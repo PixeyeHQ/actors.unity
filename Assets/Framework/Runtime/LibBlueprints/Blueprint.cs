@@ -2,6 +2,7 @@
 // Contacts : Pix - ask@pixeye.games
 
 using System.Collections.Generic;
+ 
 using UnityEngine;
 
 namespace Pixeye
@@ -10,12 +11,12 @@ namespace Pixeye
 	public class Blueprint : ScriptableObject
 	{
 
-		public List<ComponentRelease> components = new List<ComponentRelease>();
+		public IComponent component;
+		
+		[Reorderable]
+		public List<IComponent> components = new List<IComponent>();
 
-		[Button]
-		public void Test()
-		{
-		}
+  
 
 	}
 }

@@ -1,7 +1,6 @@
 //  Project  : ACTORS
 //  Contacts : Pixeye - ask@pixeye.games
 
-
 using System.Collections.Generic;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -12,7 +11,6 @@ using UnityEngine;
 using Sirenix.OdinInspector;
 #endif
 
-
 namespace Pixeye
 {
 	/// <summary>
@@ -20,24 +18,23 @@ namespace Pixeye
 	/// </summary>
 	public class Starter : MonoBehaviour
 	{
+
 		public static bool initialized;
 
-
-		[FoldoutGroup("Setup")]
+		[FoldoutGroup("Setup"), Reorderable]
 		public List<Factory> factories;
 
-		[FoldoutGroup("Setup")]
-		public List<SceneField> ScenesToKeep;
+		[FoldoutGroup("Setup"), Reorderable("Test me")]
+		public List<SceneReference> ScenesToKeep;
 
 		[FoldoutGroup("Setup")]
-		public List<SceneField> SceneDependsOn;
+		public List<SceneReference> SceneDependsOn;
 
 		[FoldoutGroup("Actors Pool Cache")]
 		public List<PoolNode> nodes = new List<PoolNode>();
 
 		void Awake()
 		{
-	 
 			if (ProcUpdate.Default == null)
 			{
 				ProcUpdate.Create();
@@ -50,7 +47,7 @@ namespace Pixeye
 
 		public void ClearNodes()
 		{
-			for (int i = 0; i < nodes.Count; i++)
+			for ( int i = 0; i < nodes.Count; i++ )
 			{
 				var n = nodes[i];
 				n.createdObjs.Clear();
@@ -60,7 +57,6 @@ namespace Pixeye
 			nodes.Clear();
 		}
 
-
 		public void AddToNode(GameObject prefab, GameObject instance, int pool)
 		{
 			var       id                  = prefab.GetInstanceID();
@@ -68,8 +64,7 @@ namespace Pixeye
 			var       conditionNodeCreate = true;
 			List<int> nodesToKill         = new List<int>();
 
-
-			for (int i = 0; i < nodesValid.Count; i++)
+			for ( int i = 0; i < nodesValid.Count; i++ )
 			{
 				var node = nodes[nodesValid[i]];
 
@@ -89,7 +84,6 @@ namespace Pixeye
 					conditionNodeCreate = false;
 				}
 
-
 				if (node.createdObjs.Count == 0)
 				{
 					node.prefab = null;
@@ -97,7 +91,7 @@ namespace Pixeye
 				}
 			}
 
-			for (int i = 0; i < nodesToKill.Count; i++)
+			for ( int i = 0; i < nodesToKill.Count; i++ )
 			{
 				nodes.RemoveAt(nodesToKill[i]);
 			}
@@ -139,21 +133,19 @@ namespace Pixeye
 			}
 		}
 
-
 		#endif
 
 		public void BindScene()
 		{
-			for (int i = 0; i < nodes.Count; i++)
+			for ( int i = 0; i < nodes.Count; i++ )
 			{
 				nodes[i].Populate();
 			}
 
-			foreach (var factory in factories)
+			foreach ( var factory in factories )
 			{
 				Toolbox.Add(factory);
 			}
-
 
 			Add<ProcActorsAdd>();
 
@@ -163,7 +155,7 @@ namespace Pixeye
 
 			var objs = FindObjectsOfType<MonoBehaviour>();
 
-			for (var i = 0; i < objs.Length; i++)
+			for ( var i = 0; i < objs.Length; i++ )
 			{
 				var obj  = objs[i];
 				var ireq = obj as IRequireStarter;
@@ -173,8 +165,8 @@ namespace Pixeye
 				}
 			}
 
-
-			Timer.Add(Time.deltaFixed * 2, () => {
+			Timer.Add(Time.deltaFixed * 2, () =>
+			{
 				PostSetup();
 				Add<ProcActorsRemove>();
 			});
@@ -190,14 +182,18 @@ namespace Pixeye
 			return Toolbox.Add<T>();
 		}
 
+		protected virtual void Setup()
+		{
+		}
 
-		protected virtual void Setup() { }
-
-		protected virtual void PostSetup() { }
+		protected virtual void PostSetup()
+		{
+		}
 
 		protected virtual void OnDestroy()
 		{
 			initialized = false;
 		}
+
 	}
 }

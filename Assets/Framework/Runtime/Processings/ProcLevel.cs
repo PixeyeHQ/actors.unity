@@ -60,19 +60,19 @@ namespace Pixeye
 		}
 
 
-		public void Setup(List<SceneField> scenesToKeep, List<SceneField> sceneDependsOn, Starter starter)
+		public void Setup(List<SceneReference> scenesToKeep, List<SceneReference> sceneDependsOn, Starter starter)
 		{
 			this.scenesToKeep.Clear();
 			this.sceneDependsOn.Clear();
 
 			for (var i = 0; i < scenesToKeep.Count; i++)
 			{
-				this.scenesToKeep.Add(scenesToKeep[i].SceneName);
+				this.scenesToKeep.Add(scenesToKeep[i].ScenePath);
 			}
 
 			for (var i = 0; i < sceneDependsOn.Count; i++)
 			{
-				this.sceneDependsOn.Add(sceneDependsOn[i].SceneName);
+				this.sceneDependsOn.Add(sceneDependsOn[i].ScenePath);
 			}
 
 			Toolbox.Instance.StartCoroutine(_Setup(starter));

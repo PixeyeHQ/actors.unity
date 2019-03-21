@@ -2,12 +2,9 @@
 // Contacts : Pix - ask@pixeye.games
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
-using UnityEditor.Graphs;
-using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 
 namespace Pixeye
@@ -49,6 +46,8 @@ namespace Pixeye
 		void OnEnable()
 		{
 			blueprint = target as Blueprint;
+
+			blueprint.component = new ComponentDefault();
 
 			var list = componentTypes.ToList();
 			var len  = list.Count;
@@ -96,6 +95,7 @@ namespace Pixeye
 					state = stateMain;
 				}
 			});
+			InspectorComponent.ShowComponentProperties(blueprint.component);
 		}
 		void HandleStateFind()
 		{
@@ -179,6 +179,7 @@ namespace Pixeye
 							});
 							GUILayout.Space(1f);
 						}
+
 						EditorGUILayout.EndScrollView();
 					});
 				}
@@ -239,9 +240,9 @@ namespace Pixeye
 
 		void AddComponent(string id)
 		{
-			 blueprint.components.Add(Activator.CreateInstance<ComponentRelease>());
+			blueprint.components.Add(Activator.CreateInstance<ComponentRelease>());
 		}
- 
+
 		static class Style
 		{
 
@@ -304,6 +305,41 @@ namespace Pixeye
 				//	Search.normal.textColor = Color.white;
 
 				Search.padding = new RectOffset(3, 3, 1, 1);
+			}
+
+		}
+
+		static class InspectorComponent
+		{
+
+			public static void ShowComponentProperties<T>(T component)
+					where T : IComponent
+			{
+				var componentFields = component.GetType().GetFields();
+
+				foreach ( var field in componentFields )
+				{
+					EditorGUILayout.BeginHorizontal();
+					var fieldType  = field.FieldType;
+					var fieldValue = field.GetValue(component);
+
+					var handler = DefaultEditorInputRegistry.GetHandlerFor(fieldType);
+					if (handler == null)
+					{
+						Debug.LogWarning("This type is not supported: " + fieldType.Name + " - In component: " + component.GetType().Name);
+						EditorGUILayout.EndHorizontal();
+						continue;
+					}
+
+					var updatedValue = handler.CreateUI(field.Name, fieldValue);
+
+					if (updatedValue != null)
+					{
+						field.SetValue(component, updatedValue);
+					}
+
+					EditorGUILayout.EndHorizontal();
+				}
 			}
 
 		}

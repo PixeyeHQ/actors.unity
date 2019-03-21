@@ -1,6 +1,5 @@
 ﻿#if!ODIN_INSPECTOR
 
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,47 +12,60 @@ namespace Pixeye
 {
 	[CustomEditor(typeof(Object), true, isFallback = true)]
 	[CanEditMultipleObjects]
-	public class EditorOverride : Editor
+	public class EditorOverride : ReorderableArrayInspector
 	{
+
 		Dictionary<string, CacheFoldProp> cacheFolds = new Dictionary<string, CacheFoldProp>();
 		List<SerializedProperty> props = new List<SerializedProperty>();
 		List<MethodInfo> methods;
 		bool initialized;
 
-
 		void OnEnable()
 		{
 			initialized = false;
-		}
-
-
+ 
+	 	}
+ 
 		void OnDisable()
 		{
 			if (Toolbox.isQuittingOrChangingScene()) return;
-      if (target!=null)
-			foreach (var c in cacheFolds)
-			{
-				EditorPrefs.SetBool(string.Format($"{c.Value.atr.name}{c.Value.props[0].name}{target.name}"), c.Value.expanded);
-				c.Value.Dispose();
-			}
+			if (target != null)
+				foreach ( var c in cacheFolds )
+				{
+					EditorPrefs.SetBool(string.Format($"{c.Value.atr.name}{c.Value.props[0].name}{target.name}"), c.Value.expanded);
+					c.Value.Dispose();
+				}
 		}
-
+ 
+		
+		
+	 
+		
+		
 		public override bool RequiresConstantRepaint()
 		{
 			return EditorActorsFramework.needToRepaint;
 		}
 
-
 		public override void OnInspectorGUI()
 		{
+			 
 			serializedObject.Update();
 
+	 
+			
 			Setup();
+
+			if (props.Count == 0)
+			{
+				DrawDefaultInspector();
+				return;
+			}
+
 			Header();
 			Body();
 
 			serializedObject.ApplyModifiedProperties();
-
 
 			void Header()
 			{
@@ -67,30 +79,35 @@ namespace Pixeye
 
 			void Body()
 			{
-				if (props.Count == 0)
+				foreach ( var pair in cacheFolds )
 				{
-					DrawDefaultInspector();
+					this.UseVerticalLayout(() => Foldout(pair.Value), EditorUIStyles.box);
+					EditorGUI.indentLevel = 0;
 				}
-				else
+
+				EditorGUILayout.Space();
+
+				for ( var i = 1; i < props.Count; i++ )
 				{
-					foreach (var pair in cacheFolds)
+					
+					
+					if (props[i].isArray)
 					{
-						this.UseVerticalLayout(() => Foldout(pair.Value), EditorUIStyles.box);
-						EditorGUI.indentLevel = 0;
+						DrawPropertySortableArray(props[i]);
 					}
-
-					EditorGUILayout.Space();
-
-					for (var i = 1; i < props.Count; i++)
+					else
 					{
 						EditorGUILayout.PropertyField(props[i], true);
 					}
-
-					EditorGUILayout.Space();
+					
+					
+			 
 				}
 
+				EditorGUILayout.Space();
+
 				if (methods == null) return;
-				foreach (MethodInfo memberInfo in methods)
+				foreach ( MethodInfo memberInfo in methods )
 				{
 					this.UseButton(memberInfo);
 				}
@@ -101,11 +118,11 @@ namespace Pixeye
 				cache.expanded = EditorGUILayout.Foldout(cache.expanded, cache.atr.name, true,
 						EditorUIStyles.foldout);
 
-
 				if (cache.expanded)
 				{
 					EditorGUI.indentLevel = 1;
-					for (int i = 0; i < cache.props.Count; i++)
+
+					for ( int i = 0; i < cache.props.Count; i++ )
 					{
 						this.UseVerticalLayout(() => Child(i), EditorUIStyles.boxChild);
 					}
@@ -113,7 +130,16 @@ namespace Pixeye
 
 				void Child(int i)
 				{
-					EditorGUILayout.PropertyField(cache.props[i], new GUIContent(cache.props[i].name.FirstLetterToUpperCase()), true);
+
+					if (cache.props[i].isArray)
+					{
+						DrawPropertySortableArray(cache.props[i]);
+					}
+					else
+					{
+						EditorGUILayout.PropertyField(cache.props[i], new GUIContent(cache.props[i].name.FirstLetterToUpperCase()), true);
+					}
+ 
 				}
 			}
 
@@ -122,18 +148,19 @@ namespace Pixeye
 				EditorActorsFramework.currentEvent = Event.current;
 				if (!initialized)
 				{
-				 
+					InitInspector();
 					SetupButtons();
-	 
-					List<FieldInfo> objectFields;
-					FoldoutGroupAttribute prevFold = default;
 
+					List<FieldInfo>       objectFields;
+			  		FoldoutGroupAttribute prevFold = default;
 
 					var length = EditorTypes.Get(target, out objectFields);
 
-					for (var i = 0; i < length; i++)
+					for ( var i = 0; i < length; i++ )
 					{
-						var fold = Attribute.GetCustomAttribute(objectFields[i], typeof(FoldoutGroupAttribute)) as FoldoutGroupAttribute;
+						#region FOLDERS
+
+						var           fold = Attribute.GetCustomAttribute(objectFields[i], typeof(FoldoutGroupAttribute)) as FoldoutGroupAttribute;
 						CacheFoldProp c;
 						if (fold == null)
 						{
@@ -160,10 +187,12 @@ namespace Pixeye
 							cacheFolds.Add(fold.name, new CacheFoldProp {atr = fold, types = new HashSet<string> {objectFields[i].Name}, expanded = expanded});
 						}
 						else c.types.Add(objectFields[i].Name);
+
+						#endregion
 					}
 
 					var property = serializedObject.GetIterator();
-					var next = property.NextVisible(true);
+					var next     = property.NextVisible(true);
 					if (next)
 					{
 						do
@@ -175,12 +204,12 @@ namespace Pixeye
 					initialized = true;
 				}
 			}
-		 
+
 			void SetupButtons()
 			{
 				var members = GetButtonMembers(target);
 
-				foreach (var memberInfo in members)
+				foreach ( var memberInfo in members )
 				{
 					var method = memberInfo as MethodInfo;
 					if (method == null)
@@ -197,28 +226,30 @@ namespace Pixeye
 					methods.Add(method);
 				}
 			}
-		 
 		}
 
 		public void HandleFoldProp(SerializedProperty prop)
 		{
 			bool shouldBeFolded = false;
-			foreach (var pair in cacheFolds)
+
+			foreach ( var pair in cacheFolds )
 			{
 				if (pair.Value.types.Contains(prop.name))
 				{
+					var pr = prop.Copy();
 					shouldBeFolded = true;
-					pair.Value.props.Add(prop.Copy());
+					pair.Value.props.Add(pr);
+
 					break;
 				}
 			}
 
 			if (shouldBeFolded == false)
 			{
-				props.Add(prop.Copy());
+				var pr = prop.Copy();
+				props.Add(pr);
 			}
 		}
-
 
 		IEnumerable<MemberInfo> GetButtonMembers(object target)
 		{
@@ -232,9 +263,9 @@ namespace Pixeye
 			return Attribute.IsDefined(memberInfo, typeof(ButtonAttribute));
 		}
 
-
 		class CacheFoldProp
 		{
+
 			public HashSet<string> types = new HashSet<string>();
 			public List<SerializedProperty> props = new List<SerializedProperty>();
 			public FoldoutGroupAttribute atr;
@@ -246,7 +277,9 @@ namespace Pixeye
 				types.Clear();
 				atr = null;
 			}
+
 		}
+
 	}
 }
 #endif

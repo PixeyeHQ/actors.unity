@@ -10,7 +10,7 @@ namespace Pixeye
 	{
 
 		public static ProcSignals Default = new ProcSignals();
-		public readonly Dictionary<int, List<IReceive>> signals = new Dictionary<int, List<IReceive>>(new FastComparable());
+		readonly Dictionary<int, List<IReceive>> signals = new Dictionary<int, List<IReceive>>(new FastComparable());
 
 		#region LOGIC
 
@@ -19,7 +19,7 @@ namespace Pixeye
 			Default.Dispatch(in val);
 		}
 
-		public void Dispatch<T>(in T val)
+		void Dispatch<T>(in T val)
 		{
 			List<IReceive> cachedSignals;
 

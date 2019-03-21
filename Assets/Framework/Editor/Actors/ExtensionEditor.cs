@@ -58,6 +58,14 @@ namespace Pixeye
 			EditorGUILayout.EndHorizontal();
 		}
 
+		public static void UseProperty(this GUIStyle style,  SerializedProperty property, bool includeChildren)
+		{
+			EditorGUILayout.BeginHorizontal();
+			EditorGUILayout.PropertyField(property, includeChildren);
+			EditorGUILayout.EndHorizontal();
+			//EditorGUILayout.LabelField(label, style);
+		}
+		
 		public static void UseLabel(this GUIStyle style, in string label)
 		{
 			EditorGUILayout.LabelField(label, style);
@@ -156,20 +164,20 @@ public static class EditorUIStyles
 		foldout.overflow = new RectOffset(-10, 0, 3, 0);
 		foldout.padding = new RectOffset(25, 0, -3, 0);
 
-		foldout.active.textColor = c_on;
+	  foldout.active.textColor = c_on;
 		foldout.active.background = uiTex_in;
-		foldout.onActive.textColor = c_on;
+	  foldout.onActive.textColor = c_on;
 		foldout.onActive.background = uiTex_in_on;
 
 		foldout.focused.textColor = c_on;
 		foldout.focused.background = uiTex_in;
-		foldout.onFocused.textColor = c_on;
+	  foldout.onFocused.textColor = c_on;
 		foldout.onFocused.background = uiTex_in_on;
 
 		foldout.hover.textColor = c_on;
 		foldout.hover.background = uiTex_in;
 
-		foldout.onHover.textColor = c_on;
+	 	foldout.onHover.textColor = c_on;
 		foldout.onHover.background = uiTex_in_on;
 
 		box = new GUIStyle(GUI.skin.box);
