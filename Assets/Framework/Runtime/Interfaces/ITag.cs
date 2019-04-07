@@ -2,7 +2,7 @@
 // Contacts : Pix - info@pixeye.games
 //     Date : 3/12/2019 
 
-namespace Pixeye
+namespace Pixeye.Framework
 {
 	public interface ITag { }
 

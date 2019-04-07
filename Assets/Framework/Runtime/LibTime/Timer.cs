@@ -8,7 +8,7 @@ Date:       08/10/2017 21:54
 using System;
 using System.Collections.Generic;
 
-namespace Pixeye
+namespace Pixeye.Framework
 {
 	public class Timer : ITick, IDisposable
 	{
@@ -104,8 +104,8 @@ namespace Pixeye
 
 		public void Stop()
 		{
-			ProcUpdate.Default.Remove(this);
-			ProcTimer.Default.allWorkingTimers.Remove(this);
+			ProcessorUpdate.Default.Remove(this);
+			HandleTimer.Default.allWorkingTimers.Remove(this);
 			IsRunning = false;
 			timer = 0.0f;
 		}
@@ -120,8 +120,8 @@ namespace Pixeye
 		{
 			timer = 0.0f;
 			IsRunning = true;
-			ProcTimer.Default.allWorkingTimers.Add(this);
-			ProcUpdate.Default.Add(this);
+			HandleTimer.Default.allWorkingTimers.Add(this);
+			ProcessorUpdate.Default.Add(this);
 			return this;
 		}
 
@@ -139,8 +139,8 @@ namespace Pixeye
 
 			timer = 0.0f;
 			IsRunning = true;
-			ProcTimer.Default.allWorkingTimers.Add(this);
-			ProcUpdate.Default.Add(this);
+			HandleTimer.Default.allWorkingTimers.Add(this);
+			ProcessorUpdate.Default.Add(this);
 			return this;
 		}
 
@@ -170,8 +170,8 @@ namespace Pixeye
 			if (isAutoKill) Release();
 			else
 			{
-				ProcUpdate.Default.Remove(this);
-				ProcTimer.Default.allWorkingTimers.Remove(this);
+				ProcessorUpdate.Default.Remove(this);
+				HandleTimer.Default.allWorkingTimers.Remove(this);
 			}
 		}
 
@@ -183,8 +183,8 @@ namespace Pixeye
 
 		public void Dispose()
 		{
-			ProcUpdate.Default.Remove(this);
-			ProcTimer.Default.allWorkingTimers.Remove(this);
+			ProcessorUpdate.Default.Remove(this);
+			HandleTimer.Default.allWorkingTimers.Remove(this);
 			timer = 0.0f;
 			IsRunning = false;
 			isAutoKill = true;

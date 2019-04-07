@@ -141,8 +141,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd3ed82cb1f79aa46b26a51f607d8aea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dataGameSettings: {fileID: 11400000, guid: 01c68dd46f958b9418198c373ef04ce2, type: 2}
-  dataGameSession: {fileID: 11400000, guid: 90cd5c0431e231941b96d3f5c83073ed, type: 2}
+  gameSession: {fileID: 11400000, guid: 90cd5c0431e231941b96d3f5c83073ed, type: 2}
+  gameSettings: {fileID: 11400000, guid: 01c68dd46f958b9418198c373ef04ce2, type: 2}
   pluggables: []
 --- !u!4 &322678236
 Transform:

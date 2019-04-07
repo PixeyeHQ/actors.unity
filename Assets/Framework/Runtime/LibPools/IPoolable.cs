@@ -1,4 +1,4 @@
-namespace Pixeye
+namespace Pixeye.Framework
 {
 	public interface IPoolable
 	{

@@ -3,10 +3,13 @@
 
 using UnityEngine;
 
-namespace Pixeye
+namespace Pixeye.Framework
 {
-    [CreateAssetMenu(fileName = "GameSettings", menuName = "Actors/Data/GameSettings")]
-    public class GameSettings : DataGame, IKernel
-    {
-    }
+	[CreateAssetMenu(fileName = "GameSettings", menuName = "Actors Framework/Add/Data/GameSettings")]
+	public class GameSettings : DataGame, IKernel
+	{
+
+		public static GameSettings Default => Toolbox.Get<GameSettings>();
+
+	}
 }

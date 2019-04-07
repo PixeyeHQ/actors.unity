@@ -3,11 +3,11 @@
 
 using UnityEngine;
 
-namespace Pixeye
+namespace Pixeye.Framework
 {
-    [CreateAssetMenu(fileName = "GameSession", menuName = "Actors/Data/GameSession")]
+    [CreateAssetMenu(fileName = "GameSession", menuName = "Actors Framework/Add/Data/GameSession")]
     public class GameSession : DataGame, IKernel
     {
-       
+        public static GameSession Default => Toolbox.Get<GameSession>();
     }
 }

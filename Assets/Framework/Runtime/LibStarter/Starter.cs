@@ -1,17 +1,17 @@
 //  Project  : ACTORS
 //  Contacts : Pixeye - ask@pixeye.games
 
-using System.Collections.Generic;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
-using UnityEngine;
-
 #if ODIN_INSPECTOR
 using Sirenix.OdinInspector;
 #endif
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 
-namespace Pixeye
+namespace Pixeye.Framework
 {
 	/// <summary>
 	/// <para>A scene point of entry. The developer defines here scene dependencies and processing that will work on the scene.</para> 
@@ -21,33 +21,45 @@ namespace Pixeye
 
 		public static bool initialized;
 
+		#if ODIN_INSPECTOR
+		[FoldoutGroup("Setup")]
+		#else
 		[FoldoutGroup("Setup"), Reorderable]
+		#endif
 		public List<Factory> factories;
 
-		[FoldoutGroup("Setup"), Reorderable("Test me")]
+		#if ODIN_INSPECTOR
+		[FoldoutGroup("Setup")]
+		#else
+		[FoldoutGroup("Setup"), Reorderable]
+		#endif
 		public List<SceneReference> ScenesToKeep;
 
+		#if ODIN_INSPECTOR
 		[FoldoutGroup("Setup")]
+		#else
+		[FoldoutGroup("Setup"), Reorderable]
+		#endif
 		public List<SceneReference> SceneDependsOn;
 
-		[FoldoutGroup("Actors Pool Cache")]
+		[FoldoutGroup("Pool Cache")]
 		public List<PoolNode> nodes = new List<PoolNode>();
 
 		void Awake()
 		{
-			if (ProcUpdate.Default == null)
+			if (ProcessorUpdate.Default == null)
 			{
-				ProcUpdate.Create();
+				ProcessorUpdate.Create();
 			}
 
-			ProcLevel.Default.Setup(ScenesToKeep, SceneDependsOn, this);
+			ProcessorScene.Default.Setup(ScenesToKeep, SceneDependsOn, this);
 		}
 
 		#if UNITY_EDITOR
 
 		public void ClearNodes()
 		{
-			for ( int i = 0; i < nodes.Count; i++ )
+			for (int i = 0; i < nodes.Count; i++)
 			{
 				var n = nodes[i];
 				n.createdObjs.Clear();
@@ -59,12 +71,12 @@ namespace Pixeye
 
 		public void AddToNode(GameObject prefab, GameObject instance, int pool)
 		{
-			var       id                  = prefab.GetInstanceID();
-			var       nodesValid          = nodes.FindValidNodes(id);
-			var       conditionNodeCreate = true;
-			List<int> nodesToKill         = new List<int>();
+			var id = prefab.GetInstanceID();
+			var nodesValid = nodes.FindValidNodes(id);
+			var conditionNodeCreate = true;
+			List<int> nodesToKill = new List<int>();
 
-			for ( int i = 0; i < nodesValid.Count; i++ )
+			for (int i = 0; i < nodesValid.Count; i++)
 			{
 				var node = nodes[nodesValid[i]];
 
@@ -91,7 +103,7 @@ namespace Pixeye
 				}
 			}
 
-			for ( int i = 0; i < nodesToKill.Count; i++ )
+			for (int i = 0; i < nodesToKill.Count; i++)
 			{
 				nodes.RemoveAt(nodesToKill[i]);
 			}
@@ -118,7 +130,7 @@ namespace Pixeye
 			#endif
 
 			if (prefab == null) return;
-			var id    = prefab.GetInstanceID();
+			var id = prefab.GetInstanceID();
 			var index = nodes.FindValidNode(id, pool);
 			if (index != -1)
 			{
@@ -137,39 +149,29 @@ namespace Pixeye
 
 		public void BindScene()
 		{
-			for ( int i = 0; i < nodes.Count; i++ )
+			for (int i = 0; i < nodes.Count; i++)
 			{
 				nodes[i].Populate();
 			}
 
-			foreach ( var factory in factories )
+			foreach (var factory in factories)
 			{
 				Toolbox.Add(factory);
 			}
 
-			Add<ProcActorsAdd>();
+			Add<ProcessorEntities>();
 
 			Setup();
 
 			initialized = true;
 
-			var objs = FindObjectsOfType<MonoBehaviour>();
-
-			for ( var i = 0; i < objs.Length; i++ )
+			var objs = FindObjectsOfType<MonoBehaviour>().OfType<IRequireStarter>();
+			foreach (var obj in objs)
 			{
-				var obj  = objs[i];
-				var ireq = obj as IRequireStarter;
-				if (ireq != null)
-				{
-					ireq.SetupAfterStarter();
-				}
+				obj.AwakeAfterStarter();
 			}
 
-			Timer.Add(Time.deltaFixed * 2, () =>
-			{
-				PostSetup();
-				Add<ProcActorsRemove>();
-			});
+			Timer.Add(Time.deltaFixed, () => { PostSetup(); });
 		}
 
 		/// <summary>

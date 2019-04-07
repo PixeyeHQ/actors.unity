@@ -7,7 +7,7 @@ Date:       5/14/2018  6:34 PM
 
 using System;
 
-namespace Pixeye
+namespace Pixeye.Framework
 {
 	public class GroupExcludeAttribute : Attribute
 	{

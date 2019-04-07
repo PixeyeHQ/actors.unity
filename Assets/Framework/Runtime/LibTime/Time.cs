@@ -1,7 +1,7 @@
 //  Project  : ACTORS
 //  Contacts : Pixeye - ask@pixeye.games
 
-namespace Pixeye
+namespace Pixeye.Framework
 {
 	public class Time : ITick, IKernel
 	{
@@ -36,7 +36,7 @@ namespace Pixeye
 
 		public Time()
 		{
-			ProcUpdate.Default.Add(this);
+			ProcessorUpdate.Default.Add(this);
 			_deltaTimeFixed = 1 / fps;
 			_deltaTime = _deltaTimeFixed;
 		}

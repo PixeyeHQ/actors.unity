@@ -2,7 +2,7 @@
 // Contacts : Pixeye - info@pixeye.games
 //     Date : 2/20/2019 
 
-namespace Pixeye
+namespace Pixeye.Framework
 {
 	public class TagBase
 	{

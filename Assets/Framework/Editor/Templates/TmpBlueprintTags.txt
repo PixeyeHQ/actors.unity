@@ -1,0 +1,17 @@
+
+using Pixeye.Framework;
+
+namespace Pixeye
+{
+   
+   public class Blueprints
+   {
+// Use this class to define names of the blueprints;
+// Example : 	public static readonly int Player = "Blueprint Player".GetHashCode();
+
+
+##CODEGEN##
+   
+   }
+ 
+}

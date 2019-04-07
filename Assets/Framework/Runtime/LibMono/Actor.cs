@@ -1,132 +1,150 @@
 //  Project  : ACTORS
 //  Contacts : Pixeye - ask@pixeye.games
 
-
-using System;
+using Unity.IL2CPP.CompilerServices;
 using UnityEngine;
 
 #if ODIN_INSPECTOR
 using Sirenix.OdinInspector;
 #endif
 
-
-namespace Pixeye
+namespace Pixeye.Framework
 {
-	/// <summary>
-	/// <para>A base class of mono entity composer.</para>
-	/// </summary>
-	public abstract class Actor : MonoEntity, IRequireStarter
+	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
+	public class Actor : MonoBehaviour, IRequireStarter
 	{
-		[FoldoutGroup("Main"), TagFilter(typeof(Pool))]
-		public int pool;
 
-		[NonSerialized]
-		public bool conditionManualDeploy;
+		#region MEMBERS
+
+		[FoldoutGroup("Main")]
+		[TagFilter(typeof(Pool))]
+		public int pool = -1;
+
+		protected ent entity;
+
+		#if UNITY_EDITOR
+
+		[FoldoutGroup("Main"), SerializeField, ReadOnly]
+		protected int _entity;
+
+		#endif
+
+		[FoldoutGroup("Main")]
+		public BlueprintEntity blueprint;
+
+		#endregion
+
+		#region METHODS UNITY
+
+		private void Awake()
+		{
+			if (!Starter.initialized) return;
+
+			Generate();
+		}
+
+		private void OnEnable()
+		{
+			if (Starter.initialized == false) return;
+
+			CoreEntity.isAlive[entity] = true;
+
+			CoreEntity.Delayed.Set(entity, 0, CoreEntity.Delayed.Action.Activate);
+		}
+
+		private void OnDisable()
+		{
+			if (!CoreEntity.isAlive[entity]) return;
+
+			CoreEntity.isAlive[entity] = false;
+			CoreEntity.Delayed.Set(entity, 0, CoreEntity.Delayed.Action.Deactivate);
+		}
+
+		#endregion
 
 		#region METHODS
 
-		protected virtual void Awake()
+		private void Generate()
 		{
-			var entityID = ProcEntities.Create();
-			entity = entityID;
-			entity.AddReference(transform);
-
-
+			entity = ent.Create();
 			#if UNITY_EDITOR
-			_entity = entity;
+			_entity = entity.id;
 			#endif
 
-			if (pool > 0)
-				entity.AddPool(pool);
-
-			conditionManualDeploy = this is IManualDeploy;
-
-
-			if (Starter.initialized == false) return;
+			entity.Add(transform);
 			Setup();
+
+			SetupBlueprint();
 		}
 
-
-		/// <summary>
-		/// <para>Setup is used to add components and tags to the entity. Use it instead of the Awake/Start methods.</para>
-		/// </summary>
-		protected abstract void Setup();
-
-
-		public void SetupAfterStarter()
+		public void AwakeAfterStarter()
 		{
-			Setup();
-			if (conditionManualDeploy) return;
-			OnEnable();
+			Generate();
+			CoreEntity.Delayed.Set(entity, 0, CoreEntity.Delayed.Action.Activate);
 		}
 
-
-		public override void OnEnable()
+		protected virtual void Setup()
 		{
-			if (Starter.initialized == false) return;
-			if (conditionManualDeploy) return;
-			RefEntity.isAlive[entity] = true;
-			ProcEntities.Default.CheckGroups(entity, true);
 		}
 
-		#endregion
-
-		#region ADD/REMOVE
-
-		/// <summary>
-		/// <para>Adds the tag to the entity.</para>
-		/// </summary>
-		/// <param name="tags"></param>
-		protected void Add(int tags)
+		protected void Add(int tag)
 		{
-			entity.AddTagsRaw(tags);
+			entity.AddLater(tag);
 		}
 
-		/// <summary>
-		/// <para>Adds tags to the entity.</para>
-		/// </summary>
-		/// <param name="tags"></param>
 		protected void Add(params int[] tags)
 		{
-			entity.AddTagsRaw(tags);
+			entity.AddLater(tags);
 		}
 
-		/// <summary>
-		/// <para>Adds the component to the entity. Triggers Setup method on the components inherited from ISetup.</para>
-		/// </summary>
-		/// <param name="component"></param>
-		/// <typeparam name="T"></typeparam>
-		protected void Add<T>(T component) where T : IComponent, new()
-		{
-			Storage<T>.Instance.AddNoCheck(component, entity);
-		}
-
-		/// <summary>
-		/// <para>Adds the component to the entity by type. Triggers Setup method on the components inherited from ISetup.</para>
-		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <returns>Returns created component.</returns>
 		protected T Add<T>() where T : IComponent, new()
 		{
-			var component = Storage<T>.Instance.AddNoCheck(entity);
-			return component;
+			CoreEntity.components[entity.id].Add(Storage<T>.componentID);
+			return entity.AddLater<T>();
 		}
 
-		protected void AddRef<T>() where T : Component
+		protected void Add<T>(T component) where T : IComponent, new()
 		{
-			entity.RefComponent(transform.GetComponent<T>());
+			CoreEntity.components[entity.id].Add(Storage<T>.componentID);
+			entity.AddLater(component);
 		}
 
-		protected void AddRef<T>(string path) where T : Component
+		protected T AddLater<T>() where T : IComponent, new()
 		{
-			entity.RefComponent(transform.Find(path).GetComponent<T>(), path);
+			return entity.AddLater<T>();
 		}
 
-		protected void AddRef<T>(string path, string name) where T : Component
+		protected void AddLater<T>(T component) where T : IComponent, new()
 		{
-			entity.RefComponent(transform.Find(path).GetComponent<T>(), name);
+			entity.AddLater(component);
+		}
+
+		private void SetupBlueprint()
+		{
+			if (blueprint == null)
+				return;
+			var entityID = entity.id;
+
+			for (int i = 0; i < blueprint.lenOnCreate; i++)
+			{
+				var component = blueprint.onCreate[i];
+				var hash = component.GetType().GetHashCode();
+				var storage = Storage.allDict[hash];
+				component.Copy(entityID);
+				CoreEntity.components[entityID].Add(storage.GetComponentID());
+			}
+
+			for (int i = 0; i < blueprint.lenAddLater; i++)
+			{
+				var component = blueprint.onLater[i];
+				component.Copy(entityID);
+			}
+			
+			entity.AddLater(blueprint.tags);
+			
 		}
 
 		#endregion
+
 	}
 }

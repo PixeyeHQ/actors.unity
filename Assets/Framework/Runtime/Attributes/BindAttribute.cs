@@ -1,6 +1,6 @@
 using System;
 
-namespace Pixeye
+namespace Pixeye.Framework
 {
 
 	public class BindAttribute : Attribute

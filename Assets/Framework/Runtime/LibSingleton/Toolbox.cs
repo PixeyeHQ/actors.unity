@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Pixeye
+namespace Pixeye.Framework
 {
 	/// <summary>
 	/// <para>Service locator</para>
@@ -77,7 +77,7 @@ namespace Pixeye
 		{
 			var awakeble = obj as IAwake;
 			if (awakeble != null) awakeble.OnAwake();
-			ProcUpdate.Default.Add(obj);
+			ProcessorUpdate.Default.Add(obj);
 		}
 
  
@@ -109,11 +109,11 @@ namespace Pixeye
 			}
 
 
-			ProcTimer.Default.Dispose();
-			ProcPool.Default.Dispose();
-			ProcEntities.Default.Dispose();
-			ProcLevel.Default.Dispose();
-			ProcUpdate.Default.Dispose();
+			HandleTimer.Default.Dispose();
+			HandlePool.Dispose();
+			ProcessorGroups.Dispose();
+			ProcessorScene.Default.Dispose();
+			ProcessorUpdate.Default.Dispose();
 			Box.Default.Dispose();
 
 			for (var i = 0; i < toWipe.Count; i++)

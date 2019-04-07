@@ -1,0 +1,41 @@
+
+using System;
+using Pixeye.Framework;
+using UnityEngine;
+
+##NAMESPACE##
+{
+   [Serializable]
+   public class ##NAME## : IComponent
+  	{
+  
+  		// Use this method to copy variables from reference
+  		public void Copy(int entityID)
+  		{
+  			var component = Storage<##NAME##>.Instance.GetFromStorage(entityID);
+  		}
+        	 
+         public void Dispose()
+         {
+        	       
+         }
+
+  	}
+    
+  public static partial class HelperComponents
+    {
+    
+    	[RuntimeInitializeOnLoadMethod]
+    		static void ##NAME##Init()
+    		{
+    			Storage<##NAME##>.Instance.Creator = () => { return new ##NAME##(); };
+    			 
+    		}
+    
+        public static ##NAME## ##NAME##(this in ent entity)
+        {
+            return Storage<##NAME##>.Instance.components[entity];
+        }
+    }
+ 
+}

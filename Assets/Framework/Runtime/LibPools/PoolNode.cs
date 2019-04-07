@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-namespace Pixeye
+namespace Pixeye.Framework
 {
 	[System.Serializable]
 	public class PoolNode
@@ -21,7 +21,7 @@ namespace Pixeye
 		public void Populate()
 		{
 			if (pool == Pool.None) return;
-			var poolStash = ProcPool.pools[pool];
+			var poolStash = HandlePool.pools[pool];
 			poolStash.RegisterObject(prefab);
 
 			for (var i = 0; i < createdObjs.Count; i++)

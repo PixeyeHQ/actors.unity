@@ -4,7 +4,7 @@
 using System;
 using UnityEngine;
 
-namespace Pixeye
+namespace Pixeye.Framework
 {
 	[AttributeUsage(AttributeTargets.Method)]
 	public class ButtonAttribute : PropertyAttribute { }

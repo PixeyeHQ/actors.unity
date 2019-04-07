@@ -1,70 +1,129 @@
 //  Project  : ACTORS
 //  Contacts : Pixeye - ask@pixeye.games
+
 using System;
-using System.Collections.Generic;
+using Unity.IL2CPP.CompilerServices;
+using UnityEngine;
 
-
-namespace Pixeye
+namespace Pixeye.Framework
 {
-  
-    public class Composition : IEquatable<Composition>
-    {
-  
-        internal int[] include = new int[0];
-        internal int[] exclude = new int[0];
+	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
+	public class Composition : IEquatable<Composition>
+	{
 
+		internal int[] tagsToInclude = new int[0];
+		internal int[] tagsToExclude = new int[0];
 
-        public override bool Equals(object obj)
-        {
-            var other = obj as Composition;
-            return other != null && Equals(other);
-        }
+		internal int[] generations = new int[0];
+		internal int[] ids = new int[0];
 
-        public override int GetHashCode()
-        {
-            int hc = include.Length;
-            int len1 = include.Length;
-            int len2 = exclude.Length;
+		public override bool Equals(object obj)
+		{
+			var other = obj as Composition;
+			return other != null && Equals(other);
+		}
 
-            unchecked
-            {
-                for (int i = 0; i < len1; ++i)
-                {
-                    hc = unchecked(hc * 17 + include[i]);
-                }
+		public override int GetHashCode()
+		{
+			int hc = tagsToInclude.Length;
+			int len1 = tagsToInclude.Length;
+			int len2 = tagsToExclude.Length;
 
-                hc += exclude.Length;
-                for (int i = 0; i < len2; ++i)
-                {
-                    hc = unchecked(hc * 31 + exclude[i]);
-                }
-            }
+			unchecked
+			{
+				for (int i = 0; i < len1; ++i)
+				{
+					hc = unchecked(hc * 17 + tagsToInclude[i]);
+				}
 
-            return hc;
-        }
+				hc += tagsToExclude.Length;
+				for (int i = 0; i < len2; ++i)
+				{
+					hc = unchecked(hc * 31 + tagsToExclude[i]);
+				}
+			}
 
-     
- 
-        public bool Equals(Composition other)
-        {
-            if (include.Length != other.include.Length) return false;
+			return hc;
+		}
 
-            int len1 = include.Length;
-            int len2 = exclude.Length;
+		internal bool Include(int entityID)
+		{
+			ref var tags = ref CoreEntity.tags[entityID];
+			var length = tags.GetLength();
+			if (length == 0) return false;
+			var match = 0;
+		 
+			for (int l = 0; l < tagsToInclude.Length; l++)
+			{
+				var tagToInclude = tagsToInclude[l];
+				for (int i = 0; i < length; i++)
+				{
+					ref var tag = ref tags.GetElementByRef(i);
+					if (tag == tagToInclude) match++;
+				}
+			}
 
-            for (int i = 0; i < len1; i++)
-            {
-                if (include[i] != other.include[i]) return false;
-            }
+			return match == tagsToInclude.Length;
+		}
 
-            if (exclude.Length != other.exclude.Length) return false;
+		internal bool Exclude(int entityID)
+		{
+			ref var tags = ref CoreEntity.tags[entityID];
+			var length = tags.GetLength();
+			if (length == 0) return true;
 
-            for (int i = 0; i < len2; i++)
-            {
-                if (exclude[i] != other.exclude[i]) return false;
-            }
+			for (int l = 0; l < tagsToExclude.Length; l++)
+			{
+				var tagToExclude = tagsToExclude[l];
+				for (int i = 0; i < length; i++)
+				{
+					ref var tag = ref tags.GetElementByRef(i);
+					if (tag == tagToExclude) return false;
+				}
+			}
 
-            return true;
-        }
-    }
+			return true;
+		}
+
+//			ref var tags    = ref CoreEntity.tags[entityID];
+//			ref var storage = ref tags.pool;
+//			if (storage == null) return false;
+//
+//			var length = tags.length;
+//			if (length == 0) return false;
+//			length -= 1;
+//			for (int i = 0; i < tagsToExclude.Length; i++)
+//			{
+//				var tagID = tagsToExclude[i];
+//				for (int ii = 0; ii < length; ii++)
+//				{
+//					if (storage[ii].id != tagID) continue;
+//					return false;
+//				}
+//			}
+
+		//	return true;
+		//	}
+
+		public bool Equals(Composition other)
+		{
+			if (tagsToInclude.Length != other.tagsToInclude.Length) return false;
+			int len1 = tagsToInclude.Length;
+			int len2 = tagsToExclude.Length;
+			for (int i = 0; i < len1; i++)
+			{
+				if (tagsToInclude[i] != other.tagsToInclude[i]) return false;
+			}
+
+			if (tagsToExclude.Length != other.tagsToExclude.Length) return false;
+
+			for (int i = 0; i < len2; i++)
+			{
+				if (tagsToExclude[i] != other.tagsToExclude[i]) return false;
+			}
+
+			return true;
+		}
+
+	}
 }

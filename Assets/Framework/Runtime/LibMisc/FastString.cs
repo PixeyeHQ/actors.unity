@@ -1,10 +1,10 @@
 //  Project  : ACTORS
 //  Contacts : Pixeye - ask@pixeye.games
- 
+
 using System.Collections.Generic;
  
 
-namespace Pixeye{
+namespace Pixeye.Framework{
 
  
 ///<summary>

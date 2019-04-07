@@ -4,7 +4,7 @@
 
 using UnityEngine;
 
-namespace Pixeye
+namespace Pixeye.Framework
 {
 	public abstract class Factory : ScriptableObject
 	{

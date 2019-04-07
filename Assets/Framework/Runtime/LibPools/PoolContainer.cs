@@ -1,22 +1,23 @@
 using System.Collections.Generic;
+using Unity.IL2CPP.CompilerServices;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace Pixeye
+namespace Pixeye.Framework
 {
+	[Il2CppSetOption(Option.NullChecks, false)]
 	public class PoolContainer
 	{
+
 		public bool globalPool = false;
-		public List<GameObject> activeObjs = new List<GameObject>(600);
+		private List<GameObject> activeObjs = new List<GameObject>(600);
 
-		protected Transform parent;
+		private Transform parent;
+		private Dictionary<int, Stack<GameObject>> cachedObjects = new Dictionary<int, Stack<GameObject>>(600, new FastComparable());
+		private Dictionary<int, IPoolable> cachedPoolables = new Dictionary<int, IPoolable>(600, new FastComparable());
+		private Dictionary<int, int> cachedIds = new Dictionary<int, int>(600, new FastComparable());
 
-		protected Dictionary<int, Stack<GameObject>> cachedObjects = new Dictionary<int, Stack<GameObject>>(600, new FastComparable());
-
-		protected Dictionary<int, IPoolable> cachedPoolables = new Dictionary<int, IPoolable>(600, new FastComparable());
-		protected Dictionary<int, int> cachedIds = new Dictionary<int, int>(600, new FastComparable());
-
-
+		[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
 		public void RegisterObject(GameObject prefab)
 		{
 			var               key = prefab.GetInstanceID();
@@ -24,7 +25,7 @@ namespace Pixeye
 			var               hasValue = cachedObjects.TryGetValue(key, out stack);
 			if (!hasValue) cachedObjects.Add(key, new Stack<GameObject>());
 		}
-
+		[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
 		public void Prepopulate(GameObject prefab, GameObject obj)
 		{
 			var               key = prefab.GetInstanceID();
@@ -36,17 +37,19 @@ namespace Pixeye
 				cachedIds.Add(obj.GetInstanceID(), key);
 			}
 		}
+		[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
+		public void AddToPool(GameObject go, GameObject prefab)
+		{
+			cachedIds.Add(go.GetInstanceID(), prefab.GetInstanceID());
+		}
 
-
-		public void AddToPool(GameObject go, GameObject prefab) { cachedIds.Add(go.GetInstanceID(), prefab.GetInstanceID()); }
-
+		[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
 		public PoolContainer PopulateWith(GameObject prefab, int amount, int amountPerTick = 10, int timeRate = 1)
 		{
 			var               key = prefab.GetInstanceID();
 			Stack<GameObject> stack;
 			var               hasValue = cachedObjects.TryGetValue(key, out stack);
 			if (!hasValue) cachedObjects.Add(key, new Stack<GameObject>(amount));
-
 
 			Timer.Add(Time.delta * timeRate, () =>
 			{
@@ -63,13 +66,12 @@ namespace Pixeye
 				}
 			});
 
-
 			return this;
 		}
 
+		[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
 		public GameObject Spawn(GameObject prefab, Transform parent = null)
 		{
-		 
 			if (parent == null)
 			{
 				parent = this.parent;
@@ -82,7 +84,6 @@ namespace Pixeye
 
 			if (stacked && objs.Count > 0)
 			{
-				
 				var obj       = objs.Pop();
 				var transform = obj.transform;
 				if (transform.parent != parent)
@@ -95,7 +96,6 @@ namespace Pixeye
 
 				return obj;
 			}
-
 
 			if (!stacked)
 			{
@@ -119,6 +119,7 @@ namespace Pixeye
 			return createdPrefab;
 		}
 
+		[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
 		public void Despawn(GameObject go)
 		{
 			go.SetActive(false);
@@ -138,11 +139,11 @@ namespace Pixeye
 
 		public void Dispose()
 		{
-			//	cachedPoolables.Clear();
 			cachedObjects.Clear();
 			cachedIds.Clear();
 		}
 
+		[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
 		private void Populate(GameObject prefab, int key)
 		{
 			var go = Object.Instantiate(prefab);
@@ -150,5 +151,6 @@ namespace Pixeye
 			cachedIds.Add(go.GetInstanceID(), key);
 			cachedObjects[key].Push(go);
 		}
+
 	}
 }

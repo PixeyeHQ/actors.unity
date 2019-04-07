@@ -6,32 +6,40 @@ using Sirenix.OdinInspector;
 #endif
 using System.Collections;
 using System.Collections.Generic;
- 
 using UnityEngine;
 
-namespace Pixeye
+namespace Pixeye.Framework
 {
 	public class StarterKernel : MonoBehaviour
 	{
-		[FoldoutGroup("SetupData")] public DataGame dataGameSettings;
-		[FoldoutGroup("SetupData")] public DataGame dataGameSession;
 
-		[FoldoutGroup("SetupData")] public List<Pluggable> pluggables = new List<Pluggable>();
+		[FoldoutGroup("SetupData")]
+		public DataGame gameSession;
 
+		[FoldoutGroup("SetupData")]
+		public DataGame gameSettings;
+
+		[FoldoutGroup("SetupData")]
+		public List<Pluggable> pluggables = new List<Pluggable>();
 
 		void Awake()
 		{
-			for (var i = 0; i < pluggables.Count; i++)
+		 
+			
+			for ( var i = 0; i < pluggables.Count; i++ )
 			{
 				pluggables[i].Plug();
 			}
 
-			Toolbox.Add(dataGameSession);
-			Toolbox.Add(dataGameSettings);
+			if (gameSession != null)
+				Toolbox.Add(gameSession);
+			if (gameSettings != null)
+			{
+				Toolbox.Add(gameSettings);
+			}
 
-			ProcFastPool<Timer>.Instance.Populate(50);
+			HandleFastPool<Timer>.Instance.Populate(50);
 		}
-
 
 		IEnumerator OnApplicationFocus(bool hasFocus)
 		{
@@ -47,8 +55,6 @@ namespace Pixeye
 				Time.Default.timeScale = Time.Default.timeScaleCached;
 			}
 		}
+
 	}
-	
-	 
-	
 }

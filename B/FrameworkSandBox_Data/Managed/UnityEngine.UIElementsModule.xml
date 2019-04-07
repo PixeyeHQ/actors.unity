@@ -184,6 +184,28 @@
         <para>Constructor.</para>
       </summary>
     </member>
+    <member name="T:UnityEngine.Experimental.UIElements.Button">
+      <summary>
+        <para>A clickable button.</para>
+      </summary>
+    </member>
+    <member name="F:UnityEngine.Experimental.UIElements.Button.clickable">
+      <summary>
+        <para>Clickable MouseManipulator for this Button.</para>
+      </summary>
+    </member>
+    <member name="M:UnityEngine.Experimental.UIElements.Button.#ctor">
+      <summary>
+        <para>Constructs a Button.</para>
+      </summary>
+      <param name="clickEvent">Action triggered when the button is clicked.</param>
+    </member>
+    <member name="M:UnityEngine.Experimental.UIElements.Button.#ctor(System.Action)">
+      <summary>
+        <para>Constructs a Button.</para>
+      </summary>
+      <param name="clickEvent">Action triggered when the button is clicked.</param>
+    </member>
     <member name="T:UnityEngine.Experimental.UIElements.Button.UxmlFactory">
       <summary>
         <para>Instantiates a Button using the data read from a UXML file.</para>
@@ -1374,6 +1396,45 @@
         <para>The element that handles the interaction.</para>
       </summary>
     </member>
+    <member name="T:UnityEngine.Experimental.UIElements.IMGUIContainer">
+      <summary>
+        <para>Element that draws IMGUI content.</para>
+      </summary>
+    </member>
+    <member name="P:UnityEngine.Experimental.UIElements.IMGUIContainer.canGrabFocus">
+      <summary>
+        <para>Indicate whether this element can be focused.</para>
+      </summary>
+    </member>
+    <member name="P:UnityEngine.Experimental.UIElements.IMGUIContainer.contextType">
+      <summary>
+        <para>Indicate the type of context this element is associated with. See ContextType.</para>
+      </summary>
+    </member>
+    <member name="M:UnityEngine.Experimental.UIElements.IMGUIContainer.#ctor">
+      <summary>
+        <para>Construct an element used to draw IMGUI elements.</para>
+      </summary>
+      <param name="onGUIHandler">The function called when drawing is in-progress.</param>
+    </member>
+    <member name="M:UnityEngine.Experimental.UIElements.IMGUIContainer.#ctor(System.Action)">
+      <summary>
+        <para>Construct an element used to draw IMGUI elements.</para>
+      </summary>
+      <param name="onGUIHandler">The function called when drawing is in-progress.</param>
+    </member>
+    <member name="M:UnityEngine.Experimental.UIElements.IMGUIContainer.DoRepaint(UnityEngine.Experimental.UIElements.IStylePainter)">
+      <summary>
+        <para>This method is called whenever a Repaint is required from the VisualElement.</para>
+      </summary>
+      <param name="painter"></param>
+    </member>
+    <member name="M:UnityEngine.Experimental.UIElements.IMGUIContainer.HandleEvent(UnityEngine.Experimental.UIElements.EventBase)">
+      <summary>
+        <para>This method is called as part of the IEventHandler interface.</para>
+      </summary>
+      <param name="evt">EventBase representing the event to be handled.</param>
+    </member>
     <member name="M:UnityEngine.Experimental.UIElements.IMGUIContainer.MarkDirtyLayout">
       <summary>
         <para>Marks layout as dirty to trigger a redraw.</para>
@@ -2254,6 +2315,23 @@
         <para>Constructor. Avoid newing events. Instead, use GetPooled() to get an event from a pool of reusable events.</para>
       </summary>
     </member>
+    <member name="T:UnityEngine.Experimental.UIElements.Label">
+      <summary>
+        <para>Provides an Element displaying text.</para>
+      </summary>
+    </member>
+    <member name="M:UnityEngine.Experimental.UIElements.Label.#ctor">
+      <summary>
+        <para>Constructs a label.</para>
+      </summary>
+      <param name="text">The text to be displayed.</param>
+    </member>
+    <member name="M:UnityEngine.Experimental.UIElements.Label.#ctor(System.String)">
+      <summary>
+        <para>Constructs a label.</para>
+      </summary>
+      <param name="text">The text to be displayed.</param>
+    </member>
     <member name="T:UnityEngine.Experimental.UIElements.Label.UxmlFactory">
       <summary>
         <para>Instantiates a Label using the data read from a UXML file.</para>
@@ -2929,6 +3007,100 @@
       <param name="bag">The attribute bag.</param>
       <param name="cc">The creation context; unused.</param>
     </member>
+    <member name="T:UnityEngine.Experimental.UIElements.Scroller">
+      <summary>
+        <para>A vertical or horizontal scrollbar.</para>
+      </summary>
+    </member>
+    <member name="P:UnityEngine.Experimental.UIElements.Scroller.direction">
+      <summary>
+        <para>Direction of this scrollbar.</para>
+      </summary>
+    </member>
+    <member name="P:UnityEngine.Experimental.UIElements.Scroller.highButton">
+      <summary>
+        <para>Top or right scroll button.</para>
+      </summary>
+    </member>
+    <member name="P:UnityEngine.Experimental.UIElements.Scroller.highValue">
+      <summary>
+        <para>Maximum value.</para>
+      </summary>
+    </member>
+    <member name="P:UnityEngine.Experimental.UIElements.Scroller.lowButton">
+      <summary>
+        <para>Bottom or left scroll button.</para>
+      </summary>
+    </member>
+    <member name="P:UnityEngine.Experimental.UIElements.Scroller.lowValue">
+      <summary>
+        <para>Minimum value.</para>
+      </summary>
+    </member>
+    <member name="P:UnityEngine.Experimental.UIElements.Scroller.slider">
+      <summary>
+        <para>The slider used by this scroller.</para>
+      </summary>
+    </member>
+    <member name="P:UnityEngine.Experimental.UIElements.Scroller.value">
+      <summary>
+        <para>Value that defines the slider position. It lies between lowValue and highValue.</para>
+      </summary>
+    </member>
+    <member name="?:UnityEngine.Experimental.UIElements.Scroller.valueChanged(System.Action`1&lt;System.Single&gt;)">
+      <summary>
+        <para>Event sent when the slider value has changed.</para>
+      </summary>
+      <param name="value"></param>
+    </member>
+    <member name="M:UnityEngine.Experimental.UIElements.Scroller.Adjust(System.Single)">
+      <summary>
+        <para>Updates the slider element size as a ratio of the total range. A value greater than 1 disables the Scroller.</para>
+      </summary>
+      <param name="factor">Slider size ratio.</param>
+    </member>
+    <member name="M:UnityEngine.Experimental.UIElements.Scroller.#ctor">
+      <summary>
+        <para>Constructor for this element.</para>
+      </summary>
+      <param name="lowValue">The minimum value represented by lowValue.</param>
+      <param name="highValue">The maximum value represented by highValue.</param>
+      <param name="valueChanged">The event method that is called when the value changes.</param>
+      <param name="direction">The slider direction. See SliderDirection.</param>
+    </member>
+    <member name="M:UnityEngine.Experimental.UIElements.Scroller.#ctor(System.Single,System.Single,System.Action`1&lt;System.Single&gt;,UnityEngine.Experimental.UIElements.SliderDirection)">
+      <summary>
+        <para>Constructor for this element.</para>
+      </summary>
+      <param name="lowValue">The minimum value represented by lowValue.</param>
+      <param name="highValue">The maximum value represented by highValue.</param>
+      <param name="valueChanged">The event method that is called when the value changes.</param>
+      <param name="direction">The slider direction. See SliderDirection.</param>
+    </member>
+    <member name="M:UnityEngine.Experimental.UIElements.Scroller.ScrollPageDown">
+      <summary>
+        <para>Changes the value according to the current slider pageSize.</para>
+      </summary>
+      <param name="factor">The factor that applies to the scroll down action. Set to 1 to scroll down by 1 page. Set to a value greater than 1 to scroll down by over a page.</param>
+    </member>
+    <member name="M:UnityEngine.Experimental.UIElements.Scroller.ScrollPageDown(System.Single)">
+      <summary>
+        <para>Changes the value according to the current slider pageSize.</para>
+      </summary>
+      <param name="factor">The factor that applies to the scroll down action. Set to 1 to scroll down by 1 page. Set to a value greater than 1 to scroll down by over a page.</param>
+    </member>
+    <member name="M:UnityEngine.Experimental.UIElements.Scroller.ScrollPageUp">
+      <summary>
+        <para>Changes the value according to the current slider pageSize.</para>
+      </summary>
+      <param name="factor">The factor that applies to the scroll up action. Set to 1 to scroll up by 1 page. Set to a value greater than 1 to scroll up by over a page.</param>
+    </member>
+    <member name="M:UnityEngine.Experimental.UIElements.Scroller.ScrollPageUp(System.Single)">
+      <summary>
+        <para>Changes the value according to the current slider pageSize.</para>
+      </summary>
+      <param name="factor">The factor that applies to the scroll up action. Set to 1 to scroll up by 1 page. Set to a value greater than 1 to scroll up by over a page.</param>
+    </member>
     <member name="T:UnityEngine.Experimental.UIElements.Scroller.UxmlFactory">
       <summary>
         <para>Instantiates a Scroller using the data read from a UXML file.</para>
@@ -2961,6 +3133,32 @@
       <param name="ve">The object to initialize.</param>
       <param name="bag">The attribute bag.</param>
       <param name="cc">The creation context; unused.</param>
+    </member>
+    <member name="T:UnityEngine.Experimental.UIElements.ScrollerButton">
+      <summary>
+        <para>For internal use only. The button used by the Scroller.</para>
+      </summary>
+    </member>
+    <member name="F:UnityEngine.Experimental.UIElements.ScrollerButton.clickable">
+      <summary>
+        <para>Clickable manipulator.</para>
+      </summary>
+    </member>
+    <member name="M:UnityEngine.Experimental.UIElements.ScrollerButton.#ctor">
+      <summary>
+        <para>Constructor.</para>
+      </summary>
+      <param name="clickEvent">The method called when a click event occurs.</param>
+      <param name="delay">Sets a delay for when the event begins. The delay is only applied if the specified value is greater than 0.</param>
+      <param name="interval">Determines the time delta between event repetitions. The interval is only applied if the specified value is greater than 0.</param>
+    </member>
+    <member name="M:UnityEngine.Experimental.UIElements.ScrollerButton.#ctor(System.Action,System.Int64,System.Int64)">
+      <summary>
+        <para>Constructor.</para>
+      </summary>
+      <param name="clickEvent">The method called when a click event occurs.</param>
+      <param name="delay">Sets a delay for when the event begins. The delay is only applied if the specified value is greater than 0.</param>
+      <param name="interval">Determines the time delta between event repetitions. The interval is only applied if the specified value is greater than 0.</param>
     </member>
     <member name="T:UnityEngine.Experimental.UIElements.ScrollerButton.UxmlFactory">
       <summary>
@@ -2995,9 +3193,59 @@
       <param name="bag">The attribute bag.</param>
       <param name="cc">The creation context; unused.</param>
     </member>
+    <member name="T:UnityEngine.Experimental.UIElements.ScrollView">
+      <summary>
+        <para>Displays its contents inside a scrollable frame.</para>
+      </summary>
+    </member>
+    <member name="P:UnityEngine.Experimental.UIElements.ScrollView.contentContainer">
+      <summary>
+        <para>Contains the full content that could be partially visible.</para>
+      </summary>
+    </member>
+    <member name="P:UnityEngine.Experimental.UIElements.ScrollView.contentView">
+      <summary>
+        <para>Obsolete. Use contentContainer instead.</para>
+      </summary>
+    </member>
+    <member name="P:UnityEngine.Experimental.UIElements.ScrollView.contentViewport">
+      <summary>
+        <para>Represents the visible area of contentContainer.</para>
+      </summary>
+    </member>
     <member name="P:UnityEngine.Experimental.UIElements.ScrollView.horizontalPageSize">
       <summary>
         <para>This property is controlling the scrolling speed of the horizontal scroller.</para>
+      </summary>
+    </member>
+    <member name="P:UnityEngine.Experimental.UIElements.ScrollView.horizontalScroller">
+      <summary>
+        <para>Horizontal scrollbar.</para>
+      </summary>
+    </member>
+    <member name="P:UnityEngine.Experimental.UIElements.ScrollView.needsHorizontal">
+      <summary>
+        <para>Whether the view contents fit the horizontal area.</para>
+      </summary>
+    </member>
+    <member name="P:UnityEngine.Experimental.UIElements.ScrollView.needsVertical">
+      <summary>
+        <para>Whether the view contents fit the vertical area.</para>
+      </summary>
+    </member>
+    <member name="P:UnityEngine.Experimental.UIElements.ScrollView.scrollOffset">
+      <summary>
+        <para>The current scrolling position.</para>
+      </summary>
+    </member>
+    <member name="P:UnityEngine.Experimental.UIElements.ScrollView.showHorizontal">
+      <summary>
+        <para>Whether the horizontal scroller is visible.</para>
+      </summary>
+    </member>
+    <member name="P:UnityEngine.Experimental.UIElements.ScrollView.showVertical">
+      <summary>
+        <para>Whether the vertical scroller is visible.</para>
       </summary>
     </member>
     <member name="P:UnityEngine.Experimental.UIElements.ScrollView.stretchContentWidth">
@@ -3008,6 +3256,16 @@
     <member name="P:UnityEngine.Experimental.UIElements.ScrollView.verticalPageSize">
       <summary>
         <para>This property is controlling the scrolling speed of the vertical scroller.</para>
+      </summary>
+    </member>
+    <member name="P:UnityEngine.Experimental.UIElements.ScrollView.verticalScroller">
+      <summary>
+        <para>Vertical Scrollbar.</para>
+      </summary>
+    </member>
+    <member name="M:UnityEngine.Experimental.UIElements.ScrollView.#ctor">
+      <summary>
+        <para>Constructor.</para>
       </summary>
     </member>
     <member name="M:UnityEngine.Experimental.UIElements.ScrollView.ScrollTo(UnityEngine.Experimental.UIElements.VisualElement)">
@@ -4754,6 +5012,52 @@
       <summary>
         <para>Constructor.</para>
       </summary>
+    </member>
+    <member name="T:UnityEngine.Experimental.UIElements.VisualContainer">
+      <summary>
+        <para>Obsolete. Use VisualElement instead.</para>
+      </summary>
+    </member>
+    <member name="M:UnityEngine.Experimental.UIElements.VisualContainer.AddChild(UnityEngine.Experimental.UIElements.VisualElement)">
+      <summary>
+        <para>Obsolete. VisualContainer.AddChild will be removed. Use VisualElement.Add or VisualElement.shadow.Add instead.</para>
+      </summary>
+      <param name="child"></param>
+    </member>
+    <member name="M:UnityEngine.Experimental.UIElements.VisualContainer.ClearChildren">
+      <summary>
+        <para>VisualContainer.ClearChildren will be removed. Use VisualElement.Clear or VisualElement.shadow.Clear instead.</para>
+      </summary>
+    </member>
+    <member name="M:UnityEngine.Experimental.UIElements.VisualContainer.#ctor">
+      <summary>
+        <para>Obsolete. Use VisualElement instead.</para>
+      </summary>
+    </member>
+    <member name="M:UnityEngine.Experimental.UIElements.VisualContainer.GetChildAt(System.Int32)">
+      <summary>
+        <para>Obsolete. VisualContainer.GetChildAt will be removed. Use VisualElement.ElementAt or VisualElement.shadow.ElementAt instead.</para>
+      </summary>
+      <param name="index"></param>
+    </member>
+    <member name="M:UnityEngine.Experimental.UIElements.VisualContainer.InsertChild(System.Int32,UnityEngine.Experimental.UIElements.VisualElement)">
+      <summary>
+        <para>Obsolete. VisualContainer.InsertChild will be removed. Use VisualElement.Insert or VisualElement.shadow.Insert instead.</para>
+      </summary>
+      <param name="index"></param>
+      <param name="child"></param>
+    </member>
+    <member name="M:UnityEngine.Experimental.UIElements.VisualContainer.RemoveChild(UnityEngine.Experimental.UIElements.VisualElement)">
+      <summary>
+        <para>Obsolete. VisualContainer.RemoveChild will be removed. Use VisualElement.Remove or VisualElement.shadow.Remove instead.</para>
+      </summary>
+      <param name="child"></param>
+    </member>
+    <member name="M:UnityEngine.Experimental.UIElements.VisualContainer.RemoveChildAt(System.Int32)">
+      <summary>
+        <para>Obsolete. VisualContainer.RemoveChildAt will be removed. Use VisualElement.RemoveAt or VisualElement.shadow.RemoveAt instead.</para>
+      </summary>
+      <param name="index"></param>
     </member>
     <member name="T:UnityEngine.Experimental.UIElements.VisualContainer.UxmlFactory">
       <summary>

@@ -4,33 +4,15 @@
 
 using UnityEngine;
 
-namespace Pixeye
+namespace Pixeye.Framework
 {
 	public static class Log
 	{
-
-		public static void Show(object content)
-		{
-			Debug.Log(content);
-		}
-		
-		public static void Show(string context, params object[] args)
-		{
-			var final = string.Format(context, args);
-			Debug.Log(final);
-		}
-
-		public static void Show(string context, Object o, params object[] args)
-		{
-			var final = string.Format(context, args);
-			Debug.Log(final, o);
-		}
 
 		public static void print(this object o, object content)
 		{
 			Debug.Log(content);
 		}
 
-		
 	}
 }

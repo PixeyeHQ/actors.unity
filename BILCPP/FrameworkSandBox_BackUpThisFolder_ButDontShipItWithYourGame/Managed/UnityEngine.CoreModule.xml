@@ -12337,9 +12337,9 @@ All of the commands within the buffer are guaranteed to be executed on the same 
     </member>
     <member name="M:UnityEngine.GameObject.SetActive(System.Boolean)">
       <summary>
-        <para>Activates/Deactivates the GameObject.</para>
+        <para>ActivatesDeactivates the GameObject, depending on the given true or false/ value.</para>
       </summary>
-      <param name="value">Activate or deactivate the  object.</param>
+      <param name="value">Activate or deactivate the object, where true activates the GameObject and false deactivates the GameObject.</param>
     </member>
     <member name="T:UnityEngine.GeometryUtility">
       <summary>
@@ -18810,19 +18810,25 @@ Only usable on Android, Windows Phone or Windows Tablets.</para>
     </member>
     <member name="M:UnityEngine.Mathf.Clamp(System.Single,System.Single,System.Single)">
       <summary>
-        <para>Clamps a value between a minimum float and maximum float value.</para>
+        <para>Clamps the given value between the given minimum float and maximum float values.  Returns the given value if it is within the min and max range.</para>
       </summary>
-      <param name="value"></param>
-      <param name="min"></param>
-      <param name="max"></param>
+      <param name="value">The floating point value to restrict inside the range defined by the min and max values.</param>
+      <param name="min">The minimum floating point value to compare against.</param>
+      <param name="max">The maximum floating point value to compare against.</param>
+      <returns>
+        <para>The float result between the min and max values.</para>
+      </returns>
     </member>
     <member name="M:UnityEngine.Mathf.Clamp(System.Int32,System.Int32,System.Int32)">
       <summary>
-        <para>Clamps value between min and max and returns value.</para>
+        <para>Clamps the given value between a range defined by the given minimum integer and maximum integer values. Returns the given value if it is within min and max.</para>
       </summary>
-      <param name="value"></param>
-      <param name="min"></param>
-      <param name="max"></param>
+      <param name="value">The integer point value to restrict inside the min-to-max range</param>
+      <param name="min">The minimum integer point value to compare against.</param>
+      <param name="max">The maximum  integer point value to compare against.</param>
+      <returns>
+        <para>The int result between min and max values.</para>
+      </returns>
     </member>
     <member name="M:UnityEngine.Mathf.Clamp01(System.Single)">
       <summary>
@@ -33963,27 +33969,27 @@ Useful for restarting a trail from a new position.</para>
     </member>
     <member name="M:UnityEngine.Transform.Rotate(UnityEngine.Vector3,UnityEngine.Space)">
       <summary>
-        <para>Applies a rotation of eulerAngles.z degrees around the z axis, eulerAngles.x degrees around the x axis, and eulerAngles.y degrees around the y axis (in that order).</para>
+        <para>Applies a rotation of eulerAngles.z degrees around the z-axis, eulerAngles.x degrees around the x-axis, and eulerAngles.y degrees around the y-axis (in that order).</para>
       </summary>
-      <param name="relativeTo">Rotation is local to object or World.</param>
-      <param name="eulers">Rotation to apply.</param>
+      <param name="eulers">The rotation to apply.</param>
+      <param name="relativeTo">Determines whether to rotate the GameObject either locally to  the GameObject or relative to the Scene in world space.</param>
     </member>
     <member name="M:UnityEngine.Transform.Rotate(System.Single,System.Single,System.Single,UnityEngine.Space)">
       <summary>
         <para>Applies a rotation of zAngle degrees around the z axis, xAngle degrees around the x axis, and yAngle degrees around the y axis (in that order).</para>
       </summary>
-      <param name="xAngle">Degrees to rotate around the X axis.</param>
-      <param name="yAngle">Degrees to rotate around the Y axis.</param>
-      <param name="zAngle">Degrees to rotate around the Z axis.</param>
-      <param name="relativeTo">Rotation is local to object or World.</param>
+      <param name="relativeTo">Determines whether to rotate the GameObject either is locally to the GameObject or relative to the Scene in world space.</param>
+      <param name="xAngle">Degrees to rotate the GameObject around the X axis.</param>
+      <param name="yAngle">Degrees to rotate the GameObject around the Y axis.</param>
+      <param name="zAngle">Degrees to rotate the GameObject around the Z axis.</param>
     </member>
     <member name="M:UnityEngine.Transform.Rotate(UnityEngine.Vector3,System.Single,UnityEngine.Space)">
       <summary>
-        <para>Rotates the object around axis by angle degrees.</para>
+        <para>Rotates the object around the given axis by the number of degrees defined by the given angle.</para>
       </summary>
-      <param name="axis">Axis to apply rotation to.</param>
-      <param name="angle">Degrees to rotation to apply.</param>
-      <param name="relativeTo">Rotation is local to object or World.</param>
+      <param name="angle">The degrees of rotation to apply.</param>
+      <param name="axis">The axis to apply rotation to.</param>
+      <param name="relativeTo">Determines whether to rotate the GameObject either locally to the GameObject or relative to the Scene in world space.</param>
     </member>
     <member name="M:UnityEngine.Transform.RotateAround(UnityEngine.Vector3,UnityEngine.Vector3,System.Single)">
       <summary>

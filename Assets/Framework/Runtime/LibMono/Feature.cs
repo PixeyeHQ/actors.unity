@@ -1,7 +1,7 @@
 //  Project  : ACTORS
 //  Contacts : Pixeye - ask@pixeye.games
 
-namespace Pixeye
+namespace Pixeye.Framework
 {
 	public abstract class Feature : IAwake
 	{
