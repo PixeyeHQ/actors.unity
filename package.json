@@ -4,7 +4,7 @@
     "displayName": "Actors",
     "description": "Entity Component System framework. Ease the pain of decoupling data from behaviors.",
     "unity": "2018.3",
-    "version": "2019.3.9",
+    "version": "2019.4.7",
     "keywords": [
         "ecs",
         "pixeye",
@@ -17,6 +17,6 @@
     "dependencies": {},
     "repository": {
         "type": "git",
-        "url": "https://github.com/dimmpixeye/ACTORS.git"
+        "url": "https://github.com/dimmpixeye/ecs.git"
     }
 }
