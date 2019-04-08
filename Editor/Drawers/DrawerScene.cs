@@ -53,7 +53,7 @@ namespace Pixeye.Framework
 			EditorGUI.BeginProperty(position, GUIContent.none, property);
 
 			var sceneAsset = property.FindPropertyRelative(sceneAssetPropertyString);
-			var sceneName  = property.FindPropertyRelative(sceneNamePropertyString);
+			var sceneName = property.FindPropertyRelative(sceneNamePropertyString);
 
 			sceneAsset.objectReferenceValue = EditorGUI.ObjectField(position, label, sceneAsset.objectReferenceValue, typeof(SceneAsset), false);
 			if (sceneAsset.objectReferenceValue != null)
@@ -81,7 +81,7 @@ namespace Pixeye.Framework
 		/// </summary>
 		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
 		{
-			int                lines              = 2;
+			int lines = 2;
 			SerializedProperty sceneAssetProperty = GetSceneAssetProperty(property);
 			if (sceneAssetProperty.objectReferenceValue == null)
 				lines = 1;
@@ -94,11 +94,11 @@ namespace Pixeye.Framework
 		/// </summary>
 		private void DrawSceneInfoGUI(Rect position, BuildUtils.BuildScene buildScene, int sceneControlID)
 		{
-			bool   readOnly        = BuildUtils.IsReadOnly();
+			bool readOnly = BuildUtils.IsReadOnly();
 			string readOnlyWarning = readOnly ? "\n\nWARNING: Build Settings is not checked out and so cannot be modified." : "";
 
 			// Label Prefix
-			GUIContent iconContent  = new GUIContent();
+			GUIContent iconContent = new GUIContent();
 			GUIContent labelContent = new GUIContent();
 
 			// Missing from build scenes
@@ -127,7 +127,7 @@ namespace Pixeye.Framework
 			using (new EditorGUI.DisabledScope(readOnly))
 			{
 				Rect labelRect = DrawUtils.GetLabelRect(position);
-				Rect iconRect  = labelRect;
+				Rect iconRect = labelRect;
 				iconRect.width = iconContent.image.width + padSize;
 				labelRect.width -= iconRect.width;
 				labelRect.x += iconRect.width;
@@ -158,7 +158,7 @@ namespace Pixeye.Framework
 				// In build settings
 				else
 				{
-					bool   isEnabled   = buildScene.scene.enabled;
+					bool isEnabled = buildScene.scene.enabled;
 					string stateString = isEnabled ? "Disable" : "Enable";
 					tooltipMsg = stateString + " this scene in build settings.\n" + (isEnabled ? "It will no longer be included in builds" : "It will be included in builds") + "." + readOnlyWarning;
 
@@ -182,21 +182,25 @@ namespace Pixeye.Framework
 
 			buttonRect.x += buttonRect.width;
 			//	buttonRect.width /= 3;
-			tooltipMsg = "Add scene to hierarchy" + readOnlyWarning;
 
-			var scene = SceneManager.GetSceneByBuildIndex(buildScene.buildIndex);
-
-			bool exists = scene.IsValid();
-
-			if (DrawUtils.ButtonHelper(buttonRect, exists ? "-" : "+", exists ? "-" : "+", EditorStyles.miniButtonRight, tooltipMsg))
+			if (buildScene.buildIndex != -1)
 			{
-				if (!exists)
-					EditorSceneManager.OpenScene(buildScene.assetPath, OpenSceneMode.Additive);
-				else
-					EditorSceneManager.CloseScene(scene, true);
-			}
+				tooltipMsg = "Add scene to hierarchy" + readOnlyWarning;
 
-			buttonRect.x += buttonRect.width;
+				var scene = SceneManager.GetSceneByBuildIndex(buildScene.buildIndex);
+
+				bool exists = scene.IsValid();
+
+				if (DrawUtils.ButtonHelper(buttonRect, exists ? "-" : "+", exists ? "-" : "+", EditorStyles.miniButtonRight, tooltipMsg))
+				{
+					if (!exists)
+						EditorSceneManager.OpenScene(buildScene.assetPath, OpenSceneMode.Additive);
+					else
+						EditorSceneManager.CloseScene(scene, true);
+				}
+
+				buttonRect.x += buttonRect.width;
+			}
 		}
 
 		static SerializedProperty GetSceneNameProperty(SerializedProperty property)
@@ -283,7 +287,7 @@ namespace Pixeye.Framework
 			/// </summary>
 			static public bool IsReadOnly()
 			{
-				float curTime            = UnityEngine.Time.realtimeSinceStartup;
+				float curTime = UnityEngine.Time.realtimeSinceStartup;
 				float timeSinceLastCheck = curTime - lastTimeChecked;
 
 				if (timeSinceLastCheck > minCheckWait)
@@ -345,7 +349,7 @@ namespace Pixeye.Framework
 				entry.assetPath = AssetDatabase.GetAssetPath(sceneObject);
 				entry.assetGUID = new GUID(AssetDatabase.AssetPathToGUID(entry.assetPath));
 
-				for ( int index = 0; index < EditorBuildSettings.scenes.Length; ++index )
+				for (int index = 0; index < EditorBuildSettings.scenes.Length; ++index)
 				{
 					if (entry.assetGUID.Equals(EditorBuildSettings.scenes[index].guid))
 					{
@@ -363,9 +367,9 @@ namespace Pixeye.Framework
 			/// </summary>
 			static public void SetBuildSceneState(BuildScene buildScene, bool enabled)
 			{
-				bool                       modified       = false;
+				bool modified = false;
 				EditorBuildSettingsScene[] scenesToModify = EditorBuildSettings.scenes;
-				foreach ( var curScene in scenesToModify )
+				foreach (var curScene in scenesToModify)
 				{
 					if (curScene.guid.Equals(buildScene.assetGUID))
 					{
@@ -407,7 +411,7 @@ namespace Pixeye.Framework
 					}
 				}
 
-				EditorBuildSettingsScene       newScene   = new EditorBuildSettingsScene(buildScene.assetGUID, enabled);
+				EditorBuildSettingsScene newScene = new EditorBuildSettingsScene(buildScene.assetGUID, enabled);
 				List<EditorBuildSettingsScene> tempScenes = EditorBuildSettings.scenes.ToList();
 				tempScenes.Add(newScene);
 				EditorBuildSettings.scenes = tempScenes.ToArray();
@@ -428,8 +432,8 @@ namespace Pixeye.Framework
 							buildScene.assetPath, buildScene.buildIndex,
 							"This will modify build settings, but the scene asset will remain untouched.");
 					string confirm = "Remove From Build";
-					string alt     = "Just Disable";
-					string cancel  = "Cancel (do nothing)";
+					string alt = "Just Disable";
+					string cancel = "Cancel (do nothing)";
 
 					if (buildScene.scene.enabled)
 					{
