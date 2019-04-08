@@ -2,7 +2,6 @@
     <img src="http://raw.pixeye.games/logo_framework.png" alt="Actors">
 </p>
 
-
 [![Discord](https://img.shields.io/discord/320945300892286996.svg?label=Discord)](https://discord.gg/suZuhyt)
 [![Join the chat at https://gitter.im/ActorsFramework/Lobby](https://img.shields.io/badge/gitter-join%20chat-green.svg?style=flat-square)](https://gitter.im/ActorsFramework/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Twitter Follow](https://img.shields.io/badge/twitter-%40dimmPixeye-blue.svg?style=flat-square&label=Follow)](https://twitter.com/dimmPixeye)
@@ -49,6 +48,4 @@ ACTORS is a complete game framework with multiscene editing, game object pooling
 
 * [Examples](https://github.com/dimmpixeye/ecs-Examples)
 * [Wiki](https://github.com/dimmpixeye/ecs/wiki)
- 
- 
  
