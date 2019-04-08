@@ -423,7 +423,7 @@ namespace Pixeye.Framework
 		[NonSerialized]
 		public static Dictionary<int, BlueprintEntity> storage = new Dictionary<int, BlueprintEntity>(new FastComparable());
 
-		internal int id;
+		//internal int id;
 
 		[FoldoutGroup("Setup")]
 		public RefType refType = RefType.Entity;

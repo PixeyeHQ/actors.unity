@@ -12,7 +12,7 @@ namespace Pixeye.Framework
 		public bool globalPool = false;
 		private List<GameObject> activeObjs = new List<GameObject>(600);
 
-		private Transform parent;
+	//	private Transform parent;
 		private Dictionary<int, Stack<GameObject>> cachedObjects = new Dictionary<int, Stack<GameObject>>(600, new FastComparable());
 		private Dictionary<int, IPoolable> cachedPoolables = new Dictionary<int, IPoolable>(600, new FastComparable());
 		private Dictionary<int, int> cachedIds = new Dictionary<int, int>(600, new FastComparable());
@@ -72,10 +72,10 @@ namespace Pixeye.Framework
 		[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
 		public GameObject Spawn(GameObject prefab, Transform parent = null)
 		{
-			if (parent == null)
-			{
-				parent = this.parent;
-			}
+//			if (parent == null)
+//			{
+//				parent = this.parent;
+//			}
 
 			var key = prefab.GetInstanceID();
 
