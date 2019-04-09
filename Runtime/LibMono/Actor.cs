@@ -11,7 +11,7 @@ using Sirenix.OdinInspector;
 namespace Pixeye.Framework
 {
 	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
-	public class Actor : MonoBehaviour, IRequireStarter
+	public class Actor : MonoBehaviour, IRequireStarter, IEntity
 	{
 
 		#region MEMBERS
@@ -139,12 +139,17 @@ namespace Pixeye.Framework
 				var component = blueprint.onLater[i];
 				component.Copy(entityID);
 			}
-			
+
 			entity.AddLater(blueprint.tags);
-			
 		}
 
 		#endregion
+
+		public ref readonly ent GetEntity()
+		{
+			return ref entity;
+		}
+	 
 
 	}
 }

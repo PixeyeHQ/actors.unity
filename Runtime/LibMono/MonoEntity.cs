@@ -11,7 +11,7 @@ namespace Pixeye.Framework
 	/// <summary>
 	/// <para>Links a game object with specific entity.</para>
 	/// </summary>
-	public class MonoEntity : MonoBehaviour
+	public class MonoEntity : MonoBehaviour, IEntity
 	{
 
 		#if UNITY_EDITOR
@@ -45,6 +45,11 @@ namespace Pixeye.Framework
 		public void Release()
 		{
 			entity.Release();
+		}
+
+		public ref readonly ent GetEntity()
+		{
+			return ref entity;
 		}
 
 	}
