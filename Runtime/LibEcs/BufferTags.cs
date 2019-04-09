@@ -384,6 +384,27 @@ namespace Pixeye.Framework
 			}
 		}
 
+		public static void RemoveAll(in this ent entity, params int[] tagsID)
+		{
+			var entityID = entity.id;
+			ref var tags = ref CoreEntity.tags[entityID];
+			var length = tags.GetLength();
+
+			for (int l = 0; l < tagsID.Length; l++)
+			{
+				var tagID = tagsID[l];
+				for (int i = 0; i < length; i++)
+				{
+					if (tags.GetElementByRef(i) == tagID)
+					{
+						tags.ClearAt(i);
+						HandleChange(entity, tagID);
+						break;
+					}
+				}
+			}
+		}
+
 		public static void RemoveAll(in this ent entity, int tagID)
 		{
 			var entityID = entity.id;
