@@ -98,11 +98,12 @@ namespace Pixeye.Framework
 		{
 			ref var transforms = ref CoreEntity.transforms;
 			var entityID = entity.id;
-			if (entityID >= counter)
+			if (entityID >= transforms.Length)
 			{
 				var l = entityID << 1;
 				Array.Resize(ref transforms, l);
 			}
+	 
 			transforms[entityID] = instance;
 		}
 
