@@ -1,9 +1,8 @@
 //  Project : ecs.sandbox
 // Contacts : Pix - ask@pixeye.games
 
-using Pixeye.Framework;
 
-namespace Pixeye
+namespace Pixeye.Framework
 {
 	public class ActorExtended : Actor
 	{
