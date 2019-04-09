@@ -43,7 +43,7 @@ namespace Pixeye.Framework
 			Generate();
 		}
 
-		private void OnEnable()
+		protected virtual void OnEnable()
 		{
 			if (Starter.initialized == false) return;
 
@@ -52,7 +52,7 @@ namespace Pixeye.Framework
 			CoreEntity.Delayed.Set(entity, 0, CoreEntity.Delayed.Action.Activate);
 		}
 
-		private void OnDisable()
+		protected virtual  void OnDisable()
 		{
 			if (!CoreEntity.isAlive[entity]) return;
 
@@ -60,6 +60,8 @@ namespace Pixeye.Framework
 			CoreEntity.Delayed.Set(entity, 0, CoreEntity.Delayed.Action.Deactivate);
 		}
 
+	
+		
 		#endregion
 
 		#region METHODS
