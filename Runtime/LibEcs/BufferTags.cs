@@ -229,6 +229,11 @@ namespace Pixeye.Framework
 
 		internal static DictionaryGroupTags inUseGroups = new DictionaryGroupTags();
 
+		public static void ClearTags(in this ent entity)
+		{
+			CoreEntity.tags[entity.id].Clear();
+		}
+
 		public static void Clear(int entityID)
 		{
 			ref var tags = ref CoreEntity.tags[entityID];
