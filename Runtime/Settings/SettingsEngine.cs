@@ -9,8 +9,8 @@ namespace Pixeye.Framework
 	public static class SettingsEngine
 	{
 
-		public const int SizeEntities = 8092;
-		public const int SizeComponents = 8092;
+		public const int SizeEntities = 1024;
+		public const int SizeComponents = 1024;
 		public const int SizeBlueprinths = 24;
 		public const int SizeGenerations = 4;
 
