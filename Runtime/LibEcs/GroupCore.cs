@@ -25,7 +25,7 @@ namespace Pixeye.Framework
 		/// don't use for iterating.
 		public ref ent this[int index] => ref entities[index];
 
-		internal ent[] entities = new ent[SettingsEngine.SizeEntities];
+		public ent[] entities = new ent[SettingsEngine.SizeEntities];
 		internal Composition composition;
 
 		private static int idCounter;
