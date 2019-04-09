@@ -32,9 +32,9 @@ using UnityEngine;
     			 
     		}
     
-        public static ##NAME## ##NAME##(this in ent entity)
+        public static ##NAME## ##NAME##(in this ent entity)
         {
-            return Storage<##NAME##>.Instance.components[entity];
+            return Storage<##NAME##>.Instance.components[entity.id];
         }
     }
  
