@@ -42,6 +42,7 @@ namespace Pixeye.Framework
 		public static EntityComposer Modify(in this ent entity)
 		{
 			EntityComposer.Default.entity = entity;
+			EntityComposer.Default.entityID = entity.id;
 			return EntityComposer.Default;
 		}
 
