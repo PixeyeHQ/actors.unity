@@ -106,7 +106,6 @@ namespace Pixeye.Framework
 			else
 				id = lastID++;
 
-			CoreEntity.Setup(id);
 		 
 			 CoreEntity.SetupWithTransform(id, pooled);
 		 if (pooled) CoreEntity.transforms[id] = id.Spawn(Pool.Entities, prefab);
