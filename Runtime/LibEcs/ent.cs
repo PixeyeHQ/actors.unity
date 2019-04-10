@@ -169,11 +169,10 @@ namespace Pixeye.Framework
 
 			var entity = new ent(id, age);
 
-			#if UNITY_EDITOR
+		 
 			if (blueprint.refType == RefType.EntityMono)
 				entity.AddMonoReference();
-			#endif
-
+			 
 			 
 			if (blueprint.tags.Length>0)
 			entity.AddLater(blueprint.tags);
