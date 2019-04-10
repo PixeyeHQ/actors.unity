@@ -6,7 +6,7 @@ namespace Pixeye.Framework
 	public sealed class EntityComposer
 	{
 
-		internal ent entity;
+		public ent entity;
 		internal int entityID;
 		public static EntityComposer Default = new EntityComposer();
 
