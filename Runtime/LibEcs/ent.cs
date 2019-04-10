@@ -56,7 +56,7 @@ namespace Pixeye.Framework
 			return new ent(id, age);
 		}
 
-		public static ent CreateFrom(in string prefabID, bool pooled = false)
+		public static ent CreateFor(in string prefabID, bool pooled = false)
 		{
 			int id;
 			byte age = 0;
@@ -83,7 +83,7 @@ namespace Pixeye.Framework
 
 			return new ent(id, age);
 		}
-		public static ent CreateFrom(GameObject prefab, bool pooled = false)
+		public static ent CreateFor(GameObject prefab, bool pooled = false)
 		{
 			int id;
 			byte age = 0;
@@ -111,7 +111,7 @@ namespace Pixeye.Framework
 			return new ent(id, age);
 		}
 
-		public static ent CreateFrom(in bpt blueprintKey, bool pooled = false)
+		public static ent CreateFor(in bpt blueprintKey, bool pooled = false)
 		{
 			int id;
 			byte age = 0;
