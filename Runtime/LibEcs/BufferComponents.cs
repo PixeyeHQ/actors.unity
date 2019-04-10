@@ -37,9 +37,14 @@ namespace Pixeye
 
 		public void Add(int type)
 		{
+
+		 
+
 			if (length == components.Length)
 				Array.Resize(ref components, length << 1);
 
+			 
+			
 			components[length++] = (ushort) type;
 		}
 

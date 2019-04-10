@@ -22,6 +22,11 @@ namespace Pixeye.Framework
 			return Storage<T>.Instance.GetFromStorage(entityID);
 		}
 
+		public void Deploy()
+		{
+			CoreEntity.Delayed.Set(entity, 0, CoreEntity.Delayed.Action.Activate);
+		}
+		
 		public void Deploy(int tag)
 		{
 			entity.AddLater(tag);

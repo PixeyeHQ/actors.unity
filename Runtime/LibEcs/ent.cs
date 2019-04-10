@@ -75,7 +75,7 @@ namespace Pixeye.Framework
 				entityStackLength--;
 			}
 			else
-				id = ++lastID;
+				id = lastID++;
 
 			CoreEntity.SetupWithTransform(id, pooled);
 			if (pooled) CoreEntity.transforms[id] = id.Spawn(Pool.Entities, prefabID);
@@ -83,6 +83,8 @@ namespace Pixeye.Framework
 
 			return new ent(id, age);
 		}
+		
+		
 		public static ent CreateFor(GameObject prefab, bool pooled = false)
 		{
 			int id;
@@ -102,13 +104,19 @@ namespace Pixeye.Framework
 				entityStackLength--;
 			}
 			else
-				id = ++lastID;
+				id = lastID++;
 
-			CoreEntity.SetupWithTransform(id, pooled);
-			if (pooled) CoreEntity.transforms[id] = id.Spawn(Pool.Entities, prefab);
-			else CoreEntity.transforms[id] = id.Spawn(prefab);
+			CoreEntity.Setup(id);
+		 
+			 CoreEntity.SetupWithTransform(id, pooled);
+		 if (pooled) CoreEntity.transforms[id] = id.Spawn(Pool.Entities, prefab);
+	 	else CoreEntity.transforms[id] = id.Spawn(prefab);
 
 			return new ent(id, age);
+			
+	 
+			
+			
 		}
 
 		public static ent CreateFor(in bpt blueprintKey, bool pooled = false)
@@ -130,7 +138,7 @@ namespace Pixeye.Framework
 				entityStackLength--;
 			}
 			else
-				id = ++lastID;
+				id = lastID++;
 
 			var blueprint = BlueprintEntity.storage[blueprintKey.id];
 
@@ -151,6 +159,7 @@ namespace Pixeye.Framework
 				var storage = Storage.allDict[hash];
 				component.Copy(id);
 				CoreEntity.components[id].Add(storage.GetComponentID());
+			 
 			}
 
 			for (int i = 0; i < blueprint.lenAddLater; i++)
@@ -167,7 +176,7 @@ namespace Pixeye.Framework
 			#endif
 
 			 
-			
+			if (blueprint.tags.Length>0)
 			entity.AddLater(blueprint.tags);
 			CoreEntity.Delayed.Set(entity, 0, CoreEntity.Delayed.Action.Activate);
 	 

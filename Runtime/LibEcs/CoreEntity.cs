@@ -149,6 +149,7 @@ namespace Pixeye.Framework
 
 		public static T Add<T>(in this ent entity) where T : IComponent, new()
 		{
+			Debug.Log(entity.id);
 			var storage = Storage<T>.Instance;
 
 			var entityID = entity.id;
@@ -314,7 +315,7 @@ namespace Pixeye.Framework
 				Kill,
 				KillFinalize,
 				Activate,
-				Deactivate,
+				Deactivate 
 
 			}
 

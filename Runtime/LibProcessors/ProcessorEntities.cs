@@ -11,6 +11,8 @@ namespace Pixeye.Framework
 	internal sealed class ProcessorEntities : Processor, ITick
 	{
 
+ 
+		
 		public void Tick()
 		{
 			if (!Starter.initialized) return;
@@ -162,6 +164,7 @@ namespace Pixeye.Framework
 
 						ref var componentsToActivate = ref CoreEntity.components[entityID];
 						var lenToActivate = componentsToActivate.length;
+						
 						for (int j = 0; j < lenToActivate; j++)
 						{
 							ref var component = ref componentsToActivate.GetComponent(j);
@@ -170,6 +173,9 @@ namespace Pixeye.Framework
 
 							CoreEntity.generations[entityID, generationActivate] |= maskActivate;
 							components = Storage.all[component];
+						
+							
+							
 							for (int l = 0; l < components.lenOfGroups; l++)
 							{
 								var group = components.groupsOfInterest[l];
@@ -189,7 +195,7 @@ namespace Pixeye.Framework
 
 								canBeAdded &= composition.tagsToInclude.Length == 0 || composition.Include(entityID);
 								canBeAdded &= composition.tagsToExclude.Length == 0 || composition.Exclude(entityID);
-
+ 
 								if (canBeAdded)
 								{
 									group.Insert(entity);
@@ -199,6 +205,9 @@ namespace Pixeye.Framework
 
 						break;
 
+					
+				 
+					
 					case CoreEntity.Delayed.Action.Deactivate:
 
 						ref var componentsToDeactivate = ref CoreEntity.components[entityID];
