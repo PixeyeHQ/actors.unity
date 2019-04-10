@@ -55,6 +55,8 @@ namespace Pixeye.Framework
 			ProcessorScene.Default.Setup(ScenesToKeep, SceneDependsOn, this);
 		}
 
+		 
+		
 		#if UNITY_EDITOR
 
 		public void ClearNodes()

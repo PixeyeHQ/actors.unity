@@ -22,11 +22,14 @@ namespace Pixeye.Framework
 		[FoldoutGroup("SetupData")]
 		public List<Pluggable> pluggables = new List<Pluggable>();
 
+		[FoldoutGroup("Settings")]
+		public int sizeEntities = 2048;
+
 		void Awake()
 		{
-		 
+			SettingsEngine.SizeEntities = sizeEntities;
 			
-			for ( var i = 0; i < pluggables.Count; i++ )
+			for (var i = 0; i < pluggables.Count; i++)
 			{
 				pluggables[i].Plug();
 			}

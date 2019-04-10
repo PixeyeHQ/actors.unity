@@ -61,7 +61,7 @@ namespace Pixeye.Framework
 
 		public int len = 0;
 
-		public T[] components = new T[SettingsEngine.SizeComponents];
+		public T[] components = new T[SettingsEngine.SizeEntities];
 
 		public T this[int index] => components[index];
 
