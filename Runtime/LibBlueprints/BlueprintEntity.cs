@@ -1,4 +1,4 @@
-//  Project : ecs
+﻿//  Project : ecs
 // Contacts : Pix - ask@pixeye.games
 
 #if ODIN_INSPECTOR
@@ -28,6 +28,7 @@ namespace Pixeye.Framework
 	public class BlueprintEntity : SerializedScriptableObject
 	{
 
+		[ShowInInspector, Title("Debug")]
 		public static Dictionary<int, BlueprintEntity> storage = new Dictionary<int, BlueprintEntity>(new FastComparable());
 
 		[Title("Setup")]
@@ -281,6 +282,12 @@ namespace Pixeye.Framework
 		internal void GenerateBlueprintTags()
 		{
 			PostHandleBlueprintTags.Generate();
+		}
+		
+		[Sirenix.OdinInspector.Button(ButtonSizes.Large)]
+		internal void DebugClearStorage()
+		{
+			storage.Clear();
 		}
 
 //		ReferenceType EditorAddRefType()
