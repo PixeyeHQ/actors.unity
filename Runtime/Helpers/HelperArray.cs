@@ -61,18 +61,7 @@ namespace Pixeye.Framework
 		public static int BinarySearch(ref int[] entries, int value, int left, int right)
 		{
 			if (right == 0) return -1;
-
-			if (right < 4)
-			{
-				for (int i = 0; i < right; i++)
-				{
-					if (value == entries[i])
-					{
-						return i;
-					}
-				}
-			}
-
+ 
 			var len = right;
 			while (left <= right)
 			{
@@ -83,41 +72,35 @@ namespace Pixeye.Framework
 					right = middle - 1;
 			}
 
-			return left > len ? -1 : left;
+			if (left > len) return -1;
+			if (entries[left] != value) return -1;
+			return left;
 		}
 
 		public static int BinarySearch(ref ent[] entries, int value, int left, int right)
 		{
 			if (right == 0) return -1;
+
 			var len = right;
-			while (left <= right)
+
+			while (left < right)
 			{
 				var middle = (left + right) / 2;
+
+				if (entries[middle].id == value)
+				{
+					return middle;
+				}
+
 				if (entries[middle].id < value)
 					left = middle + 1;
 				else
 					right = middle - 1;
 			}
 
-			return left > len ? -1 : left;
-		}
-
- 
-
-		public static void InsertionSort(ref ent[] inputArray, int len)
-		{
-			for (int i = 0; i < len - 1; i++)
-			{
-				for (int j = i + 1; j > 0; j--)
-				{
-					if (inputArray[j - 1].id > inputArray[j].id)
-					{
-						ref var temp = ref inputArray[j - 1];
-						inputArray[j - 1] = inputArray[j];
-						inputArray[j] = temp;
-					}
-				}
-			}
+			if (left > len) return -1;
+			if (entries[left] != value) return -1;
+			return left;
 		}
 
 		internal class ArrayTraverse
