@@ -25,6 +25,10 @@ namespace Pixeye.Framework
 		[FoldoutGroup("Settings")]
 		public int sizeEntities = 2048;
 
+		
+		
+		
+		
 		void Awake()
 		{
 			SettingsEngine.SizeEntities = sizeEntities;

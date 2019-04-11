@@ -8,21 +8,23 @@ namespace Pixeye.Framework
 	public readonly struct bpt
 	{
 
-		public readonly int id;
+		public readonly string id;
+		public readonly int hash;
 
-		public bpt(int id = 0)
+		public bpt(string id, int hash)
 		{
 			this.id = id;
+			this.hash = hash;
 		}
 
-		static public implicit operator int(bpt value)
+		static public implicit operator string(bpt value)
 		{
 			return value.id;
 		}
 
-		static public implicit operator bpt(int value)
+		static public implicit operator bpt(string value)
 		{
-			return new bpt(value);
+			return new bpt(value, value.GetHashCode());
 		}
 
 	}
@@ -32,13 +34,14 @@ namespace Pixeye.Framework
 
 		public static BlueprintEntity Create(ref this bpt blueprint, string name = default)
 		{
-			var id = name == default ? blueprint.id : name.GetHashCode();
+			var id = name == default ? blueprint.id : name;
 			var bp = ScriptableObject.CreateInstance<BlueprintEntity>();
 
 			if (name != default)
 				blueprint = id;
 
-			BlueprintEntity.storage.Add(id, bp);
+			BlueprintEntity.storage.Add(blueprint.hash, bp);
+			//BlueprintEntity.storage.Add(id, bp);
 
 			return bp;
 		}

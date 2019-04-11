@@ -15,14 +15,12 @@ using Sirenix.OdinInspector;
 #endif
 #if UNITY_EDITOR
 using UnityEditor;
-
 #if ODIN_INSPECTOR
 using Sirenix.Utilities.Editor;
 
 #endif
 #endif
 
- 
 namespace Pixeye.Framework
 {
 	public class BlueprintEntity : SerializedScriptableObject
@@ -56,6 +54,17 @@ namespace Pixeye.Framework
 
 		[SerializeField, TagFilter(typeof(ITag))]
 		internal int[] tags;
+
+		internal static BlueprintEntity Get(in bpt blueprint)
+		{
+			if (!storage.TryGetValue(blueprint.hash, out BlueprintEntity bp))
+			{
+				bp = Box.Get<BlueprintEntity>(blueprint.id);
+				storage.Add(blueprint.hash, bp);
+			}
+
+			return bp;
+		}
 
 		internal IEnumerable<Type> GetFilteredTypeList()
 		{
@@ -247,11 +256,9 @@ namespace Pixeye.Framework
 
 		void OnEnable()
 		{
-	 
-	 
 			components.Clear();
-	  
-			storage.Add(name.GetHashCode(), this);
+
+			//storage.Add(name.GetHashCode(), this);
 
 			for (int i = 0; i < lenOnCreate; i++)
 			{
@@ -283,7 +290,7 @@ namespace Pixeye.Framework
 		{
 			PostHandleBlueprintTags.Generate();
 		}
-		
+
 		[Sirenix.OdinInspector.Button(ButtonSizes.Large)]
 		internal void DebugClearStorage()
 		{
@@ -417,7 +424,6 @@ namespace Pixeye.Framework
 	#endif
 }
 #else
-
 using System;
 using System.Collections.Generic;
 using UnityEngine;

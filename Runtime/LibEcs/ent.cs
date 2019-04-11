@@ -133,7 +133,7 @@ namespace Pixeye.Framework
 			else
 				id = lastID++;
 
-			var blueprint = BlueprintEntity.storage[blueprintKey.id];
+			var blueprint = BlueprintEntity.Get(blueprintKey);
 
 			if (blueprint.model)
 			{
@@ -162,14 +162,12 @@ namespace Pixeye.Framework
 
 			var entity = new ent(id, age);
 
-			 
-			 
 			if (blueprint.tags.Length > 0)
 				entity.AddLater(blueprint.tags);
-			
+
 			if (blueprint.refType == RefType.EntityMono)
 				entity.AddMonoReference();
-		 
+
 			CoreEntity.Delayed.Set(entity, 0, CoreEntity.Delayed.Action.Activate);
 
 			return entity;
