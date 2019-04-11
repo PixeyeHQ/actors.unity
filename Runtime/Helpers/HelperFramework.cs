@@ -38,24 +38,32 @@ namespace Pixeye.Framework
 			return false;
 		}
 
-		public static float Plus(this float arg0, float val, float clamp = 1f)
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static float Plus(ref this float arg0_pl, float val_pl, float clamp_pl = 1f)
 		{
-			return Math.Min(clamp, arg0 + val);
+			arg0_pl = Math.Min(clamp_pl, arg0_pl + val_pl);
+			return arg0_pl;
 		}
 
-		public static float Minus(this float arg0, float val, float clamp = 0f)
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static float Minus(ref this float arg0_mn, float val_mn, float clamp_mn = 0f)
 		{
-			return Math.Max(clamp, arg0 - val);
+			arg0_mn = Math.Max(clamp_mn, arg0_mn - val_mn);
+			return arg0_mn;
 		}
 
-		public static int Plus(this int arg0, int val, int clamp = 1)
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static int Plus(ref this int arg0_pl, int val_pl, int clamp_pl = 1)
 		{
-			return Math.Min(clamp, arg0 + val);
+			arg0_pl = Math.Min(clamp_pl, arg0_pl + val_pl);
+			return arg0_pl;
 		}
 
-		public static int Minus(this int arg0, int val, int clamp = 0)
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static int Minus(ref this int arg0_mn, int val_mn, int clamp_mn = 0)
 		{
-			return Math.Max(clamp, arg0 - val);
+			arg0_mn = Math.Max(clamp_mn, arg0_mn - val_mn);
+			return arg0_mn;
 		}
 
 		#endregion
