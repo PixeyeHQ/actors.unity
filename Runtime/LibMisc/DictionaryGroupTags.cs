@@ -83,6 +83,7 @@ namespace Pixeye.Framework
 						else
 						{
 							endIndex = middleIndex;
+							pointer = endIndex;
 						}
 					}
 				}

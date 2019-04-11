@@ -50,6 +50,7 @@ namespace Pixeye.Framework
 			var index = indexLast - 1;
 
 			if (index > 0)
+			{
 				if (entityID < entities[index].id)
 				{
 					var startIndex = 0;
@@ -59,15 +60,16 @@ namespace Pixeye.Framework
 					{
 						var area = endIndex - startIndex;
 						var middleIndex = startIndex + area / 2;
-						var middleValue = entities[middleIndex];
+						var middleValue = entities[middleIndex].id;
 
-						if (middleValue.id == entityID)
+						if (middleValue == entityID)
 						{
 							pointer = middleIndex;
+
 							break;
 						}
 
-						if (middleValue.id < entityID)
+						if (middleValue < entityID)
 						{
 							startIndex = middleIndex + 1;
 							pointer = startIndex;
@@ -75,9 +77,11 @@ namespace Pixeye.Framework
 						else
 						{
 							endIndex = middleIndex;
+							pointer = endIndex;
 						}
 					}
 				}
+			}
 
 			for (int i = indexLast; i >= pointer; i--)
 				entities[i + 1] = entities[i];
