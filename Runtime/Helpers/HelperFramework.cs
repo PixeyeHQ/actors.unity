@@ -39,31 +39,57 @@ namespace Pixeye.Framework
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static float Plus(ref this float arg0_pl, float val_pl, float clamp_pl = 1f)
+		public static bool PlusCheck(ref this float arg0_pl, float val_pl, float clamp_pl = 1f)
 		{
 			arg0_pl = Math.Min(clamp_pl, arg0_pl + val_pl);
-			return arg0_pl;
+			return arg0_pl == clamp_pl;
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static float Minus(ref this float arg0_mn, float val_mn, float clamp_mn = 0f)
+		public static bool MinusCheck(ref this float arg0_mn, float val_mn, float clamp_mn = 0f)
 		{
 			arg0_mn = Math.Max(clamp_mn, arg0_mn - val_mn);
-			return arg0_mn;
+			return arg0_mn == clamp_mn;
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static int Plus(ref this int arg0_pl, int val_pl, int clamp_pl = 1)
+		public static bool PlusCheck(ref this int arg0_pl, int val_pl, int clamp_pl = 1)
 		{
 			arg0_pl = Math.Min(clamp_pl, arg0_pl + val_pl);
-			return arg0_pl;
+			return arg0_pl == clamp_pl;
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static int Minus(ref this int arg0_mn, int val_mn, int clamp_mn = 0)
+		public static bool MinusCheck(ref this int arg0_mn, int val_mn, int clamp_mn = 0)
 		{
 			arg0_mn = Math.Max(clamp_mn, arg0_mn - val_mn);
-			return arg0_mn;
+			return arg0_mn == clamp_mn;
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static void Plus(ref this float arg0_pl, float val_pl, float clamp_pl = 1f)
+		{
+			arg0_pl = Math.Min(clamp_pl, arg0_pl + val_pl);
+			;
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static void Minus(ref this float arg0_mn, float val_mn, float clamp_mn = 0f)
+		{
+			arg0_mn = Math.Max(clamp_mn, arg0_mn - val_mn);
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static void Plus(ref this int arg0_pl, int val_pl, int clamp_pl = 1)
+		{
+			arg0_pl = Math.Min(clamp_pl, arg0_pl + val_pl);
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static void Minus(ref this int arg0_mn, int val_mn, int clamp_mn = 0)
+		{
+			arg0_mn = Math.Max(clamp_mn, arg0_mn - val_mn);
+			;
 		}
 
 		#endregion
