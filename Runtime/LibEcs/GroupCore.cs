@@ -49,7 +49,7 @@ namespace Pixeye.Framework
 
 			var index = indexLast - 1;
 
-			if (index > 0)
+			if (index >= 0)
 			{
 				if (entityID < entities[index].id)
 				{
@@ -58,8 +58,7 @@ namespace Pixeye.Framework
 
 					while (endIndex > startIndex)
 					{
-						var area = endIndex - startIndex;
-						var middleIndex = startIndex + area / 2;
+						var middleIndex = (endIndex + startIndex) / 2;
 						var middleValue = entities[middleIndex].id;
 
 						if (middleValue == entityID)
@@ -93,9 +92,8 @@ namespace Pixeye.Framework
 
 		internal void TryRemove(int entityID)
 		{
-     
 			var i = HelperArray.BinarySearch(ref entities, entityID, 0, length);
- 
+
 			if (i == -1) return;
 
 			if (onRemove != null)

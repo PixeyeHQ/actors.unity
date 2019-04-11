@@ -95,7 +95,7 @@ namespace Pixeye.Framework
 				if (entries[middle].id < value)
 					left = middle + 1;
 				else
-					right = middle - 1;
+					right = middle;
 			}
 
 			if (left > len) return -1;
