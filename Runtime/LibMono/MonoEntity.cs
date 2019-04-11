@@ -11,7 +11,7 @@ namespace Pixeye.Framework
 	/// <summary>
 	/// <para>Links a game object with specific entity.</para>
 	/// </summary>
-	public class MonoEntity : MonoBehaviour, IEntity
+	public class MonoEntity : MonoBehaviour, IEntity, IPoolable
 	{
 
 		#if UNITY_EDITOR
@@ -22,7 +22,7 @@ namespace Pixeye.Framework
 		[HideInInspector]
 		public ent entity = -1;
 
-		bool conditionInitialized;
+		internal bool conditionInitialized;
 
 		public virtual void OnEnable()
 		{
@@ -32,13 +32,15 @@ namespace Pixeye.Framework
 				return;
 			}
 
-			CoreEntity.isAlive[entity] = true;
+			CoreEntity.isAlive[entity.id] = true;
 			CoreEntity.Delayed.Set(entity, 0, CoreEntity.Delayed.Action.Activate);
 		}
 
 		public virtual void OnDisable()
 		{
-			CoreEntity.isAlive[entity] = false;
+			if (!CoreEntity.isAlive[entity.id]) return;
+
+			CoreEntity.isAlive[entity.id] = false;
 			CoreEntity.Delayed.Set(entity, 0, CoreEntity.Delayed.Action.Deactivate);
 		}
 
@@ -50,6 +52,11 @@ namespace Pixeye.Framework
 		public ref readonly ent GetEntity()
 		{
 			return ref entity;
+		}
+
+		public void Spawn()
+		{
+			conditionInitialized = false;
 		}
 
 	}

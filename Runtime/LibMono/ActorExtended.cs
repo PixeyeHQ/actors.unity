@@ -11,7 +11,7 @@ namespace Pixeye.Framework
 		{
 			if (Starter.initialized == false) return;
 
-			CoreEntity.isAlive[entity] = true;
+			CoreEntity.isAlive[entity.id] = true;
 			CoreEntity.Delayed.Set(entity, 0, CoreEntity.Delayed.Action.Activate);
 			ProcessorUpdate.Default.Add(this);
 			ProcessorSignals.Default.Add(this);
@@ -19,7 +19,7 @@ namespace Pixeye.Framework
 
 		protected override void OnDisable()
 		{
-			if (!CoreEntity.isAlive[entity]) return;
+			if (!CoreEntity.isAlive[entity.id]) return;
 
 			CoreEntity.isAlive[entity] = false;
 			CoreEntity.Delayed.Set(entity, 0, CoreEntity.Delayed.Action.Deactivate);

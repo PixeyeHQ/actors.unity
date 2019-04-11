@@ -162,11 +162,14 @@ namespace Pixeye.Framework
 
 			var entity = new ent(id, age);
 
-			if (blueprint.refType == RefType.EntityMono)
-				entity.AddMonoReference();
-
+			 
+			 
 			if (blueprint.tags.Length > 0)
 				entity.AddLater(blueprint.tags);
+			
+			if (blueprint.refType == RefType.EntityMono)
+				entity.AddMonoReference();
+		 
 			CoreEntity.Delayed.Set(entity, 0, CoreEntity.Delayed.Action.Activate);
 
 			return entity;
@@ -234,8 +237,8 @@ namespace Pixeye.Framework
 
 		public void Release()
 		{
-			CoreEntity.Delayed.Set(this, 0, CoreEntity.Delayed.Action.Kill);
 			CoreEntity.isAlive[id] = false;
+			CoreEntity.Delayed.Set(this, 0, CoreEntity.Delayed.Action.Kill);
 			CoreEntity.entitiesCount--;
 		}
 
