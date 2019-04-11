@@ -30,11 +30,11 @@ namespace Pixeye.Framework
 		internal ArrayEntities entitiesToRemove = new ArrayEntities();
 
 		internal abstract int GetComponentID();
-	
+
 		internal GroupCore[] groupsOfInterest = new GroupCore[8];
 		internal int lenOfGroups;
 
-	//	public abstract void AddNoCheckAbstract(int entityID);
+		//	public abstract void AddNoCheckAbstract(int entityID);
 
 		public abstract void RemoveNoCheck(int entityID);
 
@@ -91,7 +91,7 @@ namespace Pixeye.Framework
 
 			masks[componentID] = componentMask;
 			generations[componentID] = generation;
-			 
+
 			allDict.Add(typeof(T).GetHashCode(), this);
 		}
 
@@ -111,7 +111,7 @@ namespace Pixeye.Framework
 
 		public T TryGet(int entityID)
 		{
-			return HelperFramework.BitCheck(CoreEntity.generations[entityID, generation], componentMask) ? components[entityID] : default;
+			return (CoreEntity.generations[entityID, generation] & componentMask) == componentMask ? components[entityID] : default;
 		}
 
 		public T GetFromStorage(int entityID)
