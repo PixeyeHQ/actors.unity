@@ -40,7 +40,7 @@ namespace Pixeye.Framework
 
 		internal static BitArray isAlive = new BitArray(SettingsEngine.SizeEntities);
 		internal static BitArray isPooled = new BitArray(SettingsEngine.SizeEntities);
-		internal static Transform[] transforms = new Transform[SettingsEngine.SizeEntities];
+		public static Transform[] transforms = new Transform[SettingsEngine.SizeEntities];
 
 		internal static int[,] generations = new int[SettingsEngine.SizeEntities, SettingsEngine.SizeGenerations];
 		internal static BufferTags[] tags = new BufferTags[SettingsEngine.SizeEntities];

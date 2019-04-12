@@ -109,6 +109,7 @@ namespace Pixeye.Framework
 			EntityCore.generations[entityID, generation] &= ~componentMask;
 		}
 
+	 
 		public T TryGet(int entityID)
 		{
 			return (EntityCore.generations[entityID, generation] & componentMask) == componentMask ? components[entityID] : default;

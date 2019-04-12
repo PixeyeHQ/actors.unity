@@ -402,8 +402,8 @@ namespace Pixeye.Framework
 				var name = Path.GetFileNameWithoutExtension(AssetDatabase.GUIDToAssetPath(guid));
 
 				var strName = name.Split(' ')[1];
-				gen.Append($"public static bpt {strName} = \"{name}\".GetHashCode();{Environment.NewLine}");
-			}
+				gen.Append($"public static bpt {strName} = \"{name}\";{Environment.NewLine}");
+			} 
 
 			templateContents = templateContents.Replace("##CODEGEN##", gen.ToString());
 
@@ -450,6 +450,19 @@ namespace Pixeye.Framework
 
 		internal List<IComponent> onCreate = new List<IComponent>();
 		internal List<IComponent> onLater = new List<IComponent>();
+
+
+	internal static BlueprintEntity Get(in bpt blueprint)
+		{
+			if (!storage.TryGetValue(blueprint.hash, out BlueprintEntity bp))
+			{
+				bp = Box.Get<BlueprintEntity>(blueprint.id);
+				storage.Add(blueprint.hash, bp);
+			}
+
+			return bp;
+		}
+
 
 		[FoldoutGroup("Setup")]
 		[TagFilter(typeof(ITag))]

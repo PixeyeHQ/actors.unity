@@ -57,7 +57,7 @@ namespace Pixeye.Framework
 			var pointer = len++;
 			var indexLast = pointer;
 			var index = pointer - 1;
-  
+ 
 			if (index >= 0)
 			{
 				if (tagID < tagsID[index])

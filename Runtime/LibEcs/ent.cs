@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Unity.IL2CPP.CompilerServices;
 using UnityEngine;
@@ -261,11 +262,11 @@ namespace Pixeye.Framework
 		/// <param name="arg0"></param>
 		/// <typeparam name="T"></typeparam>
 		/// <returns>Returns true if the entity has this component.</returns>
-		[Il2CppSetOption(Option.NullChecks, false)]
+		[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public bool Get<T>(out T arg0) where T : class, IComponent, new()
 		{
-			arg0 = default;
-			return (arg0 = Storage<T>.Instance.TryGet(id)) != null;
+			return (arg0 = (EntityCore.generations[id, Storage<T>.generation] & Storage<T>.componentMask) == Storage<T>.componentMask ? Storage<T>.Instance.components[id] : default) != null;
 		}
 
 		/// <summary>
@@ -277,7 +278,7 @@ namespace Pixeye.Framework
 		/// <typeparam name="T"></typeparam>
 		/// <typeparam name="Y"></typeparam>
 		/// <returns>Returns true if the entity has these components.</returns>
-		[Il2CppSetOption(Option.NullChecks, false)]
+		[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
 		public bool Get<T, Y>(out T arg0, out Y arg1) where T : class, IComponent, new() where Y : class, IComponent, new()
 		{
 			arg0 = default;
