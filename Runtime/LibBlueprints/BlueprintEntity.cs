@@ -46,25 +46,13 @@ namespace Pixeye.Framework
 
 		[SerializeField, HideInInspector]
 		internal int lenAddLater;
-
-		//	[SerializeField, ListDrawerSettings(DraggableItems = false, Expanded = false, OnBeginListElementGUI = "BeginDrawListElement", OnEndListElementGUI = "EndDrawListElement", CustomAddFunction = "EditorAddRefType")]
-		//	internal List<ReferenceType> references = new List<ReferenceType>();
-
+ 
 		internal Dictionary<int, IComponent> components = new Dictionary<int, IComponent>(new FastComparable());
 
 		[SerializeField, TagFilter(typeof(ITag))]
 		internal int[] tags;
 
-		internal static BlueprintEntity Get(in bpt blueprint)
-		{
-			if (!storage.TryGetValue(blueprint.hash, out BlueprintEntity bp))
-			{
-				bp = Box.Get<BlueprintEntity>(blueprint.id);
-				storage.Add(blueprint.hash, bp);
-			}
-
-			return bp;
-		}
+ 
 
 		internal IEnumerable<Type> GetFilteredTypeList()
 		{
@@ -105,52 +93,6 @@ namespace Pixeye.Framework
 			storage.Add(id, instance);
 			return instance;
 		}
-
-//		#region REFS
-//
-//		/// <summary>
-//		/// Add reference to the Unity Component on root for the entity
-//		/// </summary>
-//		/// <typeparam name="T"></typeparam>
-//		public void AddRef<T>() where T : Component
-//		{
-//			ReferenceType instance = new ReferenceType();
-//			instance.type = typeof(T);
-//			references.Add(instance);
-//		}
-//
-//		/// <summary>
-//		/// Add reference to the Unity Component by path  for the entity
-//		/// </summary>
-//		/// <param name="path"></param>
-//		/// <typeparam name="T"></typeparam>
-//		public void AddRef<T>(string path) where T : Component
-//		{
-//			ReferenceType instance = new ReferenceType();
-//			instance.path = path;
-//			instance.name = path;
-//			instance.type = typeof(T);
-//			instance.hash = path.GetHashCode();
-//			references.Add(instance);
-//		}
-//
-//		/// <summary>
-//		/// Add reference to the Unity Component by path  for the entity with special name
-//		/// </summary>
-//		/// <param name="path"></param>
-//		/// <param name="name"></param>
-//		/// <typeparam name="T"></typeparam>
-//		public void AddRef<T>(string path, string name) where T : Component
-//		{
-//			ReferenceType instance = new ReferenceType();
-//			instance.name = name;
-//			instance.path = path;
-//			instance.type = typeof(T);
-//			instance.hash = name.GetHashCode();
-//			references.Add(instance);
-//		}
-//
-//		#endregion
 
 		#region REFS OBJECT
 
@@ -297,71 +239,9 @@ namespace Pixeye.Framework
 			storage.Clear();
 		}
 
-//		ReferenceType EditorAddRefType()
-//		{
-//			return new ReferenceType();
-//		}
-
 		#endif
 
 	}
-
-//	[HideReferenceObjectPicker]
-//	public class ReferenceType
-//	{
-//
-//		[ShowInInspector, ReadOnly]
-//		public int[] siblings;
-//
-//		[ReadOnly]
-//		public int hash;
-//
-//		[ReadOnly]
-//		public string path;
-//
-//		[OnValueChanged("GenerateHash")]
-//		public string name;
-//
-//		public Type type;
-//
-//		#if UNITY_EDITOR
-//		[Tooltip("A special variable that helps to setup reference. Not included in build.")]
-//		[OnValueChanged("GenerateType")]
-//		public Component component;
-//
-//		void GenerateHash()
-//		{
-//			hash = name.GetHashCode();
-//		}
-//
-//		void GenerateType()
-//		{
-//			if (component == null)
-//			{
-//				type = null;
-//				return;
-//			}
-//
-//			type = component.GetType();
-//
-////			if (typeof(Collider2D).IsAssignableFrom(type))
-////			{
-////				type = typeof(Collider2D);
-////			}
-////			else if (typeof(Collider).IsAssignableFrom(type))
-////			{
-////				type = typeof(Collider);
-////			}
-//
-//			Transform transform = component.transform;
-//			siblings = new int[0];
-//			path = HelperFramework.GetGameObjectPath(transform, ref siblings);
-//			name = transform.parent == null ? "self" : path;
-//			hash = name.GetHashCode();
-//		}
-//		#endif
-//
-//	}
 
 	#if UNITY_EDITOR
 	public static class PostHandleBlueprintTags
@@ -400,13 +280,24 @@ namespace Pixeye.Framework
 			foreach (var guid in guids1)
 			{
 				var name = Path.GetFileNameWithoutExtension(AssetDatabase.GUIDToAssetPath(guid));
+        
+				var strName = name.Split(' ')[1];
+				gen.Append($"		public static bpt {strName};{Environment.NewLine}");
+			}
+
+			templateContents = templateContents.Replace("##CODEGEN1##", gen.ToString());
+
+			gen.Clear();
+
+			foreach (var guid in guids1)
+			{
+				var name = Path.GetFileNameWithoutExtension(AssetDatabase.GUIDToAssetPath(guid));
 
 				var strName = name.Split(' ')[1];
-				gen.Append($"public static bpt {strName} = \"{name}\";{Environment.NewLine}");
-			} 
+				gen.Append($"		{strName}= \"{name}\";{Environment.NewLine}");
+			}
 
-			templateContents = templateContents.Replace("##CODEGEN##", gen.ToString());
-
+			templateContents = templateContents.Replace("##CODEGEN2##", gen.ToString());
 			var encoding = new UTF8Encoding(true, false);
 
 			using (var tc = new StreamWriter(filePath, false, encoding))
@@ -451,19 +342,7 @@ namespace Pixeye.Framework
 		internal List<IComponent> onCreate = new List<IComponent>();
 		internal List<IComponent> onLater = new List<IComponent>();
 
-
-	internal static BlueprintEntity Get(in bpt blueprint)
-		{
-			if (!storage.TryGetValue(blueprint.hash, out BlueprintEntity bp))
-			{
-				bp = Box.Get<BlueprintEntity>(blueprint.id);
-				storage.Add(blueprint.hash, bp);
-			}
-
-			return bp;
-		}
-
-
+ 
 		[FoldoutGroup("Setup")]
 		[TagFilter(typeof(ITag))]
 		public int[] tags = new int[0];

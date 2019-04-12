@@ -34,12 +34,13 @@ namespace Pixeye.Framework
 	{
 
 		public static int entitiesCount;
-		internal static int counter = SettingsEngine.SizeEntities;
 
+		internal static int counter = SettingsEngine.SizeEntities;
 		internal static readonly int self = "self".GetHashCode();
 
 		internal static BitArray isAlive = new BitArray(SettingsEngine.SizeEntities);
 		internal static BitArray isPooled = new BitArray(SettingsEngine.SizeEntities);
+	
 		public static Transform[] transforms = new Transform[SettingsEngine.SizeEntities];
 
 		internal static int[,] generations = new int[SettingsEngine.SizeEntities, SettingsEngine.SizeGenerations];

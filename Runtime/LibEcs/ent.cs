@@ -113,7 +113,7 @@ namespace Pixeye.Framework
 			return new ent(id, age);
 		}
 
-		public static ent CreateFor(in bpt blueprintKey, bool pooled = false)
+		public static ent CreateFor(in bpt blueprint, bool pooled = false)
 		{
 			int id;
 			byte age = 0;
@@ -134,20 +134,20 @@ namespace Pixeye.Framework
 			else
 				id = lastID++;
 
-			var blueprint = BlueprintEntity.Get(blueprintKey);
+			var bpAsset = blueprint.Get();
 
-			if (blueprint.model)
+			if (bpAsset.model)
 			{
 				EntityCore.SetupWithTransform(id, pooled);
-				if (pooled) EntityCore.transforms[id] = blueprint.Spawn(Pool.Entities, blueprint.model);
-				else EntityCore.transforms[id] = blueprint.Spawn(blueprint.model);
+				if (pooled) EntityCore.transforms[id] = bpAsset.Spawn(Pool.Entities, bpAsset.model);
+				else EntityCore.transforms[id] = bpAsset.Spawn(bpAsset.model);
 			}
 			else
 				EntityCore.Setup(id);
 
-			for (int i = 0; i < blueprint.lenOnCreate; i++)
+			for (int i = 0; i < bpAsset.lenOnCreate; i++)
 			{
-				var component = blueprint.onCreate[i];
+				var component = bpAsset.onCreate[i];
 
 				var hash = component.GetType().GetHashCode();
 				var storage = Storage.allDict[hash];
@@ -155,18 +155,18 @@ namespace Pixeye.Framework
 				EntityCore.components[id].Add(storage.GetComponentID());
 			}
 
-			for (int i = 0; i < blueprint.lenAddLater; i++)
+			for (int i = 0; i < bpAsset.lenAddLater; i++)
 			{
-				var component = blueprint.onLater[i];
+				var component = bpAsset.onLater[i];
 				component.Copy(id);
 			}
 
 			var entity = new ent(id, age);
 
-			if (blueprint.tags.Length > 0)
-				entity.AddLater(blueprint.tags);
+			if (bpAsset.tags.Length > 0)
+				entity.AddLater(bpAsset.tags);
 
-			if (blueprint.refType == RefType.EntityMono)
+			if (bpAsset.refType == RefType.EntityMono)
 				entity.AddMonoReference();
 
 			EntityCore.Delayed.Set(entity, 0, EntityCore.Delayed.Action.Activate);
