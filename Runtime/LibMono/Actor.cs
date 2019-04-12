@@ -47,17 +47,17 @@ namespace Pixeye.Framework
 		{
 			if (Starter.initialized == false) return;
 
-			CoreEntity.isAlive[entity.id] = true;
+			EntityCore.isAlive[entity.id] = true;
 
-			CoreEntity.Delayed.Set(entity, 0, CoreEntity.Delayed.Action.Activate);
+			EntityCore.Delayed.Set(entity, 0, EntityCore.Delayed.Action.Activate);
 		}
 
 		protected virtual  void OnDisable()
 		{
-			if (!CoreEntity.isAlive[entity.id]) return;
+			if (!EntityCore.isAlive[entity.id]) return;
 
-			CoreEntity.isAlive[entity.id] = false;
-			CoreEntity.Delayed.Set(entity, 0, CoreEntity.Delayed.Action.Deactivate);
+			EntityCore.isAlive[entity.id] = false;
+			EntityCore.Delayed.Set(entity, 0, EntityCore.Delayed.Action.Deactivate);
 		}
 
 	
@@ -82,7 +82,7 @@ namespace Pixeye.Framework
 		public void AwakeAfterStarter()
 		{
 			Generate();
-			CoreEntity.Delayed.Set(entity, 0, CoreEntity.Delayed.Action.Activate);
+			EntityCore.Delayed.Set(entity, 0, EntityCore.Delayed.Action.Activate);
 		}
 
 		protected virtual void Setup()
@@ -101,13 +101,13 @@ namespace Pixeye.Framework
 
 		protected T Add<T>() where T : IComponent, new()
 		{
-			CoreEntity.components[entity.id].Add(Storage<T>.componentID);
+			EntityCore.components[entity.id].Add(Storage<T>.componentID);
 			return entity.AddLater<T>();
 		}
 
 		protected void Add<T>(T component) where T : IComponent, new()
 		{
-			CoreEntity.components[entity.id].Add(Storage<T>.componentID);
+			EntityCore.components[entity.id].Add(Storage<T>.componentID);
 			entity.AddLater(component);
 		}
 
@@ -133,7 +133,7 @@ namespace Pixeye.Framework
 				var hash = component.GetType().GetHashCode();
 				var storage = Storage.allDict[hash];
 				component.Copy(entityID);
-				CoreEntity.components[entityID].Add(storage.GetComponentID());
+				EntityCore.components[entityID].Add(storage.GetComponentID());
 			}
 
 			for (int i = 0; i < blueprint.lenAddLater; i++)

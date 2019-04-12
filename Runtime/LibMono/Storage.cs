@@ -31,7 +31,7 @@ namespace Pixeye.Framework
 
 		internal abstract int GetComponentID();
 
-		internal GroupCore[] groupsOfInterest = new GroupCore[8];
+		internal GroupCore[] GroupCoreOfInterest = new GroupCore[8];
 		internal int lenOfGroups;
 
 		//	public abstract void AddNoCheckAbstract(int entityID);
@@ -65,12 +65,12 @@ namespace Pixeye.Framework
 
 		public T this[int index] => components[index];
 
-		public void Add(GroupCore group)
+		public void Add(GroupCore groupCore)
 		{
-			if (lenOfGroups == groupsOfInterest.Length)
-				Array.Resize(ref groupsOfInterest, lenOfGroups << 1);
+			if (lenOfGroups == GroupCoreOfInterest.Length)
+				Array.Resize(ref GroupCoreOfInterest, lenOfGroups << 1);
 
-			groupsOfInterest[lenOfGroups++] = group;
+			GroupCoreOfInterest[lenOfGroups++] = groupCore;
 		}
 
 		public Storage()
@@ -106,12 +106,12 @@ namespace Pixeye.Framework
 
 		public override void RemoveNoCheck(int entityID)
 		{
-			CoreEntity.generations[entityID, generation] &= ~componentMask;
+			EntityCore.generations[entityID, generation] &= ~componentMask;
 		}
 
 		public T TryGet(int entityID)
 		{
-			return (CoreEntity.generations[entityID, generation] & componentMask) == componentMask ? components[entityID] : default;
+			return (EntityCore.generations[entityID, generation] & componentMask) == componentMask ? components[entityID] : default;
 		}
 
 		public T GetFromStorage(int entityID)

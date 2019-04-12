@@ -187,7 +187,7 @@ namespace Pixeye.Framework
 		/// <param name="e"></param>
 		public static void ForceDeploy(this in ent e)
 		{
-			CoreEntity.Delayed.Set(e, 0, CoreEntity.Delayed.Action.Activate);
+			EntityCore.Delayed.Set(e, 0, EntityCore.Delayed.Action.Activate);
 		}
 
 		#endregion

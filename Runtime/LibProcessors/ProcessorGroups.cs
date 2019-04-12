@@ -16,19 +16,19 @@ namespace Pixeye.Framework
 
 		internal static GroupCore SetupGroup(Type groupType, Composition filter)
 		{
-			GroupCore group;
+			GroupCore groupCore;
 
-			if (container.TryGet(groupType, filter, out group))
-				return group;
+			if (container.TryGet(groupType, filter, out groupCore))
+				return groupCore;
 
-			group = Activator.CreateInstance(groupType, true) as GroupCore;
-			group.composition = filter;
-			group.Initialize();
+			groupCore = Activator.CreateInstance(groupType, true) as GroupCore;
+			groupCore.composition = filter;
+			groupCore.Initialize();
 
-			container.Add(group);
-			HelperTags.Add(group);
+			container.Add(groupCore);
+			HelperTags.Add(groupCore);
 
-			return group;
+			return groupCore;
 		}
 
 		public static void Dispose()

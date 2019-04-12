@@ -57,7 +57,9 @@ namespace Pixeye.Framework
 			var pointer = len++;
 			var indexLast = pointer;
 			var index = pointer - 1;
-			if (index > 0)
+  
+			if (index >= 0)
+			{
 				if (tagID < tagsID[index])
 				{
 					var startIndex = 0;
@@ -65,13 +67,13 @@ namespace Pixeye.Framework
 
 					while (endIndex > startIndex)
 					{
-						var area = endIndex - startIndex;
-						var middleIndex = startIndex + area / 2;
+						var middleIndex = (endIndex + startIndex) / 2;
 						var middleValue = tagsID[middleIndex];
 
 						if (middleValue == tagID)
 						{
 							pointer = middleIndex;
+
 							break;
 						}
 
@@ -87,6 +89,7 @@ namespace Pixeye.Framework
 						}
 					}
 				}
+			}
 
 			for (int i = indexLast; i >= pointer; i--)
 			{

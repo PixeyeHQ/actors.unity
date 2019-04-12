@@ -32,16 +32,16 @@ namespace Pixeye.Framework
 				return;
 			}
 
-			CoreEntity.isAlive[entity.id] = true;
-			CoreEntity.Delayed.Set(entity, 0, CoreEntity.Delayed.Action.Activate);
+			EntityCore.isAlive[entity.id] = true;
+			EntityCore.Delayed.Set(entity, 0, EntityCore.Delayed.Action.Activate);
 		}
 
 		public virtual void OnDisable()
 		{
-			if (!CoreEntity.isAlive[entity.id]) return;
+			if (!EntityCore.isAlive[entity.id]) return;
 
-			CoreEntity.isAlive[entity.id] = false;
-			CoreEntity.Delayed.Set(entity, 0, CoreEntity.Delayed.Action.Deactivate);
+			EntityCore.isAlive[entity.id] = false;
+			EntityCore.Delayed.Set(entity, 0, EntityCore.Delayed.Action.Deactivate);
 		}
 
 		public void Release()

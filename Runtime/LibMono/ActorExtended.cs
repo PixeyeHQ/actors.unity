@@ -11,18 +11,18 @@ namespace Pixeye.Framework
 		{
 			if (Starter.initialized == false) return;
 
-			CoreEntity.isAlive[entity.id] = true;
-			CoreEntity.Delayed.Set(entity, 0, CoreEntity.Delayed.Action.Activate);
+			EntityCore.isAlive[entity.id] = true;
+			EntityCore.Delayed.Set(entity, 0, EntityCore.Delayed.Action.Activate);
 			ProcessorUpdate.Default.Add(this);
 			ProcessorSignals.Default.Add(this);
 		}
 
 		protected override void OnDisable()
 		{
-			if (!CoreEntity.isAlive[entity.id]) return;
+			if (!EntityCore.isAlive[entity.id]) return;
 
-			CoreEntity.isAlive[entity] = false;
-			CoreEntity.Delayed.Set(entity, 0, CoreEntity.Delayed.Action.Deactivate);
+			EntityCore.isAlive[entity] = false;
+			EntityCore.Delayed.Set(entity, 0, EntityCore.Delayed.Action.Deactivate);
 			ProcessorUpdate.Default.Remove(this);
 			ProcessorSignals.Default.Remove(this);
 		}

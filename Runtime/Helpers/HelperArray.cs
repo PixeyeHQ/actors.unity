@@ -69,7 +69,7 @@ namespace Pixeye.Framework
 				if (entries[middle] < value)
 					left = middle + 1;
 				else
-					right = middle;
+					right = middle -1 ;
 			}
 
 			if (left > len) return -1;
@@ -95,7 +95,7 @@ namespace Pixeye.Framework
 				if (entries[middle].id < value)
 					left = middle + 1;
 				else
-					right = middle;
+					right = middle - 1;
 			}
 
 			if (left > len) return -1;

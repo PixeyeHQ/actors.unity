@@ -13,22 +13,29 @@ using Object = UnityEngine.Object;
 namespace Pixeye.Framework
 {
 	[StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Unicode)]
-	public struct EntityOperation
+	public readonly struct EntityOperation
 	{
 
-		public ent entity;
-		public int arg;
-		public CoreEntity.Delayed.Action action;
+		public readonly ent entity;
+		public readonly int arg;
+		public readonly EntityCore.Delayed.Action action;
+
+		public EntityOperation(in ent entity, int arg, EntityCore.Delayed.Action action)
+		{
+			this.entity = entity;
+			this.arg = arg;
+			this.action = action;
+		}
 
 	}
 
 	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
-	public static class CoreEntity
+	public static class EntityCore
 	{
 
 		public static int entitiesCount;
 		internal static int counter = SettingsEngine.SizeEntities;
-  
+
 		internal static readonly int self = "self".GetHashCode();
 
 		internal static BitArray isAlive = new BitArray(SettingsEngine.SizeEntities);
@@ -96,14 +103,14 @@ namespace Pixeye.Framework
 
 		internal static void Add(in this ent entity, Transform instance)
 		{
-			ref var transforms = ref CoreEntity.transforms;
+			ref var transforms = ref EntityCore.transforms;
 			var entityID = entity.id;
 			if (entityID >= transforms.Length)
 			{
 				var l = entityID << 1;
 				Array.Resize(ref transforms, l);
 			}
-	 
+
 			transforms[entityID] = instance;
 		}
 
@@ -149,7 +156,6 @@ namespace Pixeye.Framework
 
 		public static T Add<T>(in this ent entity) where T : IComponent, new()
 		{
-			 
 			var storage = Storage<T>.Instance;
 
 			var entityID = entity.id;
@@ -302,7 +308,6 @@ namespace Pixeye.Framework
 
 		#endregion
 
-	 
 		public static class Delayed
 		{
 
@@ -315,7 +320,7 @@ namespace Pixeye.Framework
 				Kill,
 				KillFinalize,
 				Activate,
-				Deactivate 
+				Deactivate
 
 			}
 
@@ -334,9 +339,7 @@ namespace Pixeye.Framework
 				var pointer = len++;
 
 				ref var operation = ref operations[pointer];
-				operation.action = action;
-				operation.entity = entity;
-				operation.arg = arg;
+				operation = new EntityOperation(entity, arg, action);
 			}
 			internal static void Set(in ent entity, Action action)
 			{
@@ -349,9 +352,7 @@ namespace Pixeye.Framework
 				var pointer = len++;
 
 				ref var operation = ref operations[pointer];
-				operation.action = action;
-				operation.entity = entity;
-				operation.arg = 0;
+				operation = new EntityOperation(entity, 0, action);
 			}
 
 		}

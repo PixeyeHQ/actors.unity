@@ -21,7 +21,7 @@ namespace Pixeye.Framework
 		public readonly int id;
 		internal readonly byte age;
 
-		public ref readonly Transform transform => ref CoreEntity.transforms[id];
+		public ref readonly Transform transform => ref EntityCore.transforms[id];
 
 		#region ENTITY
 
@@ -51,7 +51,7 @@ namespace Pixeye.Framework
 			else
 				id = lastID++;
 
-			CoreEntity.Setup(id);
+			EntityCore.Setup(id);
 
 			return new ent(id, age);
 		}
@@ -77,9 +77,9 @@ namespace Pixeye.Framework
 			else
 				id = lastID++;
 
-			CoreEntity.SetupWithTransform(id, pooled);
-			if (pooled) CoreEntity.transforms[id] = id.Spawn(Pool.Entities, prefabID);
-			else CoreEntity.transforms[id] = id.Spawn(prefabID);
+			EntityCore.SetupWithTransform(id, pooled);
+			if (pooled) EntityCore.transforms[id] = id.Spawn(Pool.Entities, prefabID);
+			else EntityCore.transforms[id] = id.Spawn(prefabID);
 
 			return new ent(id, age);
 		}
@@ -105,9 +105,9 @@ namespace Pixeye.Framework
 			else
 				id = lastID++;
 
-			CoreEntity.SetupWithTransform(id, pooled);
-			if (pooled) CoreEntity.transforms[id] = id.Spawn(Pool.Entities, prefab);
-			else CoreEntity.transforms[id] = id.Spawn(prefab);
+			EntityCore.SetupWithTransform(id, pooled);
+			if (pooled) EntityCore.transforms[id] = id.Spawn(Pool.Entities, prefab);
+			else EntityCore.transforms[id] = id.Spawn(prefab);
 
 			return new ent(id, age);
 		}
@@ -137,12 +137,12 @@ namespace Pixeye.Framework
 
 			if (blueprint.model)
 			{
-				CoreEntity.SetupWithTransform(id, pooled);
-				if (pooled) CoreEntity.transforms[id] = blueprint.Spawn(Pool.Entities, blueprint.model);
-				else CoreEntity.transforms[id] = blueprint.Spawn(blueprint.model);
+				EntityCore.SetupWithTransform(id, pooled);
+				if (pooled) EntityCore.transforms[id] = blueprint.Spawn(Pool.Entities, blueprint.model);
+				else EntityCore.transforms[id] = blueprint.Spawn(blueprint.model);
 			}
 			else
-				CoreEntity.Setup(id);
+				EntityCore.Setup(id);
 
 			for (int i = 0; i < blueprint.lenOnCreate; i++)
 			{
@@ -151,7 +151,7 @@ namespace Pixeye.Framework
 				var hash = component.GetType().GetHashCode();
 				var storage = Storage.allDict[hash];
 				component.Copy(id);
-				CoreEntity.components[id].Add(storage.GetComponentID());
+				EntityCore.components[id].Add(storage.GetComponentID());
 			}
 
 			for (int i = 0; i < blueprint.lenAddLater; i++)
@@ -168,7 +168,7 @@ namespace Pixeye.Framework
 			if (blueprint.refType == RefType.EntityMono)
 				entity.AddMonoReference();
 
-			CoreEntity.Delayed.Set(entity, 0, CoreEntity.Delayed.Action.Activate);
+			EntityCore.Delayed.Set(entity, 0, EntityCore.Delayed.Action.Activate);
 
 			return entity;
 		}
@@ -230,14 +230,14 @@ namespace Pixeye.Framework
 		public bool Has<T>() where T : class, IComponent, new()
 		{
 			var id = Storage<T>.componentMask;
-			return (CoreEntity.generations[id, Storage<T>.generation] & id) == id;
+			return (EntityCore.generations[id, Storage<T>.generation] & id) == id;
 		}
 
 		public void Release()
 		{
-			CoreEntity.isAlive[id] = false;
-			CoreEntity.Delayed.Set(this, 0, CoreEntity.Delayed.Action.Kill);
-			CoreEntity.entitiesCount--;
+			EntityCore.isAlive[id] = false;
+			EntityCore.Delayed.Set(this, 0, EntityCore.Delayed.Action.Kill);
+			EntityCore.entitiesCount--;
 		}
 
 		public bool Equals(ent other)
@@ -247,7 +247,7 @@ namespace Pixeye.Framework
 
 		public bool Exist()
 		{
-			return CoreEntity.isAlive[id];
+			return EntityCore.isAlive[id];
 		}
 
 		#endregion

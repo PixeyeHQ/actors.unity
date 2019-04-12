@@ -81,9 +81,12 @@ namespace Pixeye.Framework
 					}
 				}
 			}
-
+ 
 			for (int i = indexLast; i >= pointer; i--)
+			{
+			 
 				entities[i + 1] = entities[i];
+			}
 
 			entities[pointer] = entity;
 
@@ -92,8 +95,9 @@ namespace Pixeye.Framework
 
 		internal void TryRemove(int entityID)
 		{
-			var i = HelperArray.BinarySearch(ref entities, entityID, 0, length);
-
+			 var i = HelperArray.BinarySearch(ref entities, entityID, 0, length);
+ 
+			
 			if (i == -1) return;
 
 			if (onRemove != null)

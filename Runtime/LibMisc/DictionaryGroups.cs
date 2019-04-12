@@ -13,7 +13,7 @@ namespace Pixeye.Framework
 		internal GroupCore[] storage = new GroupCore[3];
 		internal int len;
 
-		internal void Add(GroupCore group)
+		internal void Add(GroupCore groupCore)
 		{
 			if (len == storage.Length)
 			{
@@ -21,21 +21,21 @@ namespace Pixeye.Framework
 				Array.Resize(ref storage, l);
 			}
 
-			storage[len++] = group;
+			storage[len++] = groupCore;
 		}
 
-		internal bool Contain(GroupCore group)
+		internal bool Contain(GroupCore groupCore)
 		{
 			for (int i = 0; i < len; i++)
 			{
 				var groupAdded = storage[i];
-				if (groupAdded.Equals(group)) return true;
+				if (groupAdded.Equals(groupCore)) return true;
 			}
 
 			return false;
 		}
 
-		internal bool TryGet(Type t, Composition composition, out GroupCore group)
+		internal bool TryGet(Type t, Composition composition, out GroupCore groupCore)
 		{
 			for (int i = 0; i < len; i++)
 			{
@@ -45,11 +45,11 @@ namespace Pixeye.Framework
 
 				if (t != instanceType) continue;
 				if (!instanceComposition.Equals(composition)) continue;
-				group = instance;
+				groupCore = instance;
 				return true;
 			}
 
-			group = default;
+			groupCore = default;
 			return false;
 		}
 
