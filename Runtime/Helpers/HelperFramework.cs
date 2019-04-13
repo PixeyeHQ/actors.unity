@@ -706,6 +706,15 @@ namespace Pixeye.Framework
 
 			return path;
 		}
+
+		internal static MonoEntity AddGetMono(this Transform co)
+		{
+			var c = co.GetComponent<MonoEntity>();
+			if ((object) c == null)
+				c = co.gameObject.AddComponent<MonoEntity>();
+			return c;
+		}
+
 		public static T AddGet<T>(this GameObject co) where T : Component
 		{
 			var c = co.GetComponent<T>();

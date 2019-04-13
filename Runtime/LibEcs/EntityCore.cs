@@ -95,7 +95,7 @@ namespace Pixeye.Framework
 		public static void AddMonoReference(in this ent entity)
 		{
 			var entityID = entity.id;
-			var mono = transforms[entityID].AddGet<MonoEntity>();
+			var mono = transforms[entityID].AddGetMono();
 			#if UNITY_EDITOR
 			mono._entity = entityID;
 			#endif

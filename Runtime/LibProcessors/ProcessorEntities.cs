@@ -2,6 +2,7 @@
 // Contacts : Pix - info@pixeye.games
 //     Date : 3/7/2019 
 
+using System;
 using Unity.IL2CPP.CompilerServices;
 using UnityEngine;
 
@@ -10,6 +11,19 @@ namespace Pixeye.Framework
 	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
 	internal sealed class ProcessorEntities : Processor, ITick
 	{
+
+		private GroupCore[] groupsToClear = new GroupCore[100];
+		private int groupsToClearLen = 0;
+
+		bool CheckIfExists(GroupCore group)
+		{
+			for (int i = 0; i < groupsToClearLen; i++)
+			{
+				if (groupsToClear[i].id == group.id) return true;
+			}
+
+			return false;
+		}
 
 		public void Tick()
 		{
@@ -20,7 +34,7 @@ namespace Pixeye.Framework
 			for (int i = 0; i < EntityCore.Delayed.len; i++)
 			{
 				ref var operation = ref EntityCore.Delayed.operations[i];
-			 
+
 				var entityID = operation.entity.id;
 
 				var components = Storage.all[operation.arg];
@@ -66,24 +80,62 @@ namespace Pixeye.Framework
 
 					case EntityCore.Delayed.Action.Kill:
 
+//						ref var componentsToKill = ref EntityCore.components[entityID];
+//						var length = componentsToKill.Length;
+//						Profile.StartProfile("RELEASE");
+//						for (int j = 0; j < length; j++)
+//						{
+//							var c = componentsToKill.GetComponent(j);
+//							var generationRemoveOnKill = Storage.generations[c];
+//							var maskRemoveOnKill = Storage.masks[c];
+//
+//							EntityCore.generations[entityID, generationRemoveOnKill] &= ~maskRemoveOnKill;
+//
+//							var storages = Storage.all[c];
+//
+//							for (int l = 0; l < storages.lenOfGroups; l++)
+//							{
+//								var group = storages.GroupCoreOfInterest[l];
+//						 
+//								group.TryRemove(entityID);
+//							}
+//						}
+//						Profile.EndProfile("RELEASE");
+//						EntityCore.components[entityID].Clear();
+//						EntityCore.Delayed.Set(operation.entity, 0, EntityCore.Delayed.Action.KillFinalize);
+						/// todo: continue researching
 						ref var componentsToKill = ref EntityCore.components[entityID];
-						var length = componentsToKill.length;
+						var length = componentsToKill.Length;
 
 						for (int j = 0; j < length; j++)
 						{
-							var c = componentsToKill.GetComponent(j);
-							var generationRemoveOnKill = Storage.generations[c];
-							var maskRemoveOnKill = Storage.masks[c];
+							var componentOnKillId = componentsToKill.GetComponent(j);
+							var generationRemoveOnKill = Storage.generations[componentOnKillId];
+							var maskRemoveOnKill = Storage.masks[componentOnKillId];
 
 							EntityCore.generations[entityID, generationRemoveOnKill] &= ~maskRemoveOnKill;
-							var storages = Storage.all[c];
 
-							for (int l = 0; l < storages.lenOfGroups; l++)
+							var storageOnKill = Storage.all[componentOnKillId];
+
+							for (int l = 0; l < storageOnKill.lenOfGroups; l++)
 							{
-								var group = storages.GroupCoreOfInterest[l];
-								group.TryRemove(entityID);
+								var group = storageOnKill.GroupCoreOfInterest[l];
+								if (!CheckIfExists(group))
+								{
+									if (group.composition.OverlapComponents(componentsToKill))
+									{
+										group.TryRemove(entityID);
+									}
+
+									if (groupsToClearLen == groupsToClear.Length)
+										Array.Resize(ref groupsToClear, groupsToClearLen << 1);
+
+									groupsToClear[groupsToClearLen++] = group;
+								}
 							}
 						}
+
+						groupsToClearLen = 0;
 
 						EntityCore.components[entityID].Clear();
 						EntityCore.Delayed.Set(operation.entity, 0, EntityCore.Delayed.Action.KillFinalize);
@@ -171,7 +223,7 @@ namespace Pixeye.Framework
 					case EntityCore.Delayed.Action.Activate:
 
 						ref var componentsToActivate = ref EntityCore.components[entityID];
-						var lenToActivate = componentsToActivate.length;
+						var lenToActivate = componentsToActivate.Length;
 
 						for (int j = 0; j < lenToActivate; j++)
 						{
@@ -214,7 +266,7 @@ namespace Pixeye.Framework
 					case EntityCore.Delayed.Action.Deactivate:
 
 						ref var componentsToDeactivate = ref EntityCore.components[entityID];
-						var lenToDeactivate = componentsToDeactivate.length;
+						var lenToDeactivate = componentsToDeactivate.Length;
 
 						for (int j = 0; j < lenToDeactivate; j++)
 						{

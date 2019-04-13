@@ -149,8 +149,8 @@ namespace Pixeye.Framework
 			{
 				var component = bpAsset.onCreate[i];
 
-				var hash = component.GetType().GetHashCode();
-				var storage = Storage.allDict[hash];
+			 
+				var storage = Storage.allDict[bpAsset.hashesOnCreate[i]];
 				component.Copy(id);
 				EntityCore.components[id].Add(storage.GetComponentID());
 			}

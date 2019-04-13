@@ -27,7 +27,7 @@ namespace Pixeye.Framework
 	{
 
 		[ShowInInspector, Title("Debug")]
-		public static Dictionary<int, BlueprintEntity> storage = new Dictionary<int, BlueprintEntity>(new FastComparable());
+		public static Dictionary<int, BlueprintEntity> storage = new Dictionary<int, BlueprintEntity>(FastComparable.Default);
 
 		[Title("Setup")]
 		public RefType refType = RefType.Entity;
@@ -46,14 +46,15 @@ namespace Pixeye.Framework
 
 		[SerializeField, HideInInspector]
 		internal int lenAddLater;
- 
-		internal Dictionary<int, IComponent> components = new Dictionary<int, IComponent>(new FastComparable());
+
+		internal Dictionary<int, IComponent> components = new Dictionary<int, IComponent>(FastComparable.Default);
 
 		[SerializeField, TagFilter(typeof(ITag))]
 		internal int[] tags;
 
  
-
+		internal int[] hashesOnCreate = new int[0];
+	 
 		internal IEnumerable<Type> GetFilteredTypeList()
 		{
 			var q = AppDomain.CurrentDomain.GetAssemblies().Where(x => x != Assembly.GetExecutingAssembly());
@@ -199,19 +200,23 @@ namespace Pixeye.Framework
 		void OnEnable()
 		{
 			components.Clear();
-
-			//storage.Add(name.GetHashCode(), this);
+			hashesOnCreate = new int[lenOnCreate];
+		 
 
 			for (int i = 0; i < lenOnCreate; i++)
 			{
 				var c = onCreate[i];
-				components.Add(c.GetType().GetHashCode(), c);
+				var hash = c.GetType().GetHashCode();
+				components.Add(hash, c);
+				hashesOnCreate[i] = hash;
 			}
 
 			for (int i = 0; i < lenAddLater; i++)
 			{
 				var c = onLater[i];
+			//	var hash = c.GetType().GetHashCode();
 				components.Add(c.GetType().GetHashCode(), c);
+				//hashesonLater[i] = hash;
 			}
 		}
 
@@ -280,7 +285,7 @@ namespace Pixeye.Framework
 			foreach (var guid in guids1)
 			{
 				var name = Path.GetFileNameWithoutExtension(AssetDatabase.GUIDToAssetPath(guid));
-        
+
 				var strName = name.Split(' ')[1];
 				gen.Append($"		public static bpt {strName};{Environment.NewLine}");
 			}
@@ -342,6 +347,7 @@ namespace Pixeye.Framework
 		internal List<IComponent> onCreate = new List<IComponent>();
 		internal List<IComponent> onLater = new List<IComponent>();
 
+    internal int[] hashesOnCreate = new int[0];
  
 		[FoldoutGroup("Setup")]
 		[TagFilter(typeof(ITag))]
@@ -349,13 +355,18 @@ namespace Pixeye.Framework
 
 		void OnEnable()
 		{
+
+     	//hashesOnCreate = new int[lenOnCreate];
+    
+       
+     
 			lenOnCreate = 0;
 			lenAddLater = 0;
 			tags = new int[0];
-			if (name != string.Empty)
-			{
-				storage.Add(name.GetHashCode(), this);
-			}
+//			if (name != string.Empty)
+//			{
+//				storage.Add(name.GetHashCode(), this);
+//			}
 
 			Setup();
 		}
@@ -400,7 +411,15 @@ namespace Pixeye.Framework
 		{
 			var instance = new T();
 			onCreate.Add(instance);
-			lenOnCreate++;
+
+
+			if (lenOnCreate==hashesOnCreate.Length)
+				Array.Resize(ref hashesOnCreate, lenOnCreate<<1);
+			
+			hashesOnCreate[lenOnCreate++] = typeof(T).GetHashCode();
+			
+			
+			 
 			return instance;
 		}
 		/// <summary>
@@ -418,7 +437,10 @@ namespace Pixeye.Framework
 		public T Add<T>(T component) where T : class, IComponent, new()
 		{
 			onCreate.Add(component);
-			lenOnCreate++;
+			if (lenOnCreate==hashesOnCreate.Length)
+				Array.Resize(ref hashesOnCreate, lenOnCreate<<1);
+			
+			hashesOnCreate[lenOnCreate++] = typeof(T).GetHashCode();
 			return component;
 		}
 

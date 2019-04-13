@@ -24,14 +24,20 @@ namespace Pixeye.Framework
 
 		[FoldoutGroup("Settings")]
 		public int sizeEntities = 2048;
+		[FoldoutGroup("Settings")]
+		public int sizeComponents = 256;
 
-		
-		
-		
+
+		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+		void PreStart()
+		{
+			SettingsEngine.SizeEntities = sizeEntities;
+			SettingsEngine.SizeComponents = sizeComponents;
+		}
 		
 		void Awake()
 		{
-			SettingsEngine.SizeEntities = sizeEntities;
+		 
 			
 			for (var i = 0; i < pluggables.Count; i++)
 			{

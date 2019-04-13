@@ -13,6 +13,22 @@ namespace Pixeye.Framework
 {
 	internal delegate void CallBackDelete(int i);
 
+	public class GroupCoreComparer : IEqualityComparer<GroupCore>
+	{
+
+		public static GroupCoreComparer Default = new GroupCoreComparer();
+
+		public bool Equals(GroupCore x, GroupCore y)
+		{
+			return y.id == x.id;
+		}
+		public int GetHashCode(GroupCore obj)
+		{
+			return obj.id;
+		}
+
+	}
+
 	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
 	public abstract class GroupCore : IEnumerable, IEquatable<GroupCore>, IDisposable
 	{
@@ -30,7 +46,7 @@ namespace Pixeye.Framework
 
 		private static int idCounter;
 
-		private int id;
+		internal int id;
 		private int indexLast;
 
 		internal void Insert(in ent entity)
@@ -81,10 +97,9 @@ namespace Pixeye.Framework
 					}
 				}
 			}
- 
+
 			for (int i = indexLast; i >= pointer; i--)
 			{
-			 
 				entities[i + 1] = entities[i];
 			}
 
@@ -95,9 +110,8 @@ namespace Pixeye.Framework
 
 		internal void TryRemove(int entityID)
 		{
-			 var i = HelperArray.BinarySearch(ref entities, entityID, 0, length);
- 
-			
+			var i = HelperArray.BinarySearch(ref entities, entityID, 0, length);
+
 			if (i == -1) return;
 
 			if (onRemove != null)
@@ -141,19 +155,6 @@ namespace Pixeye.Framework
 		}
 
 		public abstract void Initialize();
-
-		void RemoveAt(int i)
-		{
-			if (onRemove != null)
-				onRemove(entities[i]);
-
-			var l = length--;
-			indexLast--;
-			var next = i + 1;
-			var size = l - i;
-
-			Array.Copy(entities, next, entities, i, size);
-		}
 
 		public void Dispose()
 		{
@@ -254,6 +255,8 @@ namespace Pixeye.Framework
 
 			composition.generations[0] = Storage<T>.generation;
 			composition.ids[0] = Storage<T>.componentMask;
+
+			composition.components[Storage<T>.componentID] = true;
 		}
 
 	}
@@ -273,9 +276,11 @@ namespace Pixeye.Framework
 
 			composition.generations[0] = Storage<T>.generation;
 			composition.ids[0] = Storage<T>.componentMask;
+			composition.components[Storage<T>.componentID] = true;
 
 			composition.generations[1] = Storage<Y>.generation;
 			composition.ids[1] = Storage<Y>.componentMask;
+			composition.components[Storage<Y>.componentID] = true;
 		}
 
 	}
@@ -296,12 +301,15 @@ namespace Pixeye.Framework
 
 			composition.generations[0] = Storage<T>.generation;
 			composition.ids[0] = Storage<T>.componentMask;
+			composition.components[Storage<T>.componentID] = true;
 
 			composition.generations[1] = Storage<Y>.generation;
 			composition.ids[1] = Storage<Y>.componentMask;
+			composition.components[Storage<Y>.componentID] = true;
 
 			composition.generations[2] = Storage<U>.generation;
 			composition.ids[2] = Storage<U>.componentMask;
+			composition.components[Storage<U>.componentID] = true;
 		}
 
 	}
@@ -326,15 +334,19 @@ namespace Pixeye.Framework
 
 			composition.generations[0] = Storage<T>.generation;
 			composition.ids[0] = Storage<T>.componentMask;
+			composition.components[Storage<T>.componentID] = true;
 
 			composition.generations[1] = Storage<Y>.generation;
 			composition.ids[1] = Storage<Y>.componentMask;
+			composition.components[Storage<Y>.componentID] = true;
 
 			composition.generations[2] = Storage<U>.generation;
 			composition.ids[2] = Storage<U>.componentMask;
+			composition.components[Storage<U>.componentID] = true;
 
 			composition.generations[3] = Storage<I>.generation;
 			composition.ids[3] = Storage<I>.componentMask;
+			composition.components[Storage<I>.componentID] = true;
 		}
 
 	}
@@ -400,21 +412,27 @@ namespace Pixeye.Framework
 
 			composition.generations[0] = Storage<T>.generation;
 			composition.ids[0] = Storage<T>.componentMask;
+			composition.components[Storage<T>.componentID] = true;
 
 			composition.generations[1] = Storage<Y>.generation;
 			composition.ids[1] = Storage<Y>.componentMask;
+			composition.components[Storage<Y>.componentID] = true;
 
 			composition.generations[2] = Storage<U>.generation;
 			composition.ids[2] = Storage<U>.componentMask;
+			composition.components[Storage<U>.componentID] = true;
 
 			composition.generations[3] = Storage<I>.generation;
 			composition.ids[3] = Storage<I>.componentMask;
+			composition.components[Storage<I>.componentID] = true;
 
 			composition.generations[4] = Storage<O>.generation;
 			composition.ids[4] = Storage<O>.componentMask;
+			composition.components[Storage<O>.componentID] = true;
 
 			composition.generations[5] = Storage<P>.generation;
 			composition.ids[5] = Storage<P>.componentMask;
+			composition.components[Storage<P>.componentID] = true;
 		}
 
 	}
@@ -445,24 +463,31 @@ namespace Pixeye.Framework
 
 			composition.generations[0] = Storage<T>.generation;
 			composition.ids[0] = Storage<T>.componentMask;
+			composition.components[Storage<T>.componentID] = true;
 
 			composition.generations[1] = Storage<Y>.generation;
 			composition.ids[1] = Storage<Y>.componentMask;
+			composition.components[Storage<Y>.componentID] = true;
 
 			composition.generations[2] = Storage<U>.generation;
 			composition.ids[2] = Storage<U>.componentMask;
+			composition.components[Storage<U>.componentID] = true;
 
 			composition.generations[3] = Storage<I>.generation;
 			composition.ids[3] = Storage<I>.componentMask;
+			composition.components[Storage<I>.componentID] = true;
 
 			composition.generations[4] = Storage<O>.generation;
 			composition.ids[4] = Storage<O>.componentMask;
+			composition.components[Storage<O>.componentID] = true;
 
 			composition.generations[5] = Storage<P>.generation;
 			composition.ids[5] = Storage<P>.componentMask;
+			composition.components[Storage<P>.componentID] = true;
 
 			composition.generations[6] = Storage<A>.generation;
 			composition.ids[6] = Storage<A>.componentMask;
+			composition.components[Storage<A>.componentID] = true;
 		}
 
 	}
@@ -495,27 +520,35 @@ namespace Pixeye.Framework
 
 			composition.generations[0] = Storage<T>.generation;
 			composition.ids[0] = Storage<T>.componentMask;
+			composition.components[Storage<T>.componentID] = true;
 
 			composition.generations[1] = Storage<Y>.generation;
 			composition.ids[1] = Storage<Y>.componentMask;
+			composition.components[Storage<Y>.componentID] = true;
 
 			composition.generations[2] = Storage<U>.generation;
 			composition.ids[2] = Storage<U>.componentMask;
+			composition.components[Storage<U>.componentID] = true;
 
 			composition.generations[3] = Storage<I>.generation;
 			composition.ids[3] = Storage<I>.componentMask;
+			composition.components[Storage<I>.componentID] = true;
 
 			composition.generations[4] = Storage<O>.generation;
 			composition.ids[4] = Storage<O>.componentMask;
+			composition.components[Storage<O>.componentID] = true;
 
 			composition.generations[5] = Storage<P>.generation;
 			composition.ids[5] = Storage<P>.componentMask;
+			composition.components[Storage<P>.componentID] = true;
 
 			composition.generations[6] = Storage<A>.generation;
 			composition.ids[6] = Storage<A>.componentMask;
+			composition.components[Storage<A>.componentID] = true;
 
 			composition.generations[7] = Storage<S>.generation;
 			composition.ids[7] = Storage<S>.componentMask;
+			composition.components[Storage<S>.componentID] = true;
 		}
 
 	}
@@ -549,30 +582,39 @@ namespace Pixeye.Framework
 
 			composition.generations[0] = Storage<T>.generation;
 			composition.ids[0] = Storage<T>.componentMask;
+			composition.components[Storage<T>.componentID] = true;
 
 			composition.generations[1] = Storage<Y>.generation;
 			composition.ids[1] = Storage<Y>.componentMask;
+			composition.components[Storage<Y>.componentID] = true;
 
 			composition.generations[2] = Storage<U>.generation;
 			composition.ids[2] = Storage<U>.componentMask;
+			composition.components[Storage<U>.componentID] = true;
 
 			composition.generations[3] = Storage<I>.generation;
 			composition.ids[3] = Storage<I>.componentMask;
+			composition.components[Storage<I>.componentID] = true;
 
 			composition.generations[4] = Storage<O>.generation;
 			composition.ids[4] = Storage<O>.componentMask;
+			composition.components[Storage<O>.componentID] = true;
 
 			composition.generations[5] = Storage<P>.generation;
 			composition.ids[5] = Storage<P>.componentMask;
+			composition.components[Storage<P>.componentID] = true;
 
 			composition.generations[6] = Storage<A>.generation;
 			composition.ids[6] = Storage<A>.componentMask;
+			composition.components[Storage<A>.componentID] = true;
 
 			composition.generations[7] = Storage<S>.generation;
 			composition.ids[7] = Storage<S>.componentMask;
+			composition.components[Storage<S>.componentID] = true;
 
 			composition.generations[8] = Storage<D>.generation;
 			composition.ids[8] = Storage<D>.componentMask;
+			composition.components[Storage<D>.componentID] = true;
 		}
 
 	}
@@ -607,33 +649,43 @@ namespace Pixeye.Framework
 
 			composition.generations[0] = Storage<T>.generation;
 			composition.ids[0] = Storage<T>.componentMask;
+			composition.components[Storage<T>.componentID] = true;
 
 			composition.generations[1] = Storage<Y>.generation;
 			composition.ids[1] = Storage<Y>.componentMask;
+			composition.components[Storage<Y>.componentID] = true;
 
 			composition.generations[2] = Storage<U>.generation;
 			composition.ids[2] = Storage<U>.componentMask;
+			composition.components[Storage<U>.componentID] = true;
 
 			composition.generations[3] = Storage<I>.generation;
 			composition.ids[3] = Storage<I>.componentMask;
+			composition.components[Storage<I>.componentID] = true;
 
 			composition.generations[4] = Storage<O>.generation;
 			composition.ids[4] = Storage<O>.componentMask;
+			composition.components[Storage<O>.componentID] = true;
 
 			composition.generations[5] = Storage<P>.generation;
 			composition.ids[5] = Storage<P>.componentMask;
+			composition.components[Storage<P>.componentID] = true;
 
 			composition.generations[6] = Storage<A>.generation;
 			composition.ids[6] = Storage<A>.componentMask;
+			composition.components[Storage<A>.componentID] = true;
 
 			composition.generations[7] = Storage<S>.generation;
 			composition.ids[7] = Storage<S>.componentMask;
+			composition.components[Storage<S>.componentID] = true;
 
 			composition.generations[8] = Storage<D>.generation;
 			composition.ids[8] = Storage<D>.componentMask;
+			composition.components[Storage<D>.componentID] = true;
 
 			composition.generations[9] = Storage<F>.generation;
 			composition.ids[9] = Storage<F>.componentMask;
+			composition.components[Storage<F>.componentID] = true;
 		}
 
 	}

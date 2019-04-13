@@ -2,6 +2,9 @@
 //  Contacts : Pixeye - ask@pixeye.games
 
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Unity.IL2CPP.CompilerServices;
 using UnityEngine;
 
@@ -16,6 +19,10 @@ namespace Pixeye.Framework
 
 		internal int[] generations = new int[0];
 		internal int[] ids = new int[0];
+
+		//internal ushort[] components = new ushort[0];
+
+		internal bool[] components = new bool[SettingsEngine.SizeComponents];
 
 		public override bool Equals(object obj)
 		{
@@ -46,13 +53,26 @@ namespace Pixeye.Framework
 			return hc;
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		internal bool OverlapComponents(in BufferComponents entityComponents)
+		{
+			int match = 0;
+			for (int i = 0; i < entityComponents.Length; i++)
+			{
+				if (components[entityComponents.components[i]])
+					match++;
+			}
+
+			return ids.Length == match;
+		}
+
 		internal bool Include(int entityID)
 		{
 			ref var tags = ref EntityCore.tags[entityID];
 			var length = tags.GetLength();
 			if (length == 0) return false;
 			var match = 0;
-		 
+
 			for (int l = 0; l < tagsToInclude.Length; l++)
 			{
 				var tagToInclude = tagsToInclude[l];

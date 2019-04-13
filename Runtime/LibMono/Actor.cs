@@ -54,7 +54,7 @@ namespace Pixeye.Framework
 
 		protected virtual  void OnDisable()
 		{
-			if (!EntityCore.isAlive[entity.id]) return;
+			if (Toolbox.applicationIsQuitting||!EntityCore.isAlive[entity.id]) return;
 
 			EntityCore.isAlive[entity.id] = false;
 			EntityCore.Delayed.Set(entity, 0, EntityCore.Delayed.Action.Deactivate);
@@ -79,7 +79,7 @@ namespace Pixeye.Framework
 			SetupBlueprint();
 		}
 
-		public void AwakeAfterStarter()
+		public virtual void AwakeAfterStarter()
 		{
 			Generate();
 			EntityCore.Delayed.Set(entity, 0, EntityCore.Delayed.Action.Activate);
