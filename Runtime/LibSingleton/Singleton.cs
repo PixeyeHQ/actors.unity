@@ -1,71 +1,74 @@
 using UnityEngine;
 
+ 
+
 public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
 {
-    public static T _instance;
 
-    protected void Initialize()
-    {
-        if (_instance) return;
-        _instance = this as T;
-        DontDestroyOnLoad(_instance);
-    }
+	public static T _instance;
 
- 
-    private static System.Object _lock = new System.Object();
+	protected void Initialize()
+	{
+		if (_instance) return;
+		_instance = this as T;
+		DontDestroyOnLoad(_instance);
+	}
 
-    public static T Instance
-    {
-        get
-        {
-            if (applicationIsQuitting)
-            {
-                Debug.LogWarning("[Singleton] Instance '" + typeof(T) +
-                                 "' already destroyed on application quit." +
-                                 " Won't create again - returning null.");
-                return null;
-            }
+	private static System.Object _lock = new System.Object();
 
-            lock (_lock)
-            {
-                if (_instance != null) return _instance;
-                _instance = (T) FindObjectOfType(typeof(T));
+	public static T Instance
+	{
+		get
+		{
+			if (applicationIsQuitting)
+			{
+				Debug.LogWarning("[Singleton] Instance '" + typeof(T) +
+				                 "' already destroyed on application quit." +
+				                 " Won't create again - returning null.");
+				return null;
+			}
 
-                if (FindObjectsOfType(typeof(T)).Length > 1)
-                {
-                    Debug.LogError("[Singleton] Something went really wrong " +
-                                   " - there should never be more than 1 singleton!" +
-                                   " Reopening the scene might fix it.");
-                    return _instance;
-                }
+			lock (_lock)
+			{
+				if (_instance != null) return _instance;
+				_instance = (T) FindObjectOfType(typeof(T));
 
-                if (_instance != null) return _instance;
-                var singleton = new GameObject();
-                _instance = singleton.AddComponent<T>();
-                singleton.name = typeof(T).Name;
+				if (FindObjectsOfType(typeof(T)).Length > 1)
+				{
+					Debug.LogError("[Singleton] Something went really wrong " +
+					               " - there should never be more than 1 singleton!" +
+					               " Reopening the scene might fix it.");
+					return _instance;
+				}
 
-                DontDestroyOnLoad(singleton);
+				if (_instance != null) return _instance;
+				var singleton = new GameObject();
+				_instance = singleton.AddComponent<T>();
+				singleton.name = typeof(T).Name;
 
-                return _instance;
-            }
-        }
-    }
+				DontDestroyOnLoad(singleton);
 
-    public static bool isQuittingOrChangingScene()
-    {
-        return applicationIsQuitting || changingScene;
-    }
+				return _instance;
+			}
+		}
+	}
 
-    public static bool changingScene;
-    public static bool applicationIsQuitting;
+	public static bool isQuittingOrChangingScene()
+	{
+		return applicationIsQuitting || changingScene;
+	}
 
-    private void OnDisable()
-    {
-        applicationIsQuitting = true;
-    }
+	public static bool changingScene;
+	public static bool applicationIsQuitting;
 
-    private void OnApplicationQuit()
-    {
-        applicationIsQuitting = true;
-    }
+	private void OnDisable()
+	{
+		applicationIsQuitting = true;
+	}
+
+	private void OnApplicationQuit()
+	{
+		applicationIsQuitting = true;
+	}
+
 }

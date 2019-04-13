@@ -2,11 +2,8 @@
 //  Contacts : Pixeye - ask@pixeye.games
 
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Unity.IL2CPP.CompilerServices;
-using UnityEngine;
 
 namespace Pixeye.Framework
 {
@@ -19,8 +16,6 @@ namespace Pixeye.Framework
 
 		internal int[] generations = new int[0];
 		internal int[] ids = new int[0];
-
-		//internal ushort[] components = new ushort[0];
 
 		internal bool[] components = new bool[SettingsEngine.SizeComponents];
 
@@ -104,26 +99,6 @@ namespace Pixeye.Framework
 
 			return true;
 		}
-
-//			ref var tags    = ref CoreEntity.tags[entityID];
-//			ref var storage = ref tags.pool;
-//			if (storage == null) return false;
-//
-//			var length = tags.length;
-//			if (length == 0) return false;
-//			length -= 1;
-//			for (int i = 0; i < tagsToExclude.Length; i++)
-//			{
-//				var tagID = tagsToExclude[i];
-//				for (int ii = 0; ii < length; ii++)
-//				{
-//					if (storage[ii].id != tagID) continue;
-//					return false;
-//				}
-//			}
-
-		//	return true;
-		//	}
 
 		public bool Equals(Composition other)
 		{
