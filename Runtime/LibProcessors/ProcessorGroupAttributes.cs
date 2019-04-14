@@ -34,13 +34,13 @@ namespace Pixeye.Framework
 
 					if (!binds.TryGetValue(hash, out object o))
 					{
-						if (!FrameworkActivator.activators.TryGetValue(hash, out ObjectActivator activator))
-						{
-							ConstructorInfo ctor = fType.GetConstructors().First();
-							activator = FrameworkActivator.GetActivator(ctor);
-							FrameworkActivator.activators.Add(hash, activator);
-						}
-						o = activator();
+//						if (!FrameworkActivator.activators.TryGetValue(hash, out ObjectActivator activator))
+//						{
+//							ConstructorInfo ctor = fType.GetConstructors().First();
+//							activator = FrameworkActivator.GetActivator(ctor);
+//							FrameworkActivator.activators.Add(hash, activator);
+//						}
+						o =  Activator.CreateInstance(fType);
 						binds.Add(hash, o);
 					}
 
