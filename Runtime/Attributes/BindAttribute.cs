@@ -18,12 +18,12 @@ namespace Pixeye.Framework
 		}
 	}
 
-	public class From
-	{
-		public const int Toolbox = 1;
-		public const int Object = 2;
-		public const int Blueprint = 3;
-	}
+//	public class From
+//	{
+//		public const int Toolbox = 1;
+//		public const int Object = 2;
+//		public const int Blueprint = 3;
+//	}
  
 
 }

@@ -1,12 +1,12 @@
-﻿//  Project : game.metro
+//  Project : game.metro
 // Contacts : Pix - ask@pixeye.games
 
 namespace Pixeye.Framework
 {
-	public interface IView
+	public interface IScriptableObject
 	{
 
-		void Tick(float delta);
+		void Tick(in ent entity, float delta);
 		void OnAdd(in ent entity);
 		void OnRemove(in ent entity);
 		void Dispose();

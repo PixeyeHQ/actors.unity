@@ -35,8 +35,8 @@ namespace Pixeye.Framework
 
 		public int length;
 
-		public CallBackEntity onAdd;
-		public CallBackEntity onRemove;
+		public EntityAction onAdd;
+		public EntityAction onRemove;
 
 		/// don't use for iterating.
 		public ref ent this[int index] => ref entities[index];

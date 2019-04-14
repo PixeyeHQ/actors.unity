@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Pixeye
 {
 
-[CreateAssetMenu(fileName = "##NAME FILE##", menuName = "Actors Framework/Add/Blueprints/&NAME&", order = 10)]
+[CreateAssetMenu(fileName = "##NAME FILE##", menuName = "Actors/Add/Blueprints/&NAME&", order = 10)]
 public class ##NAME## : BlueprintEntity
 {
   protected override void Setup() { }   

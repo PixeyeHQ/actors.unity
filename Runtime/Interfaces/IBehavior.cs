@@ -1,9 +1,9 @@
-﻿//  Project : game.metro
+//  Project : game.metro
 // Contacts : Pix - ask@pixeye.games
 
 namespace Pixeye.Framework
 {
-	public interface IView
+	public interface IBehavior
 	{
 
 		void Tick(float delta);

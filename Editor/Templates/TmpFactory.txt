@@ -1,7 +1,7 @@
 
 using UnityEngine;
 namespace Pixeye{
-[CreateAssetMenu(fileName = "Factory &NAME&", menuName = "Actors Framework/Add/Factories/&NAME&")]
+[CreateAssetMenu(fileName = "Factory &NAME&", menuName = "Actors/Add/Factories/&NAME&")]
 public class ##NAME## : Factory
 {
      	 
