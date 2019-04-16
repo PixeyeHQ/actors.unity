@@ -114,7 +114,7 @@ namespace Pixeye.Framework
 
 			if (blueprint != null)
 				blueprint.Populate(entity);
-
+      else 
 			Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Activate);
 		}
 

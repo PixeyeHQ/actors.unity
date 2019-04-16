@@ -124,11 +124,11 @@ namespace Pixeye.Framework
 				if (transform.parent != parent)
 					transform.SetParent(parent);
 
-				IPoolable poolable = transform.GetComponent<IPoolable>();
-				if (poolable != null)
-				{
-					poolable.Spawn();
-				}
+//				IPoolable poolable = transform.GetComponent<IPoolable>();
+//				if (poolable != null)
+//				{
+//					poolable.Spawn();
+//				}
 
 				transform.gameObject.SetActive(true);
 
