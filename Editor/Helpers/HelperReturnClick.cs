@@ -16,7 +16,7 @@ namespace Pixeye.Framework
 	{
 		static HelperReturnClick()
 		{
-			SceneView.onSceneGUIDelegate += SceneGUI;
+			SceneView.duringSceneGui += SceneGUI;
 		}
 
 
