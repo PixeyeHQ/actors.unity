@@ -36,6 +36,10 @@ namespace Pixeye.Framework
 		internal int lenOfGroups;
 
 		public abstract void RemoveNoCheck(int entityID);
+		
+		#if ODIN_INSPECTOR && UNITY_EDITOR && ACTORS_DEBUG
+		internal abstract IComponent GetComponent(int entityID);
+		#endif
 
 	}
 
@@ -97,7 +101,13 @@ namespace Pixeye.Framework
 		{
 			Entity.generations[entityID, generation] &= ~componentMask;
 		}
-
+		#if ODIN_INSPECTOR && UNITY_EDITOR && ACTORS_DEBUG
+		internal override  IComponent GetComponent(int entityID)
+		{
+			return components[entityID];
+		}
+		#endif
+		
 		public T TryGet(int entityID)
 		{
 			return (Entity.generations[entityID, generation] & componentMask) == componentMask ? components[entityID] : default;

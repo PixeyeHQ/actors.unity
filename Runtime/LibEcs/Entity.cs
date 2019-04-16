@@ -48,6 +48,10 @@ namespace Pixeye.Framework
 		internal static BufferTags[] tags = new BufferTags[SettingsEngine.SizeEntities];
 		internal static BufferComponents[] components = new BufferComponents[SettingsEngine.SizeEntities];
 
+		#if UNITY_EDITOR && ODIN_INSPECTOR && ACTORS_DEBUG
+		internal static List<IComponent>[] actorsComponents = new List<IComponent>[SettingsEngine.SizeEntities];
+		#endif
+
 		#region SETUP
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -61,7 +65,9 @@ namespace Pixeye.Framework
 				Array.Resize(ref tags, l);
 				Array.Resize(ref components, l);
 				Array.Resize(ref db, l);
-
+				#if UNITY_EDITOR && ODIN_INSPECTOR && ACTORS_DEBUG
+				Array.Resize(ref actorsComponents, l);
+				#endif
 				counter = l;
 			}
 
@@ -84,7 +90,9 @@ namespace Pixeye.Framework
 				Array.Resize(ref transforms, l);
 				Array.Resize(ref components, l);
 				Array.Resize(ref db, l);
-
+				#if UNITY_EDITOR && ODIN_INSPECTOR && ACTORS_DEBUG
+				Array.Resize(ref actorsComponents, l);
+				#endif
 				counter = l;
 			}
 
