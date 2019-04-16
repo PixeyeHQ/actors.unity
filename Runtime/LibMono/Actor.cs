@@ -1,9 +1,9 @@
 //  Project  : ACTORS
 //  Contacts : Pixeye - ask@pixeye.games
 
-#if UNITY_EDITOR && ODIN_INSPECTOR && ACTORS_DEBUG
-using System.Collections.Generic;
-#endif
+//#if UNITY_EDITOR && ODIN_INSPECTOR && ACTORS_DEBUG
+//using System.Collections.Generic;
+//#endif
 
 using System.Runtime.CompilerServices;
 using Unity.IL2CPP.CompilerServices;
@@ -36,17 +36,18 @@ namespace Pixeye.Framework
 		[FoldoutGroup("Main")]
 		public BlueprintEntity blueprint;
 
-		#if UNITY_EDITOR && ODIN_INSPECTOR && ACTORS_DEBUG
-		[HideLabel, FoldoutGroup("Debug")]
-		[ShowInInspector, ListDrawerSettings(HideRemoveButton = true, HideAddButton = true, DraggableItems = false)]
-		[HideIf("ConditionShowComponentdsDebug")]
-		public List<IComponent> components = new List<IComponent>();
-
-		bool ConditionShowComponentdsDebug()
-		{
-			return components == null || components.Count==0;
-		}
-		#endif
+//		#if UNITY_EDITOR && ODIN_INSPECTOR && ACTORS_DEBUG
+//		[InfoBox("DEBUG MODE", InfoMessageType.Warning)]
+//		[HideLabel, FoldoutGroup("Debug")]
+//		[ShowInInspector, ListDrawerSettings(HideRemoveButton = true, HideAddButton = true, DraggableItems = false)]
+//		[HideIf("ConditionShowComponentdsDebug")]
+//		public List<IComponent> components = new List<IComponent>();
+//
+//		bool ConditionShowComponentdsDebug()
+//		{
+//			return components == null || components.Count==0;
+//		}
+//		#endif
 
 		#endregion
 
@@ -122,14 +123,13 @@ namespace Pixeye.Framework
 			#if UNITY_EDITOR
 			_entity = id;
 
-			#if ODIN_INSPECTOR && ACTORS_DEBUG
-			if ( Entity.actorsComponents[id]!=null)
-				Entity.actorsComponents[id].Clear();
-
-			Entity.actorsComponents[id] = components;
-		 
-
-			#endif
+//			#if ODIN_INSPECTOR && ACTORS_DEBUG
+//			if ( Entity.actorsComponents[id]!=null)
+//				Entity.actorsComponents[id].Clear();
+//			Entity.actorsComponents[id] = components;
+//		 
+//
+//			#endif
 
 			#endif
 

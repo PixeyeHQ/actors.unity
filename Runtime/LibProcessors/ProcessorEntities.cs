@@ -74,10 +74,10 @@ namespace Pixeye.Framework
 								group.Insert(operation.entity);
 								Entity.components[entityID].Add(operation.arg);
 
-								#if ODIN_INSPECTOR && UNITY_EDITOR && ACTORS_DEBUG
-								if (Entity.actorsComponents[entityID] != null)
-									Entity.actorsComponents[entityID].Add(components.GetComponent(entityID));
-								#endif
+//								#if ODIN_INSPECTOR && UNITY_EDITOR && ACTORS_DEBUG
+//								if (Entity.actorsComponents[entityID] != null)
+//									Entity.actorsComponents[entityID].Add(components.GetComponent(entityID));
+//								#endif
 							}
 						}
 
@@ -121,11 +121,11 @@ namespace Pixeye.Framework
 						Entity.components[entityID].Clear();
 						Entity.Delayed.Set(operation.entity, 0, Entity.Delayed.Action.KillFinalize);
 
-						#if ODIN_INSPECTOR && UNITY_EDITOR && ACTORS_DEBUG
-						if (Entity.actorsComponents[entityID] != null)
-							Entity.actorsComponents[entityID].Clear();
-
-						#endif
+//						#if ODIN_INSPECTOR && UNITY_EDITOR && ACTORS_DEBUG
+//						if (Entity.actorsComponents[entityID] != null)
+//							Entity.actorsComponents[entityID].Clear();
+//
+//						#endif
 
 						break;
 
@@ -136,10 +136,10 @@ namespace Pixeye.Framework
 
 						Entity.generations[entityID, generationRemove] &= ~maskRemove;
 
-						#if ODIN_INSPECTOR && UNITY_EDITOR && ACTORS_DEBUG
-						if (Entity.actorsComponents[entityID] != null)
-							Entity.actorsComponents[entityID].Remove(components.GetComponent(entityID));
-						#endif
+//						#if ODIN_INSPECTOR && UNITY_EDITOR && ACTORS_DEBUG
+//						if (Entity.actorsComponents[entityID] != null)
+//							Entity.actorsComponents[entityID].Remove(components.GetComponent(entityID));
+//						#endif
 
 						for (int l = 0; l < components.lenOfGroups; l++)
 						{
@@ -220,13 +220,13 @@ namespace Pixeye.Framework
 							Entity.generations[entityID, generationActivate] |= maskActivate;
 							components = Storage.all[component];
 
-							#if ODIN_INSPECTOR && UNITY_EDITOR && ACTORS_DEBUG
-
-							if (Entity.actorsComponents[entityID] != null)
-							{
-								Entity.actorsComponents[entityID].Add(components.GetComponent(entityID));
-							}
-							#endif
+//							#if ODIN_INSPECTOR && UNITY_EDITOR && ACTORS_DEBUG
+//
+//							if (Entity.actorsComponents[entityID] != null)
+//							{
+//								Entity.actorsComponents[entityID].Add(components.GetComponent(entityID));
+//							}
+//							#endif
 
 							for (int l = 0; l < components.lenOfGroups; l++)
 							{
