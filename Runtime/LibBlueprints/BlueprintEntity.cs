@@ -121,13 +121,11 @@ namespace Pixeye.Framework
 
 		#endif
 
-		
-		
-		 
-internal void Populate(in ent entity)
+		internal void Populate(in ent entity)
 		{
 			var id = entity.id;
-	Entity.BindDB(id, db.id);
+			if (db != null)
+				Entity.BindDB(id, db.id);
 			for (int i = 0; i < lenOnCreate; i++)
 			{
 				var component = onCreate[i];
@@ -146,6 +144,7 @@ internal void Populate(in ent entity)
 			entity.AddLater(tags);
 			Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Activate);
 		}
+
 	}
 
 	#if UNITY_EDITOR
