@@ -3,6 +3,7 @@
 
 namespace Pixeye.Framework
 {
+	
 	public delegate bool EntityCallback(in ent entity);
 	public delegate bool EntityCallbackUpdated(in ent entity, float delta);
 	public delegate void EntityAction(in ent entity);

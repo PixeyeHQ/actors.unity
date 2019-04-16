@@ -8,8 +8,7 @@ namespace Pixeye.Framework
 
 		void Tick(float delta);
 		void OnAdd(in ent entity);
-		void OnRemove(in ent entity);
-		void Dispose();
+		void OnRemove();
 
 	}
 }

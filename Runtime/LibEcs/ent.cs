@@ -22,7 +22,7 @@ namespace Pixeye.Framework
 		public readonly int id;
 		internal readonly byte age;
 
-		public ref readonly Transform transform => ref EntityCore.transforms[id];
+		public ref readonly Transform transform => ref Entity.transforms[id];
 
 		#region ENTITY
 
@@ -30,148 +30,6 @@ namespace Pixeye.Framework
 		{
 			EntityComposer.Default.entity = default;
 			return EntityComposer.Default;
-		}
-
-		public static ent Create()
-		{
-			int id;
-			byte age = 0;
-
-			if (entityStackLength > 0)
-			{
-				var pop = entityStack.Dequeue();
-				byte ageOld = pop.age;
-				id = pop.id;
-				unchecked
-				{
-					age = (byte) (ageOld + 1);
-				}
-
-				entityStackLength--;
-			}
-			else
-				id = lastID++;
-
-			EntityCore.Setup(id);
-
-			return new ent(id, age);
-		}
-
-		public static ent CreateFor(in string prefabID, bool pooled = false)
-		{
-			int id;
-			byte age = 0;
-
-			if (entityStack.Count > 0)
-			{
-				var pop = entityStack.Dequeue();
-				byte ageOld = pop.age;
-				id = pop.id;
-
-				unchecked
-				{
-					age = (byte) (ageOld + 1);
-				}
-
-				entityStackLength--;
-			}
-			else
-				id = lastID++;
-
-			EntityCore.SetupWithTransform(id, pooled);
-			if (pooled) EntityCore.transforms[id] = id.Spawn(Pool.Entities, prefabID);
-			else EntityCore.transforms[id] = id.Spawn(prefabID);
-
-			return new ent(id, age);
-		}
-
-		public static ent CreateFor(GameObject prefab, bool pooled = false)
-		{
-			int id;
-			byte age = 0;
-
-			if (entityStack.Count > 0)
-			{
-				var pop = entityStack.Dequeue();
-				byte ageOld = pop.age;
-				id = pop.id;
-
-				unchecked
-				{
-					age = (byte) (ageOld + 1);
-				}
-
-				entityStackLength--;
-			}
-			else
-				id = lastID++;
-
-			EntityCore.SetupWithTransform(id, pooled);
-			if (pooled) EntityCore.transforms[id] = id.Spawn(Pool.Entities, prefab);
-			else EntityCore.transforms[id] = id.Spawn(prefab);
-
-			return new ent(id, age);
-		}
-
-		public static ent CreateFor(in bpt blueprint, bool pooled = false)
-		{
-			int id;
-			byte age = 0;
-
-			if (entityStack.Count > 0)
-			{
-				var pop = entityStack.Dequeue();
-				byte ageOld = pop.age;
-				id = pop.id;
-
-				unchecked
-				{
-					age = (byte) (ageOld + 1);
-				}
-
-				entityStackLength--;
-			}
-			else
-				id = lastID++;
-
-			var bpAsset = blueprint.Get();
-
-			if (bpAsset.model)
-			{
-				EntityCore.SetupWithTransform(id, pooled);
-				if (pooled) EntityCore.transforms[id] = bpAsset.Spawn(Pool.Entities, bpAsset.model);
-				else EntityCore.transforms[id] = bpAsset.Spawn(bpAsset.model);
-			}
-			else
-				EntityCore.Setup(id);
-
-			for (int i = 0; i < bpAsset.lenOnCreate; i++)
-			{
-				var component = bpAsset.onCreate[i];
-
-			 
-				var storage = Storage.allDict[bpAsset.hashesOnCreate[i]];
-				component.Copy(id);
-				EntityCore.components[id].Add(storage.GetComponentID());
-			}
-
-			for (int i = 0; i < bpAsset.lenAddLater; i++)
-			{
-				var component = bpAsset.onLater[i];
-				component.Copy(id);
-			}
-
-			var entity = new ent(id, age);
-
-			if (bpAsset.tags.Length > 0)
-				entity.AddLater(bpAsset.tags);
-
-			if (bpAsset.refType == RefType.EntityMono)
-				entity.AddMonoReference();
-
-			EntityCore.Delayed.Set(entity, 0, EntityCore.Delayed.Action.Activate);
-
-			return entity;
 		}
 
 		public ent(int id = -1, byte age = 0)
@@ -222,6 +80,7 @@ namespace Pixeye.Framework
 		{
 			return age;
 		}
+
 		public int CompareTo(object obj)
 		{
 			ent other = (ent) obj;
@@ -231,14 +90,14 @@ namespace Pixeye.Framework
 		public bool Has<T>() where T : class, IComponent, new()
 		{
 			var id = Storage<T>.componentMask;
-			return (EntityCore.generations[id, Storage<T>.generation] & id) == id;
+			return (Entity.generations[id, Storage<T>.generation] & id) == id;
 		}
 
 		public void Release()
 		{
-			EntityCore.isAlive[id] = false;
-			EntityCore.Delayed.Set(this, 0, EntityCore.Delayed.Action.Kill);
-			EntityCore.entitiesCount--;
+			Entity.isAlive[id] = false;
+			Entity.Delayed.Set(this, 0, Entity.Delayed.Action.Kill);
+			Entity.entitiesCount--;
 		}
 
 		public bool Equals(ent other)
@@ -248,7 +107,7 @@ namespace Pixeye.Framework
 
 		public bool Exist()
 		{
-			return EntityCore.isAlive[id];
+			return Entity.isAlive[id];
 		}
 
 		#endregion
@@ -266,7 +125,7 @@ namespace Pixeye.Framework
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public bool Get<T>(out T arg0) where T : class, IComponent, new()
 		{
-			return (arg0 = (EntityCore.generations[id, Storage<T>.generation] & Storage<T>.componentMask) == Storage<T>.componentMask ? Storage<T>.Instance.components[id] : default) != null;
+			return (arg0 = (Entity.generations[id, Storage<T>.generation] & Storage<T>.componentMask) == Storage<T>.componentMask ? Storage<T>.Instance.components[id] : default) != null;
 		}
 
 		/// <summary>

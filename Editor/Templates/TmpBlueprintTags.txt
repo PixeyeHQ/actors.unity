@@ -5,23 +5,12 @@ using UnityEngine;
 namespace Pixeye
 {
    
-   public class Blueprints
+   public static class Blueprints
    {
-// Use this class to define names of the blueprints;
-// public static bpt Player;
-
+   
 ##CODEGEN1##
-
-   [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-		public static void Create()
-		{
-		
-		// Set blueprint with a name as in the Resources folder.
-		// Player = "Blueprint Player"; 
-		
-##CODEGEN2##
-		
-		}
+ 
+  
  
    }
 }

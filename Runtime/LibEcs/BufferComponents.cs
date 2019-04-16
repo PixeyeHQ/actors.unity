@@ -18,7 +18,7 @@ namespace Pixeye
 		{
 			return ref components[id];
 		}
-		
+
 		public BufferComponents(int size)
 		{
 			components = new ushort[size];
@@ -31,8 +31,6 @@ namespace Pixeye
 			Length = 0;
 		}
 
-	 
-		
 		public void Clear()
 		{
 			Length = 0;
@@ -40,14 +38,9 @@ namespace Pixeye
 
 		public void Add(int type)
 		{
-
-		 
-
 			if (Length == components.Length)
 				Array.Resize(ref components, Length << 1);
 
-			 
-			
 			components[Length++] = (ushort) type;
 		}
 
@@ -68,25 +61,20 @@ namespace Pixeye
 		public void RemoveAt(int index)
 		{
 			for (int i = index; i < Length - 1; ++i)
-				SetElement(i, GetElement(i + 1));
+				SetElement(i, components[i + 1]);
 
 			Length--;
 		}
-		
+
 		public void SetElement(int index, int arg)
 		{
-		 
 			components[index] = (ushort) arg;
- 
+		}
 
-		 
-		}
-		
-		private ushort GetElement(int index)
-		{
-			 
-				return components[index];
-		}
-		
+//		private ushort GetElement(int index)
+		//		{
+		//			return components[index];
+		//		}
+
 	}
 }

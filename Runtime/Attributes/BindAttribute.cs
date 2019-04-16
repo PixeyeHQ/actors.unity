@@ -6,15 +6,12 @@ namespace Pixeye.Framework
 	public class BindAttribute : Attribute
 	{
  	
-		public int bindType;
+		public int capacity;
 		
+		 
 		public BindAttribute()
 		{
-		 	
-		}
-		public BindAttribute(int bindType)
-		{
-			this.bindType = bindType;
+	
 		}
 	}
 

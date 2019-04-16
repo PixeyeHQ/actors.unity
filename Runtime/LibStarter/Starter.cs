@@ -55,8 +55,6 @@ namespace Pixeye.Framework
 			ProcessorScene.Default.Setup(ScenesToKeep, SceneDependsOn, this);
 		}
 
-		 
-		
 		#if UNITY_EDITOR
 
 		public void ClearNodes()
@@ -162,15 +160,17 @@ namespace Pixeye.Framework
 			}
 
 			Add<ProcessorEntities>();
-
+			Add<ProcessorView>();
+		 
 			Setup();
 
 			initialized = true;
 
 			var objs = FindObjectsOfType<MonoBehaviour>().OfType<IRequireStarter>();
+
 			foreach (var obj in objs)
 			{
-				obj.AwakeAfterStarter();
+				obj.Launch();
 			}
 
 			Timer.Add(Time.deltaFixed, () => { PostSetup(); });

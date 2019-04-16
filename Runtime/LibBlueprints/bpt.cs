@@ -1,13 +1,10 @@
 //  Project : ecs
 // Contacts : Pix - ask@pixeye.games
 
-using UnityEngine;
-
 namespace Pixeye.Framework
 {
 	public readonly struct bpt
 	{
-
 		public readonly int hash;
 
 		public bpt(int hash)

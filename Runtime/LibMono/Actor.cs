@@ -1,11 +1,12 @@
 //  Project  : ACTORS
 //  Contacts : Pixeye - ask@pixeye.games
 
+using System.Runtime.CompilerServices;
 using Unity.IL2CPP.CompilerServices;
 using UnityEngine;
-
 #if ODIN_INSPECTOR
 using Sirenix.OdinInspector;
+
 #endif
 
 namespace Pixeye.Framework
@@ -16,18 +17,17 @@ namespace Pixeye.Framework
 
 		#region MEMBERS
 
-		[FoldoutGroup("Main")]
-		[TagFilter(typeof(Pool))]
-		public int pool = -1;
-
-		protected ent entity;
+		public ent entity = -1;
 
 		#if UNITY_EDITOR
 
 		[FoldoutGroup("Main"), SerializeField, ReadOnly]
-		protected int _entity;
+		internal int _entity = -1;
 
 		#endif
+
+		[FoldoutGroup("Main")]
+		public bool isPooled;
 
 		[FoldoutGroup("Main")]
 		public BlueprintEntity blueprint;
@@ -36,53 +36,86 @@ namespace Pixeye.Framework
 
 		#region METHODS UNITY
 
-		private void Awake()
-		{
-			if (!Starter.initialized) return;
+		#if UNITY_EDITOR
 
-			Generate();
-		}
+		protected bool manualRemoved;
 
 		protected virtual void OnEnable()
 		{
-			if (Starter.initialized == false) return;
-
-			EntityCore.isAlive[entity.id] = true;
-
-			EntityCore.Delayed.Set(entity, 0, EntityCore.Delayed.Action.Activate);
+			if (!manualRemoved) return;
+			manualRemoved = false;
+			Entity.isAlive[entity.id] = true;
+			Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Activate);
 		}
 
-		protected virtual  void OnDisable()
+		protected virtual void OnDisable()
 		{
-			if (Toolbox.applicationIsQuitting||!EntityCore.isAlive[entity.id]) return;
+			if (Toolbox.applicationIsQuitting || !Entity.isAlive[entity.id]) return;
+			manualRemoved = true;
+			Entity.isAlive[entity.id] = false;
+			Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Deactivate);
+		}
+		#endif
 
-			EntityCore.isAlive[entity.id] = false;
-			EntityCore.Delayed.Set(entity, 0, EntityCore.Delayed.Action.Deactivate);
+		 
+		public void OnAdd(in ent entity)
+		{
+			OnAdd();
 		}
 
-	
-		
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public virtual void OnAdd()
+		{
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public virtual void OnRemove()
+		{
+		}
+
 		#endregion
 
 		#region METHODS
 
-		private void Generate()
+		/// <summary>
+		/// Don't use.
+		/// </summary>
+		public virtual void Launch()
 		{
-			entity = ent.Create();
+			int id;
+			byte age = 0;
+
+			if (ent.entityStackLength > 0)
+			{
+				var pop = ent.entityStack.Dequeue();
+				byte ageOld = pop.age;
+				id = pop.id;
+				unchecked
+				{
+					age = (byte) (ageOld + 1);
+				}
+
+				ent.entityStackLength--;
+			}
+			else
+				id = ent.lastID++;
+
+			Entity.SetupWithTransform(id, isPooled);
+
+			entity = new ent(id, age);
+
 			#if UNITY_EDITOR
-			_entity = entity.id;
+			_entity = id;
 			#endif
 
-			entity.Add(transform);
+			Entity.transforms[id] = transform;
+
 			Setup();
 
-			SetupBlueprint();
-		}
+			if (blueprint != null)
+				blueprint.Populate(entity);
 
-		public virtual void AwakeAfterStarter()
-		{
-			Generate();
-			EntityCore.Delayed.Set(entity, 0, EntityCore.Delayed.Action.Activate);
+			Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Activate);
 		}
 
 		protected virtual void Setup()
@@ -101,13 +134,13 @@ namespace Pixeye.Framework
 
 		protected T Add<T>() where T : IComponent, new()
 		{
-			EntityCore.components[entity.id].Add(Storage<T>.componentID);
+			Entity.components[entity.id].Add(Storage<T>.componentID);
 			return entity.AddLater<T>();
 		}
 
 		protected void Add<T>(T component) where T : IComponent, new()
 		{
-			EntityCore.components[entity.id].Add(Storage<T>.componentID);
+			Entity.components[entity.id].Add(Storage<T>.componentID);
 			entity.AddLater(component);
 		}
 
@@ -121,37 +154,51 @@ namespace Pixeye.Framework
 			entity.AddLater(component);
 		}
 
-		private void SetupBlueprint()
-		{
-			if (blueprint == null)
-				return;
-			var entityID = entity.id;
-
-			for (int i = 0; i < blueprint.lenOnCreate; i++)
-			{
-				var component = blueprint.onCreate[i];
-				var hash = component.GetType().GetHashCode();
-				var storage = Storage.allDict[hash];
-				component.Copy(entityID);
-				EntityCore.components[entityID].Add(storage.GetComponentID());
-			}
-
-			for (int i = 0; i < blueprint.lenAddLater; i++)
-			{
-				var component = blueprint.onLater[i];
-				component.Copy(entityID);
-			}
-
-			entity.AddLater(blueprint.tags);
-		}
-
 		#endregion
 
 		public ref readonly ent GetEntity()
 		{
 			return ref entity;
 		}
-	 
+
+		public static Actor Create(string prefabID, bool pooled = false)
+		{
+			var tr = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefabID) : HelperFramework.SpawnInternal(prefabID);
+			var actor = tr.AddGetActor();
+
+			actor.isPooled = pooled;
+			actor.Launch();
+			return actor;
+		}
+
+		public static Actor Create(GameObject prefab, bool pooled = false)
+		{
+			var tr = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefab) : HelperFramework.SpawnInternal(prefab);
+			var actor = tr.AddGetActor();
+			actor.isPooled = pooled;
+			actor.Launch();
+			return actor;
+		}
+
+		public static Actor Create(string prefabID, BlueprintEntity bp, bool pooled = false)
+		{
+			var tr = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefabID) : HelperFramework.SpawnInternal(prefabID);
+			var actor = tr.AddGetActor();
+			actor.blueprint = bp;
+			actor.isPooled = pooled;
+			actor.Launch();
+			return actor;
+		}
+
+		public static Actor Create(GameObject prefab, BlueprintEntity bp, bool pooled = false)
+		{
+			var tr = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefab) : HelperFramework.SpawnInternal(prefab);
+			var actor = tr.AddGetActor();
+			actor.blueprint = bp;
+			actor.isPooled = pooled;
+			actor.Launch();
+			return actor;
+		}
 
 	}
 }

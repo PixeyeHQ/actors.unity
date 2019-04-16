@@ -63,7 +63,7 @@ namespace Pixeye.Framework
 
 		internal bool Include(int entityID)
 		{
-			ref var tags = ref EntityCore.tags[entityID];
+			ref var tags = ref Entity.tags[entityID];
 			var length = tags.GetLength();
 			if (length == 0) return false;
 			var match = 0;
@@ -83,7 +83,7 @@ namespace Pixeye.Framework
 
 		internal bool Exclude(int entityID)
 		{
-			ref var tags = ref EntityCore.tags[entityID];
+			ref var tags = ref Entity.tags[entityID];
 			var length = tags.GetLength();
 			if (length == 0) return true;
 

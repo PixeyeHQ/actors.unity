@@ -7,6 +7,7 @@ Date:       7/25/2018 11:49 AM
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using Unity.IL2CPP.CompilerServices;
@@ -34,15 +35,7 @@ namespace Pixeye.Framework
 		internal GroupCore[] GroupCoreOfInterest = new GroupCore[8];
 		internal int lenOfGroups;
 
-		//	public abstract void AddNoCheckAbstract(int entityID);
-
 		public abstract void RemoveNoCheck(int entityID);
-
-		//internal static List<Storage> all = new List<Storage>(40);
-
-		//	internal abstract void Add(in ent entity);
-		//	internal abstract void Remove(in ent entity);
-		//public abstract void Deploy(in ent entity);
 
 	}
 
@@ -52,7 +45,6 @@ namespace Pixeye.Framework
 
 		public Func<T> Creator;
 
-		//	public static int componentHash;
 		public static int componentID;
 		public static int componentMask;
 		public static int generation;
@@ -92,27 +84,23 @@ namespace Pixeye.Framework
 			masks[componentID] = componentMask;
 			generations[componentID] = generation;
 
-			allDict.Add(typeof(T).GetHashCode(), this);
+			var type = typeof(T);
+			allDict.Add(type.GetHashCode(), this);
 		}
 
 		internal override int GetComponentID()
 		{
 			return componentID;
 		}
-//		public override void AddNoCheckAbstract(int entityID)
-//		{
-//			CoreEntity.generations[entityID, generation] |= componentMask;
-//		}
 
 		public override void RemoveNoCheck(int entityID)
 		{
-			EntityCore.generations[entityID, generation] &= ~componentMask;
+			Entity.generations[entityID, generation] &= ~componentMask;
 		}
 
-	 
 		public T TryGet(int entityID)
 		{
-			return (EntityCore.generations[entityID, generation] & componentMask) == componentMask ? components[entityID] : default;
+			return (Entity.generations[entityID, generation] & componentMask) == componentMask ? components[entityID] : default;
 		}
 
 		public T GetFromStorage(int entityID)

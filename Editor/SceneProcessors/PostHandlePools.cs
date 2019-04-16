@@ -24,22 +24,25 @@ namespace Pixeye.Framework
 	}
 
 	[InitializeOnLoad]
-	 public static class PostProcessorCheckPools
+	public static class PostProcessorCheckPools
 	{
 
 		static PostProcessorCheckPools()
 		{
 			EditorApplication.update += Step;
-
+			//started = false;
 			var starter = Object.FindObjectOfType<Starter>();
 			if (starter == null) return;
 			starter.ClearNodes();
 		}
 
+	//	private static bool started = false;
+
 		static void Step()
 		{
-			if (EditorApplication.isPlayingOrWillChangePlaymode && !Application.isPlaying)
+			if (EditorApplication.isPlayingOrWillChangePlaymode && !EditorApplication.isPlaying)
 			{
+			//	started = true;
 				CheckScene();
 			}
 		}
@@ -47,6 +50,7 @@ namespace Pixeye.Framework
 		public static void CheckScene()
 		{
 			var starter = Object.FindObjectOfType<Starter>();
+	//		started = false;
 			if (starter == null) return;
 			starter.ClearNodes();
 			var actors = Object.FindObjectsOfType<Actor>();
@@ -54,8 +58,9 @@ namespace Pixeye.Framework
 			for (int i = 0; i < actors.Length; i++)
 			{
 				var a = actors[i];
-				if (a.pool <= 0) continue;
-				CheckPoolCache(a.gameObject, a.pool, starter);
+
+				if (!a.isPooled) continue;
+				CheckPoolCache(a.gameObject, Pool.Entities, starter);
 			}
 		}
 
@@ -68,7 +73,7 @@ namespace Pixeye.Framework
 			#else
 			prefab = (GameObject) PrefabUtility.GetPrefabObject(gameObject);
 			#endif
-		 
+
 			if (prefab == null) return;
 			starter.AddToNode(prefab, gameObject, pool);
 		}

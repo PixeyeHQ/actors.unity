@@ -141,7 +141,7 @@ namespace Pixeye.Framework
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public int GetIndex(int id)
 		{
-			for (int i = 0; i <= length; i++)
+			for (int i = 0; i < length; i++)
 			{
 				if (entities[i].id == id) return i;
 			}

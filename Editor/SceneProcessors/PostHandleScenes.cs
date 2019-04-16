@@ -19,7 +19,7 @@ public class PostHandleScenes : EndNameEditAction
 		scriptIcon = EditorGUIUtility.IconContent("SceneAsset Icon").image as Texture2D;
 	}
 
-	[MenuItem("Assets/Create/Actors Framework/Add/Scene", false, MENU_ITEM_PRIORITY)]
+	[MenuItem("Assets/Create/Actors/Add/Scene", false, MENU_ITEM_PRIORITY)]
 	public static void Add()
 	{
 		CreateFromTemplate("Scene.unity", HelperEditor.GetSelectedPathOrFallback());

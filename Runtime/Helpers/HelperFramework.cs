@@ -110,6 +110,7 @@ namespace Pixeye.Framework
 		{
 			bitToFlip = value ^ bitToFlip;
 		}
+
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static bool BitCheck(int bits, int value)
 		{
@@ -187,7 +188,7 @@ namespace Pixeye.Framework
 		/// <param name="e"></param>
 		public static void ForceDeploy(this in ent e)
 		{
-			EntityCore.Delayed.Set(e, 0, EntityCore.Delayed.Action.Activate);
+			Entity.Delayed.Set(e, 0, Entity.Delayed.Action.Activate);
 		}
 
 		#endregion
@@ -670,6 +671,8 @@ namespace Pixeye.Framework
 		#region TRANSFORMS
 
 		static FastString strPath = new FastString(256);
+
+		 
 		public static string GetGameObjectPath(Transform transform)
 		{
 			string path = transform.name;
@@ -683,6 +686,7 @@ namespace Pixeye.Framework
 
 			return path;
 		}
+
 		static internal string GetGameObjectPath(Transform transform, ref int[] sibligs)
 		{
 			string path = transform.name;
@@ -707,11 +711,12 @@ namespace Pixeye.Framework
 			return path;
 		}
 
-		internal static MonoEntity AddGetMono(this Transform co)
+		[MethodImpl(MethodImplOptions.AggressiveInlining )]
+		internal static Actor AddGetActor(this Transform co)
 		{
-			var c = co.GetComponent<MonoEntity>();
-			if ((object) c == null)
-				c = co.gameObject.AddComponent<MonoEntity>();
+			var c = co.GetComponent<Actor>();
+			if ( c == null)
+				c = co.gameObject.AddComponent<Actor>();
 			return c;
 		}
 

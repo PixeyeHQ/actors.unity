@@ -18,25 +18,25 @@ namespace Pixeye.Framework
 
 		public T Add<T>() where T : IComponent, new()
 		{
-			EntityCore.components[entityID].Add(Storage<T>.componentID);
+			Entity.components[entityID].Add(Storage<T>.componentID);
 			return Storage<T>.Instance.GetFromStorage(entityID);
 		}
 
 		public void Deploy()
 		{
-			EntityCore.Delayed.Set(entity, 0, EntityCore.Delayed.Action.Activate);
+			Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Activate);
 		}
 		
 		public void Deploy(int tag)
 		{
 			entity.AddLater(tag);
-			EntityCore.Delayed.Set(entity, 0, EntityCore.Delayed.Action.Activate);
+			Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Activate);
 		}
 
 		public void Deploy(params int[] tags)
 		{
 			entity.AddLater(tags);
-			EntityCore.Delayed.Set(entity, 0, EntityCore.Delayed.Action.Activate);
+			Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Activate);
 		}
 
 	}

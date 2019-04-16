@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -12,7 +11,7 @@ namespace Pixeye.Framework
 	public class ProcessorGroupAttributes
 	{
 
-		internal static Dictionary<int, object> binds = new Dictionary<int, object>();
+	 
 
 		public static void Setup(object b)
 		{
@@ -32,7 +31,7 @@ namespace Pixeye.Framework
 					var fType = myFieldInfo.FieldType;
 					var hash = fType.GetHashCode();
 
-					if (!binds.TryGetValue(hash, out object o))
+					if (!DataSession.binds.TryGetValue(hash, out object o))
 					{
 //						if (!FrameworkActivator.activators.TryGetValue(hash, out ObjectActivator activator))
 //						{
@@ -41,7 +40,7 @@ namespace Pixeye.Framework
 //							FrameworkActivator.activators.Add(hash, activator);
 //						}
 						o =  Activator.CreateInstance(fType);
-						binds.Add(hash, o);
+						DataSession.binds.Add(hash, o);
 					}
 
 					myFieldInfo.SetValue(b, o);

@@ -24,7 +24,7 @@ namespace Pixeye.Framework
 			scriptIcon = (EditorGUIUtility.IconContent("cs Script Icon").image as Texture2D);
 		}
 
-		[MenuItem("Assets/Create/Actors Framework/Generate/Factory", false, MENU_ITEM_PRIORITY)]
+		[MenuItem("Assets/Create/Actors/Generate/Factory", false, MENU_ITEM_PRIORITY)]
 		public static void CreateSample()
 		{
 			var path = HelperFramework.GetPathLibrary();

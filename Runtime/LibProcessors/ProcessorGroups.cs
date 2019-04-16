@@ -42,7 +42,8 @@ namespace Pixeye.Framework
 	{
 
 		Entity,
-		EntityMono,
+		EntityMono
+	
 
 	}
 }

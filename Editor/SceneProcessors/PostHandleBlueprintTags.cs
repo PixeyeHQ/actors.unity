@@ -33,8 +33,7 @@ namespace Pixeye.Framework
 		public static object CreateScript(string pathName, string templatePath)
 		{
 			var filePath                 = Path.GetFullPath(pathName);
-			var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(pathName);
-
+		 
 			var templateContents = string.Empty;
 
 			if (!File.Exists(templatePath)) return (MonoScript) AssetDatabase.LoadAssetAtPath(pathName, typeof(MonoScript));

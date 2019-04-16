@@ -5,7 +5,7 @@ using Object = UnityEngine.Object;
 
 namespace Pixeye.Framework
 {
-	[Il2CppSetOption(Option.NullChecks, false)]
+	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
 	public class PoolContainer
 	{
 
@@ -18,15 +18,15 @@ namespace Pixeye.Framework
 		//	private Dictionary<int, IPoolable> cachedPoolables = new Dictionary<int, IPoolable>(600, new FastComparable());
 		private Dictionary<int, int> cachedIds = new Dictionary<int, int>(600, new FastComparable());
 
-		[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
 		public void RegisterObject(GameObject prefab)
 		{
 			var key = prefab.GetInstanceID();
 			Stack<GameObject> stack;
 			var hasValue = cachedObjects.TryGetValue(key, out stack);
+
 			if (!hasValue) cachedObjects.Add(key, new Stack<GameObject>());
 		}
-		[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
+
 		public void Prepopulate(GameObject prefab, GameObject obj)
 		{
 			var key = prefab.GetInstanceID();
@@ -38,13 +38,14 @@ namespace Pixeye.Framework
 				cachedIds.Add(obj.GetInstanceID(), key);
 			}
 		}
-		[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
+
 		public void AddToPool(GameObject go, GameObject prefab)
 		{
+			//Debug.Log(go);
 			cachedIds.Add(go.GetInstanceID(), prefab.GetInstanceID());
+			//var stack = cachedObjects[prefab.GetInstanceID()]
 		}
 
-		[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
 		public PoolContainer PopulateWith(GameObject prefab, int amount, int amountPerTick = 10, int timeRate = 1)
 		{
 			var key = prefab.GetInstanceID();
@@ -70,14 +71,47 @@ namespace Pixeye.Framework
 			return this;
 		}
 
-		[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
+		public bool Spawn(GameObject prefab, out GameObject obj, Transform parent = null)
+		{
+			var key = prefab.GetInstanceID();
+
+			Stack<GameObject> objs;
+			var stacked = cachedObjects.TryGetValue(key, out objs);
+
+			if (stacked && objs.Count > 0)
+			{
+				obj = objs.Pop();
+				var transform = obj.transform;
+				if (transform.parent != parent)
+					transform.SetParent(parent);
+
+				IPoolable poolable = transform.GetComponent<IPoolable>();
+				if (poolable != null)
+				{
+					poolable.Spawn();
+				}
+
+				transform.gameObject.SetActive(true);
+
+				return true;
+			}
+
+			if (!stacked)
+			{
+				cachedObjects.Add(key, new Stack<GameObject>(600));
+			}
+
+			var createdPrefab = Object.Instantiate(prefab, parent);
+
+			var k = createdPrefab.GetInstanceID();
+
+			cachedIds.Add(k, key);
+			obj = createdPrefab;
+			return false;
+		}
+
 		public GameObject Spawn(GameObject prefab, Transform parent = null)
 		{
-//			if (parent == null)
-//			{
-//				parent = this.parent;
-//			}
-
 			var key = prefab.GetInstanceID();
 
 			Stack<GameObject> objs;
@@ -109,15 +143,6 @@ namespace Pixeye.Framework
 			var createdPrefab = Object.Instantiate(prefab, parent);
 
 			var k = createdPrefab.GetInstanceID();
-
-//			var p = createdPrefab.GetComponent<IPoolable>();
-//			if (p != null)
-//			{
-//				if (!cachedPoolables.ContainsKey(k))
-//				{
-//					cachedPoolables.Add(k, p);
-//				}
-//			}
 
 			cachedIds.Add(k, key);
 			return createdPrefab;

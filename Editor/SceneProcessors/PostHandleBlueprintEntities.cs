@@ -2,6 +2,7 @@
 // Contacts : Pix - ask@pixeye.games
 
 #if ODIN_INSPECTOR
+using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEditor.ProjectWindowCallback;
@@ -11,7 +12,18 @@ namespace Pixeye.Framework
 {
 	public class PostHandleBlueprintEntities : EndNameEditAction
 	{
-  
+
+		[MenuItem("Tools/Actors/Update Data", priority = -10)]
+		public static void UpdateData()
+		{
+			DataObject[] objs = Resources.FindObjectsOfTypeAll<DataObject>();
+
+			foreach (var o in objs)
+			{
+				o.GenerateDatas();
+			}
+		}
+
 		const int MENU_ITEM_PRIORITY = 1;
 		static Texture2D scriptIcon;
 
@@ -20,7 +32,8 @@ namespace Pixeye.Framework
 			base.OnEnable();
 			scriptIcon = EditorGUIUtility.IconContent("ScriptableObject Icon").image as Texture2D;
 		}
-		[MenuItem("Assets/Create/Actors Framework/Add/Blueprints/Entity", false, MENU_ITEM_PRIORITY)]
+
+		[MenuItem("Assets/Create/Actors/Add/Blueprints/Entity", false, MENU_ITEM_PRIORITY)]
 		static void Add()
 		{
 			CreateFromTemplate("Blueprint.asset", HelperEditor.GetSelectedPathOrFallback());
@@ -48,8 +61,6 @@ namespace Pixeye.Framework
 				instance = AssetDatabase.LoadAssetAtPath<BlueprintEntity>(pathName);
 			}
 
- 
-
 			return instance;
 		}
 
@@ -61,12 +72,9 @@ namespace Pixeye.Framework
 			AssetDatabase.Refresh();
 		}
 
-		 
-
 	}
 }
 #else
-
 using System.IO;
 using System.Text;
 using Pixeye.Framework;
@@ -89,7 +97,7 @@ namespace Pixeye
 			base.OnEnable();
 			scriptIcon = (EditorGUIUtility.IconContent("cs Script Icon").image as Texture2D);
 		}
-		[MenuItem("Assets/Create/Actors Framework/Generate/Blueprint", false, MENU_ITEM_PRIORITY)]
+		[MenuItem("Assets/Create/Actors/Generate/Blueprint", false, MENU_ITEM_PRIORITY)]
 		public static void CreateSample()
 		{
 			var path = HelperFramework.GetPathLibrary();

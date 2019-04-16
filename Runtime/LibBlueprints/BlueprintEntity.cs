@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -26,14 +25,9 @@ namespace Pixeye.Framework
 	public class BlueprintEntity : SerializedScriptableObject
 	{
 
-		[ShowInInspector, Title("Debug")]
 		public static Dictionary<int, BlueprintEntity> storage = new Dictionary<int, BlueprintEntity>(FastComparable.Default);
 
-		[Title("Setup")]
-		public RefType refType = RefType.Entity;
-
-		[SerializeField]
-		internal GameObject model;
+		public DataObject db;
 
 		[SerializeField, HideReferenceObjectPicker, TypeFilter("GetFilteredTypeList"), OnValueChanged("HandleAdd"), Title("Components")]
 		internal IComponent[] onCreate = new IComponent[0];
@@ -52,12 +46,11 @@ namespace Pixeye.Framework
 		[SerializeField, TagFilter(typeof(ITag))]
 		internal int[] tags;
 
- 
 		internal int[] hashesOnCreate = new int[0];
-	 
+
 		internal IEnumerable<Type> GetFilteredTypeList()
 		{
-			var q = AppDomain.CurrentDomain.GetAssemblies().Where(x => x != Assembly.GetExecutingAssembly());
+			var q = AppDomain.CurrentDomain.GetAssemblies();
 			var types = q.SelectMany(x => x.GetTypes())
 					.Where(x => !x.IsAbstract)
 					.Where(x => typeof(IComponent).IsAssignableFrom(x))
@@ -88,120 +81,10 @@ namespace Pixeye.Framework
 			}
 		}
 
-		public static BlueprintEntity Create(int id)
-		{
-			var instance = CreateInstance<BlueprintEntity>();
-			storage.Add(id, instance);
-			return instance;
-		}
-
-		#region REFS OBJECT
-
-		/// <summary>
-		/// <para>Adds tags to the entity</para>
-		/// </summary>
-		/// <param name="tags"></param>
-		public void Add(params int[] tags)
-		{
-			this.tags = tags;
-		}
-
-		/// <summary>
-		/// Add Prefab from Resources folder
-		/// </summary>
-		/// <param name="path"></param>
-		/// <returns>Transform of the prefab</returns>
-		public Transform Add(string path)
-		{
-			var instance = Box.Get<GameObject>(path);
-			model = instance;
-			return instance.transform;
-		}
-
-		#endregion
-
-		#region ADD COMPONENTS
-
-		/// <summary>
-		/// Add a component when creating an entity.
-		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <returns></returns>
-		public T Add<T>() where T : IComponent, new()
-		{
-			var instance = new T();
-			if (onCreate.Length == 0) onCreate = new IComponent[1];
-			if (lenOnCreate >= onCreate.Length)
-			{
-				var l = lenOnCreate << 1;
-				Array.Resize(ref onCreate, l);
-			}
-
-			var index = lenOnCreate++;
-			onCreate[index] = instance;
-			components.Add(Storage<T>.componentID, instance);
-			return instance;
-		}
-
-		/// <summary>
-		/// Setup a component when creating an entity but don't add it.
-		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		public T AddLater<T>() where T : IComponent, new()
-		{
-			var instance = new T();
-			if (onLater.Length == 0) onLater = new IComponent[1];
-
-			if (lenAddLater >= onLater.Length)
-			{
-				var l = lenAddLater << 1;
-				Array.Resize(ref onLater, l);
-			}
-
-			var index = lenAddLater++;
-			onLater[index] = instance;
-			components.Add(Storage<T>.componentID, instance);
-			return instance;
-		}
-
-		public T Add<T>(T component) where T : IComponent, new()
-		{
-			if (onCreate.Length == 0) onCreate = new IComponent[1];
-			if (lenOnCreate >= onCreate.Length)
-			{
-				var l = lenOnCreate << 1;
-				Array.Resize(ref onCreate, l);
-			}
-
-			var index = lenOnCreate++;
-			onCreate[index] = component;
-			components.Add(Storage<T>.componentID, component);
-			return component;
-		}
-
-		public T AddLater<T>(T component) where T : IComponent, new()
-		{
-			if (onLater.Length == 0) onLater = new IComponent[1];
-
-			if (lenAddLater >= onLater.Length)
-			{
-				var l = lenAddLater << 1;
-				Array.Resize(ref onLater, l);
-			}
-
-			var index = lenAddLater++;
-			onLater[index] = component;
-			components.Add(Storage<T>.componentID, component);
-			return component;
-		}
-
-		#endregion
-
 		void OnEnable()
 		{
 			components.Clear();
 			hashesOnCreate = new int[lenOnCreate];
-		 
 
 			for (int i = 0; i < lenOnCreate; i++)
 			{
@@ -214,9 +97,7 @@ namespace Pixeye.Framework
 			for (int i = 0; i < lenAddLater; i++)
 			{
 				var c = onLater[i];
-			//	var hash = c.GetType().GetHashCode();
 				components.Add(c.GetType().GetHashCode(), c);
-				//hashesonLater[i] = hash;
 			}
 		}
 
@@ -238,14 +119,33 @@ namespace Pixeye.Framework
 			PostHandleBlueprintTags.Generate();
 		}
 
-		[Sirenix.OdinInspector.Button(ButtonSizes.Large)]
-		internal void DebugClearStorage()
-		{
-			storage.Clear();
-		}
-
 		#endif
 
+		
+		
+		 
+internal void Populate(in ent entity)
+		{
+			var id = entity.id;
+	Entity.BindDB(id, db.id);
+			for (int i = 0; i < lenOnCreate; i++)
+			{
+				var component = onCreate[i];
+
+				var storage = Storage.allDict[hashesOnCreate[i]];
+				component.Copy(id);
+				Entity.components[id].Add(storage.GetComponentID());
+			}
+
+			for (int i = 0; i < lenAddLater; i++)
+			{
+				var component = onLater[i];
+				component.Copy(id);
+			}
+
+			entity.AddLater(tags);
+			Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Activate);
+		}
 	}
 
 	#if UNITY_EDITOR
@@ -287,22 +187,11 @@ namespace Pixeye.Framework
 				var name = Path.GetFileNameWithoutExtension(AssetDatabase.GUIDToAssetPath(guid));
 
 				var strName = name.Split(' ')[1];
-				gen.Append($"		public static bpt {strName};{Environment.NewLine}");
+				gen.Append($"		public static bpt {strName}= \"{name}\";{Environment.NewLine}");
 			}
 
 			templateContents = templateContents.Replace("##CODEGEN1##", gen.ToString());
 
-			gen.Clear();
-
-			foreach (var guid in guids1)
-			{
-				var name = Path.GetFileNameWithoutExtension(AssetDatabase.GUIDToAssetPath(guid));
-
-				var strName = name.Split(' ')[1];
-				gen.Append($"		{strName}= \"{name}\";{Environment.NewLine}");
-			}
-
-			templateContents = templateContents.Replace("##CODEGEN2##", gen.ToString());
 			var encoding = new UTF8Encoding(true, false);
 
 			using (var tc = new StreamWriter(filePath, false, encoding))
@@ -322,6 +211,9 @@ namespace Pixeye.Framework
 #else
 using System;
 using System.Collections.Generic;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 using UnityEngine;
 
 namespace Pixeye.Framework
@@ -332,47 +224,53 @@ namespace Pixeye.Framework
 		[NonSerialized]
 		public static Dictionary<int, BlueprintEntity> storage = new Dictionary<int, BlueprintEntity>(new FastComparable());
 
-		//internal int id;
-
-		[FoldoutGroup("Setup")]
-		public RefType refType = RefType.Entity;
-
-		[FoldoutGroup("Setup")]
-		[SerializeField]
-		internal GameObject model;
-
 		internal int lenOnCreate;
 		internal int lenAddLater;
 
 		internal List<IComponent> onCreate = new List<IComponent>();
 		internal List<IComponent> onLater = new List<IComponent>();
 
-    internal int[] hashesOnCreate = new int[0];
- 
-		[FoldoutGroup("Setup")]
-		[TagFilter(typeof(ITag))]
+		internal int[] hashesOnCreate = new int[1];
+
+		//[FoldoutGroup("Setup")]
+		//[TagFilter(typeof(ITag))]
+		[HideInInspector]
 		public int[] tags = new int[0];
 
 		void OnEnable()
 		{
-
-     	//hashesOnCreate = new int[lenOnCreate];
-    
-       
-     
 			lenOnCreate = 0;
 			lenAddLater = 0;
 			tags = new int[0];
-//			if (name != string.Empty)
-//			{
-//				storage.Add(name.GetHashCode(), this);
-//			}
-
+			hashesOnCreate = new int[10];
 			Setup();
 		}
 
 		protected virtual void Setup()
 		{
+		}
+
+		internal void Populate(in ent entity)
+		{
+			var id = entity.id;
+
+			for (int i = 0; i < lenOnCreate; i++)
+			{
+				var component = onCreate[i];
+
+				var storage = Storage.allDict[hashesOnCreate[i]];
+				component.Copy(id);
+				Entity.components[id].Add(storage.GetComponentID());
+			}
+
+			for (int i = 0; i < lenAddLater; i++)
+			{
+				var component = onLater[i];
+				component.Copy(id);
+			}
+
+			entity.AddLater(tags);
+			Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Activate);
 		}
 
 		#region REFS OBJECT
@@ -381,21 +279,9 @@ namespace Pixeye.Framework
 		/// <para>Adds tags to the entity</para>
 		/// </summary>
 		/// <param name="tags"></param>
-		public void AddTags(params int[] tags)
+		public void Add(params int[] tags)
 		{
 			this.tags = tags;
-		}
-
-		/// <summary>
-		/// Add Prefab from Resources folder
-		/// </summary>
-		/// <param name="path"></param>
-		/// <returns>Transform of the prefab</returns>
-		public Transform AddPrefab(string path)
-		{
-			var instance = Box.Get<GameObject>(path);
-			model = instance;
-			return instance.transform;
 		}
 
 		#endregion
@@ -412,16 +298,15 @@ namespace Pixeye.Framework
 			var instance = new T();
 			onCreate.Add(instance);
 
-
-			if (lenOnCreate==hashesOnCreate.Length)
-				Array.Resize(ref hashesOnCreate, lenOnCreate<<1);
-			
+			if (lenOnCreate == hashesOnCreate.Length)
+			{
+				Array.Resize(ref hashesOnCreate, lenOnCreate << 1);
+			}
 			hashesOnCreate[lenOnCreate++] = typeof(T).GetHashCode();
-			
-			
-			 
+
 			return instance;
 		}
+
 		/// <summary>
 		/// Setup a component when creating an entity but don't add it.
 		/// </summary>
@@ -437,9 +322,10 @@ namespace Pixeye.Framework
 		public T Add<T>(T component) where T : class, IComponent, new()
 		{
 			onCreate.Add(component);
-			if (lenOnCreate==hashesOnCreate.Length)
-				Array.Resize(ref hashesOnCreate, lenOnCreate<<1);
-			
+			if (lenOnCreate == hashesOnCreate.Length)
+			{
+				Array.Resize(ref hashesOnCreate, lenOnCreate << 1);
+			}
 			hashesOnCreate[lenOnCreate++] = typeof(T).GetHashCode();
 			return component;
 		}

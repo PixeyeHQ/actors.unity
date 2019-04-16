@@ -57,7 +57,7 @@ namespace Pixeye.Framework
 		}
 
 
-		public virtual void AwakeAfterStarter()
+		public virtual void Launch()
 		{
 			Setup();
 			OnEnable();

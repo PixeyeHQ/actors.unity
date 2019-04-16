@@ -1,6 +1,6 @@
 //  Project  : ecs
 //  Contacts : Pixeye - ask@pixeye.games
-
+#if ODIN_INSPECTOR
 using System.IO;
 using System.Text;
 using UnityEditor;
@@ -24,7 +24,7 @@ namespace Pixeye.Framework
 			scriptIcon = (EditorGUIUtility.IconContent("cs Script Icon").image as Texture2D);
 		}
 		
-		[MenuItem("Assets/Create/Actors Framework/Generate/Data", false, MENU_ITEM_PRIORITY)]
+		[MenuItem("Assets/Create/Actors/Generate/Data", false, MENU_ITEM_PRIORITY)]
 		public static void CreateSample()
 		{
 			var path = HelperFramework.GetPathLibrary();
@@ -92,3 +92,4 @@ namespace Pixeye.Framework
 
 	}
 }
+#endif

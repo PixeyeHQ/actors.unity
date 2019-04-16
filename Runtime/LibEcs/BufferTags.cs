@@ -231,12 +231,12 @@ namespace Pixeye.Framework
 
 		public static void ClearTags(in this ent entity)
 		{
-			EntityCore.tags[entity.id].Clear();
+			Entity.tags[entity.id].Clear();
 		}
 
 		public static void Clear(int entityID)
 		{
-			ref var tags = ref EntityCore.tags[entityID];
+			ref var tags = ref Entity.tags[entityID];
 			var length = tags.GetLength();
 			for (int i = 0; i < length; i++)
 			{
@@ -247,7 +247,7 @@ namespace Pixeye.Framework
 		public static void Add(in this ent entity, int tagID)
 		{
 			var entityID = entity.id;
-			ref var tags = ref EntityCore.tags[entityID];
+			ref var tags = ref Entity.tags[entityID];
 
 			for (int i = 0; i < tags.Length; i++)
 			{
@@ -273,7 +273,7 @@ namespace Pixeye.Framework
 		public static void Add(in this ent entity, params int[] tagsID)
 		{
 			var entityID = entity.id;
-			ref var tags = ref EntityCore.tags[entityID];
+			ref var tags = ref Entity.tags[entityID];
 			var len = tags.GetLength();
 
 			for (int i = 0; i < tagsID.Length; i++)
@@ -308,7 +308,7 @@ namespace Pixeye.Framework
 		public static void AddLater(in this ent entity, int tagID)
 		{
 			var entityID = entity.id;
-			ref var tags = ref EntityCore.tags[entityID];
+			ref var tags = ref Entity.tags[entityID];
 
 			for (int i = 0; i < tags.Length; i++)
 			{
@@ -333,7 +333,7 @@ namespace Pixeye.Framework
 		public static void AddLater(in this ent entity, params int[] tagsID)
 		{
 			var entityID = entity.id;
-			ref var tags = ref EntityCore.tags[entityID];
+			ref var tags = ref Entity.tags[entityID];
 
 			var len = tags.GetLength();
 
@@ -368,7 +368,7 @@ namespace Pixeye.Framework
 		public static void Remove(in this ent entity, int tagID)
 		{
 			var entityID = entity.id;
-			ref var tags = ref EntityCore.tags[entityID];
+			ref var tags = ref Entity.tags[entityID];
 			var length = tags.GetLength();
 			for (int i = 0; i < length; i++)
 			{
@@ -387,7 +387,7 @@ namespace Pixeye.Framework
 		public static void RemoveAll(in this ent entity, params int[] tagsID)
 		{
 			var entityID = entity.id;
-			ref var tags = ref EntityCore.tags[entityID];
+			ref var tags = ref Entity.tags[entityID];
 			var length = tags.GetLength();
 
 			for (int l = 0; l < tagsID.Length; l++)
@@ -408,7 +408,7 @@ namespace Pixeye.Framework
 		public static void RemoveAll(in this ent entity, int tagID)
 		{
 			var entityID = entity.id;
-			ref var tags = ref EntityCore.tags[entityID];
+			ref var tags = ref Entity.tags[entityID];
 			var length = tags.GetLength();
 			for (int i = 0; i < length; i++)
 			{
@@ -424,7 +424,7 @@ namespace Pixeye.Framework
 		public static bool Has(in this ent entity, int tagID)
 		{
 			var entityID = entity.id;
-			ref var tags = ref EntityCore.tags[entityID];
+			ref var tags = ref Entity.tags[entityID];
 			var length = tags.GetLength();
 			for (int i = 0; i < length; i++)
 			{
@@ -438,7 +438,7 @@ namespace Pixeye.Framework
 		public static bool Has(in this ent entity, params int[] tagsID)
 		{
 			var entityID = entity.id;
-			ref var tags = ref EntityCore.tags[entityID];
+			ref var tags = ref Entity.tags[entityID];
 			var length = tags.GetLength();
 			if (length == 0) return false;
 
@@ -459,7 +459,7 @@ namespace Pixeye.Framework
 		public static bool HasAny(in this ent entity, params int[] tagsID)
 		{
 			var entityID = entity.id;
-			ref var tags = ref EntityCore.tags[entityID];
+			ref var tags = ref Entity.tags[entityID];
 			var length = tags.GetLength();
 			if (length == 0) return false;
 
@@ -520,7 +520,7 @@ namespace Pixeye.Framework
 			var indexGroup = inUseGroups.TryGetValue(tagID);
 			if (indexGroup == -1) return;
 			var en = entity;
-			EntityCore.Delayed.Set(en, indexGroup, EntityCore.Delayed.Action.ChangeTag);
+			Entity.Delayed.Set(en, indexGroup, Entity.Delayed.Action.ChangeTag);
 		}
 
 	}

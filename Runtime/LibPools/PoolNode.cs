@@ -20,12 +20,14 @@ namespace Pixeye.Framework
 
 		public void Populate()
 		{
+			 
 			if (pool == Pool.None) return;
 			var poolStash = HandlePool.pools[pool];
 			poolStash.RegisterObject(prefab);
 
 			for (var i = 0; i < createdObjs.Count; i++)
 			{
+				
 				poolStash.AddToPool(createdObjs[i], prefab);
 			}
 		}
