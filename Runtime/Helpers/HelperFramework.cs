@@ -509,7 +509,7 @@ namespace Pixeye.Framework
 				total += probs[i];
 			}
 
-			var randomPoint = (float) Rand.source.NextDouble() * total;
+			var randomPoint = (float) Rand.Source.NextDouble() * total;
 
 			for (int i = 0; i < probs.Length; i++)
 			{
@@ -524,18 +524,18 @@ namespace Pixeye.Framework
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static float Between(this Vector2 v)
 		{
-			return Rand.source.Next(2) > 0 ? v.x : v.y;
+			return Rand.Source.Next(2) > 0 ? v.x : v.y;
 		}
 		
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static float Or(this float arg0, float arg1, float chance = 0.5f)
 		{
-			return Rand.source.NextDouble() > chance ? arg0 : arg1;
+			return Rand.Source.NextDouble() > chance ? arg0 : arg1;
 		}
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static int Or(this int arg0, int arg1, float chance = 0.5f)
 		{
-			return Rand.source.NextDouble() > chance ? arg0 : arg1;
+			return Rand.Source.NextDouble() > chance ? arg0 : arg1;
 		}
 
 		public static int Between(this object o, int a, int b, float chance = 0.5f)
@@ -596,7 +596,7 @@ namespace Pixeye.Framework
 				total += probs[i];
 			}
 
-			float randomPoint = (float) Rand.source.NextDouble() * total;
+			float randomPoint = (float) Rand.Source.NextDouble() * total;
 
 			for (int i = 0; i < probs.Length; i++)
 			{
@@ -619,7 +619,7 @@ namespace Pixeye.Framework
 				total += probs[i];
 			}
 
-			var randomPoint = (float) Rand.source.NextDouble() * total;
+			var randomPoint = (float) Rand.Source.NextDouble() * total;
 
 			for (int i = 0; i < probs.Length; i++)
 			{
@@ -647,7 +647,7 @@ namespace Pixeye.Framework
 				total += probs[i];
 			}
 
-			float randomPoint = (float) Rand.source.NextDouble() * total;
+			float randomPoint = (float) Rand.Source.NextDouble() * total;
 
 			for (int i = 0; i < probs.Length; i++)
 			{

@@ -8,7 +8,7 @@ namespace Pixeye.Framework
 	public static class Rand
 	{
 
-		public static Random source = new Random(DateTime.Today.Second);
+		public static Random Source = new Random(DateTime.Today.Second);
 
 	}
 }
