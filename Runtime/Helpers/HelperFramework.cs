@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 
 namespace Pixeye.Framework
@@ -16,8 +15,7 @@ namespace Pixeye.Framework
 
 		#region MATH
 
-		static System.Random _r = new System.Random(DateTime.Today.Second);
-
+	 
 		public static bool Every(this float step, float time)
 		{
 			if (step % time == 0)
@@ -511,7 +509,7 @@ namespace Pixeye.Framework
 				total += probs[i];
 			}
 
-			var randomPoint = (float) _r.NextDouble() * total;
+			var randomPoint = (float) Rand.source.NextDouble() * total;
 
 			for (int i = 0; i < probs.Length; i++)
 			{
@@ -526,18 +524,18 @@ namespace Pixeye.Framework
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static float Between(this Vector2 v)
 		{
-			return _r.Next(2) > 0 ? v.x : v.y;
+			return Rand.source.Next(2) > 0 ? v.x : v.y;
 		}
 		
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static float Or(this float arg0, float arg1, float chance = 0.5f)
 		{
-			return _r.NextDouble() > chance ? arg0 : arg1;
+			return Rand.source.NextDouble() > chance ? arg0 : arg1;
 		}
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static int Or(this int arg0, int arg1, float chance = 0.5f)
 		{
-			return _r.NextDouble() > chance ? arg0 : arg1;
+			return Rand.source.NextDouble() > chance ? arg0 : arg1;
 		}
 
 		public static int Between(this object o, int a, int b, float chance = 0.5f)
@@ -598,7 +596,7 @@ namespace Pixeye.Framework
 				total += probs[i];
 			}
 
-			float randomPoint = (float) _r.NextDouble() * total;
+			float randomPoint = (float) Rand.source.NextDouble() * total;
 
 			for (int i = 0; i < probs.Length; i++)
 			{
@@ -621,7 +619,7 @@ namespace Pixeye.Framework
 				total += probs[i];
 			}
 
-			var randomPoint = (float) _r.NextDouble() * total;
+			var randomPoint = (float) Rand.source.NextDouble() * total;
 
 			for (int i = 0; i < probs.Length; i++)
 			{
@@ -649,7 +647,7 @@ namespace Pixeye.Framework
 				total += probs[i];
 			}
 
-			float randomPoint = (float) _r.NextDouble() * total;
+			float randomPoint = (float) Rand.source.NextDouble() * total;
 
 			for (int i = 0; i < probs.Length; i++)
 			{
