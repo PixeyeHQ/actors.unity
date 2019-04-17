@@ -16,7 +16,7 @@ namespace Pixeye.Framework
 
 		#region MATH
 
-		static System.Random _r = new System.Random();
+		static System.Random _r = new System.Random(DateTime.Today.Second);
 
 		public static bool Every(this float step, float time)
 		{
@@ -523,9 +523,21 @@ namespace Pixeye.Framework
 			return 0;
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static float Between(this Vector2 v)
 		{
-			return UnityEngine.Random.value > 0.5f ? v.x : v.y;
+			return _r.Next(2) > 0 ? v.x : v.y;
+		}
+		
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static float Or(this float arg0, float arg1, float chance = 0.5f)
+		{
+			return _r.NextDouble() > chance ? arg0 : arg1;
+		}
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static int Or(this int arg0, int arg1, float chance = 0.5f)
+		{
+			return _r.NextDouble() > chance ? arg0 : arg1;
 		}
 
 		public static int Between(this object o, int a, int b, float chance = 0.5f)
@@ -672,7 +684,6 @@ namespace Pixeye.Framework
 
 		static FastString strPath = new FastString(256);
 
-		 
 		public static string GetGameObjectPath(Transform transform)
 		{
 			string path = transform.name;
@@ -711,11 +722,11 @@ namespace Pixeye.Framework
 			return path;
 		}
 
-		[MethodImpl(MethodImplOptions.AggressiveInlining )]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal static Actor AddGetActor(this Transform co)
 		{
 			var c = co.GetComponent<Actor>();
-			if ( c == null)
+			if (c == null)
 				c = co.gameObject.AddComponent<Actor>();
 			return c;
 		}
