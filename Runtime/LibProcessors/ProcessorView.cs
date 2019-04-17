@@ -6,7 +6,7 @@ namespace Pixeye.Framework
 	public class ProcessorView : Processor, ITick
 	{
 
-		private Group<ComponentView> group_views;
+		public Group<ComponentView> group_views;
 
 		public ProcessorView()
 		{

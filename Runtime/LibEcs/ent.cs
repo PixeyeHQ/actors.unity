@@ -26,9 +26,9 @@ namespace Pixeye.Framework
 
 		#region ENTITY
 
-		public static EntityComposer Modify()
+		public EntityComposer Modify()
 		{
-			EntityComposer.Default.entity = default;
+			EntityComposer.Default.entity = this;
 			return EntityComposer.Default;
 		}
 
