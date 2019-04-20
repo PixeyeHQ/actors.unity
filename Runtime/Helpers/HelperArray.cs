@@ -102,6 +102,37 @@ namespace Pixeye.Framework
 			if (entries[left] != value) return -1;
 			return left;
 		}
+		
+//		public static int BinarySearch(ref ent[] entries, int value, int left, int right)
+//		{
+//			if (right == 0) return -1;
+//
+//			var len = right;
+//
+//			while (left < right)
+//			{
+//				var middle = (left + right) / 2;
+//
+//				if (entries[middle].id == value)
+//				{
+//					return middle;
+//				}
+//
+//				if (entries[middle].id < value)
+//					left = middle + 1;
+//				else
+//					right = middle - 1;
+//			}
+//
+//			if (left > len) return -1;
+//			if (entries[left] != value) return -1;
+//			return left;
+//		}
+		
+		
+		
+		
+		
 
 		internal class ArrayTraverse
 		{

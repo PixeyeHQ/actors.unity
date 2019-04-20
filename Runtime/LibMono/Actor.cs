@@ -24,10 +24,8 @@ namespace Pixeye.Framework
 		public ent entity = -1;
 
 		#if UNITY_EDITOR
-
 		[FoldoutGroup("Main"), SerializeField, ReadOnly]
 		internal int _entity = -1;
-
 		#endif
 
 		[FoldoutGroup("Main")]
@@ -35,20 +33,7 @@ namespace Pixeye.Framework
 
 		[FoldoutGroup("Main")]
 		public BlueprintEntity blueprint;
-
-//		#if UNITY_EDITOR && ODIN_INSPECTOR && ACTORS_DEBUG
-//		[InfoBox("DEBUG MODE", InfoMessageType.Warning)]
-//		[HideLabel, FoldoutGroup("Debug")]
-//		[ShowInInspector, ListDrawerSettings(HideRemoveButton = true, HideAddButton = true, DraggableItems = false)]
-//		[HideIf("ConditionShowComponentdsDebug")]
-//		public List<IComponent> components = new List<IComponent>();
-//
-//		bool ConditionShowComponentdsDebug()
-//		{
-//			return components == null || components.Count==0;
-//		}
-//		#endif
-
+	 
 		#endregion
 
 		#region METHODS UNITY
@@ -123,14 +108,6 @@ namespace Pixeye.Framework
 			#if UNITY_EDITOR
 			_entity = id;
 
-//			#if ODIN_INSPECTOR && ACTORS_DEBUG
-//			if ( Entity.actorsComponents[id]!=null)
-//				Entity.actorsComponents[id].Clear();
-//			Entity.actorsComponents[id] = components;
-//		 
-//
-//			#endif
-
 			#endif
 
 			Entity.transforms[id] = transform;
@@ -141,6 +118,45 @@ namespace Pixeye.Framework
 				blueprint.Populate(entity);
 			else
 				Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Activate);
+		}
+
+		internal void LaunchFrom(HandleEntityComposer model)
+		{
+			int id;
+			byte age = 0;
+
+			if (ent.entityStackLength > 0)
+			{
+				var pop = ent.entityStack.Dequeue();
+				byte ageOld = pop.age;
+				id = pop.id;
+				unchecked
+				{
+					age = (byte) (ageOld + 1);
+				}
+
+				ent.entityStackLength--;
+			}
+			else
+				id = ent.lastID++;
+
+			Entity.SetupWithTransform(id, isPooled);
+
+			entity = new ent(id, age);
+
+			#if UNITY_EDITOR
+			_entity = id;
+
+			#endif
+
+			Entity.transforms[id] = transform;
+
+			Setup();
+
+			EntityComposer.Default.entity = entity;
+			model(EntityComposer.Default);
+
+			Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Activate);
 		}
 
 		protected virtual void Setup()
@@ -186,6 +202,25 @@ namespace Pixeye.Framework
 			return ref entity;
 		}
 
+		public static Actor Create(string prefabID, HandleEntityComposer model, bool pooled = false)
+		{
+			var tr = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefabID) : HelperFramework.SpawnInternal(prefabID);
+			var actor = tr.AddGetActor();
+			actor.isPooled = pooled;
+			actor.LaunchFrom(model);
+			return actor;
+		}
+
+		public static Actor Create(GameObject prefab, HandleEntityComposer model, bool pooled = false)
+		{
+			var tr = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefab) : HelperFramework.SpawnInternal(prefab);
+			var actor = tr.AddGetActor();
+			actor.isPooled = pooled;
+			actor.LaunchFrom(model);
+
+			return actor;
+		}
+
 		public static Actor Create(string prefabID, bool pooled = false)
 		{
 			var tr = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefabID) : HelperFramework.SpawnInternal(prefabID);
@@ -193,6 +228,7 @@ namespace Pixeye.Framework
 
 			actor.isPooled = pooled;
 			actor.Launch();
+
 			return actor;
 		}
 

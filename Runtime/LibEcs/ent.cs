@@ -1,7 +1,6 @@
-//  Project : ecs
+﻿//  Project : ecs
 // Contacts : Pix - info@pixeye.games
 //     Date : 3/16/2019 
-
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
@@ -26,7 +25,7 @@ namespace Pixeye.Framework
 
 		#region ENTITY
 
-		public EntityComposer Modify()
+		internal EntityComposer Modify()
 		{
 			EntityComposer.Default.entity = this;
 			return EntityComposer.Default;
@@ -99,15 +98,16 @@ namespace Pixeye.Framework
 			Entity.Delayed.Set(this, 0, Entity.Delayed.Action.Kill);
 			Entity.entitiesCount--;
 		}
-
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public bool Equals(ent other)
 		{
 			return id == other.id && age == other.age;
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public bool Exist()
 		{
-			return Entity.isAlive[id];
+			return id > -1 && Entity.isAlive[id];
 		}
 
 		#endregion

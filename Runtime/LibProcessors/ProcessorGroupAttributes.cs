@@ -11,8 +11,6 @@ namespace Pixeye.Framework
 	public class ProcessorGroupAttributes
 	{
 
-	 
-
 		public static void Setup(object b)
 		{
 			var type = b.GetType();
@@ -39,7 +37,7 @@ namespace Pixeye.Framework
 //							activator = FrameworkActivator.GetActivator(ctor);
 //							FrameworkActivator.activators.Add(hash, activator);
 //						}
-						o =  Activator.CreateInstance(fType);
+						o = Activator.CreateInstance(fType);
 						DataSession.binds.Add(hash, o);
 					}
 

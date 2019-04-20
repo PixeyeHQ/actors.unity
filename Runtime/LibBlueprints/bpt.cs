@@ -3,8 +3,11 @@
 
 namespace Pixeye.Framework
 {
+	public delegate void HandleEntityComposer(EntityComposer composer);
+	
 	public readonly struct bpt
 	{
+
 		public readonly int hash;
 
 		public bpt(int hash)

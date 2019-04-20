@@ -1,4 +1,4 @@
-//  Project : ecs
+﻿//  Project : ecs
 // Contacts : Pix - ask@pixeye.games
 
 using System;
@@ -42,7 +42,7 @@ namespace Pixeye.Framework
 		internal static BitArray isPooled = new BitArray(SettingsEngine.SizeEntities);
 
 		public static Transform[] transforms = new Transform[SettingsEngine.SizeEntities];
-		public static int[] db = new int[SettingsEngine.SizeEntities];
+		internal static int[] db = new int[SettingsEngine.SizeEntities];
 
 		internal static int[,] generations = new int[SettingsEngine.SizeEntities, SettingsEngine.SizeGenerations];
 		internal static BufferTags[] tags = new BufferTags[SettingsEngine.SizeEntities];
@@ -109,6 +109,14 @@ namespace Pixeye.Framework
 			Entity.db[id] = db;
 		}
 
+        #if ODIN_INSPECTOR
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static void BindDB(in this ent entity, db database)
+		{
+			db[entity.id] = database;
+		}
+        #endif
+        
 		#endregion
 
 		public static ent Create()
@@ -159,6 +167,106 @@ namespace Pixeye.Framework
 			Setup(id);
 			var entity = new ent(id, age);
 			bpAsset.Populate(entity);
+			return entity;
+		}
+
+		public static ent Bind(GameObject prefab, HandleEntityComposer model, bool pooled = false)
+		{
+			int id;
+			byte age = 0;
+
+			if (ent.entityStackLength > 0)
+			{
+				var pop = ent.entityStack.Dequeue();
+				byte ageOld = pop.age;
+				id = pop.id;
+				unchecked
+				{
+					age = (byte) (ageOld + 1);
+				}
+
+				ent.entityStackLength--;
+			}
+			else
+				id = ent.lastID++;
+
+			SetupWithTransform(id, pooled);
+			transforms[id] = prefab.transform;
+
+			var entity = new ent(id, age);
+
+			EntityComposer.Default.entity = entity;
+			model(EntityComposer.Default);
+			Delayed.Set(entity, 0, Delayed.Action.Activate);
+			 
+			#if ACTORS_DEBUG
+			prefab.name += $" [{id}]";
+			#endif
+
+			return entity;
+		}
+
+		public static ent Create(string prefabID, HandleEntityComposer model, bool pooled = false)
+		{
+			int id;
+			byte age = 0;
+
+			if (ent.entityStackLength > 0)
+			{
+				var pop = ent.entityStack.Dequeue();
+				byte ageOld = pop.age;
+				id = pop.id;
+				unchecked
+				{
+					age = (byte) (ageOld + 1);
+				}
+
+				ent.entityStackLength--;
+			}
+			else
+				id = ent.lastID++;
+
+			SetupWithTransform(id, pooled);
+			transforms[id] = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefabID) : HelperFramework.SpawnInternal(prefabID);
+
+			var entity = new ent(id, age);
+
+			EntityComposer.Default.entity = entity;
+			model(EntityComposer.Default);
+			Delayed.Set(entity, 0, Delayed.Action.Activate);
+
+			return entity;
+		}
+
+		public static ent Create(GameObject prefab, HandleEntityComposer model, bool pooled = false)
+		{
+			int id;
+			byte age = 0;
+
+			if (ent.entityStackLength > 0)
+			{
+				var pop = ent.entityStack.Dequeue();
+				byte ageOld = pop.age;
+				id = pop.id;
+				unchecked
+				{
+					age = (byte) (ageOld + 1);
+				}
+
+				ent.entityStackLength--;
+			}
+			else
+				id = ent.lastID++;
+
+			SetupWithTransform(id, pooled);
+			transforms[id] = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefab) : HelperFramework.SpawnInternal(prefab);
+
+			var entity = new ent(id, age);
+
+			EntityComposer.Default.entity = entity;
+			model(EntityComposer.Default);
+			Delayed.Set(entity, 0, Delayed.Action.Activate);
+
 			return entity;
 		}
 

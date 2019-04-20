@@ -13,16 +13,16 @@ namespace Pixeye.Framework
 	public class PostHandleBlueprintEntities : EndNameEditAction
 	{
 
-		[MenuItem("Tools/Actors/Update Data", priority = -10)]
-		public static void UpdateData()
-		{
-			DataObject[] objs = Resources.FindObjectsOfTypeAll<DataObject>();
-
-			foreach (var o in objs)
-			{
-				o.GenerateDatas();
-			}
-		}
+//		[MenuItem("Tools/Actors/Update Data", priority = -10)]
+//		public static void UpdateData()
+//		{
+//			DataObject[] objs = Resources.FindObjectsOfTypeAll<DataObject>();
+//
+//			foreach (var o in objs)
+//			{
+//				o.Update();
+//			}
+//		}
 
 		const int MENU_ITEM_PRIORITY = 1;
 		static Texture2D scriptIcon;

@@ -26,6 +26,7 @@ namespace Pixeye.Framework
 	public class DataObject : SerializedScriptableObject
 	{
 
+	 
 		internal static Dictionary<int, DataObject> all = new Dictionary<int, DataObject>(FastComparable.Default);
 
 		#if UNITY_EDITOR
@@ -38,7 +39,7 @@ namespace Pixeye.Framework
 		public int id;
 
 		[SerializeField, HideInInspector]
-		internal List<IData> containerRuntime = new List<IData>();
+		internal IData[] containerRuntime = new IData[0];
 
 		#if UNITY_EDITOR
 		[InfoBox("DONT FORGET TO UPDATE")]
@@ -78,25 +79,24 @@ namespace Pixeye.Framework
 			}
 		}
 
-		internal void OnAdd()
+		[HideInInspector]
+		[SerializeField]
+		private List<Object> unityObjectReferences;
+
+		internal void OnAdd(List<Type> types)
 		{
-			var q = AppDomain.CurrentDomain.GetAssemblies().Where(x => x != Assembly.GetExecutingAssembly());
-			var qTypes = q.SelectMany(x => x.GetTypes())
-					.Where(x => !x.IsAbstract)
-					.Where(x => typeof(IData).IsAssignableFrom(x));
+			containerRuntime = new IData[types.Count];
 
-			var types = qTypes.ToArray();
-			containerRuntime = new List<IData>(types.Length);
-
-			for (int i = 0; i < types.Length; i++)
+			for (int i = 0; i < types.Count; i++)
 			{
 				var t = types[i];
-				containerRuntime.Add(null);
+				containerRuntime[i] = null;
 				var o = container.Find(v => v.GetType() == t);
+
 				if (o != null)
 				{
-					byte[] bytes = SerializationUtility.SerializeValue(o, DataFormat.Binary);
-					containerRuntime[i] = SerializationUtility.DeserializeValue<IData>(bytes, DataFormat.Binary);
+					byte[] bytes = SerializationUtility.SerializeValue(o, DataFormat.Binary, out unityObjectReferences);
+					containerRuntime[i] = SerializationUtility.DeserializeValue<IData>(bytes, DataFormat.Binary, unityObjectReferences);
 				}
 			}
 		}
@@ -104,21 +104,42 @@ namespace Pixeye.Framework
 		[Sirenix.OdinInspector.Button(ButtonSizes.Large)]
 		public void Update()
 		{
-			OnAdd();
-		}
+			var q = AppDomain.CurrentDomain.GetAssemblies().Where(x => x != Assembly.GetExecutingAssembly());
+			var types = q.SelectMany(x => x.GetTypes())
+					.Where(x => !x.IsAbstract)
+					.Where(x => typeof(IData).IsAssignableFrom(x)).ToList();
 
-		[Sirenix.OdinInspector.Button(ButtonSizes.Large)]
-		public void GenerateDatas()
-		{
-			var arr = GetFilteredTypeList().ToList();
-			changed = arr.Count > 0;
-			for (int i = 0; i < arr.Count; i++)
+			var index = 0;
+
+			var t = Resources.Load<DataTypes>("DB !Types"); // Resources.FindObjectsOfTypeAll<DataTypes>()[0];
+
+			t.allTypes = new Type[types.Count];
+			for (int i = 0; i < types.Count; i++)
 			{
-				container.Add(Activator.CreateInstance(arr[i]) as IData);
+				var type = types[i];
+				t.allTypes[i] = type;
+
+				var objectFields = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
+
+				for (int l = 0; l < objectFields.Length; l++)
+				{
+					var myFieldInfo = objectFields[l];
+
+					var bindAttribute = Attribute.GetCustomAttribute(myFieldInfo, typeof(BindAttribute)) as BindAttribute;
+					if (bindAttribute != null)
+					{
+						myFieldInfo.SetValue(null, index++);
+						break;
+					}
+				}
 			}
-			if (changed)
-				PostHandleDataTags.Generate();
-			changed = false;
+
+			DataObject[] objs = Resources.FindObjectsOfTypeAll<DataObject>();
+
+			foreach (var o in objs)
+			{
+				o.OnAdd(types);
+			}
 		}
 		#endif
 
@@ -204,6 +225,5 @@ namespace Pixeye.Framework
 		#endif
 
 	}
-	 
 }
 #endif
