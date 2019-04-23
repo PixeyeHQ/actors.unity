@@ -88,8 +88,8 @@ namespace Pixeye.Framework
 
 		public bool Has<T>() where T : class, IComponent, new()
 		{
-			var id = Storage<T>.componentMask;
-			return (Entity.generations[id, Storage<T>.generation] & id) == id;
+			var mask = Storage<T>.componentMask;
+			return (Entity.generations[id, Storage<T>.generation] & mask) == mask;
 		}
 
 		public void Release()
