@@ -109,11 +109,13 @@ namespace Pixeye.Framework
 			Entity.db[id] = db;
 		}
 
+		#if ODIN_INSPECTOR
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static void Bind(in this ent entity, db database)
 		{
 			db[entity.id] = database;
 		}
+		#endif
 
 		#endregion
 
