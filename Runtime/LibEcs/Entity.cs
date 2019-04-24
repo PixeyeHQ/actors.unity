@@ -168,6 +168,37 @@ namespace Pixeye.Framework
 			return entity;
 		}
 
+		public static ent Create(HandleEntityComposer model)
+		{
+			int id;
+			byte age = 0;
+
+			if (ent.entityStackLength > 0)
+			{
+				var pop = ent.entityStack.Dequeue();
+				byte ageOld = pop.age;
+				id = pop.id;
+				unchecked
+				{
+					age = (byte) (ageOld + 1);
+				}
+
+				ent.entityStackLength--;
+			}
+			else
+				id = ent.lastID++;
+
+			Setup(id);
+
+			var entity = new ent(id, age);
+
+			EntityComposer.Default.entity = entity;
+			model(EntityComposer.Default);
+			Delayed.Set(entity, 0, Delayed.Action.Activate);
+
+			return entity;
+		}
+
 		public static ent Bind(GameObject prefab, HandleEntityComposer model, bool pooled = false)
 		{
 			int id;
