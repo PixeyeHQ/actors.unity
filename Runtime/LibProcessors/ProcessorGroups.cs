@@ -13,7 +13,7 @@ namespace Pixeye.Framework
 	{
 
 		internal static DictionaryGroups container = new DictionaryGroups();
-
+    
 		internal static GroupCore SetupGroup(Type groupType, Composition filter)
 		{
 			GroupCore groupCore;

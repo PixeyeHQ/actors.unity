@@ -47,7 +47,7 @@ namespace Pixeye.Framework
 						var generationAdd = Storage.generations[operation.arg];
 						var maskAdd = Storage.masks[operation.arg];
 
-						Entity.generations[entityID, generationAdd] |= maskAdd;
+						//Entity.generations[entityID, generationAdd] |= maskAdd;
 
 						for (int l = 0; l < components.lenOfGroups; l++)
 						{
@@ -113,7 +113,60 @@ namespace Pixeye.Framework
 
 						groupsToClearLen = 0;
 
+
+						for (int j = 0; j < Entity.components[entityID].Length; j++)
+						{
+							var cID = Entity.components[entityID].components[j];
+							Storage.all[cID].GetComponent(entityID).Dispose();
+						}
+						
+						 
 						Entity.components[entityID].Clear();
+
+						if (Entity.transforms.Length > entityID)
+							Entity.transforms[entityID].gameObject.Release(Entity.isPooled[entityID] ? Pool.Entities : 0);
+						
+						Entity.Delayed.Set(operation.entity, 0, Entity.Delayed.Action.KillFinalize);
+
+						break;
+
+					case Entity.Delayed.Action.Unbind:
+
+						ref var componentsToUnbind = ref Entity.components[entityID];
+						var lengthUnbind = componentsToUnbind.Length;
+
+						for (int j = 0; j < lengthUnbind; j++)
+						{
+							var componentOnKillId = componentsToUnbind.GetComponent(j);
+							var generationRemoveOnKill = Storage.generations[componentOnKillId];
+							var maskRemoveOnKill = Storage.masks[componentOnKillId];
+
+							Entity.generations[entityID, generationRemoveOnKill] &= ~maskRemoveOnKill;
+
+							var storageOnKill = Storage.all[componentOnKillId];
+
+							for (int l = 0; l < storageOnKill.lenOfGroups; l++)
+							{
+								var group = storageOnKill.GroupCoreOfInterest[l];
+								if (!CheckIfExists(group))
+								{
+									if (group.composition.OverlapComponents(componentsToUnbind))
+									{
+										group.TryRemove(entityID);
+									}
+
+									if (groupsToClearLen == groupsToClear.Length)
+										Array.Resize(ref groupsToClear, groupsToClearLen << 1);
+
+									groupsToClear[groupsToClearLen++] = group;
+								}
+							}
+						}
+
+						groupsToClearLen = 0;
+
+						Entity.components[entityID].Clear();
+
 						Entity.Delayed.Set(operation.entity, 0, Entity.Delayed.Action.KillFinalize);
 
 						break;
@@ -181,8 +234,7 @@ namespace Pixeye.Framework
 
 					case Entity.Delayed.Action.KillFinalize:
 
-						if (Entity.transforms.Length > entityID)
-							Entity.transforms[entityID].gameObject.Release(Entity.isPooled[entityID] ? Pool.Entities : 0);
+				 
 
 						operation.entity.ClearTags();
 						ent.entityStack.Enqueue(operation.entity);

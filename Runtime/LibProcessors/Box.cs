@@ -1,7 +1,6 @@
 //  Project  : ACTORS
 //  Contacts : Pixeye - ask@pixeye.games
 
-
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -15,6 +14,7 @@ namespace Pixeye.Framework
 	/// </summary>
 	public class Box : IKernel, IDisposable
 	{
+
 		/// <summary>
 		/// <para>Caches / return assets that Developer takes from the Resources folder.
 		/// Box cleans cache when scene reloads.</para>
@@ -36,8 +36,8 @@ namespace Pixeye.Framework
 		public static T Get<T>(string id) where T : Object
 		{
 			Object obj;
-			var    key      = id.GetHashCode();
-			var    hasValue = Default.items.TryGetValue(key, out obj);
+			var key = id.GetHashCode();
+			var hasValue = Default.items.TryGetValue(key, out obj);
 			if (hasValue == false)
 			{
 				obj = Resources.Load<T>(id);
@@ -46,12 +46,15 @@ namespace Pixeye.Framework
 
 			return obj as T;
 		}
+
 		public static T Get<T>(int id) where T : Object
 		{
 			Object obj;
-			var    hasValue = Default.items.TryGetValue(id, out obj);
-			if (hasValue) return obj as T;
-			obj = Resources.Load(Default.itemsPaths[id]) as GameObject;
+
+			if (Default.items.TryGetValue(id, out obj))
+				return obj as T;
+
+			obj = Resources.Load(Default.itemsPaths[id]);
 			Default.items.Add(id, obj);
 			return obj as T;
 		}
@@ -61,5 +64,6 @@ namespace Pixeye.Framework
 			items.Clear();
 			itemsPaths.Clear();
 		}
+
 	}
 }

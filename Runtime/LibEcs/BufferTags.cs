@@ -150,6 +150,7 @@ namespace Pixeye.Framework
 				return elements[index];
 			}
 		}
+
 		public void RemoveAt(int index)
 		{
 			for (int i = index; i < length - 1; ++i)
@@ -228,6 +229,7 @@ namespace Pixeye.Framework
 	{
 
 		internal static DictionaryGroupTags inUseGroups = new DictionaryGroupTags();
+		internal static DictionaryGroupTags inUseGroupsTypes = new DictionaryGroupTags();
 
 		public static void ClearTags(in this ent entity)
 		{
@@ -270,6 +272,7 @@ namespace Pixeye.Framework
 
 			HandleChange(entity, tagID);
 		}
+
 		public static void Add(in this ent entity, params int[] tagsID)
 		{
 			var entityID = entity.id;
@@ -510,6 +513,26 @@ namespace Pixeye.Framework
 					container = new DictionaryGroups();
 					container.Add(groupCore);
 					inUseGroups.Add(tagID, container);
+				}
+			}
+
+			int index = -1;
+			foreach (var typeID in filter.typesToExclude)
+			{
+				index++;
+				if (!typeID) continue;
+
+				if (inUseGroupsTypes.TryGetValue(index, out container))
+				{
+					if (container.Contain(groupCore)) continue;
+					container.Add(groupCore);
+				}
+				else
+				{
+					container = new DictionaryGroups();
+					container.Add(groupCore);
+					inUseGroupsTypes.Add(index, container);
+			       Debug.Log(index);
 				}
 			}
 		}

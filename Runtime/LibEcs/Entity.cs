@@ -1,4 +1,4 @@
-﻿//  Project : ecs
+//  Project : ecs
 // Contacts : Pix - ask@pixeye.games
 
 using System;
@@ -33,7 +33,7 @@ namespace Pixeye.Framework
 	public static class Entity
 	{
 
-		public static int entitiesCount;
+		public static int entitiesDebugCount;
 
 		internal static int counter = SettingsEngine.SizeEntities;
 		internal static readonly int self = "self".GetHashCode();
@@ -73,7 +73,7 @@ namespace Pixeye.Framework
 
 			components[id].Setup();
 			isAlive[id] = true;
-			entitiesCount++;
+			entitiesDebugCount++;
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -100,7 +100,7 @@ namespace Pixeye.Framework
 			isAlive[id] = true;
 			isPooled[id] = pooled;
 
-			entitiesCount++;
+			entitiesDebugCount++;
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -109,14 +109,12 @@ namespace Pixeye.Framework
 			Entity.db[id] = db;
 		}
 
-        #if ODIN_INSPECTOR
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static void BindDB(in this ent entity, db database)
+		public static void Bind(in this ent entity, db database)
 		{
 			db[entity.id] = database;
 		}
-        #endif
-        
+
 		#endregion
 
 		public static ent Create()
@@ -198,7 +196,7 @@ namespace Pixeye.Framework
 			EntityComposer.Default.entity = entity;
 			model(EntityComposer.Default);
 			Delayed.Set(entity, 0, Delayed.Action.Activate);
-			 
+
 			#if ACTORS_DEBUG
 			prefab.name += $" [{id}]";
 			#endif
@@ -228,6 +226,37 @@ namespace Pixeye.Framework
 
 			SetupWithTransform(id, pooled);
 			transforms[id] = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefabID) : HelperFramework.SpawnInternal(prefabID);
+
+			var entity = new ent(id, age);
+
+			EntityComposer.Default.entity = entity;
+			model(EntityComposer.Default);
+			Delayed.Set(entity, 0, Delayed.Action.Activate);
+
+			return entity;
+		}
+
+		public static ent Create(HandleEntityComposer model, bool pooled)
+		{
+			int id;
+			byte age = 0;
+
+			if (ent.entityStackLength > 0)
+			{
+				var pop = ent.entityStack.Dequeue();
+				byte ageOld = pop.age;
+				id = pop.id;
+				unchecked
+				{
+					age = (byte) (ageOld + 1);
+				}
+
+				ent.entityStackLength--;
+			}
+			else
+				id = ent.lastID++;
+
+			SetupWithTransform(id, pooled);
 
 			var entity = new ent(id, age);
 
@@ -453,16 +482,23 @@ namespace Pixeye.Framework
 		{
 			var storage = Storage<T>.Instance;
 			var entityID = entity.id;
+
 			if (entityID >= storage.components.Length)
 			{
 				var l = entityID << 1;
 				Array.Resize(ref storage.components, l);
 			}
 			ref T val = ref storage.components[entityID];
+
 			if (val == null)
 			{
 				val = storage.Creator();
 			}
+
+			if ((generations[entityID, Storage<T>.generation] & Storage<T>.componentMask) == Storage<T>.componentMask)
+				return storage.components[entityID];
+
+			generations[entityID, Storage<T>.generation] |= Storage<T>.componentMask;
 
 			Delayed.Set(entity, Storage<T>.componentID, Delayed.Action.Add);
 			return val;
@@ -611,7 +647,8 @@ namespace Pixeye.Framework
 				Kill,
 				KillFinalize,
 				Activate,
-				Deactivate
+				Deactivate,
+				Unbind,
 
 			}
 			public static EntityOperation[] operations = new EntityOperation[SettingsEngine.SizeEntities];

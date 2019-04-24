@@ -20,7 +20,6 @@ namespace Pixeye.Framework
 			if (length == container.Length)
 				Array.Resize(ref container, length << 1);
 
-	  
 			container[length++] = obj;
 		}
 
@@ -30,17 +29,13 @@ namespace Pixeye.Framework
 			for (int i = index; i < length; ++i)
 				SetElement(i, ref container[i + 1]);
 		}
-		
-		
-	
-		
 
 		public void SetElement(int index, ref T arg)
 		{
 			container[index] = arg;
 		}
 
-		public static ref T Add()
+		public ref T Add()
 		{
 			var source = Instance;
 			if (source.length == source.container.Length)

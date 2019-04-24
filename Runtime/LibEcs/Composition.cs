@@ -4,6 +4,7 @@
 using System;
 using System.Runtime.CompilerServices;
 using Unity.IL2CPP.CompilerServices;
+using UnityEngine;
 
 namespace Pixeye.Framework
 {
@@ -18,6 +19,7 @@ namespace Pixeye.Framework
 		internal int[] ids = new int[0];
 
 		internal bool[] components = new bool[SettingsEngine.SizeComponents];
+		internal bool[] typesToExclude = new bool[SettingsEngine.SizeComponents];
 
 		public override bool Equals(object obj)
 		{
@@ -30,6 +32,7 @@ namespace Pixeye.Framework
 			int hc = tagsToInclude.Length;
 			int len1 = tagsToInclude.Length;
 			int len2 = tagsToExclude.Length;
+			//	int len3 = typesToExclude.Length;
 
 			unchecked
 			{
@@ -43,6 +46,13 @@ namespace Pixeye.Framework
 				{
 					hc = unchecked(hc * 31 + tagsToExclude[i]);
 				}
+
+//				hc += typesToExclude.Length;
+//
+//				for (int i = 0; i < len3; ++i)
+//				{
+//					hc = typesToExclude[i].GetHashCode();
+//				}
 			}
 
 			return hc;
@@ -59,6 +69,20 @@ namespace Pixeye.Framework
 			}
 
 			return ids.Length == match;
+		}
+
+		internal void AddTypesExclude(int[] types)
+		{
+			if (types != null)
+				for (int i = 0; i < types.Length; i++)
+				{
+					var t = types[i];
+					typesToExclude[t] = true;
+				}
+		}
+
+		internal void Check(ref bool allow)
+		{
 		}
 
 		internal bool Include(int entityID)
@@ -100,11 +124,30 @@ namespace Pixeye.Framework
 			return true;
 		}
 
+		internal bool ExcludeTypes(int entityID)
+		{
+			BufferComponents entityComponents = Entity.components[entityID];
+
+			for (int i = 0; i < entityComponents.Length; i++)
+			{
+				if (typesToExclude[entityComponents.components[i]])
+				{
+					return false;
+				}
+			}
+
+			return true;
+		}
+
 		public bool Equals(Composition other)
 		{
 			if (tagsToInclude.Length != other.tagsToInclude.Length) return false;
+		//	if (typesToExclude.Length != other.typesToExclude.Length) return false;
+
 			int len1 = tagsToInclude.Length;
 			int len2 = tagsToExclude.Length;
+			//int len3 = typesToExclude.Length;
+
 			for (int i = 0; i < len1; i++)
 			{
 				if (tagsToInclude[i] != other.tagsToInclude[i]) return false;
@@ -116,6 +159,11 @@ namespace Pixeye.Framework
 			{
 				if (tagsToExclude[i] != other.tagsToExclude[i]) return false;
 			}
+
+//			for (int i = 0; i < len3; i++)
+//			{
+//				if (typesToExclude[i] != other.typesToExclude[i]) return false;
+//			}
 
 			return true;
 		}

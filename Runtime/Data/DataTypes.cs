@@ -1,6 +1,6 @@
-﻿//  Project : game.metro
+//  Project : game.metro
 // Contacts : Pix - ask@pixeye.games
-#if ODIN_INSPECTOR
+
 using System;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -15,4 +15,3 @@ namespace Pixeye.Framework
 
 	}
 }
-#endif

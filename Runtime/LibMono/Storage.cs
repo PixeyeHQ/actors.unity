@@ -37,9 +37,9 @@ namespace Pixeye.Framework
 
 		public abstract void RemoveNoCheck(int entityID);
 		
-		#if ODIN_INSPECTOR && UNITY_EDITOR && ACTORS_DEBUG
+		//if ODIN_INSPECTOR && UNITY_EDITOR && ACTORS_DEBUG
 		internal abstract IComponent GetComponent(int entityID);
-		#endif
+		//#endif
 
 	}
 
@@ -101,12 +101,12 @@ namespace Pixeye.Framework
 		{
 			Entity.generations[entityID, generation] &= ~componentMask;
 		}
-		#if ODIN_INSPECTOR && UNITY_EDITOR && ACTORS_DEBUG
+		//#if ODIN_INSPECTOR && UNITY_EDITOR && ACTORS_DEBUG
 		internal override  IComponent GetComponent(int entityID)
 		{
 			return components[entityID];
 		}
-		#endif
+	//	#endif
 		
 		public T TryGet(int entityID)
 		{

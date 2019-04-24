@@ -33,7 +33,7 @@ namespace Pixeye.Framework
 
 		[FoldoutGroup("Main")]
 		public BlueprintEntity blueprint;
-	 
+
 		#endregion
 
 		#region METHODS UNITY
@@ -200,6 +200,14 @@ namespace Pixeye.Framework
 		public ref readonly ent GetEntity()
 		{
 			return ref entity;
+		}
+
+		public static Actor CreateFor(GameObject obj, HandleEntityComposer model, bool pooled = false)
+		{
+			var actor = obj.transform.AddGetActor();
+			actor.isPooled = pooled;
+			actor.LaunchFrom(model);
+			return actor;
 		}
 
 		public static Actor Create(string prefabID, HandleEntityComposer model, bool pooled = false)

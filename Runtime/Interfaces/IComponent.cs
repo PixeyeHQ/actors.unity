@@ -7,5 +7,6 @@ namespace Pixeye.Framework
 	{
 		void Copy(int entityID);
 		void Dispose();
+		
 	}
 }

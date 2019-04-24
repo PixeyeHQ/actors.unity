@@ -1,7 +1,7 @@
-﻿//  Project : ecs
+//  Project : ecs
 // Contacts : Pix - info@pixeye.games
 //     Date : 3/16/2019 
-using System;
+
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -11,7 +11,7 @@ using UnityEngine;
 namespace Pixeye.Framework
 {
 	[StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Unicode)]
-	public readonly struct ent : IComparable<int>, IComparable, IEquatable<ent>
+	public readonly struct ent
 	{
 
 		internal static Queue<ent> entityStack = new Queue<ent>(0);
@@ -89,15 +89,24 @@ namespace Pixeye.Framework
 		public bool Has<T>() where T : class, IComponent, new()
 		{
 			var mask = Storage<T>.componentMask;
+
 			return (Entity.generations[id, Storage<T>.generation] & mask) == mask;
+		}
+
+		public void Unbind()
+		{
+			Entity.isAlive[id] = false;
+			Entity.Delayed.Set(this, 0, Entity.Delayed.Action.Unbind);
+			Entity.entitiesDebugCount--;
 		}
 
 		public void Release()
 		{
 			Entity.isAlive[id] = false;
 			Entity.Delayed.Set(this, 0, Entity.Delayed.Action.Kill);
-			Entity.entitiesCount--;
+			Entity.entitiesDebugCount--;
 		}
+
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public bool Equals(ent other)
 		{
@@ -143,9 +152,7 @@ namespace Pixeye.Framework
 			arg0 = default;
 			arg1 = default;
 			if ((arg0 = Storage<T>.Instance.TryGet(id)) == null) return false;
-			if ((arg1 = Storage<Y>.Instance.TryGet(id)) == null) return false;
-
-			return true;
+			return (arg1 = Storage<Y>.Instance.TryGet(id)) != null;
 		}
 
 		/// <summary>
@@ -167,9 +174,7 @@ namespace Pixeye.Framework
 			arg2 = default;
 			if ((arg0 = Storage<T>.Instance.TryGet(id)) == null) return false;
 			if ((arg1 = Storage<Y>.Instance.TryGet(id)) == null) return false;
-			if ((arg2 = Storage<U>.Instance.TryGet(id)) == null) return false;
-
-			return true;
+			return (arg2 = Storage<U>.Instance.TryGet(id)) != null;
 		}
 
 		/// <summary>
@@ -195,8 +200,7 @@ namespace Pixeye.Framework
 			if ((arg0 = Storage<T>.Instance.TryGet(id)) == null) return false;
 			if ((arg1 = Storage<Y>.Instance.TryGet(id)) == null) return false;
 			if ((arg2 = Storage<U>.Instance.TryGet(id)) == null) return false;
-			if ((arg3 = Storage<I>.Instance.TryGet(id)) == null) return false;
-			return true;
+			return (arg3 = Storage<I>.Instance.TryGet(id)) != null;
 		}
 
 		/// <summary>
@@ -230,8 +234,7 @@ namespace Pixeye.Framework
 			if ((arg1 = Storage<Y>.Instance.TryGet(id)) == null) return false;
 			if ((arg2 = Storage<U>.Instance.TryGet(id)) == null) return false;
 			if ((arg3 = Storage<I>.Instance.TryGet(id)) == null) return false;
-			if ((arg4 = Storage<O>.Instance.TryGet(id)) == null) return false;
-			return true;
+			return (arg4 = Storage<O>.Instance.TryGet(id)) != null;
 		}
 
 		#endregion

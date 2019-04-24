@@ -26,7 +26,7 @@ namespace Pixeye.Framework
 			go.localScale = Vector3.one;
 			return go;
 		}
-		
+
 		public static T Spawn<T>(GameObject prefab, Transform parent, Vector3 startPosition = default, Quaternion startRotation = default)
 		{
 			var go = Object.Instantiate(prefab, parent).transform;
@@ -34,6 +34,26 @@ namespace Pixeye.Framework
 			go.localRotation = startRotation;
 			go.localScale = Vector3.one;
 			return go.GetComponent<T>();
+		}
+
+		public static Transform Spawn(string prefabID, Vector3 startPosition = default, Quaternion startRotation = default)
+		{
+			var go = Object.Instantiate(Box.Get<GameObject>(prefabID)).transform;
+			go.position = startPosition;
+			go.localRotation = startRotation;
+			go.localScale = Vector3.one;
+			return go;
+		}
+
+		public static Transform Spawn(int poolID, string prefabID, Vector3 startPosition = default, Quaternion startRotation = default)
+		{
+			var go = HandlePool.pools[poolID].Spawn(prefabID).transform;
+			go.position = startPosition;
+			go.localRotation = startRotation;
+			go.localScale = Vector3.one;
+			return go;
+
+
 		}
 
 	}
