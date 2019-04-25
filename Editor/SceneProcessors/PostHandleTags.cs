@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using System;
 using System.Linq;
+using System.Reflection;
 using UnityEditor;
 
 /// Contributor : Dark-A-l https://github.com/Dark-A-l
 namespace Pixeye.Framework
 {
+	[InitializeOnLoad]
 	public class PostHandleTags
 	{
 
@@ -23,48 +25,77 @@ namespace Pixeye.Framework
 		//	static string pathWithMeta => DataFramework.pathTags + DataFramework.pathTagsMeta;
 		static string path => DataFramework.pathTags;
 
+		 
+		internal static List<Type> tagTypes = new List<Type>();
+
+		static PostHandleTags()
+		{
+			UpdateTypes();
+		}
+
+		//[UnityEditor.Callbacks.DidReloadScripts]
+		[MenuItem("Tools/Actors/Tags/Update Types", false, 0)]
+		private static void UpdateTypes()
+		{
+			tagTypes.Clear();
+			var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+			var executing = Assembly.GetExecutingAssembly();
+			for (int i = 0; i < assemblies.Length; i++)
+			{
+				var a = assemblies[i];
+				if (a != executing)
+				{
+					var types = a.GetTypes();
+					foreach (Type type in types)
+					{
+						if (typeof(ITag).IsAssignableFrom(type))
+							tagTypes.Add(type);
+					}
+				}
+			}
+		}
+
 		[MenuItem("Tools/Actors/Tags/Size/24 Tags", false, 0)]
 		static public void Set24()
 		{
 			DataFramework.sizeTags = 24;
-			string       definesString = PlayerSettings.GetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup);
-			List<string> allDefines    = definesString.Split(';').ToList();
+			string definesString = PlayerSettings.GetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup);
+			List<string> allDefines = definesString.Split(';').ToList();
 
-		  var index =	allDefines.FindIndex(d => d.Contains("ACTORS_TAGS"));
-		  allDefines[index] = "ACTORS_TAGS_24";
-		  PlayerSettings.SetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup,string.Join(";", allDefines.ToArray()));
+			var index = allDefines.FindIndex(d => d.Contains("ACTORS_TAGS"));
+			allDefines[index] = "ACTORS_TAGS_24";
+			PlayerSettings.SetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup, string.Join(";", allDefines.ToArray()));
 
 //			allDefines.AddRange(Symbols.Except(allDefines));
 //			PlayerSettings.SetScriptingDefineSymbolsForGroup(
 //					EditorUserBuildSettings.selectedBuildTargetGroup,
 //					string.Join(";", allDefines.ToArray()));
 		}
-		
+
 		[MenuItem("Tools/Actors/Tags/Size/12 Tags", false, 0)]
 		static public void Set12()
 		{
 			DataFramework.sizeTags = 12;
-			string       definesString = PlayerSettings.GetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup);
-			List<string> allDefines    = definesString.Split(';').ToList();
+			string definesString = PlayerSettings.GetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup);
+			List<string> allDefines = definesString.Split(';').ToList();
 
-			var index =	allDefines.FindIndex(d => d.Contains("ACTORS_TAGS"));
+			var index = allDefines.FindIndex(d => d.Contains("ACTORS_TAGS"));
 			allDefines[index] = "ACTORS_TAGS_12";
-			PlayerSettings.SetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup,string.Join(";", allDefines.ToArray()));
+			PlayerSettings.SetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup, string.Join(";", allDefines.ToArray()));
 		}
-		
+
 		[MenuItem("Tools/Actors/Tags/Size/6 Tags", false, 0)]
 		static public void Set6()
 		{
 			DataFramework.sizeTags = 6;
-			string       definesString = PlayerSettings.GetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup);
-			List<string> allDefines    = definesString.Split(';').ToList();
+			string definesString = PlayerSettings.GetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup);
+			List<string> allDefines = definesString.Split(';').ToList();
 
-			var index =	allDefines.FindIndex(d => d.Contains("ACTORS_TAGS"));
+			var index = allDefines.FindIndex(d => d.Contains("ACTORS_TAGS"));
 			allDefines[index] = "ACTORS_TAGS_6";
-			PlayerSettings.SetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup,string.Join(";", allDefines.ToArray()));
+			PlayerSettings.SetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup, string.Join(";", allDefines.ToArray()));
 		}
-		
-		
+
 		[MenuItem("Tools/Actors/Tags/Register", false, 1)]
 		static public void Execute()
 		{
@@ -99,7 +130,7 @@ namespace Pixeye.Framework
 						while (!sr.EndOfStream)
 						{
 							var str = sr.ReadLine();
-							var e   = int.Parse(str);
+							var e = int.Parse(str);
 							freeIdTags.Add(e);
 						}
 					}
@@ -136,11 +167,11 @@ namespace Pixeye.Framework
 		static void TagRegist()
 		{
 			string[] Files = Directory.GetFiles(path, "*.cs");
-			int      count = 0;
-			for ( int f = 0; f < Files.Length; f++ )
+			int count = 0;
+			for (int f = 0; f < Files.Length; f++)
 			{
-				var    readPath = Files[f];
-				string text     = String.Empty;
+				var readPath = Files[f];
+				string text = String.Empty;
 				try
 				{
 					using (StreamReader sr = new StreamReader(readPath, System.Text.Encoding.Default))
@@ -149,7 +180,7 @@ namespace Pixeye.Framework
 					}
 
 					var lines = text.Split(new[] {'\n', '\r'}, StringSplitOptions.RemoveEmptyEntries);
-					for ( int i = 0; i < lines.Length; i++ )
+					for (int i = 0; i < lines.Length; i++)
 					{
 						var atr = lines[i].LastIndexOf('[');
 						if (atr >= 0) continue;
@@ -196,7 +227,7 @@ namespace Pixeye.Framework
 
 					using (StreamWriter sw = new StreamWriter(readPath, false, System.Text.Encoding.Default))
 					{
-						foreach ( var item in lines )
+						foreach (var item in lines)
 							sw.WriteLine(item);
 					}
 				}
@@ -206,7 +237,7 @@ namespace Pixeye.Framework
 				}
 			}
 
-			for ( int i = 1; i <= lastIndex; i++ )
+			for (int i = 1; i <= lastIndex; i++)
 			{
 				if (!idTags.Contains(i) & !freeIdTags.Contains(i))
 					freeIdTags.Add(i);
