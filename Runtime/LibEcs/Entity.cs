@@ -513,24 +513,23 @@ namespace Pixeye.Framework
 
 		public static T Add<T>(in this ent entity) where T : IComponent, new()
 		{
+	 
 			var storage = Storage<T>.Instance;
 			var entityID = entity.id;
 
+			 
 			if (entityID >= storage.components.Length)
-			{
-				var l = entityID << 1;
-				Array.Resize(ref storage.components, l);
-			}
+				Array.Resize(ref storage.components, entityID << 1);
+			
 			ref T val = ref storage.components[entityID];
 
 			if (val == null)
-			{
 				val = storage.Creator();
-			}
-
+	 
 			if ((generations[entityID, Storage<T>.generation] & Storage<T>.componentMask) == Storage<T>.componentMask)
 				return storage.components[entityID];
 
+			
 			generations[entityID, Storage<T>.generation] |= Storage<T>.componentMask;
 
 			Delayed.Set(entity, Storage<T>.componentID, Delayed.Action.Add);

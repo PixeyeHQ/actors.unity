@@ -15,6 +15,8 @@ namespace Pixeye.Framework
 		public T[] container = new T[12];
 		public int length;
 
+		public ref T this[int index] => ref container[index];
+
 		public void Add(T obj)
 		{
 			if (length == container.Length)
@@ -37,11 +39,10 @@ namespace Pixeye.Framework
 
 		public ref T Add()
 		{
-			var source = Instance;
-			if (source.length == source.container.Length)
-				Array.Resize(ref source.container, source.length << 1);
+			if (length == container.Length)
+				Array.Resize(ref container, length << 1);
 
-			return ref source.container[source.length++];
+			return ref container[length++];
 		}
 
 	}

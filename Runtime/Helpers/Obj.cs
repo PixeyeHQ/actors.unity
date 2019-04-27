@@ -8,6 +8,15 @@ namespace Pixeye.Framework
 	public static class Obj
 	{
 
+		public static T Spawn<T>(string prefabID, Vector3 startPosition = default, Quaternion startRotation = default)
+		{
+			var prefab = Box.Get<GameObject>(prefabID);
+			var go = Object.Instantiate(prefab).transform;
+			go.localPosition = startPosition;
+			go.localRotation = startRotation;
+			return go.GetComponentInChildren<T>();
+		}
+
 		public static Transform Spawn(string prefabID, Transform parent, Vector3 startPosition = default, Quaternion startRotation = default)
 		{
 			var prefab = Box.Get<GameObject>(prefabID);
@@ -52,8 +61,6 @@ namespace Pixeye.Framework
 			go.localRotation = startRotation;
 			go.localScale = Vector3.one;
 			return go;
-
-
 		}
 
 	}
