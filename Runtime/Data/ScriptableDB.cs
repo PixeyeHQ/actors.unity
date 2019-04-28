@@ -14,7 +14,7 @@ namespace Pixeye
 {
 	[CreateAssetMenu(fileName = "DB", menuName = "Actors/Add/Data/Base")]
 	[ShowOdinSerializedPropertiesInInspector]
-	public class ScriptableCoreDb : CoreDB, ISerializationCallbackReceiver
+	public class ScriptableDB : CoreDB, ISerializationCallbackReceiver
 	{
 
 		[SerializeField, HideReferenceObjectPicker, TypeFilter("GetFilteredTypeList"), Title("Setup"), ListDrawerSettings(DraggableItems = false)]
