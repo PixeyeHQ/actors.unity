@@ -2,15 +2,12 @@
 // Contacts : Pix - ask@pixeye.games
 
 #if ODIN_INSPECTOR
-using UnityEngine;
-
+ 
 namespace Pixeye.Framework
 {
 	public readonly struct db
 	{
-    
 		public readonly int hash;
-
 		public db(int hash)
 		{
 			this.hash = hash;
@@ -19,23 +16,19 @@ namespace Pixeye.Framework
 		static public implicit operator db(string value)
 		{
 			var hash = value.GetHashCode();
-
-			 
-
-			if (!DataObject.all.TryGetValue(hash, out DataObject db))
-			{
-				db = Resources.Load<DataObject>(value);
-				db.id = hash;
-
-				DataObject.all.Add(hash, db);
-			}
-
+			var d = Box.Get<CoreDB>(value);
+			d.Setup();
 			return new db(hash);
 		}
 
 		static public implicit operator int(db value)
 		{
 			return value.hash;
+		}
+
+		static public implicit operator CoreDB(db value)
+		{
+			return Box.Default.items[value.hash] as CoreDB;
 		}
 
 	}

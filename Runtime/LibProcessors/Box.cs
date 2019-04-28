@@ -23,7 +23,7 @@ namespace Pixeye.Framework
 
 		public static readonly string path = "/{0}";
 
-		Dictionary<int, Object> items = new Dictionary<int, Object>(20, new FastComparable());
+		internal Dictionary<int, Object> items = new Dictionary<int, Object>(20, new FastComparable());
 		Dictionary<int, string> itemsPaths = new Dictionary<int, string>(20, new FastComparable());
 
 		public static int StringToHash(string val)

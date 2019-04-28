@@ -31,6 +31,11 @@ namespace Pixeye.Framework
 			entity.AddLater(tags);
 		}
 
+		public void Add(db db)
+		{
+			Entity.db[entity.id] = db;
+		}
+
 	}
 
 	internal static class HelperEntityComposer

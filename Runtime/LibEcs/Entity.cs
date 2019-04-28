@@ -42,15 +42,11 @@ namespace Pixeye.Framework
 		internal static BitArray isPooled = new BitArray(SettingsEngine.SizeEntities);
 
 		public static Transform[] transforms = new Transform[SettingsEngine.SizeEntities];
-		internal static int[] db = new int[SettingsEngine.SizeEntities];
+		public static CoreDB[] db = new CoreDB[SettingsEngine.SizeEntities];
 
 		internal static int[,] generations = new int[SettingsEngine.SizeEntities, SettingsEngine.SizeGenerations];
 		internal static BufferTags[] tags = new BufferTags[SettingsEngine.SizeEntities];
 		internal static BufferComponents[] components = new BufferComponents[SettingsEngine.SizeEntities];
-
-//		#if UNITY_EDITOR && ODIN_INSPECTOR && ACTORS_DEBUG
-//		internal static List<IComponent>[] actorsComponents = new List<IComponent>[SettingsEngine.SizeEntities];
-//		#endif
 
 		#region SETUP
 
@@ -65,9 +61,7 @@ namespace Pixeye.Framework
 				Array.Resize(ref tags, l);
 				Array.Resize(ref components, l);
 				Array.Resize(ref db, l);
-//				#if UNITY_EDITOR && ODIN_INSPECTOR && ACTORS_DEBUG
-//				Array.Resize(ref actorsComponents, l);
-//				#endif
+
 				counter = l;
 			}
 
@@ -90,9 +84,7 @@ namespace Pixeye.Framework
 				Array.Resize(ref transforms, l);
 				Array.Resize(ref components, l);
 				Array.Resize(ref db, l);
-//				#if UNITY_EDITOR && ODIN_INSPECTOR && ACTORS_DEBUG
-//				Array.Resize(ref actorsComponents, l);
-//				#endif
+
 				counter = l;
 			}
 
@@ -104,18 +96,10 @@ namespace Pixeye.Framework
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		internal static void BindDB(int id, int db)
+		public static void Link(in this ent entity, db db)
 		{
-			Entity.db[id] = db;
+			Entity.db[entity.id] = db;
 		}
-
-		#if ODIN_INSPECTOR
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static void Bind(in this ent entity, db database)
-		{
-			db[entity.id] = database;
-		}
-		#endif
 
 		#endregion
 
@@ -456,13 +440,6 @@ namespace Pixeye.Framework
 			mono.entity = entity;
 		}
 
-		#if ODIN_INSPECTOR
-		public static void Set(in this ent entity, db dbID)
-		{
-			db[entity.id] = dbID.hash;
-		}
-		#endif
-
 		internal static void Add(in this ent entity, Transform instance)
 		{
 			ref var transforms = ref Entity.transforms;
@@ -513,23 +490,20 @@ namespace Pixeye.Framework
 
 		public static T Add<T>(in this ent entity) where T : IComponent, new()
 		{
-	 
 			var storage = Storage<T>.Instance;
 			var entityID = entity.id;
 
-			 
 			if (entityID >= storage.components.Length)
 				Array.Resize(ref storage.components, entityID << 1);
-			
+
 			ref T val = ref storage.components[entityID];
 
 			if (val == null)
 				val = storage.Creator();
-	 
+
 			if ((generations[entityID, Storage<T>.generation] & Storage<T>.componentMask) == Storage<T>.componentMask)
 				return storage.components[entityID];
 
-			
 			generations[entityID, Storage<T>.generation] |= Storage<T>.componentMask;
 
 			Delayed.Set(entity, Storage<T>.componentID, Delayed.Action.Add);

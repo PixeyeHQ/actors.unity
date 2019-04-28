@@ -27,7 +27,7 @@ namespace Pixeye.Framework
 
 		public static Dictionary<int, BlueprintEntity> storage = new Dictionary<int, BlueprintEntity>(FastComparable.Default);
 
-		public DataObject db;
+		public CoreDB db;
 
 		[SerializeField, HideReferenceObjectPicker, TypeFilter("GetFilteredTypeList"), OnValueChanged("HandleAdd"), Title("Components")]
 		internal IComponent[] onCreate = new IComponent[0];
@@ -124,8 +124,11 @@ namespace Pixeye.Framework
 		internal void Populate(in ent entity)
 		{
 			var id = entity.id;
+
 			if (db != null)
-				Entity.BindDB(id, db.id);
+				Entity.db[id] = db;
+		 
+ 
 			for (int i = 0; i < lenOnCreate; i++)
 			{
 				var component = onCreate[i];
@@ -220,6 +223,9 @@ namespace Pixeye.Framework
 	public class BlueprintEntity : ScriptableObject
 	{
 
+    public CoreDB db;
+
+
 		[NonSerialized]
 		public static Dictionary<int, BlueprintEntity> storage = new Dictionary<int, BlueprintEntity>(new FastComparable());
 
@@ -252,6 +258,9 @@ namespace Pixeye.Framework
 		internal void Populate(in ent entity)
 		{
 			var id = entity.id;
+
+	if (db != null)
+				Entity.db[id] = db
 
 			for (int i = 0; i < lenOnCreate; i++)
 			{
