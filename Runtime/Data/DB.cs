@@ -1,7 +1,7 @@
 //  Project : ecs
 // Contacts : Pix - ask@pixeye.games
 
-#if ODIN_INSPECTOR
+ 
  
 namespace Pixeye.Framework
 {
@@ -33,4 +33,4 @@ namespace Pixeye.Framework
 
 	}
 }
-#endif
+ 
