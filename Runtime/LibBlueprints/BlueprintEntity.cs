@@ -260,7 +260,7 @@ namespace Pixeye.Framework
 			var id = entity.id;
 
 	if (db != null)
-				Entity.db[id] = db
+				Entity.db[id] = db;
 
 			for (int i = 0; i < lenOnCreate; i++)
 			{
