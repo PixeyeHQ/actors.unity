@@ -63,8 +63,8 @@ public static class ProcEditorSceneObserve
 			GameObject.DestroyImmediate(light.gameObject);
 		}
 
-		new GameObject("-- SETUP --");
-		new GameObject("-- SCENE --");
+		new GameObject("[SETUP]");
+		new GameObject("[SCENE]");
 
 		Debug.Log("New scene created!");
 	}
