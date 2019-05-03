@@ -37,7 +37,10 @@ namespace Pixeye.Framework
 		void Awake()
 		{
 			
-			
+			if (ProcessorUpdate.Default == null)
+			{
+				ProcessorUpdate.Create();
+			}
 			
 			
 			for (var i = 0; i < pluggables.Count; i++)
