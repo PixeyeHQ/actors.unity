@@ -66,6 +66,7 @@ namespace Pixeye
 
 		public override void Setup()
 		{
+      storage.Clear();
 			foreach (IData component in components)
 			{
 				Add(component);
