@@ -44,7 +44,7 @@ namespace Pixeye.Framework
 
 		public void Tick()
 		{
-			_deltaTime = UnityEngine.Time.unscaledDeltaTime * timeScale;
+			_deltaTime = UnityEngine.Time.deltaTime * timeScale;
 			_deltaTimeFixed *= timeScale;
 		}
 	}
