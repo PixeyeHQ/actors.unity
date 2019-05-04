@@ -221,6 +221,39 @@ namespace Pixeye.Framework
 			return entity;
 		}
 
+		
+		public static ent Create(string prefabID, Vector3 position, HandleEntityComposer model, bool pooled = false)
+		{
+			int id;
+			byte age = 0;
+
+			if (ent.entityStackLength > 0)
+			{
+				var pop = ent.entityStack.Dequeue();
+				byte ageOld = pop.age;
+				id = pop.id;
+				unchecked
+				{
+					age = (byte) (ageOld + 1);
+				}
+
+				ent.entityStackLength--;
+			}
+			else
+				id = ent.lastID++;
+
+			SetupWithTransform(id, pooled);
+			transforms[id] = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefabID, position) : HelperFramework.SpawnInternal(prefabID, position);
+
+			var entity = new ent(id, age);
+
+			EntityComposer.Default.entity = entity;
+			model(EntityComposer.Default);
+			Delayed.Set(entity, 0, Delayed.Action.Activate);
+
+			return entity;
+		}
+		
 		public static ent Create(string prefabID, HandleEntityComposer model, bool pooled = false)
 		{
 			int id;
