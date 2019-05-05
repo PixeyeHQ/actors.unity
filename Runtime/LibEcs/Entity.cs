@@ -57,8 +57,10 @@ namespace Pixeye.Framework
 			{
 				var l = id << 1;
 				isAlive.Length = l;
+				isPooled.Length = l;
 				HelperArray.ResizeInt(ref generations, l, SettingsEngine.SizeGenerations);
 				Array.Resize(ref tags, l);
+				Array.Resize(ref transforms, l);
 				Array.Resize(ref components, l);
 				Array.Resize(ref db, l);
 
@@ -66,6 +68,7 @@ namespace Pixeye.Framework
 			}
 
 			components[id].Setup();
+			isPooled[id] = false;
 			isAlive[id] = true;
 			entitiesDebugCount++;
 		}
@@ -73,6 +76,7 @@ namespace Pixeye.Framework
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal static void SetupWithTransform(int id, bool pooled)
 		{
+		 
 			if (id >= counter)
 			{
 				var l = id << 1;
@@ -86,10 +90,12 @@ namespace Pixeye.Framework
 				Array.Resize(ref db, l);
 
 				counter = l;
+		 
 			}
 
 			components[id].Setup();
 			isAlive[id] = true;
+		 
 			isPooled[id] = pooled;
 
 			entitiesDebugCount++;

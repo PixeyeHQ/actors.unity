@@ -22,7 +22,7 @@ namespace Pixeye.Framework
 				return groupCore;
 
 			groupCore = Activator.CreateInstance(groupType, true) as GroupCore;
-			groupCore.composition = filter;
+			groupCore.Add(filter);
 			groupCore.Initialize();
 
 			container.Add(groupCore);

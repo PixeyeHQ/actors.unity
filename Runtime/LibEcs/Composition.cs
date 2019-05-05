@@ -67,7 +67,6 @@ namespace Pixeye.Framework
 				if (components[entityComponents.components[i]])
 					match++;
 			}
-
 			return ids.Length == match;
 		}
 
@@ -81,8 +80,22 @@ namespace Pixeye.Framework
 				}
 		}
 
-		internal void Check(ref bool allow)
+		internal void SetupExcludeTypes(GroupCore g)
 		{
+			for (int i = 0; i < Storage.lastID; i++)
+			{
+				var t = typesToExclude[i];
+				if (t)
+				{
+					Storage.all[i].AddGroupExclude(g);
+				}
+			}
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		internal bool Check(int entityID)
+		{
+			return (tagsToInclude.Length == 0 || Include(entityID)) & (tagsToExclude.Length == 0 || Exclude(entityID));
 		}
 
 		internal bool Include(int entityID)
@@ -135,14 +148,13 @@ namespace Pixeye.Framework
 					return false;
 				}
 			}
-
 			return true;
 		}
 
 		public bool Equals(Composition other)
 		{
 			if (tagsToInclude.Length != other.tagsToInclude.Length) return false;
-		//	if (typesToExclude.Length != other.typesToExclude.Length) return false;
+			//	if (typesToExclude.Length != other.typesToExclude.Length) return false;
 
 			int len1 = tagsToInclude.Length;
 			int len2 = tagsToExclude.Length;

@@ -17,6 +17,8 @@ namespace Pixeye.Framework
         {
             this.filter = filter;
         }
+        
+        
        
     }
 }

@@ -33,10 +33,13 @@ namespace Pixeye.Framework
 		internal abstract int GetComponentID();
 
 		internal GroupCore[] GroupCoreOfInterest = new GroupCore[8];
+		internal GroupCore[] GroupCoreOfInterestRemove = new GroupCore[8];
 		internal int lenOfGroups;
+		internal int lenOfGroupsFiltered;
 
 		public abstract void RemoveNoCheck(int entityID);
-		
+
+		internal abstract void AddGroupExclude(GroupCore groupCore);
 		//if ODIN_INSPECTOR && UNITY_EDITOR && ACTORS_DEBUG
 		internal abstract IComponent GetComponent(int entityID);
 		//#endif
@@ -67,6 +70,14 @@ namespace Pixeye.Framework
 				Array.Resize(ref GroupCoreOfInterest, lenOfGroups << 1);
 
 			GroupCoreOfInterest[lenOfGroups++] = groupCore;
+		}
+		
+		internal override void AddGroupExclude(GroupCore groupCore)
+		{
+			if (lenOfGroupsFiltered == GroupCoreOfInterestRemove.Length)
+				Array.Resize(ref GroupCoreOfInterestRemove, lenOfGroupsFiltered << 1);
+
+			GroupCoreOfInterestRemove[lenOfGroupsFiltered++] = groupCore;
 		}
 
 		public Storage()

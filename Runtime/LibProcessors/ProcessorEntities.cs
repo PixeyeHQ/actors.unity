@@ -13,7 +13,7 @@ namespace Pixeye.Framework
 	{
 
 		private GroupCore[] groupsToClear = new GroupCore[100];
-		private int groupsToClearLen = 0;
+		private int groupsToClearLen;
 
 		bool CheckIfExists(GroupCore group)
 		{
@@ -31,55 +31,91 @@ namespace Pixeye.Framework
 
 			if (Entity.Delayed.len == 0) return;
 
+		 
 			for (int i = 0; i < Entity.Delayed.len; i++)
 			{
+	 
 				ref var operation = ref Entity.Delayed.operations[i];
 
 				var entityID = operation.entity.id;
 
 				var components = Storage.all[operation.arg];
-
+				
+			 
 				switch (operation.action)
 				{
+				 
 					case Entity.Delayed.Action.Add:
+					
 						if (!Entity.isAlive[entityID]) continue;
 
 						var generationAdd = Storage.generations[operation.arg];
 						var maskAdd = Storage.masks[operation.arg];
 
-						//Entity.generations[entityID, generationAdd] |= maskAdd;
+					 
+						Entity.components[entityID].Add(operation.arg);
 
+					 
+						
+						
+						
 						for (int l = 0; l < components.lenOfGroups; l++)
 						{
 							var group = components.GroupCoreOfInterest[l];
 							var composition = group.composition;
-							bool canBeAdded = true;
 
-							for (int ll = 0; ll < composition.ids.Length; ll++)
+              if (!CanProceed()) continue;
+              if (!composition.Check(entityID)) continue;
+              
+              group.Insert(operation.entity);
+           
+              
+							bool CanProceed()
 							{
-								generationAdd = composition.generations[ll];
-								maskAdd = composition.ids[ll];
+								for (int ll = 0; ll < composition.ids.Length; ll++)
+								{
+									generationAdd = composition.generations[ll];
+									maskAdd = composition.ids[ll];
 
-								if ((Entity.generations[entityID, generationAdd] & maskAdd) == maskAdd) continue;
+									if ((Entity.generations[entityID, generationAdd] & maskAdd) != maskAdd) return false;
 
-								canBeAdded = false;
-								break;
+								}
+								return true;
 							}
-
-							canBeAdded &= composition.tagsToInclude.Length == 0 || composition.Include(entityID);
-							canBeAdded &= composition.tagsToExclude.Length == 0 || composition.Exclude(entityID);
-
-							if (canBeAdded)
-							{
-								group.Insert(operation.entity);
-								Entity.components[entityID].Add(operation.arg);
-							}
+							
 						}
 
+						for (int l = 0; l < components.lenOfGroupsFiltered; l++)
+						{
+							var group = components.GroupCoreOfInterestRemove[l];
+						 
+							var composition = group.composition;
+			 
+						  if (!CanProceed()) continue;
+							
+							var inGroup = HelperArray.BinarySearch(ref group.entities, entityID, 0, group.length);
+							if (inGroup>-1)
+								group.Remove(inGroup);
+  
+							bool CanProceed()
+							{
+								for (int ll = 0; ll < composition.ids.Length; ll++)
+								{
+									generationAdd = composition.generations[ll];
+									maskAdd = composition.ids[ll];
+
+									if ((Entity.generations[entityID, generationAdd] & maskAdd) != maskAdd) return false;
+
+								}
+								return true;
+							}
+							
+						}
+						
 						break;
-
+				 
+						
 					case Entity.Delayed.Action.Kill:
-
 						ref var componentsToKill = ref Entity.components[entityID];
 						var length = componentsToKill.Length;
 
@@ -113,25 +149,22 @@ namespace Pixeye.Framework
 
 						groupsToClearLen = 0;
 
-
 						for (int j = 0; j < Entity.components[entityID].Length; j++)
 						{
 							var cID = Entity.components[entityID].components[j];
 							Storage.all[cID].GetComponent(entityID).Dispose();
 						}
-						
-						 
+
 						Entity.components[entityID].Clear();
 
 						if (Entity.transforms.Length > entityID)
 							Entity.transforms[entityID].gameObject.Release(Entity.isPooled[entityID] ? Pool.Entities : 0);
-						
+
 						Entity.Delayed.Set(operation.entity, 0, Entity.Delayed.Action.KillFinalize);
 
 						break;
 
 					case Entity.Delayed.Action.Unbind:
-
 						ref var componentsToUnbind = ref Entity.components[entityID];
 						var lengthUnbind = componentsToUnbind.Length;
 
@@ -183,6 +216,22 @@ namespace Pixeye.Framework
 							var group = components.GroupCoreOfInterest[l];
 							group.TryRemove(entityID);
 						}
+						
+						for (int l = 0; l < components.lenOfGroupsFiltered; l++)
+						{
+							var group = components.GroupCoreOfInterestRemove[l];
+						 
+							var composition = group.composition;
+			 
+							 
+							if (!composition.Check(entityID)) continue;
+							var inGroup = HelperArray.BinarySearch(ref group.entities, entityID, 0, group.length);
+							if (inGroup==-1)
+							group.Insert(operation.entity);
+						  
+					 
+						}
+						
 
 						Entity.components[entityID].Remove(operation.arg);
 						break;
@@ -234,8 +283,6 @@ namespace Pixeye.Framework
 
 					case Entity.Delayed.Action.KillFinalize:
 
-				 
-
 						operation.entity.ClearTags();
 						ent.entityStack.Enqueue(operation.entity);
 						ent.entityStackLength++;
@@ -243,7 +290,6 @@ namespace Pixeye.Framework
 						break;
 
 					case Entity.Delayed.Action.Activate:
-
 						ref var componentsToActivate = ref Entity.components[entityID];
 						var lenToActivate = componentsToActivate.Length;
 
@@ -286,7 +332,6 @@ namespace Pixeye.Framework
 						break;
 
 					case Entity.Delayed.Action.Deactivate:
-
 						ref var componentsToDeactivate = ref Entity.components[entityID];
 						var lenToDeactivate = componentsToDeactivate.Length;
 
@@ -307,6 +352,7 @@ namespace Pixeye.Framework
 
 						break;
 				}
+ 
 			}
 
 			Entity.Delayed.len = 0;

@@ -57,9 +57,10 @@ namespace Pixeye.Framework
 					var filter = new Composition();
 					filter.tagsToExclude = excludeFilter;
 					filter.tagsToInclude = includeFilter;
+					
 					if (groupExcludeAttribute!=null)
 					filter.AddTypesExclude(groupExcludeAttribute.filterType);
-					//filter.typesToExclude = groupExcludeAttribute!=null? groupExcludeAttribute.filterType : new int[0];
+				 
 
 					myFieldInfo.SetValue(b, ProcessorGroups.SetupGroup(myFieldInfo.FieldType, filter));
 				}

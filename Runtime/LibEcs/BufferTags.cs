@@ -532,7 +532,7 @@ namespace Pixeye.Framework
 					container = new DictionaryGroups();
 					container.Add(groupCore);
 					inUseGroupsTypes.Add(index, container);
-			       Debug.Log(index);
+			    
 				}
 			}
 		}

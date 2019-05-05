@@ -49,6 +49,12 @@ namespace Pixeye.Framework
 		internal int id;
 		private int indexLast;
 
+		internal void Add(Composition composition)
+		{
+			this.composition = composition;
+			composition.SetupExcludeTypes(this);
+		}
+		
 		internal void Insert(in ent entity)
 		{
 			var entityID = entity.id;
