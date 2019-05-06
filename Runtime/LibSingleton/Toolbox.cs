@@ -12,11 +12,16 @@ namespace Pixeye.Framework
 	/// </summary>
 	public class Toolbox : Singleton<Toolbox>
 	{
-		[SerializeField] Dictionary<int, object> data = new Dictionary<int, object>(5, new FastComparable());
 
+		[SerializeField]
+		Dictionary<int, object> data = new Dictionary<int, object>(5, new FastComparable());
 
-		public static bool Contains<T>() { return Instance.data.ContainsKey(typeof(T).GetHashCode()); }
+		public static bool Contains<T>()
+		{
+			return Instance.data.ContainsKey(typeof(T).GetHashCode());
+		}
 
+		public static List<IDisposable> disposables = new List<IDisposable>(64);
 
 		/// <summary>
 		/// <para>Creates an object to the toolbox by type.</para> 
@@ -24,7 +29,7 @@ namespace Pixeye.Framework
 		public static T Add<T>(Type type = null) where T : new()
 		{
 			object o;
-			var    hash = type == null ? typeof(T).GetHashCode() : type.GetHashCode();
+			var hash = type == null ? typeof(T).GetHashCode() : type.GetHashCode();
 			if (Instance.data.TryGetValue(hash, out o))
 			{
 				InitializeObject(o);
@@ -38,7 +43,6 @@ namespace Pixeye.Framework
 
 			return created;
 		}
-
 
 		public static object Get(Type t)
 		{
@@ -58,11 +62,10 @@ namespace Pixeye.Framework
 				InitializeObject(possibleObj);
 			}
 
-			var add        = obj;
+			var add = obj;
 			var scriptable = obj as ScriptableObject;
 			if (scriptable) add = Instantiate(scriptable);
 			InitializeObject(obj);
-
 
 			Instance.data.Add(obj.GetType().GetHashCode(), add);
 		}
@@ -80,7 +83,6 @@ namespace Pixeye.Framework
 			ProcessorUpdate.Default.Add(obj);
 		}
 
- 
 		/// <summary>
 		/// <para>Gets an object from the toolbox by type</para>
 		/// </summary>
@@ -108,7 +110,6 @@ namespace Pixeye.Framework
 				needToBeCleaned.Dispose();
 			}
 
-
 			HandleTimer.Default.Dispose();
 			HandlePool.Dispose();
 			ProcessorGroups.Dispose();
@@ -132,5 +133,14 @@ namespace Pixeye.Framework
 				disposable.Dispose();
 			}
 		}
+
+		private void OnDestroy()
+		{
+			for (int i = 0; i < disposables.Count; i++)
+			{
+				disposables[i].Dispose();
+			}
+		}
+
 	}
 }

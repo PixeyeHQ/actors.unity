@@ -5,9 +5,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using System.Threading;
 using Unity.IL2CPP.CompilerServices;
-using UnityEngine;
 
 namespace Pixeye.Framework
 {
@@ -22,6 +20,7 @@ namespace Pixeye.Framework
 		{
 			return y.id == x.id;
 		}
+
 		public int GetHashCode(GroupCore obj)
 		{
 			return obj.id;
@@ -38,7 +37,6 @@ namespace Pixeye.Framework
 		public EntityAction onAdd;
 		public EntityAction onRemove;
 
-		/// don't use for iterating.
 		public ref ent this[int index] => ref entities[index];
 
 		public ent[] entities = new ent[SettingsEngine.SizeEntities];
@@ -54,7 +52,7 @@ namespace Pixeye.Framework
 			this.composition = composition;
 			composition.SetupExcludeTypes(this);
 		}
-		
+
 		internal void Insert(in ent entity)
 		{
 			var entityID = entity.id;
@@ -62,10 +60,7 @@ namespace Pixeye.Framework
 			indexLast = length++;
 
 			if (length >= entities.Length)
-			{
-				var l = length << 1;
-				Array.Resize(ref entities, l);
-			}
+				Array.Resize(ref entities, length << 1);
 
 			var pointer = indexLast;
 
@@ -105,9 +100,7 @@ namespace Pixeye.Framework
 			}
 
 			for (int i = indexLast; i >= pointer; i--)
-			{
 				entities[i + 1] = entities[i];
-			}
 
 			entities[pointer] = entity;
 
@@ -189,6 +182,7 @@ namespace Pixeye.Framework
 			if (obj.GetType() != GetType()) return false;
 			return Equals((GroupCore) obj);
 		}
+
 		public override int GetHashCode()
 		{
 			return id;

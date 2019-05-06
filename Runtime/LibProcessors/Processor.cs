@@ -12,6 +12,7 @@ namespace Pixeye.Framework
 		{
 			ProcessorGroupAttributes.Setup(this);
 			ProcessorSignals.Default.Add(this);
+			Toolbox.disposables.Add(this);
 		}
 
 		public void Dispose()

@@ -29,5 +29,10 @@ namespace Pixeye.Framework
 			}
 		}
 
+		protected override void OnDispose()
+		{
+			
+		}
+
 	}
 }
