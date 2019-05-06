@@ -71,6 +71,8 @@ namespace Pixeye.Framework
 				else
 					right = middle -1 ;
 			}
+
+			return left;
 		}
 		
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
