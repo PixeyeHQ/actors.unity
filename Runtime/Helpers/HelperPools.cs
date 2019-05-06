@@ -134,8 +134,6 @@ namespace Pixeye.Framework
 			return go;
 		}
 
-	 
-
 		#endregion
 
 		#region POOLS
@@ -271,7 +269,7 @@ namespace Pixeye.Framework
 
 		internal static Transform SpawnInternal(string prefabID, Vector3 startPosition = default, Quaternion startRotation = default)
 		{
-			return Object.Instantiate(Box.Get<GameObject>(prefabID),startPosition,startRotation).transform;
+			return Object.Instantiate(Box.Get<GameObject>(prefabID), startPosition, startRotation).transform;
 		}
 
 		public static Transform SpawnInternal(GameObject prefab, Vector3 startPosition = default, Quaternion startRotation = default)
@@ -284,8 +282,6 @@ namespace Pixeye.Framework
 
 		internal static Transform SpawnInternal(int poolID, GameObject prefab, Vector3 startPosition = default, Quaternion startRotation = default)
 		{
-
-
 			var tr = HandlePool.pools[poolID].Spawn(prefab).transform;
 			tr.localPosition = startPosition;
 			tr.localRotation = startRotation;
@@ -295,8 +291,10 @@ namespace Pixeye.Framework
 
 		internal static Transform SpawnInternal(int poolID, string prefabID, Vector3 startPosition = default, Quaternion startRotation = default)
 		{
-			var prefab = Box.Get<GameObject>(prefabID);
-			return HandlePool.pools[poolID].Spawn(prefab, startPosition, startRotation).transform;
+			var tr = HandlePool.pools[poolID].Spawn(Box.Get<GameObject>(prefabID)).transform;
+			tr.localPosition = startPosition;
+			tr.localRotation = startRotation;
+			return tr;
 		}
 
 		#endregion

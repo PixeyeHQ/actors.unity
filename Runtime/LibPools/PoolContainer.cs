@@ -110,6 +110,8 @@ namespace Pixeye.Framework
 			return false;
 		}
 
+	
+		
 		public GameObject Spawn(GameObject prefab, Transform parent = null)
 		{
 			var key = prefab.GetInstanceID();
@@ -123,12 +125,7 @@ namespace Pixeye.Framework
 				var transform = obj.transform;
 				if (transform.parent != parent)
 					transform.SetParent(parent);
-
-//				IPoolable poolable = transform.GetComponent<IPoolable>();
-//				if (poolable != null)
-//				{
-//					poolable.Spawn();
-//				}
+ 
 
 				transform.gameObject.SetActive(true);
 
@@ -147,7 +144,7 @@ namespace Pixeye.Framework
 			cachedIds.Add(k, key);
 			return createdPrefab;
 		}
-
+	 
 		[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
 		public void Despawn(GameObject go)
 		{
