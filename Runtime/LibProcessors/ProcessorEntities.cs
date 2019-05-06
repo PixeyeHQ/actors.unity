@@ -109,6 +109,7 @@ namespace Pixeye.Framework
 							var generationRemoveOnKill = Storage.generations[componentOnKillId];
 							var maskRemoveOnKill = Storage.masks[componentOnKillId];
 
+								//	if ((Entity.generations[entityID, generationRemoveOnKill] & maskRemoveOnKill) != maskAdd) c;
 							Entity.generations[entityID, generationRemoveOnKill] &= ~maskRemoveOnKill;
 
 							var storageOnKill = Storage.all[componentOnKillId];
@@ -141,7 +142,7 @@ namespace Pixeye.Framework
 
 						Entity.components[entityID].Clear();
 
-						if (Entity.transforms.Length > entityID)
+						if (Entity.transforms.Length > entityID && Entity.transforms[entityID].gameObject!=null)
 							Entity.transforms[entityID].gameObject.Release(Entity.isPooled[entityID] ? Pool.Entities : 0);
 
 						Entity.Delayed.Set(operation.entity, 0, Entity.Delayed.Action.KillFinalize);
