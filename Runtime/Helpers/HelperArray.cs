@@ -60,44 +60,27 @@ namespace Pixeye.Framework
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static int BinarySearch(ref int[] entries, int value, int left, int right)
 		{
-			if (right == 0) return -1;
- 
-			var len = right;
-			while (left <= right)
+			while (left<=right)
 			{
-				var middle = (left + right) / 2;
-				if (entries[middle] < value)
-					left = middle + 1;
-				else
-					right = middle -1 ;
+				var m = (left + right) / 2;
+				if (entries[m] == value) return m;
+				if (entries[m] < value) left = m + 1;
+				else right = m - 1;
 			}
-
-			return left;
+			return -1;
 		}
 		
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static int BinarySearch(ref ent[] entries, int value, int left, int right)
 		{
-			if (right == 0) return -1;
-			var len = right;
-			while (left < right)
+			while (left<=right)
 			{
-				var middle = (left + right) / 2;
-
-				if (entries[middle].id == value)
-				{
-					return middle;
-				}
-
-				if (entries[middle].id < value)
-					left = middle + 1;
-				else
-					right = middle - 1;
+				var m = (left + right) / 2;
+				if (entries[m] == value) return m;
+				if (entries[m].id < value) left = m + 1;
+				else right = m - 1;
 			}
-
-			if (left > len) return -1;
-			if (entries[left] != value) return -1;
-			return left;
+			return -1;
 		}
 		
  /*
