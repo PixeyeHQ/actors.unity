@@ -7,7 +7,6 @@ using System.Reflection;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
-
 namespace Pixeye.Framework
 {
 	#if ODIN_INSPECTOR
@@ -26,9 +25,10 @@ namespace Pixeye.Framework
 			#endif
 
 			Type t = GetType();
-			var n = name.Split(' ');
-			helpers.Add(GetInstanceID(), (Action<EntityComposer>) Delegate.CreateDelegate(typeof(Action<EntityComposer>), null, t.GetMethod(n[1], BindingFlags.Public | BindingFlags.Static)));
-		}
+		  var n = name.Substring(5).Replace(" ", string.Empty);
+			helpers.Add(GetInstanceID(), (Action<EntityComposer>) Delegate.CreateDelegate(typeof(Action<EntityComposer>), null, t.GetMethod(n, BindingFlags.Public | BindingFlags.Static)));
+
+    }
 
 		protected virtual void OnDisable()
 		{
@@ -65,8 +65,8 @@ namespace Pixeye.Framework
 			#endif
 
 			Type t = GetType();
-			var n = name.Split(' ');
-			helpers.Add(GetInstanceID(), (Action<EntityComposer>) Delegate.CreateDelegate(typeof(Action<EntityComposer>), null, t.GetMethod(n[1], BindingFlags.Public | BindingFlags.Static)));
+			var n = name.Substring(5).Replace(" ", string.Empty);
+			helpers.Add(GetInstanceID(), (Action<EntityComposer>) Delegate.CreateDelegate(typeof(Action<EntityComposer>), null, t.GetMethod(n, BindingFlags.Public | BindingFlags.Static)));
 		}
 
 		protected virtual void OnDisable()
