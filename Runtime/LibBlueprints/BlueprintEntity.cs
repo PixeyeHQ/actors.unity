@@ -80,7 +80,7 @@ namespace Pixeye.Framework
 			}
 		}
 
-		void OnEnable()
+		protected override void OnEnable()
 		{
 			components.Clear();
 			hashesOnCreate = new int[lenOnCreate];
@@ -98,6 +98,11 @@ namespace Pixeye.Framework
 				var c = onLater[i];
 				components.Add(c.GetType().GetHashCode(), c);
 			}
+		}
+
+		protected override void OnDisable()
+		{
+			
 		}
 
 		#if UNITY_EDITOR
@@ -244,13 +249,18 @@ namespace Pixeye.Framework
 		[HideInInspector]
 		public int[] tags = new int[0];
 
-		void OnEnable()
+	  protected override void OnEnable()
 		{
 			lenOnCreate = 0;
 			lenAddLater = 0;
 			tags = new int[0];
 			hashesOnCreate = new int[10];
 			Setup();
+		}
+
+    protected override void OnDisable()
+		{
+			
 		}
 
 		protected virtual void Setup()
