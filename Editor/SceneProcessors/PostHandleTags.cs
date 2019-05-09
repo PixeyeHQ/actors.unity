@@ -96,14 +96,14 @@ namespace Pixeye.Framework
 			PlayerSettings.SetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup, string.Join(";", allDefines.ToArray()));
 		}
 
-		[MenuItem("Tools/Actors/Tags/Register", false, 1)]
+	//	[MenuItem("Tools/Actors/Tags/Register", false, 1)]
 		static public void Execute()
 		{
 			Init();
 			TagRegist();
 		}
 
-		[MenuItem("Tools/Actors/Tags/Reset/Reset And Register", false, 1)]
+	//	[MenuItem("Tools/Actors/Tags/Reset/Reset And Register", false, 1)]
 		static public void ExecuteResetAndRegistration()
 		{
 			isReset = true;
@@ -111,7 +111,7 @@ namespace Pixeye.Framework
 			TagRegist();
 		}
 
-		[MenuItem("Tools/Actors/Tags/Reset/Reset", false, 1)]
+	//	[MenuItem("Tools/Actors/Tags/Reset/Reset", false, 1)]
 		static public void ExecuteReset()
 		{
 			isReset = true;

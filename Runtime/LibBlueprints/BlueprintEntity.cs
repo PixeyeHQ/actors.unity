@@ -29,18 +29,18 @@ namespace Pixeye.Framework
 		public CoreDB db;
 
 		[SerializeField, HideReferenceObjectPicker, TypeFilter("GetFilteredTypeList"), OnValueChanged("HandleAdd"), Title("Components")]
-		internal IComponent[] onCreate = new IComponent[0];
+		internal IComponentCopy[] onCreate = new IComponentCopy[0];
 
 		[SerializeField, HideInInspector]
 		internal int lenOnCreate;
 
 		[SerializeField, HideReferenceObjectPicker, TypeFilter("GetFilteredTypeList"), OnValueChanged("HandleAddLater")]
-		internal IComponent[] onLater = new IComponent[0];
+		internal IComponentCopy[] onLater = new IComponentCopy[0];
 
 		[SerializeField, HideInInspector]
 		internal int lenAddLater;
 
-		internal Dictionary<int, IComponent> components = new Dictionary<int, IComponent>(FastComparable.Default);
+		internal Dictionary<int, IComponentCopy> components = new Dictionary<int, IComponentCopy>(FastComparable.Default);
 
 		[SerializeField, TagFilter(typeof(ITag))]
 		internal int[] tags;
@@ -52,7 +52,7 @@ namespace Pixeye.Framework
 			var q = AppDomain.CurrentDomain.GetAssemblies();
 			var types = q.SelectMany(x => x.GetTypes())
 					.Where(x => !x.IsAbstract)
-					.Where(x => typeof(IComponent).IsAssignableFrom(x))
+					.Where(x => typeof(IComponentCopy).IsAssignableFrom(x))
 					.Where(x => !ContainsAddLater(x));
 
 			return types;
@@ -217,7 +217,7 @@ namespace Pixeye.Framework
 	}
 	#endif
 }
- #else
+#else 
 using System;
 using System.Collections.Generic;
 #if UNITY_EDITOR
@@ -239,8 +239,8 @@ namespace Pixeye.Framework
 		internal int lenOnCreate;
 		internal int lenAddLater;
 
-		internal List<IComponent> onCreate = new List<IComponent>();
-		internal List<IComponent> onLater = new List<IComponent>();
+		internal List<IComponentCopy> onCreate = new List<IComponentCopy>();
+		internal List<IComponentCopy> onLater = new List<IComponentCopy>();
 
 		internal int[] hashesOnCreate = new int[1];
 
@@ -316,7 +316,7 @@ namespace Pixeye.Framework
 		public T Add<T>() where T : class, IComponent, new()
 		{
 			var instance = new T();
-			onCreate.Add(instance);
+			onCreate.Add(instance as IComponentCopy);
 
 			if (lenOnCreate == hashesOnCreate.Length)
 			{
@@ -334,14 +334,14 @@ namespace Pixeye.Framework
 		public T AddLater<T>() where T : class, IComponent, new()
 		{
 			var instance = new T();
-			onLater.Add(instance);
+			onLater.Add(instance as IComponentCopy);
 			lenAddLater++;
 			return instance;
 		}
 
 		public T Add<T>(T component) where T : class, IComponent, new()
 		{
-			onCreate.Add(component);
+			onCreate.Add(component as IComponentCopy);
 			if (lenOnCreate == hashesOnCreate.Length)
 			{
 				Array.Resize(ref hashesOnCreate, lenOnCreate << 1);
@@ -352,7 +352,7 @@ namespace Pixeye.Framework
 
 		public T AddLater<T>(T component) where T : class, IComponent, new()
 		{
-			onLater.Add(component);
+			onLater.Add(component as IComponentCopy);
 			lenAddLater++;
 			return component;
 		}

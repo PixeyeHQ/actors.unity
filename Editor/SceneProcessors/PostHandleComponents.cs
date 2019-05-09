@@ -62,8 +62,7 @@ namespace Pixeye.Framework
 				templateContents = t.ReadToEnd();
 			}
 
-			templateContents = templateContents.Replace("##NAMESPACE##",
-					DataFramework.nameSpace != "Pixeye" ? string.Format($"using Pixeye;{Environment.NewLine}namespace {DataFramework.nameSpace}") : string.Format($"{Environment.NewLine}namespace {DataFramework.nameSpace}"));
+			templateContents = templateContents.Replace("##NAMESPACE##", string.Format($"{Environment.NewLine}namespace {DataFramework.nameSpace}"));
 			templateContents = templateContents.Replace("##NAME##", className);
 
 			var encoding = new UTF8Encoding(true, false);

@@ -160,7 +160,7 @@ namespace Pixeye.Framework
 			}
 
 			Add<ProcessorEntities>();
-			Add<ProcessorView>();
+		 
 		 
 			Setup();
 

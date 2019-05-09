@@ -8,13 +8,7 @@ using UnityEngine;
    [Serializable]
    public class ##NAME## : IComponent
   	{
-  
-  		// Use this method to copy variables from reference
-  		public void Copy(int entityID)
-  		{
-  			var component = Storage<##NAME##>.Instance.GetFromStorage(entityID);
-  		}
-        	 
+     	 
          public void Dispose()
          {
         	       
