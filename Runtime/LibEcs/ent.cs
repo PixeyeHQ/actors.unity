@@ -47,7 +47,7 @@ namespace Pixeye.Framework
 		{
 			return new ent(value);
 		}
-
+		 
 		public static ent operator +(ent a, int b)
 		{
 			return new ent(a.id + b, a.age);

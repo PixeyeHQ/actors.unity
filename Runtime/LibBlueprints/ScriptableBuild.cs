@@ -57,6 +57,23 @@ namespace Pixeye.Framework
 			helpers[GetInstanceID()](EntityComposer.Default);
 			Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Activate);
 		}
+
+	  protected virtual void OnEnable()
+		{
+			#if UNITY_EDITOR
+			if (!EditorApplication.isPlayingOrWillChangePlaymode) return;
+			#endif
+
+			Type t = GetType();
+			var n = name.Split(' ');
+			helpers.Add(GetInstanceID(), (Action<EntityComposer>) Delegate.CreateDelegate(typeof(Action<EntityComposer>), null, t.GetMethod(n[1], BindingFlags.Public | BindingFlags.Static)));
+		}
+
+		protected virtual void OnDisable()
+		{
+			helpers.Clear();
+		}
+
 	}
 
 	#endif
