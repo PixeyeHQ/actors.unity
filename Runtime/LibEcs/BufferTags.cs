@@ -22,113 +22,107 @@ namespace Pixeye.Framework
 		#if ACTORS_TAGS_24 || ACTORS_TAGS_DEFAULT
 		public const int Capacity = 24;
 
-		private ushort tag0;
-		private ushort tag1;
-		private ushort tag2;
-		private ushort tag3;
-		private ushort tag4;
-		private ushort tag5;
-		private ushort tag6;
-		private ushort tag7;
-		private ushort tag8;
-		private ushort tag9;
-		private ushort tag10;
-		private ushort tag11;
-		private ushort tag12;
-		private ushort tag13;
-		private ushort tag14;
-		private ushort tag15;
-		private ushort tag16;
-		private ushort tag17;
-		private ushort tag18;
-		private ushort tag19;
-		private ushort tag20;
-		private ushort tag21;
-		private ushort tag22;
-		private ushort tag23;
+		public ushort tag0;
+		public ushort tag1;
+		public ushort tag2;
+		public ushort tag3;
+		public ushort tag4;
+		public ushort tag5;
+		public ushort tag6;
+		public ushort tag7;
+		public ushort tag8;
+		public ushort tag9;
+		public ushort tag10;
+		public ushort tag11;
+		public ushort tag12;
+		public ushort tag13;
+		public ushort tag14;
+		public ushort tag15;
+		public ushort tag16;
+		public ushort tag17;
+		public ushort tag18;
+		public ushort tag19;
+		public ushort tag20;
+		public ushort tag21;
+		public ushort tag22;
+		public ushort tag23;
 		#elif ACTORS_TAGS_12
 		public const int Capacity = 12;
 
-		private ushort tag0;
-		private ushort tag1;
-		private ushort tag2;
-		private ushort tag3;
-		private ushort tag4;
-		private ushort tag5;
-		private ushort tag6;
-		private ushort tag7;
-		private ushort tag8;
-		private ushort tag9;
-		private ushort tag10;
-		private ushort tag11;
+		public ushort tag0;
+		public ushort tag1;
+		public ushort tag2;
+		public ushort tag3;
+		public ushort tag4;
+		public ushort tag5;
+		public ushort tag6;
+		public ushort tag7;
+		public ushort tag8;
+		public ushort tag9;
+		public ushort tag10;
+		public ushort tag11;
 		#elif ACTORS_TAGS_6
 		public const int Capacity = 6;
 
-		private ushort tag0;
-		private ushort tag1;
-		private ushort tag2;
-		private ushort tag3;
-		private ushort tag4;
-		private ushort tag5;
+		public ushort tag0;
+		public ushort tag1;
+		public ushort tag2;
+		public ushort tag3;
+		public ushort tag4;
+		public ushort tag5;
 		#endif
 
-		private byte length;
+		public byte length;
 
 		#if ACTORS_TAGS_24 || ACTORS_TAGS_DEFAULT
-		private byte tag0Len;
-		private byte tag1Len;
-		private byte tag2Len;
-		private byte tag3Len;
-		private byte tag4Len;
-		private byte tag5Len;
-		private byte tag6Len;
-		private byte tag7Len;
-		private byte tag8Len;
-		private byte tag9Len;
-		private byte tag10Len;
-		private byte tag11Len;
-		private byte tag12Len;
-		private byte tag13Len;
-		private byte tag14Len;
-		private byte tag15Len;
-		private byte tag16Len;
-		private byte tag17Len;
-		private byte tag18Len;
-		private byte tag19Len;
-		private byte tag20Len;
-		private byte tag21Len;
-		private byte tag22Len;
-		private byte tag23Len;
+		public byte tag0Len;
+		public byte tag1Len;
+		public byte tag2Len;
+		public byte tag3Len;
+		public byte tag4Len;
+		public byte tag5Len;
+		public byte tag6Len;
+		public byte tag7Len;
+		public byte tag8Len;
+		public byte tag9Len;
+		public byte tag10Len;
+		public byte tag11Len;
+		public byte tag12Len;
+		public byte tag13Len;
+		public byte tag14Len;
+		public byte tag15Len;
+		public byte tag16Len;
+		public byte tag17Len;
+		public byte tag18Len;
+		public byte tag19Len;
+		public byte tag20Len;
+		public byte tag21Len;
+		public byte tag22Len;
+		public byte tag23Len;
 		#elif ACTORS_TAGS_12
-		private byte tag0Len;
-		private byte tag1Len;
-		private byte tag2Len;
-		private byte tag3Len;
-		private byte tag4Len;
-		private byte tag5Len;
-		private byte tag6Len;
-		private byte tag7Len;
-		private byte tag8Len;
-		private byte tag9Len;
-		private byte tag10Len;
-		private byte tag11Len;
+		public byte tag0Len;
+		public byte tag1Len;
+		public byte tag2Len;
+		public byte tag3Len;
+		public byte tag4Len;
+		public byte tag5Len;
+		public byte tag6Len;
+		public byte tag7Len;
+		public byte tag8Len;
+		public byte tag9Len;
+		public byte tag10Len;
+		public byte tag11Len;
 		#elif ACTORS_TAGS_6
-		private byte tag0Len;
-		private byte tag1Len;
-		private byte tag2Len;
-		private byte tag3Len;
-		private byte tag4Len;
-		private byte tag5Len;
+		public byte tag0Len;
+		public byte tag1Len;
+		public byte tag2Len;
+		public byte tag3Len;
+		public byte tag4Len;
+		public byte tag5Len;
 		#endif
 
 		public ref ushort this[int index] => ref GetElementByRef(index);
-
 		public int Length => length;
-
-		public int GetLength()
-		{
-			return length;
-		}
 
 		public void Clear()
 		{
@@ -223,6 +217,53 @@ namespace Pixeye.Framework
 				return elements[index];
 		}
 
+		public bool HasAny(params int[] tagsID)
+		{
+			if (length == 0) return false;
+
+			for (int i = 0; i < tagsID.Length; i++)
+			{
+				var tID = (ushort) tagsID[i];
+				for (int j = 0; j < length; j++)
+				{
+					fixed (ushort* elements = &tag0)
+						if (elements[j] == tID)
+							return true;
+				}
+			}
+
+			return false;
+		}
+
+		public bool Has(params int[] tagsID)
+		{
+			if (length == 0) return false;
+			var match = 0;
+
+			for (int i = 0; i < tagsID.Length; i++)
+			{
+				var tID = (ushort) tagsID[i];
+				for (int j = 0; j < length; j++)
+				{
+					fixed (ushort* elements = &tag0)
+						if (elements[j] == tID)
+							match++;
+				}
+			}
+			return match == tagsID.Length;
+		}
+
+		public bool Has(int tagID)
+		{
+			for (int i = 0; i < length; i++)
+			{
+				fixed (ushort* elements = &tag0)
+					if (elements[i] == tagID)
+						return true;
+			}
+			return false;
+		}
+
 	}
 
 	public static class HelperTags
@@ -239,244 +280,241 @@ namespace Pixeye.Framework
 		public static void Clear(int entityID)
 		{
 			ref var tags = ref Entity.tags[entityID];
-			var length = tags.GetLength();
-			for (int i = 0; i < length; i++)
+			var len = tags.Length;
+			for (int i = 0; i < len; i++)
 			{
 				tags[i] = 0;
 			}
 		}
 
-		public static void Add(in this ent entity, int tagID)
+		public unsafe static void Add(in this ent entity, int tagID)
 		{
-			var entityID = entity.id;
-			ref var tags = ref Entity.tags[entityID];
-
-			for (int i = 0; i < tags.Length; i++)
+			ref var tags = ref Entity.tags[entity.id];
+			var len = tags.Length;
+			var tID = (ushort) tagID;
+			for (int index = 0; index < len; index++)
 			{
-				if (tags[i] == tagID)
+				fixed (ushort* elements = &tags.tag0)
 				{
-					tags.Increase(i);
-					return;
+					if (elements[index] == tID)
+					{
+						fixed (byte* elementsLen = &tags.tag0Len)
+							unchecked
+							{
+								elementsLen[index] += 1;
+							}
+
+						return;
+					}
 				}
 			}
 
 			#if UNITY_EDITOR
-			if (tags.Length == BufferTags.Capacity)
+			if (len == BufferTags.Capacity)
 			{
 				throw new Exception("Tags limit reached!");
 			}
 			#endif
-
-			var fistAvailable = tags.Length;
-			tags.SetElement(fistAvailable, tagID);
-
+ 
+			tags.SetElement(tags.Length, tagID);
 			HandleChange(entity, tagID);
 		}
 
-		public static void Add(in this ent entity, params int[] tagsID)
+		public unsafe static void Add(in this ent entity, params int[] tagsID)
 		{
-			var entityID = entity.id;
-			ref var tags = ref Entity.tags[entityID];
-			var len = tags.GetLength();
+			ref var tags = ref Entity.tags[entity.id];
+			var len = tags.Length;
 
 			for (int i = 0; i < tagsID.Length; i++)
 			{
-				var tagID = tagsID[i];
-				var needToAdd = true;
-				for (int l = 0; l < len; l++)
+				var tID = (ushort) tagsID[i];
+				var allowToAdd = true;
+				for (int index = 0; index < len; index++)
 				{
-					if (tags[l] == tagID)
+					fixed (ushort* elements = &tags.tag0)
 					{
-						tags.Increase(l);
-						needToAdd = false;
-						break;
+						if (elements[index] == tID)
+						{
+							fixed (byte* elementsLen = &tags.tag0Len)
+								unchecked
+								{
+									elementsLen[index] += 1;
+								}
+							allowToAdd = false;
+							break;
+						}
 					}
 				}
-
-				if (!needToAdd) continue;
+				if (!allowToAdd) continue;
 
 				#if UNITY_EDITOR
-				if (tags.Length == BufferTags.Capacity)
+				if (len == BufferTags.Capacity)
 				{
 					throw new Exception("Tags limit reached!");
 				}
 				#endif
 
-				var fistAvailable = tags.GetLength();
-				tags.SetElement(fistAvailable, tagID);
-				HandleChange(entity, tagID);
+				tags.SetElement(tags.Length, tID);
+				HandleChange(entity, tID);
 			}
 		}
 
-		public static void AddLater(in this ent entity, int tagID)
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		internal unsafe static void AddLater(in this ent entity, int tagID)
 		{
-			var entityID = entity.id;
-			ref var tags = ref Entity.tags[entityID];
-
-			for (int i = 0; i < tags.Length; i++)
+			ref var tags = ref Entity.tags[entity.id];
+			var len = tags.Length;
+			var tID = (ushort) tagID;
+			for (int index = 0; index < len; index++)
 			{
-				if (tags[i] == tagID)
+				fixed (ushort* elements = &tags.tag0)
 				{
-					tags.Increase(i);
-					return;
+					if (elements[index] == tID)
+					{
+						fixed (byte* elementsLen = &tags.tag0Len)
+							unchecked
+							{
+								elementsLen[index] += 1;
+							}
+
+						return;
+					}
 				}
 			}
 
 			#if UNITY_EDITOR
-			if (tags.Length == BufferTags.Capacity)
+			if (len == BufferTags.Capacity)
 			{
 				throw new Exception("Tags limit reached!");
 			}
 			#endif
 
-			var fistAvailable = tags.Length;
-			tags.SetElement(fistAvailable, tagID);
+			tags.SetElement(tags.Length, tagID);
 		}
 
-		public static void AddLater(in this ent entity, params int[] tagsID)
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		internal unsafe static void AddLater(in this ent entity, params int[] tagsID)
 		{
-			var entityID = entity.id;
-			ref var tags = ref Entity.tags[entityID];
+			ref var tags = ref Entity.tags[entity.id];
 
-			var len = tags.GetLength();
+			var len = tags.Length;
 
 			for (int i = 0; i < tagsID.Length; i++)
 			{
-				var tagID = tagsID[i];
-				var needToAdd = true;
-				for (int l = 0; l < len; l++)
+				var tID = (ushort) tagsID[i];
+				var allowToAdd = true;
+				for (int index = 0; index < len; index++)
 				{
-					if (tags[l] == tagID)
+					fixed (ushort* elements = &tags.tag0)
 					{
-						tags.Increase(l);
-						needToAdd = false;
-						break;
+						if (elements[index] == tID)
+						{
+							fixed (byte* elementsLen = &tags.tag0Len)
+								unchecked
+								{
+									elementsLen[index] += 1;
+								}
+							allowToAdd = false;
+							break;
+						}
 					}
 				}
-
-				if (!needToAdd) continue;
+				if (!allowToAdd) continue;
 
 				#if UNITY_EDITOR
-				if (tags.Length == BufferTags.Capacity)
+				if (len == BufferTags.Capacity)
 				{
 					throw new Exception("Tags limit reached!");
 				}
 				#endif
 
-				var fistAvailable = tags.GetLength();
-				tags.SetElement(fistAvailable, tagID);
+				tags.SetElement(tags.Length, tID);
 			}
 		}
 
-		public static void Remove(in this ent entity, int tagID)
+		public unsafe static void Remove(in this ent entity, int tagID)
 		{
-			var entityID = entity.id;
-			ref var tags = ref Entity.tags[entityID];
-			var length = tags.GetLength();
-			for (int i = 0; i < length; i++)
+			ref var tags = ref Entity.tags[entity.id];
+			var len = tags.Length;
+			for (int index = 0; index < len; index++)
 			{
-				if (tags.GetElementByRef(i) == tagID)
-				{
-					if (tags.Decrease(i))
+				fixed (ushort* elements = &tags.tag0)
+					if (elements[index] == tagID)
 					{
-						HandleChange(entity, tagID);
+						fixed (byte* elementsLengths = &tags.tag0Len)
+							if (--elementsLengths[index] == 0)
+							{
+								tags.RemoveAt(index);
+								HandleChange(entity, tagID);
+							}
+						return;
 					}
-
-					return;
-				}
 			}
 		}
 
-		public static void RemoveAll(in this ent entity, params int[] tagsID)
+		public unsafe static void RemoveAll(in this ent entity, params int[] tagsID)
 		{
-			var entityID = entity.id;
-			ref var tags = ref Entity.tags[entityID];
-			var length = tags.GetLength();
-
-			for (int l = 0; l < tagsID.Length; l++)
-			{
-				var tagID = tagsID[l];
-				for (int i = 0; i < length; i++)
-				{
-					if (tags.GetElementByRef(i) == tagID)
-					{
-						tags.ClearAt(i);
-						HandleChange(entity, tagID);
-						break;
-					}
-				}
-			}
-		}
-
-		public static void RemoveAll(in this ent entity, int tagID)
-		{
-			var entityID = entity.id;
-			ref var tags = ref Entity.tags[entityID];
-			var length = tags.GetLength();
-			for (int i = 0; i < length; i++)
-			{
-				if (tags.GetElementByRef(i) == tagID)
-				{
-					tags.ClearAt(i);
-					HandleChange(entity, tagID);
-					return;
-				}
-			}
-		}
-
-		public static bool Has(in this ent entity, int tagID)
-		{
-			var entityID = entity.id;
-			ref var tags = ref Entity.tags[entityID];
-			var length = tags.GetLength();
-			for (int i = 0; i < length; i++)
-			{
-				if (tags.GetElementByRef(i) == tagID)
-					return true;
-			}
-
-			return false;
-		}
-
-		public static bool Has(in this ent entity, params int[] tagsID)
-		{
-			var entityID = entity.id;
-			ref var tags = ref Entity.tags[entityID];
-			var length = tags.GetLength();
-			if (length == 0) return false;
-
-			var match = 0;
-
-			for (int l = 0; l < tagsID.Length; l++)
-			{
-				var tagToLook = tagsID[l];
-				for (int i = 0; i < length; i++)
-				{
-					if (tags.GetElementByRef(i) == tagToLook) match++;
-				}
-			}
-
-			return match == tagsID.Length;
-		}
-
-		public static bool HasAny(in this ent entity, params int[] tagsID)
-		{
-			var entityID = entity.id;
-			ref var tags = ref Entity.tags[entityID];
-			var length = tags.GetLength();
-			if (length == 0) return false;
+			ref var tags = ref Entity.tags[entity.id];
+			var len = tags.Length;
 
 			for (int i = 0; i < tagsID.Length; i++)
 			{
-				var tagID = tagsID[i];
-				for (int l = 0; l < length; l++)
+				var tID = (ushort) tagsID[i];
+				for (int index = 0; index < len; index++)
 				{
-					if (tags.GetElementByRef(l) == tagID)
-						return true;
+					fixed (ushort* elements = &tags.tag0)
+						if (elements[index] == tID)
+						{
+							fixed (byte* elementsLen = &tags.tag0Len)
+							{
+								elementsLen[index] = 0;
+								tags.RemoveAt(index);
+								HandleChange(entity, tID);
+								break;
+							}
+						}
 				}
 			}
+		}
 
-			return false;
+		public unsafe static void RemoveAll(in this ent entity, int tagID)
+		{
+			ref var tags = ref Entity.tags[entity.id];
+			var len = tags.Length;
+			var tID = (ushort) tagID;
+
+			for (int index = 0; index < len; index++)
+			{
+				fixed (ushort* elements = &tags.tag0)
+				{
+					if (elements[index] == tID)
+					{
+						fixed (byte* elementsLen = &tags.tag0Len)
+							elementsLen[index] = 0;
+						tags.RemoveAt(index);
+						HandleChange(entity, tID);
+						return;
+					}
+				}
+			}
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static bool Has(in this ent entity, int tagID)
+		{
+			return Entity.tags[entity.id].Has(tagID);
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static bool Has(in this ent entity, params int[] tagsID)
+		{
+			return Entity.tags[entity.id].Has(tagsID);
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static bool HasAny(in this ent entity, params int[] tagsID)
+		{
+			return Entity.tags[entity.id].HasAny(tagsID);
 		}
 
 		internal static void Add(GroupCore groupCore)
@@ -532,18 +570,17 @@ namespace Pixeye.Framework
 					container = new DictionaryGroups();
 					container.Add(groupCore);
 					inUseGroupsTypes.Add(index, container);
-			    
 				}
 			}
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		private static void HandleChange(in ent entity, int tagID)
+		internal static void HandleChange(in ent entity, int tagID)
 		{
 			var indexGroup = inUseGroups.TryGetValue(tagID);
+		 
 			if (indexGroup == -1) return;
-			var en = entity;
-			Entity.Delayed.Set(en, indexGroup, Entity.Delayed.Action.ChangeTag);
+			Entity.Delayed.Set(entity, indexGroup, Entity.Delayed.Action.ChangeTag);
 		}
 
 	}

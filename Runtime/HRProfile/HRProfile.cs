@@ -44,7 +44,7 @@ namespace Pixeye.Framework
 			}
 		}
 
-		public static void StartProfile(string tag)
+		public static void Start(string tag)
 		{
 			ProfilePoint point;
 
@@ -53,7 +53,7 @@ namespace Pixeye.Framework
 			profiles[tag] = point;
 		}
 
-		public static void EndProfile(string tag)
+		public static void End(string tag)
 		{
 			if (!profiles.ContainsKey(tag))
 			{

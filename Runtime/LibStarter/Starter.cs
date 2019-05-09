@@ -170,6 +170,7 @@ namespace Pixeye.Framework
 
 			foreach (var obj in objs)
 			{
+				
 				obj.Launch();
 			}
 

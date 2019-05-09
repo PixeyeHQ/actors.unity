@@ -22,7 +22,7 @@ namespace Pixeye
 
 		#region SERILIZATION
 
-		[SerializeField, HideInInspector, ExcludeDataFromInspector]
+		[SerializeField, HideInInspector]
 		private SerializationData serializationData;
 
 		public void OnBeforeSerialize()

@@ -234,7 +234,7 @@ namespace Pixeye.Framework
 							canBeAdded &= composition.tagsToExclude.Length == 0 || composition.Exclude(entityID);
 
 							var inGroup = HelperArray.BinarySearch(ref group.entities, entityID, 0, group.length);
-
+					 
 							if (inGroup == -1 && canBeAdded)
 							{
 								var generation = Storage.generations[operation.arg];
@@ -249,7 +249,7 @@ namespace Pixeye.Framework
 									canBeAdded = false;
 									break;
 								}
-
+              
 								if (canBeAdded)
 									group.Insert(operation.entity);
 							}

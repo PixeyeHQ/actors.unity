@@ -22,7 +22,8 @@ namespace Pixeye.Framework
 		internal readonly byte age;
 
 		public ref readonly Transform transform => ref Entity.transforms[id];
-	 
+		//public ref readonly BufferTags tags => ref Entity.tags[id];
+	
 		#region ENTITY
 
 		internal EntityComposer Modify()
@@ -238,6 +239,6 @@ namespace Pixeye.Framework
 		}
 
 		#endregion
-
+		
 	}
 }

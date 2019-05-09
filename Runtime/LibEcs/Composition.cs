@@ -101,14 +101,15 @@ namespace Pixeye.Framework
 		internal bool Include(int entityID)
 		{
 			ref var tags = ref Entity.tags[entityID];
-			var length = tags.GetLength();
-			if (length == 0) return false;
+			var len = tags.Length;
+
+			if (len == 0) return false;
 			var match = 0;
 
 			for (int l = 0; l < tagsToInclude.Length; l++)
 			{
 				var tagToInclude = tagsToInclude[l];
-				for (int i = 0; i < length; i++)
+				for (int i = 0; i < len; i++)
 				{
 					ref var tag = ref tags.GetElementByRef(i);
 					if (tag == tagToInclude) match++;
@@ -121,13 +122,13 @@ namespace Pixeye.Framework
 		internal bool Exclude(int entityID)
 		{
 			ref var tags = ref Entity.tags[entityID];
-			var length = tags.GetLength();
-			if (length == 0) return true;
+			var len = tags.Length;
+			if (len == 0) return true;
 
 			for (int l = 0; l < tagsToExclude.Length; l++)
 			{
 				var tagToExclude = tagsToExclude[l];
-				for (int i = 0; i < length; i++)
+				for (int i = 0; i < len; i++)
 				{
 					ref var tag = ref tags.GetElementByRef(i);
 					if (tag == tagToExclude) return false;

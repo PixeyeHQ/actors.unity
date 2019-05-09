@@ -156,7 +156,7 @@ namespace Pixeye.Framework
 
 			Setup(id);
 			var entity = new ent(id, age);
-			bpAsset.Populate(entity);
+			bpAsset.Execute(entity);
 			return entity;
 		}
 
@@ -429,7 +429,7 @@ namespace Pixeye.Framework
 			SetupWithTransform(id, pooled);
 			transforms[id] = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefabID) : HelperFramework.SpawnInternal(prefabID);
 			var entity = new ent(id, age);
-			bpAsset.Populate(entity);
+			bpAsset.Execute(entity);
 			return entity;
 		}
 
@@ -456,7 +456,7 @@ namespace Pixeye.Framework
 			SetupWithTransform(id, pooled);
 			transforms[id] = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefab) : HelperFramework.SpawnInternal(prefab);
 			var entity = new ent(id, age);
-			bpAsset.Populate(entity);
+			bpAsset.Execute(entity);
 			return entity;
 		}
 

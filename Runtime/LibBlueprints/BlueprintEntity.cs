@@ -16,13 +16,12 @@ using Sirenix.OdinInspector;
 using UnityEditor;
 #if ODIN_INSPECTOR
 using Sirenix.Utilities.Editor;
-
 #endif
 #endif
 
 namespace Pixeye.Framework
 {
-	public class BlueprintEntity : SerializedScriptableObject
+	public class BlueprintEntity : ScriptableBuild
 	{
 
 		public static Dictionary<int, BlueprintEntity> storage = new Dictionary<int, BlueprintEntity>(FastComparable.Default);
@@ -121,7 +120,7 @@ namespace Pixeye.Framework
 
 		#endif
 
-		internal void Populate(in ent entity)
+		internal override void Execute(in ent entity)
 		{
 			var id = entity.id;
 
@@ -147,6 +146,9 @@ namespace Pixeye.Framework
 			entity.AddLater(tags);
 			Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Activate);
 		}
+
+		 
+		 
 
 	}
 
@@ -210,7 +212,7 @@ namespace Pixeye.Framework
 	}
 	#endif
 }
-#else
+ #else
 using System;
 using System.Collections.Generic;
 #if UNITY_EDITOR
@@ -220,7 +222,7 @@ using UnityEngine;
 
 namespace Pixeye.Framework
 {
-	public class BlueprintEntity : ScriptableObject
+	public class BlueprintEntity : ScriptableBuild
 	{
 
     public CoreDB db;
@@ -255,7 +257,7 @@ namespace Pixeye.Framework
 		{
 		}
 
-		internal void Populate(in ent entity)
+		internal override void Execute(in ent entity)
 		{
 			var id = entity.id;
 
@@ -349,5 +351,6 @@ namespace Pixeye.Framework
 
 	}
 }
-
 #endif
+
+ 

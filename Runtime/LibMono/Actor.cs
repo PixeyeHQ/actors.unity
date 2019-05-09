@@ -13,6 +13,8 @@ using Sirenix.OdinInspector;
 
 #endif
 
+ 
+
 namespace Pixeye.Framework
 {
 	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
@@ -30,9 +32,9 @@ namespace Pixeye.Framework
 
 		[FoldoutGroup("Main")]
 		public bool isPooled;
-
-		[FoldoutGroup("Main")]
-		public BlueprintEntity blueprint;
+ 
+	  [FoldoutGroup("Main")]
+		public ScriptableBuild buildFrom;
 
 		#endregion
 
@@ -44,6 +46,7 @@ namespace Pixeye.Framework
 
 		protected virtual void OnEnable()
 		{
+			 
 			if (!manualRemoved) return;
 			manualRemoved = false;
 			Entity.isAlive[entity.id] = true;
@@ -113,11 +116,11 @@ namespace Pixeye.Framework
 			Entity.transforms[id] = transform;
 
 			Setup();
-
-			if (blueprint != null)
-				blueprint.Populate(entity);
-			else
-				Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Activate);
+ 
+			if (buildFrom != null)
+				buildFrom.Execute(entity);
+			else 
+			Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Activate);
 		}
 
 		internal void LaunchFrom(HandleEntityComposer model)
@@ -210,7 +213,6 @@ namespace Pixeye.Framework
 			return actor;
 		}
 
-		
 		public static Actor Create(string prefabID, Vector3 position, HandleEntityComposer model, bool pooled = false)
 		{
 			var tr = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefabID, position) : HelperFramework.SpawnInternal(prefabID, position);
@@ -219,8 +221,7 @@ namespace Pixeye.Framework
 			actor.LaunchFrom(model);
 			return actor;
 		}
-		
-		
+
 		public static Actor Create(string prefabID, HandleEntityComposer model, bool pooled = false)
 		{
 			var tr = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefabID) : HelperFramework.SpawnInternal(prefabID);
@@ -250,6 +251,18 @@ namespace Pixeye.Framework
 
 			return actor;
 		}
+		
+		public static Actor Create(string prefabID, Vector3 position, bool pooled = false)
+		{
+			var tr = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefabID, position) : HelperFramework.SpawnInternal(prefabID, position);
+			var actor = tr.AddGetActor();
+
+			actor.isPooled = pooled;
+			actor.Launch();
+
+			return actor;
+		}
+		
 
 		public static Actor Create(GameObject prefab, bool pooled = false)
 		{
@@ -264,7 +277,7 @@ namespace Pixeye.Framework
 		{
 			var tr = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefabID) : HelperFramework.SpawnInternal(prefabID);
 			var actor = tr.AddGetActor();
-			actor.blueprint = bp;
+			actor.buildFrom = bp;
 			actor.isPooled = pooled;
 			actor.Launch();
 			return actor;
@@ -274,7 +287,7 @@ namespace Pixeye.Framework
 		{
 			var tr = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefab) : HelperFramework.SpawnInternal(prefab);
 			var actor = tr.AddGetActor();
-			actor.blueprint = bp;
+			actor.buildFrom = bp;
 			actor.isPooled = pooled;
 			actor.Launch();
 			return actor;
