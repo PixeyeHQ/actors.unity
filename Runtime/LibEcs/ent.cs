@@ -86,7 +86,7 @@ namespace Pixeye.Framework
 			ent other = (ent) obj;
 			return id.CompareTo(other.id);
 		}
-
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public bool Has<T>() where T : class, IComponent, new()
 		{
 			var mask = Storage<T>.componentMask;
