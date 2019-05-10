@@ -33,7 +33,7 @@ namespace Pixeye.Framework
 	{
 
 		public int length;
-
+		int position;
 		public EntityAction onAdd;
 		public EntityAction onRemove;
 
@@ -148,6 +148,21 @@ namespace Pixeye.Framework
 			return -1;
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public bool next(out ent entity)
+		{
+			if (length == 0)
+			{
+				entity = -1;
+				return false;
+			}
+			if (position == length)
+				position = 0;
+
+			entity = entities[position++];
+			return true;
+		}
+
 		public GroupCore()
 		{
 			id = idCounter++;
@@ -205,13 +220,15 @@ namespace Pixeye.Framework
 		public struct Enumerator : IEnumerator
 		{
 
-			private ent[] entities;
-			private int position;
-			private int length;
+			ent[] entities;
+
+			int position;
+			int length;
 
 			internal Enumerator(ent[] entities, int length)
 			{
 				position = -1;
+
 				this.entities = entities;
 				this.length = length;
 			}
