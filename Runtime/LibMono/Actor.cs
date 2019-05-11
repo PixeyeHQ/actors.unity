@@ -62,11 +62,6 @@ namespace Pixeye.Framework
 		}
 		#endif
 
-		public void OnAdd(in ent entity)
-		{
-			OnAdd();
-		}
-
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public virtual void OnAdd()
 		{
@@ -75,6 +70,11 @@ namespace Pixeye.Framework
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public virtual void OnRemove()
 		{
+		}
+
+		public virtual void Dispose()
+		{
+      
 		}
 
 		#endregion
