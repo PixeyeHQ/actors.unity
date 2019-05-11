@@ -15,7 +15,7 @@ namespace Pixeye.Framework
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
 		/// <returns>Actor</returns>
-		public T GetActor<T>() where T: Actor
+		public T Get<T>() where T: Actor
 		{
 			return actor as T;
 		}
