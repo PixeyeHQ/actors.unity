@@ -15,7 +15,7 @@ namespace Pixeye.Framework
 	public abstract class ScriptableBuild : SerializedScriptableObject
 	{
 
-		protected Dictionary<int, Action<EntityComposer>> helpers = new Dictionary<int, Action<EntityComposer>>();
+		public Dictionary<int, Action<EntityComposer>> helpers = new Dictionary<int, Action<EntityComposer>>();
 
 		
 		protected virtual void OnEnable()
@@ -53,7 +53,7 @@ namespace Pixeye.Framework
 	using UnityEngine;
 	public class ScriptableBuild : ScriptableObject
 	{
-    protected Dictionary<int,Action<EntityComposer>> helpers = new Dictionary<int, Action<EntityComposer>>();
+    public Dictionary<int,Action<EntityComposer>> helpers = new Dictionary<int, Action<EntityComposer>>();
  
 		internal virtual void Execute(in ent entity, Actor a = null)
 		{
