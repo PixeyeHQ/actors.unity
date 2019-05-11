@@ -1,9 +1,9 @@
-//  Project : game.metro
+//  Project : ecs
 // Contacts : Pix - ask@pixeye.games
 
 
 
-namespace Pixeye
+namespace Pixeye.Framework
 {
    public interface IBind
     {

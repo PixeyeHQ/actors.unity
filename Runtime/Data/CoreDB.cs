@@ -3,10 +3,9 @@
 
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using Pixeye.Framework;
 using UnityEngine;
 
-namespace Pixeye
+namespace Pixeye.Framework
 {
 	public abstract class CoreDB : ScriptableObject, IDB
 	{

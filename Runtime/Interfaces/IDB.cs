@@ -3,7 +3,7 @@
 
 using System.Runtime.CompilerServices;
 
-namespace Pixeye
+namespace Pixeye.Framework
 {
 	public interface IDB
 	{

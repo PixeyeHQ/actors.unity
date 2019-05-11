@@ -104,9 +104,8 @@ namespace Pixeye.Framework
 			else
 				id = ent.lastID++;
 
-			Entity.SetupWithTransform(id, isPooled);
-
-			entity = new ent(id, age);
+			 
+			entity = Entity. SetupWithTransform(id, isPooled, age);
 
 			#if UNITY_EDITOR
 			_entity = id;
@@ -143,9 +142,9 @@ namespace Pixeye.Framework
 			else
 				id = ent.lastID++;
 
-			Entity.SetupWithTransform(id, isPooled);
+ 
 
-			entity = new ent(id, age);
+			entity = Entity.SetupWithTransform(id, isPooled, age);
 
 			#if UNITY_EDITOR
 			_entity = id;

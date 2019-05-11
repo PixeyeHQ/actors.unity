@@ -62,7 +62,7 @@ namespace Pixeye.Framework
 		internal bool OverlapComponents(in BufferComponents entityComponents)
 		{
 			int match = 0;
-			for (int i = 0; i < entityComponents.Length; i++)
+			for (int i = 0; i < entityComponents.length; i++)
 			{
 				if (components[entityComponents.components[i]])
 					match++;
@@ -142,7 +142,7 @@ namespace Pixeye.Framework
 		{
 			BufferComponents entityComponents = Entity.components[entityID];
 
-			for (int i = 0; i < entityComponents.Length; i++)
+			for (int i = 0; i < entityComponents.length; i++)
 			{
 				if (typesToExclude[entityComponents.components[i]])
 				{

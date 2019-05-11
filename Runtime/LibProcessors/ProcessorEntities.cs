@@ -101,7 +101,7 @@ namespace Pixeye.Framework
 
 					case Entity.Delayed.Action.Kill:
 						ref var componentsToKill = ref Entity.components[entityID];
-						var length = componentsToKill.Length;
+						var length = componentsToKill.length;
 
 						for (int j = 0; j < length; j++)
 						{
@@ -134,7 +134,7 @@ namespace Pixeye.Framework
 
 						groupsToClearLen = 0;
 
-						for (int j = 0; j < Entity.components[entityID].Length; j++)
+						for (int j = 0; j < Entity.components[entityID].length; j++)
 						{
 							var cID = Entity.components[entityID].components[j];
 							Storage.all[cID].GetComponent(entityID).Dispose();
@@ -151,7 +151,7 @@ namespace Pixeye.Framework
 
 					case Entity.Delayed.Action.Unbind:
 						ref var componentsToUnbind = ref Entity.components[entityID];
-						var lengthUnbind = componentsToUnbind.Length;
+						var lengthUnbind = componentsToUnbind.length;
 
 						for (int j = 0; j < lengthUnbind; j++)
 						{
@@ -272,7 +272,7 @@ namespace Pixeye.Framework
 
 					case Entity.Delayed.Action.Activate:
 						ref var componentsToActivate = ref Entity.components[entityID];
-						var lenToActivate = componentsToActivate.Length;
+						var lenToActivate = componentsToActivate.length;
 
 						for (int j = 0; j < lenToActivate; j++)
 						{
@@ -314,7 +314,7 @@ namespace Pixeye.Framework
 
 					case Entity.Delayed.Action.Deactivate:
 						ref var componentsToDeactivate = ref Entity.components[entityID];
-						var lenToDeactivate = componentsToDeactivate.Length;
+						var lenToDeactivate = componentsToDeactivate.length;
 
 						for (int j = 0; j < lenToDeactivate; j++)
 						{

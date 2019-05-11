@@ -1,4 +1,4 @@
-//  Project : game.metro
+//  Project : ecs
 // Contacts : Pix - ask@pixeye.games
 
 #if ODIN_INSPECTOR
@@ -10,7 +10,7 @@ using Sirenix.OdinInspector;
 using Sirenix.Serialization;
 using UnityEngine;
 
-namespace Pixeye
+namespace Pixeye.Framework
 {
 	[CreateAssetMenu(fileName = "DB", menuName = "Actors/Add/Data/Base")]
 	[ShowOdinSerializedPropertiesInInspector]

@@ -1,9 +1,13 @@
 using UnityEngine;
-using System.Collections;
 
-
-public class EnumFlagAttribute : PropertyAttribute
+namespace Pixeye.Framework
 {
-    public EnumFlagAttribute() { }
+	public class EnumFlagAttribute : PropertyAttribute
+	{
+		public EnumFlagAttribute() { }
+	}
+
+ 
 }
 
+ 

@@ -2,17 +2,17 @@
 // Contacts : Pix - ask@pixeye.games
 
 using System;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
-namespace Pixeye
+namespace Pixeye.Framework
 {
 	[StructLayout(LayoutKind.Sequential)]
 	public struct BufferComponents
 	{
 
 		public ushort[] components;
-		public byte Length;
+		public byte length;
+		public byte ageCache;  // caching age of entity for retrivieng it in future. ( ParseBy method )
 
 		public ref ushort GetComponent(int id)
 		{
@@ -22,33 +22,35 @@ namespace Pixeye
 		public BufferComponents(int size)
 		{
 			components = new ushort[size];
-			Length = 0;
+			length = 0;
+			ageCache = 0;
 		}
 
-		public void Setup()
+		public void Setup(byte ageCache)
 		{
+			length = 0;
+			this.ageCache = ageCache;
 			if (components == null) components = new ushort[1];
-			Length = 0;
 		}
 
 		public void Clear()
 		{
-			Length = 0;
+			length = 0;
 		}
 
 		public void Add(int type)
 		{
-			if (Length == components.Length)
-				Array.Resize(ref components, Length << 1);
+			if (length == components.Length)
+				Array.Resize(ref components, length << 1);
 
-			components[Length++] = (ushort) type;
+			components[length++] = (ushort) type;
 		}
 
 		public void Remove(int type)
 		{
 			var typeConverted = (ushort) type;
 
-			for (int i = 0; i < Length; i++)
+			for (int i = 0; i < length; i++)
 			{
 				if (components[i] == typeConverted)
 				{
@@ -60,10 +62,10 @@ namespace Pixeye
 
 		public void RemoveAt(int index)
 		{
-			for (int i = index; i < Length - 1; ++i)
+			for (int i = index; i < length - 1; ++i)
 				SetElement(i, components[i + 1]);
 
-			Length--;
+			length--;
 		}
 
 		public void SetElement(int index, int arg)

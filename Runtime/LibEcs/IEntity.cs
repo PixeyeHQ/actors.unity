@@ -1,9 +1,8 @@
 //  Project : ecs.examples
 // Contacts : Pix - ask@pixeye.games
 
-using Pixeye.Framework;
-
-namespace Pixeye
+ 
+namespace Pixeye.Framework
 {
 	public interface IEntity
 	{
