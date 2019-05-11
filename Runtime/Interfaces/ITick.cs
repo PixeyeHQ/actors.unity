@@ -5,7 +5,7 @@
  
  public interface ITick  {
  
-    void  Tick();
+    void  Tick(float delta);
  
    }
  }

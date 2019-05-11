@@ -150,14 +150,9 @@ namespace Pixeye.Framework
 			return Restart(finishTime);
 		}
 
-		public void Tick()
+		public void Tick(float delta)
 		{
-			Execute();
-		}
-
-		public void Execute()
-		{
-			timer += Time.delta * timeScale;
+			timer += delta * timeScale;
 
 			if (timer < finishTime) return;
 
@@ -174,6 +169,8 @@ namespace Pixeye.Framework
 				HandleTimer.Default.allWorkingTimers.Remove(this);
 			}
 		}
+
+	 
 
 		public void Release()
 		{

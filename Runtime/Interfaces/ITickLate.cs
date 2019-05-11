@@ -5,7 +5,7 @@ namespace Pixeye.Framework{
 
 public interface ITickLate  {
 
-    void TickLate();
+    void TickLate(float delta);
 
 }
 }

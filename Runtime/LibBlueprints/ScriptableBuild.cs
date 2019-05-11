@@ -40,10 +40,10 @@ namespace Pixeye.Framework
 		
 			internal virtual void Execute(in ent entity, Actor a = null)
     		{
-    			helpers[GetInstanceID()](EntityComposer.Default);
+    		 
     			EntityComposer.Default.entity = entity;
     			EntityComposer.Default.actor = a;
-    			
+    		  helpers[GetInstanceID()](EntityComposer.Default);
     			Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Activate);
     		}
 
@@ -57,10 +57,10 @@ namespace Pixeye.Framework
  
 		internal virtual void Execute(in ent entity, Actor a = null)
 		{
-			helpers[GetInstanceID()](EntityComposer.Default);
+	 
 			EntityComposer.Default.entity = entity;
 			EntityComposer.Default.actor = a;
-			
+			helpers[GetInstanceID()](EntityComposer.Default);
 			Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Activate);
 		}
 

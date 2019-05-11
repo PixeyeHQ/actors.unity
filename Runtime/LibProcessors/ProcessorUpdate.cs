@@ -14,8 +14,11 @@ namespace Pixeye.Framework
 		List<ITickLate> ticksLate = new List<ITickLate>();
 
 		public static ProcessorUpdate Default;
-
-		int countTicks;
+	
+		internal static List<Time> times = new List<Time>();
+    internal static int timesLen = 0;
+	
+    int countTicks;
 		int countTicksFixed;
 		int countTicksLate;
 
@@ -71,25 +74,33 @@ namespace Pixeye.Framework
 		{
 			
 			if (Toolbox.changingScene) return;
+
+			for (int i = 0; i < timesLen; i++)
+			{
+				times[i].Tick();
+			}
 			
+			var delta = Time.delta;
 			for (var i = 0; i < countTicks; i++)
 			{
-				ticks[i].Tick();
+				ticks[i].Tick(delta);
 			}
 		}
 
 		void FixedUpdate()
 		{
 			if (Toolbox.changingScene) return;
+			var delta = Time.deltaFixed;
 			for (var i = 0; i < countTicksFixed; i++)
-				ticksFixed[i].TickFixed();
+				ticksFixed[i].TickFixed(delta);
 		}
 
 		void LateUpdate()
 		{
 			if (Toolbox.changingScene) return;
+			var delta = Time.delta;
 			for (var i = 0; i < countTicksLate; i++)
-				ticksLate[i].TickLate();
+				ticksLate[i].TickLate(delta);
 		}
 
 

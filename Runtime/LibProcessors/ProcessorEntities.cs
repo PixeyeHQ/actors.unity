@@ -25,7 +25,7 @@ namespace Pixeye.Framework
 			return false;
 		}
 
-		public void Tick()
+		public void Tick(float delta)
 		{
 			if (!Starter.initialized) return;
 

@@ -3,7 +3,7 @@
 
 namespace Pixeye.Framework
 {
-	public class Time : ITick, IKernel
+	public class Time :  IKernel
 	{
 		protected const float fps = 60;
 		
@@ -36,7 +36,8 @@ namespace Pixeye.Framework
 
 		public Time()
 		{
-			ProcessorUpdate.Default.Add(this);
+			ProcessorUpdate.times.Add(this);
+			ProcessorUpdate.timesLen++;
 			_deltaTimeFixed = 1 / fps;
 			_deltaTime = _deltaTimeFixed;
 		}

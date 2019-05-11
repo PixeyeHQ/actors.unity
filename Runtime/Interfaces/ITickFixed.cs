@@ -5,7 +5,7 @@ namespace Pixeye.Framework{
 
 public interface ITickFixed  {
 
-    void TickFixed();
+    void TickFixed(float delta);
 
 }
 }
