@@ -217,28 +217,28 @@ namespace Pixeye.Framework
 			return GetEnumerator();
 		}
 
-		public struct Enumerator : IEnumerator
+		public struct Enumerator : IEnumerator<ent>
 		{
 
 			ent[] entities;
-
 			int position;
 			int length;
 
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			internal Enumerator(ent[] entities, int length)
 			{
 				position = -1;
-
 				this.entities = entities;
 				this.length = length;
 			}
-
+			
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			public bool MoveNext()
 			{
-				position++;
-				return position < length;
+				return ++position < length;
 			}
 
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			public void Reset()
 			{
 				position = -1;
@@ -246,8 +246,12 @@ namespace Pixeye.Framework
 
 			object IEnumerator.Current => Current;
 
-			public ent Current => entities[position];
-
+			public ent Current
+			{
+				[MethodImpl(MethodImplOptions.AggressiveInlining)]
+				get { return entities[position]; }
+			}
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			public void Dispose()
 			{
 			}
@@ -258,7 +262,7 @@ namespace Pixeye.Framework
 
 	}
 
-	public sealed class Group<T> : GroupCore where T : class, IComponent, new()
+	public sealed class Group<T> : GroupCore
 	{
 
 		public override void Initialize()
@@ -278,7 +282,7 @@ namespace Pixeye.Framework
 
 	}
 
-	public sealed class Group<T, Y> : GroupCore where T : class, IComponent, new() where Y : class, IComponent, new()
+	public sealed class Group<T, Y> : GroupCore
 	{
 
 		public override void Initialize()
@@ -302,7 +306,7 @@ namespace Pixeye.Framework
 
 	}
 
-	public sealed class Group<T, Y, U> : GroupCore where T : class, IComponent, new() where Y : class, IComponent, new() where U : class, IComponent, new()
+	public sealed class Group<T, Y, U> : GroupCore
 	{
 
 		public override void Initialize()
@@ -331,10 +335,7 @@ namespace Pixeye.Framework
 
 	}
 
-	public sealed class Group<T, Y, U, I> : GroupCore where T : class, IComponent, new()
-			where Y : class, IComponent, new()
-			where U : class, IComponent, new()
-			where I : class, IComponent, new()
+	public sealed class Group<T, Y, U, I> : GroupCore
 	{
 
 		public override void Initialize()
@@ -368,11 +369,7 @@ namespace Pixeye.Framework
 
 	}
 
-	public sealed class Group<T, Y, U, I, O> : GroupCore where T : class, IComponent, new()
-			where Y : class, IComponent, new()
-			where U : class, IComponent, new()
-			where I : class, IComponent, new()
-			where O : class, IComponent, new()
+	public sealed class Group<T, Y, U, I, O> : GroupCore
 	{
 
 		public override void Initialize()
@@ -405,12 +402,8 @@ namespace Pixeye.Framework
 
 	}
 
-	public sealed class Group<T, Y, U, I, O, P> : GroupCore where T : class, IComponent, new()
-			where Y : class, IComponent, new()
-			where U : class, IComponent, new()
-			where I : class, IComponent, new()
-			where O : class, IComponent, new()
-			where P : class, IComponent, new()
+	public sealed class Group<T, Y, U, I, O, P> : GroupCore
+		 
 	{
 
 		public override void Initialize()
@@ -454,13 +447,7 @@ namespace Pixeye.Framework
 
 	}
 
-	public sealed class Group<T, Y, U, I, O, P, A> : GroupCore where T : class, IComponent, new()
-			where Y : class, IComponent, new()
-			where U : class, IComponent, new()
-			where I : class, IComponent, new()
-			where O : class, IComponent, new()
-			where P : class, IComponent, new()
-			where A : class, IComponent, new()
+	public sealed class Group<T, Y, U, I, O, P, A> : GroupCore
 	{
 
 		public override void Initialize()
@@ -509,14 +496,7 @@ namespace Pixeye.Framework
 
 	}
 
-	public sealed class Group<T, Y, U, I, O, P, A, S> : GroupCore where T : class, IComponent, new()
-			where Y : class, IComponent, new()
-			where U : class, IComponent, new()
-			where I : class, IComponent, new()
-			where O : class, IComponent, new()
-			where P : class, IComponent, new()
-			where A : class, IComponent, new()
-			where S : class, IComponent, new()
+	public sealed class Group<T, Y, U, I, O, P, A, S> : GroupCore
 	{
 
 		public override void Initialize()
@@ -570,15 +550,7 @@ namespace Pixeye.Framework
 
 	}
 
-	public sealed class Group<T, Y, U, I, O, P, A, S, D> : GroupCore where T : class, IComponent, new()
-			where Y : class, IComponent, new()
-			where U : class, IComponent, new()
-			where I : class, IComponent, new()
-			where O : class, IComponent, new()
-			where P : class, IComponent, new()
-			where A : class, IComponent, new()
-			where S : class, IComponent, new()
-			where D : class, IComponent, new()
+	public sealed class Group<T, Y, U, I, O, P, A, S, D> : GroupCore
 	{
 
 		public override void Initialize()
@@ -635,16 +607,7 @@ namespace Pixeye.Framework
 		}
 
 	}
-	public sealed class Group<T, Y, U, I, O, P, A, S, D, F> : GroupCore where T : class, IComponent, new()
-			where Y : class, IComponent, new()
-			where U : class, IComponent, new()
-			where I : class, IComponent, new()
-			where O : class, IComponent, new()
-			where P : class, IComponent, new()
-			where A : class, IComponent, new()
-			where S : class, IComponent, new()
-			where D : class, IComponent, new()
-			where F : class, IComponent, new()
+	public sealed class Group<T, Y, U, I, O, P, A, S, D, F> : GroupCore
 	{
 
 		public override void Initialize()

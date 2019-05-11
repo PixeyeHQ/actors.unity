@@ -313,7 +313,7 @@
 //		{
 //
 //			public static void ShowComponentProperties<T>(T component)
-//					where T : IComponent
+//					where T 
 //			{
 //				var componentFields = component.GetType().GetFields();
 //

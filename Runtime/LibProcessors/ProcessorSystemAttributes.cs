@@ -8,11 +8,10 @@ Date:       18/01/2018 10:57
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using UnityEngine;
 
 namespace Pixeye.Framework
 {
-	public class ProcessorSystemAttributes
+	public sealed class ProcessorSystemAttributes
 	{
 
 		public static readonly Dictionary<Type, CachedType> cached = new Dictionary<Type, CachedType>();

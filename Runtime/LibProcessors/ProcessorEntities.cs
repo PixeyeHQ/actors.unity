@@ -1,4 +1,4 @@
-//  Project : ecs.examples
+//  Project : ecs
 // Contacts : Pix - info@pixeye.games
 //     Date : 3/7/2019 
 
@@ -9,11 +9,11 @@ using UnityEngine;
 namespace Pixeye.Framework
 {
 	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
-	internal sealed class ProcessorEntities : Processor, ITick
+	sealed class ProcessorEntities : Processor, ITick
 	{
 
-		private GroupCore[] groupsToClear = new GroupCore[100];
-		private int groupsToClearLen;
+		GroupCore[] groupsToClear = new GroupCore[100];
+		int groupsToClearLen;
 
 		bool CheckIfExists(GroupCore group)
 		{
@@ -25,6 +25,8 @@ namespace Pixeye.Framework
 			return false;
 		}
 
+		//todo: there must be a better way to filter entities. Need research / refactoring
+		
 		public void Tick(float delta)
 		{
 			if (!Starter.initialized) return;
@@ -109,7 +111,7 @@ namespace Pixeye.Framework
 							var generationRemoveOnKill = Storage.generations[componentOnKillId];
 							var maskRemoveOnKill = Storage.masks[componentOnKillId];
 
-								//	if ((Entity.generations[entityID, generationRemoveOnKill] & maskRemoveOnKill) != maskAdd) c;
+							//	if ((Entity.generations[entityID, generationRemoveOnKill] & maskRemoveOnKill) != maskAdd) c;
 							Entity.generations[entityID, generationRemoveOnKill] &= ~maskRemoveOnKill;
 
 							var storageOnKill = Storage.all[componentOnKillId];
@@ -136,13 +138,13 @@ namespace Pixeye.Framework
 
 						for (int j = 0; j < Entity.components[entityID].length; j++)
 						{
-							var cID = Entity.components[entityID].components[j];
-							Storage.all[cID].GetComponent(entityID).Dispose();
+							var cID = (int) Entity.components[entityID].components[j];
+							Storage.all[cID].DisposeComponent(entityID);
 						}
 
 						Entity.components[entityID].Clear();
 
-						if (Entity.transforms.Length > entityID && Entity.transforms[entityID].gameObject!=null)
+						if (Entity.transforms.Length > entityID && Entity.transforms[entityID] != null)
 							Entity.transforms[entityID].gameObject.Release(Entity.isPooled[entityID] ? Pool.Entities : 0);
 
 						Entity.Delayed.Set(operation.entity, 0, Entity.Delayed.Action.KillFinalize);
@@ -234,7 +236,7 @@ namespace Pixeye.Framework
 							canBeAdded &= composition.tagsToExclude.Length == 0 || composition.Exclude(entityID);
 
 							var inGroup = HelperArray.BinarySearch(ref group.entities, entityID, 0, group.length);
-					 
+
 							if (inGroup == -1 && canBeAdded)
 							{
 								var generation = Storage.generations[operation.arg];
@@ -249,7 +251,7 @@ namespace Pixeye.Framework
 									canBeAdded = false;
 									break;
 								}
-              
+
 								if (canBeAdded)
 									group.Insert(operation.entity);
 							}

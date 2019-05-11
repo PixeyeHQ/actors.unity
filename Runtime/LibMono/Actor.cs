@@ -18,7 +18,7 @@ using Sirenix.OdinInspector;
 namespace Pixeye.Framework
 {
 	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
-	public class Actor : MonoBehaviour, IRequireStarter, IEntity
+	public class Actor : MonoBehaviour, IRequireStarter
 	{
 
 		#region MEMBERS
@@ -177,24 +177,24 @@ namespace Pixeye.Framework
 			entity.AddLater(tags);
 		}
 
-		protected T Add<T>() where T : IComponent, new()
+		protected T Add<T>()
 		{
 			Entity.components[entity.id].Add(Storage<T>.componentID);
 			return entity.AddLater<T>();
 		}
 
-		protected void Add<T>(T component) where T : IComponent, new()
+		protected void Add<T>(T component)
 		{
 			Entity.components[entity.id].Add(Storage<T>.componentID);
 			entity.AddLater(component);
 		}
 
-		protected T AddLater<T>() where T : IComponent, new()
+		protected T AddLater<T>()
 		{
 			return entity.AddLater<T>();
 		}
 
-		protected void AddLater<T>(T component) where T : IComponent, new()
+		protected void AddLater<T>(T component)
 		{
 			entity.AddLater(component);
 		}

@@ -496,7 +496,7 @@ namespace Pixeye.Framework
 			transforms[entityID] = instance;
 		}
 
-		public static T AddLater<T>(in this ent entity) where T : IComponent, new()
+		public static T AddLater<T>(in this ent entity)
 		{
 			var storage = Storage<T>.Instance;
 			var entityID = entity.id;
@@ -514,7 +514,7 @@ namespace Pixeye.Framework
 			return val;
 		}
 
-		public static void AddLater<T>(in this ent entity, T component) where T : IComponent, new()
+		public static void AddLater<T>(in this ent entity, T component)
 		{
 			var storage = Storage<T>.Instance;
 			var entityID = entity.id;
@@ -524,15 +524,15 @@ namespace Pixeye.Framework
 				Array.Resize(ref storage.components, l);
 			}
 			ref T val = ref storage.components[entityID];
-			if (val != null)
-			{
-				val.Dispose();
-			}
+//			if (val != null)
+//			{
+//				val.Dispose();
+//			}
 
 			val = component;
 		}
 
-		public static T Add<T>(in this ent entity) where T : IComponent, new()
+		public static T Add<T>(in this ent entity)
 		{
 			var storage = Storage<T>.Instance;
 			var entityID = entity.id;
@@ -554,7 +554,7 @@ namespace Pixeye.Framework
 			return val;
 		}
 
-		public static void Add<T>(in this ent entity, T component) where T : IComponent, new()
+		public static void Add<T>(in this ent entity, T component)
 		{
 			var storage = Storage<T>.Instance;
 			var entityID = entity.id;
@@ -564,15 +564,16 @@ namespace Pixeye.Framework
 				Array.Resize(ref storage.components, l);
 			}
 			ref T val = ref storage.components[entityID];
+
 			if (val != null)
-				val.Dispose();
+				Storage<T>.Instance.DisposeAction(val);
 
 			val = component;
 			Delayed.Set(entity, Storage<T>.componentID, Delayed.Action.Add);
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static void Remove<T>(this in ent entity) where T : IComponent, new()
+		public static void Remove<T>(this in ent entity)
 		{
 			Delayed.Set(entity, Storage<T>.componentID, Delayed.Action.Remove);
 		}

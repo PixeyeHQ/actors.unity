@@ -27,6 +27,7 @@ namespace Pixeye.Framework
 			return other != null && Equals(other);
 		}
 
+		// todo: Refactor composition GetHashCode shit.
 		public override int GetHashCode()
 		{
 			int hc = tagsToInclude.Length;
@@ -152,6 +153,7 @@ namespace Pixeye.Framework
 			return true;
 		}
 
+		// todo: Refactor composition Equals shit.
 		public bool Equals(Composition other)
 		{
 			if (tagsToInclude.Length != other.tagsToInclude.Length) return false;

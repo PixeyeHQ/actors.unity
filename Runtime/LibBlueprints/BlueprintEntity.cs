@@ -313,9 +313,9 @@ namespace Pixeye.Framework
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
 		/// <returns></returns>
-		public T Add<T>() where T : class, IComponent, new()
+		public T Add<T>()
 		{
-			var instance = new T();
+			var instance = Storage<T>.Instance.Creator();
 			onCreate.Add(instance as IComponentCopy);
 
 			if (lenOnCreate == hashesOnCreate.Length)
@@ -331,15 +331,15 @@ namespace Pixeye.Framework
 		/// Setup a component when creating an entity but don't add it.
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
-		public T AddLater<T>() where T : class, IComponent, new()
+		public T AddLater<T>()
 		{
-			var instance = new T();
+			var instance = Storage<T>.Instance.Creator();
 			onLater.Add(instance as IComponentCopy);
 			lenAddLater++;
 			return instance;
 		}
 
-		public T Add<T>(T component) where T : class, IComponent, new()
+		public T Add<T>(T component) 
 		{
 			onCreate.Add(component as IComponentCopy);
 			if (lenOnCreate == hashesOnCreate.Length)
@@ -350,7 +350,7 @@ namespace Pixeye.Framework
 			return component;
 		}
 
-		public T AddLater<T>(T component) where T : class, IComponent, new()
+		public T AddLater<T>(T component) 
 		{
 			onLater.Add(component as IComponentCopy);
 			lenAddLater++;

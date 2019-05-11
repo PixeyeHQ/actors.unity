@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace Pixeye.Framework
 {
-	public class ProcessorSignals : IDisposable, IKernel
+	public sealed class ProcessorSignals : IDisposable, IKernel
 	{
 
 		public static ProcessorSignals Default = new ProcessorSignals();

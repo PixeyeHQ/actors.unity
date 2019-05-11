@@ -18,7 +18,7 @@ namespace Pixeye.Framework
 
 		public static string nameSpace
 		{
-			get { return EditorPrefs.GetString("hba.data.namespace", "Pixeye"); }
+			get { return EditorPrefs.GetString("hba.data.namespace", "Pixeye.Source"); }
 			set { EditorPrefs.SetString("hba.data.namespace", value); }
 		}
 

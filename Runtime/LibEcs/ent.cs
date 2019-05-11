@@ -87,7 +87,7 @@ namespace Pixeye.Framework
 			return id.CompareTo(other.id);
 		}
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public bool Has<T>() where T : class, IComponent, new()
+		public bool Has<T>()
 		{
 			var mask = Storage<T>.componentMask;
 
@@ -133,7 +133,7 @@ namespace Pixeye.Framework
 		/// <returns>Returns true if the entity has this component.</returns>
 		[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public bool Get<T>(out T arg0) where T : class, IComponent, new()
+		public bool Get<T>(out T arg0)
 		{
 			return (arg0 = (Entity.generations[id, Storage<T>.generation] & Storage<T>.componentMask) == Storage<T>.componentMask ? Storage<T>.Instance.components[id] : default) != null;
 		}
@@ -148,7 +148,7 @@ namespace Pixeye.Framework
 		/// <typeparam name="Y"></typeparam>
 		/// <returns>Returns true if the entity has these components.</returns>
 		[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
-		public bool Get<T, Y>(out T arg0, out Y arg1) where T : class, IComponent, new() where Y : class, IComponent, new()
+		public bool Get<T, Y>(out T arg0, out Y arg1)
 		{
 			arg0 = default;
 			arg1 = default;
@@ -168,7 +168,7 @@ namespace Pixeye.Framework
 		/// <typeparam name="U"></typeparam>
 		/// <returns>Returns true if the entity has these components.</returns>
 		[Il2CppSetOption(Option.NullChecks, false)]
-		public bool Get<T, Y, U>(out T arg0, out Y arg1, out U arg2) where T : class, IComponent, new() where Y : class, IComponent, new() where U : class, IComponent, new()
+		public bool Get<T, Y, U>(out T arg0, out Y arg1, out U arg2)
 		{
 			arg0 = default;
 			arg1 = default;
@@ -192,7 +192,7 @@ namespace Pixeye.Framework
 		/// <typeparam name="I"></typeparam>
 		/// <returns>Returns true if the entity has these components.</returns>
 		[Il2CppSetOption(Option.NullChecks, false)]
-		public bool Get<T, Y, U, I>(out T arg0, out Y arg1, out U arg2, out I arg3) where T : class, IComponent, new() where Y : class, IComponent, new() where U : class, IComponent, new() where I : class, IComponent, new()
+		public bool Get<T, Y, U, I>(out T arg0, out Y arg1, out U arg2, out I arg3)
 		{
 			arg0 = default;
 			arg1 = default;
@@ -220,11 +220,7 @@ namespace Pixeye.Framework
 		/// <typeparam name="O"></typeparam>
 		/// <returns>Returns true if the entity has these components.</returns>
 		[Il2CppSetOption(Option.NullChecks, false)]
-		public bool Get<T, Y, U, I, O>(out T arg0, out Y arg1, out U arg2, out I arg3, out O arg4) where T : class, IComponent, new()
-				where Y : class, IComponent, new()
-				where U : class, IComponent, new()
-				where I : class, IComponent, new()
-				where O : class, IComponent, new()
+		public bool Get<T, Y, U, I, O>(out T arg0, out Y arg1, out U arg2, out I arg3, out O arg4)
 		{
 			arg0 = default;
 			arg1 = default;

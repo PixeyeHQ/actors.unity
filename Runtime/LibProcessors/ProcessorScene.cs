@@ -9,20 +9,19 @@ using UnityEngine.SceneManagement;
 
 namespace Pixeye.Framework
 {
-	public class ProcessorScene : IKernel
+	public sealed class ProcessorScene : IKernel
 	{
+
 		public static ProcessorScene Default = new ProcessorScene();
 
+		public Action sceneLoaded = delegate { };
+		public Action sceneClosing = delegate { };
 
-		public Action sceneLoaded = delegate{ };
-		public Action sceneClosing = delegate{ };
-
-		protected readonly Dictionary<string, Transform> sceneObjs = new Dictionary<string, Transform>();
+		readonly Dictionary<string, Transform> sceneObjs = new Dictionary<string, Transform>();
 
 		List<string> scenesToKeep = new List<string>();
 		List<string> sceneDependsOn = new List<string>();
 		Dictionary<string, Scene> scenes = new Dictionary<string, Scene>();
-
 
 		public void Dispose()
 		{
@@ -32,7 +31,7 @@ namespace Pixeye.Framework
 		public static Transform Get(string id)
 		{
 			Transform obj;
-			var       haveFound = Default.sceneObjs.TryGetValue(id, out obj);
+			var haveFound = Default.sceneObjs.TryGetValue(id, out obj);
 			if (!haveFound)
 			{
 				var o = GameObject.Find(id);
@@ -47,7 +46,7 @@ namespace Pixeye.Framework
 		public static Transform Get(ref string id)
 		{
 			Transform obj;
-			var       haveFound = Default.sceneObjs.TryGetValue(id, out obj);
+			var haveFound = Default.sceneObjs.TryGetValue(id, out obj);
 			if (!haveFound)
 			{
 				var o = GameObject.Find(id);
@@ -58,7 +57,6 @@ namespace Pixeye.Framework
 
 			return obj;
 		}
-
 
 		public void Setup(List<SceneReference> scenesToKeep, List<SceneReference> sceneDependsOn, Starter starter)
 		{
@@ -116,8 +114,7 @@ namespace Pixeye.Framework
 			Toolbox.changingScene = true;
 			Toolbox.Instance.ClearSessionData();
 
-
-			var s     = SceneManager.GetActiveScene();
+			var s = SceneManager.GetActiveScene();
 			var sName = s.name;
 
 			var job = SceneManager.UnloadSceneAsync(s);
@@ -126,7 +123,6 @@ namespace Pixeye.Framework
 			{
 				yield return 0;
 			}
-
 
 			scenes.Remove(sName);
 			foreach (var key in scenes.Keys)
@@ -166,8 +162,7 @@ namespace Pixeye.Framework
 			Toolbox.changingScene = true;
 			Toolbox.Instance.ClearSessionData();
 
-
-			var s     = SceneManager.GetActiveScene();
+			var s = SceneManager.GetActiveScene();
 			var sName = s.name;
 
 			var job = SceneManager.UnloadSceneAsync(s);
@@ -176,7 +171,6 @@ namespace Pixeye.Framework
 			{
 				yield return 0;
 			}
-
 
 			scenes.Remove(sName);
 			foreach (var key in scenes.Keys)
@@ -240,7 +234,6 @@ namespace Pixeye.Framework
 			SceneManager.sceneLoaded -= OnAdditiveLoaded;
 		}
 
-
 		static IEnumerator _Remove(int id)
 		{
 			Toolbox.changingScene = true;
@@ -252,7 +245,6 @@ namespace Pixeye.Framework
 
 			Toolbox.changingScene = false;
 		}
-
 
 		public static void To(int id)
 		{
@@ -266,5 +258,6 @@ namespace Pixeye.Framework
 			var processing = Default;
 			Toolbox.Instance.StartCoroutine(processing._Load(name));
 		}
+
 	}
 }

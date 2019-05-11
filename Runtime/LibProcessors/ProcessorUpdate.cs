@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Pixeye.Framework
 {
-	public class ProcessorUpdate : MonoBehaviour, IDisposable, IKernel
+	public sealed class ProcessorUpdate : MonoBehaviour, IDisposable, IKernel
 	{
 		List<ITick> ticks = new List<ITick>(1000);
 		List<ITickFixed> ticksFixed = new List<ITickFixed>();

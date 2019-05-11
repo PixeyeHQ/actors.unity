@@ -20,13 +20,13 @@ namespace Pixeye.Framework
 			return actor as T;
 		}
 		
-		public T Add<T>() where T : IComponent, new()
+		public T Add<T>()
 		{
 			Entity.components[entity.id].Add(Storage<T>.componentID);
 			return Storage<T>.Instance.GetFromStorage(entity.id);
 		}
 
-		public T AddLater<T>() where T : IComponent, new()
+		public T AddLater<T>()
 		{
 			return entity.AddLater<T>();
 		}

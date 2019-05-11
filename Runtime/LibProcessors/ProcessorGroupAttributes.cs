@@ -8,7 +8,7 @@ using System.Reflection;
 
 namespace Pixeye.Framework
 {
-	public class ProcessorGroupAttributes
+	public sealed class ProcessorGroupAttributes
 	{
 
 		public static void Setup(object b)

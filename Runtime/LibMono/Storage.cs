@@ -30,27 +30,33 @@ namespace Pixeye.Framework
 		internal ArrayEntities entitiesToPopulate = new ArrayEntities();
 		internal ArrayEntities entitiesToRemove = new ArrayEntities();
 
-		internal abstract int GetComponentID();
+ 
 
 		internal GroupCore[] GroupCoreOfInterest = new GroupCore[8];
 		internal GroupCore[] GroupCoreOfInterestRemove = new GroupCore[8];
 		internal int lenOfGroups;
 		internal int lenOfGroupsFiltered;
 
-		public abstract void RemoveNoCheck(int entityID);
-
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		internal abstract int GetComponentID();
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		internal abstract void DisposeComponent(int entityID);
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		internal abstract void RemoveNoCheck(int entityID);
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal abstract void AddGroupExclude(GroupCore groupCore);
-		//if ODIN_INSPECTOR && UNITY_EDITOR && ACTORS_DEBUG
-		internal abstract IComponent GetComponent(int entityID);
-		//#endif
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		internal abstract object GetComponent(int entityID);
+		
 
 	}
 
 	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
-	public sealed class Storage<T> : Storage where T : IComponent, new()
+	public sealed class Storage<T> : Storage
 	{
 
 		public Func<T> Creator;
+		public Action<T> DisposeAction = delegate { };
 
 		public static int componentID;
 		public static int componentMask;
@@ -71,7 +77,7 @@ namespace Pixeye.Framework
 
 			GroupCoreOfInterest[lenOfGroups++] = groupCore;
 		}
-		
+
 		internal override void AddGroupExclude(GroupCore groupCore)
 		{
 			if (lenOfGroupsFiltered == GroupCoreOfInterestRemove.Length)
@@ -103,27 +109,38 @@ namespace Pixeye.Framework
 			allDict.Add(type.GetHashCode(), this);
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal override int GetComponentID()
 		{
 			return componentID;
 		}
+    
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		internal override void DisposeComponent(int entityID)
+		{
+			DisposeAction(components[entityID]);
+		}
 
-		public override void RemoveNoCheck(int entityID)
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		internal override void RemoveNoCheck(int entityID)
 		{
 			Entity.generations[entityID, generation] &= ~componentMask;
 		}
-		//#if ODIN_INSPECTOR && UNITY_EDITOR && ACTORS_DEBUG
-		internal override  IComponent GetComponent(int entityID)
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		internal override object GetComponent(int entityID)
 		{
 			return components[entityID];
 		}
-	//	#endif
-		
+ 
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public T TryGet(int entityID)
 		{
 			return (Entity.generations[entityID, generation] & componentMask) == componentMask ? components[entityID] : default;
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public T GetFromStorage(int entityID)
 		{
 			T val;
