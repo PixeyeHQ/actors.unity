@@ -117,7 +117,7 @@ namespace Pixeye.Framework
 			Setup();
  
 			if (buildFrom != null)
-				buildFrom.Execute(entity);
+				buildFrom.Execute(entity,this);
 			else 
 			Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Activate);
 		}
@@ -156,6 +156,7 @@ namespace Pixeye.Framework
 			Setup();
 
 			EntityComposer.Default.entity = entity;
+			EntityComposer.Default.actor = this;
 			model(EntityComposer.Default);
 
 			Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Activate);

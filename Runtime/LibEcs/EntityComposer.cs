@@ -7,9 +7,19 @@ namespace Pixeye.Framework
 	{
 
 		public static EntityComposer Default = new EntityComposer();
-
+		internal Actor actor;
 		public ent entity;
 
+		/// <summary>
+		///  Get actor with type cast
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <returns>Actor</returns>
+		public T GetActor<T>() where T: Actor
+		{
+			return actor as T;
+		}
+		
 		public T Add<T>() where T : IComponent, new()
 		{
 			Entity.components[entity.id].Add(Storage<T>.componentID);

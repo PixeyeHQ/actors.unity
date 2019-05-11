@@ -125,7 +125,7 @@ namespace Pixeye.Framework
 
 		#endif
 
-		internal override void Execute(in ent entity)
+		internal override void Execute(in ent entity, Actor a = null)
 		{
 			var id = entity.id;
 
@@ -267,7 +267,7 @@ namespace Pixeye.Framework
 		{
 		}
 
-		internal override void Execute(in ent entity)
+		internal override void Execute(in ent entity, Actor a = null)
 		{
 			var id = entity.id;
 

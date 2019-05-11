@@ -36,12 +36,16 @@ namespace Pixeye.Framework
 		}
 		
 		
-		internal virtual void Execute(in ent entity)
-		{
-			EntityComposer.Default.entity = entity;
-			helpers[GetInstanceID()](EntityComposer.Default);
-			Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Activate);
-		}
+	 
+		
+			internal virtual void Execute(in ent entity, Actor a = null)
+    		{
+    			helpers[GetInstanceID()](EntityComposer.Default);
+    			EntityComposer.Default.entity = entity;
+    			EntityComposer.Default.actor = a;
+    			
+    			Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Activate);
+    		}
 
 	}
 
@@ -50,11 +54,13 @@ namespace Pixeye.Framework
 	public class ScriptableBuild : ScriptableObject
 	{
     protected Dictionary<int,Action<EntityComposer>> helpers = new Dictionary<int, Action<EntityComposer>>();
-	
-		internal virtual void Execute(in ent entity)
+ 
+		internal virtual void Execute(in ent entity, Actor a = null)
 		{
-			EntityComposer.Default.entity = entity;
 			helpers[GetInstanceID()](EntityComposer.Default);
+			EntityComposer.Default.entity = entity;
+			EntityComposer.Default.actor = a;
+			
 			Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Activate);
 		}
 
