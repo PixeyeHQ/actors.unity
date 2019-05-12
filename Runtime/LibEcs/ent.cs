@@ -2,6 +2,7 @@
 // Contacts : Pix - info@pixeye.games
 //     Date : 3/16/2019 
 
+using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -109,10 +110,16 @@ namespace Pixeye.Framework
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public bool Equals(ent other)
+		public bool EqualsAndExist(ent other)
 		{
-			return id == other.id && age == other.age;
+			return id > -1 && Entity.isAlive[id] && this.id == other.id && this.age == other.age;
 		}
+		
+	    	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool Equals(ent other)
+        {
+          return this.id == other.id && this.age ==  other.age;
+        }
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public bool Exist()
