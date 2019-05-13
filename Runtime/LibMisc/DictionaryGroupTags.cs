@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Pixeye.Framework
 {
-	internal class DictionaryGroupTags
+	sealed class DictionaryGroupTags
 	{
 
 		internal DictionaryGroups[] groups = new DictionaryGroups[10];
@@ -47,7 +47,7 @@ namespace Pixeye.Framework
 
 		internal void Add(int tagID, DictionaryGroups group)
 		{
-			if (len >= groups.Length)
+			if (len == groups.Length - 1)
 			{
 				var l = len << 1;
 				Array.Resize(ref groups, l);
@@ -57,7 +57,7 @@ namespace Pixeye.Framework
 			var pointer = len++;
 			var indexLast = pointer;
 			var index = pointer - 1;
- 
+
 			if (index >= 0)
 			{
 				if (tagID < tagsID[index])

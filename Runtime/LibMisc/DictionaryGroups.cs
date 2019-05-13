@@ -7,10 +7,10 @@ using Unity.IL2CPP.CompilerServices;
 namespace Pixeye.Framework
 {
 	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
-	internal class DictionaryGroups : IDisposable
+	sealed class DictionaryGroups : IDisposable
 	{
 
-		internal GroupCore[] storage = new GroupCore[3];
+		internal GroupCore[] storage = new GroupCore[10];
 		internal int len;
 
 		internal void Add(GroupCore groupCore)

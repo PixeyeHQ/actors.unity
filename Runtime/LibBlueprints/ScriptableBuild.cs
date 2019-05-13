@@ -4,8 +4,10 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
+
 #endif
 namespace Pixeye.Framework
 {
@@ -15,9 +17,9 @@ namespace Pixeye.Framework
 	public abstract class ScriptableBuild : SerializedScriptableObject
 	{
 
+		[HideInInspector]
 		public Dictionary<int, Action<EntityComposer>> helpers = new Dictionary<int, Action<EntityComposer>>();
 
-		
 		protected virtual void OnEnable()
 		{
 			#if UNITY_EDITOR
@@ -25,27 +27,22 @@ namespace Pixeye.Framework
 			#endif
 
 			Type t = GetType();
-		  var n = name.Substring(5).Replace(" ", string.Empty);
+			var n = name.Substring(5).Replace(" ", string.Empty);
 			helpers.Add(GetInstanceID(), (Action<EntityComposer>) Delegate.CreateDelegate(typeof(Action<EntityComposer>), null, t.GetMethod(n, BindingFlags.Public | BindingFlags.Static)));
-
-    }
+		}
 
 		protected virtual void OnDisable()
 		{
 			helpers.Clear();
 		}
-		
-		
-	 
-		
-			internal virtual void Execute(in ent entity, Actor a = null)
-    		{
-    		 
-    			EntityComposer.Default.entity = entity;
-    			EntityComposer.Default.actor = a;
-    		  helpers[GetInstanceID()](EntityComposer.Default);
-    			Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Activate);
-    		}
+
+		internal virtual void Execute(in ent entity, Actor a = null)
+		{
+			EntityComposer.Default.entity = entity;
+			EntityComposer.Default.actor = a;
+			helpers[GetInstanceID()](EntityComposer.Default);
+			Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Activate);
+		}
 
 	}
 
