@@ -69,5 +69,11 @@ namespace Pixeye.Framework
 		protected virtual void HandleDisable() { }
 
 		protected virtual void Setup() { }
+		public void LaunchOnStart()
+		{
+			Setup();
+			OnEnable();
+		}
+
 	}
 }

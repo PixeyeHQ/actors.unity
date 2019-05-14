@@ -1,4 +1,4 @@
-//  Project : ecs
+﻿//  Project : ecs
 // Contacts : Pix - ask@pixeye.games
 
 using System;
@@ -109,6 +109,8 @@ namespace Pixeye.Framework
 
 		#endregion
 
+ 
+		
 		public static ent Create()
 		{
 			int id;
@@ -132,6 +134,7 @@ namespace Pixeye.Framework
 			return Setup(id, age);
 		}
 
+         #if ODIN_INSPECTOR
 		public static ent Create(BlueprintEntity bpAsset)
 		{
 			int id;
@@ -156,7 +159,8 @@ namespace Pixeye.Framework
 			bpAsset.Execute(entity);
 			return entity;
 		}
-
+      #endif
+      
 		public static ent Create(HandleEntityComposer model)
 		{
 			int id;
@@ -392,6 +396,7 @@ namespace Pixeye.Framework
 			return SetupWithTransform(id, pooled, age);
 		}
 
+#if ODIN_INSPECTOR
 		public static ent Create(string prefabID, BlueprintEntity bpAsset, bool pooled = false)
 		{
 			int id;
@@ -443,7 +448,7 @@ namespace Pixeye.Framework
 			bpAsset.Execute(entity);
 			return entity;
 		}
-
+#endif
 		public static void RenameGameobject(this ent entity)
 		{
 			var tr = transforms[entity.id];

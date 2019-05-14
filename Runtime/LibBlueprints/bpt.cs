@@ -1,10 +1,11 @@
-//  Project : ecs
+﻿//  Project : ecs
 // Contacts : Pix - ask@pixeye.games
 
 namespace Pixeye.Framework
 {
 	public delegate void HandleEntityComposer(EntityComposer composer);
 	
+	#if ODIN_INSPECTOR
 	public readonly struct bpt
 	{
 
@@ -43,4 +44,5 @@ namespace Pixeye.Framework
 		}
 
 	}
+	#endif
 }

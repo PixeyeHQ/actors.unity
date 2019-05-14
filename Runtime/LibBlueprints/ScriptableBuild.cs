@@ -28,7 +28,7 @@ namespace Pixeye.Framework
 
 			Type t = GetType();
 			var n = name.Substring(5).Replace(" ", string.Empty);
-			helpers.Add(GetInstanceID(), (Action<EntityComposer>) Delegate.CreateDelegate(typeof(Action<EntityComposer>), null, t.GetMethod(n, BindingFlags.Public | BindingFlags.Static)));
+			helpers.Add(GetInstanceID(), (Action<EntityComposer>) Delegate.CreateDelegate(typeof(Action<EntityComposer>), null, t.GetMethod(n, BindingFlags.Public | BindingFlags.Static | BindingFlags.Default)));
 		}
 
 		protected virtual void OnDisable()
@@ -44,8 +44,16 @@ namespace Pixeye.Framework
 			Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Activate);
 		}
 
-	}
+		internal virtual void ExecuteOnStart(in ent entity, Actor a)
+		{
+			EntityComposer.Default.entity = entity;
+			EntityComposer.Default.actor = a;
+			helpers[GetInstanceID()](EntityComposer.Default);
+			if (a.isActiveAndEnabled)
+				Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Activate);
+		}
 
+	}
 	#else
 	using UnityEngine;
 	public class ScriptableBuild : ScriptableObject
@@ -61,6 +69,15 @@ namespace Pixeye.Framework
 			Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Activate);
 		}
 
+		internal virtual void ExecuteOnStart(in ent entity, Actor a)
+		{
+			EntityComposer.Default.entity = entity;
+			EntityComposer.Default.actor = a;
+			helpers[GetInstanceID()](EntityComposer.Default);
+			if (!a.isActiveAndEnabled) return;
+			Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Activate);
+		}
+		
 	  protected virtual void OnEnable()
 		{
 			#if UNITY_EDITOR

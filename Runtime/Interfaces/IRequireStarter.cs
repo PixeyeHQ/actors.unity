@@ -6,7 +6,7 @@ namespace Pixeye.Framework
 	public interface IRequireStarter
 	{
 
-		void Launch();
+		void LaunchOnStart();
 
 	}
 }

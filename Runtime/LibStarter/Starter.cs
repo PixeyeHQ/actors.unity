@@ -21,6 +21,7 @@ namespace Pixeye.Framework
 
 		public static bool initialized;
 
+	 
 		#if ODIN_INSPECTOR
 		[FoldoutGroup("Setup")]
 		#else
@@ -171,7 +172,7 @@ namespace Pixeye.Framework
 			foreach (var obj in objs)
 			{
 				
-				obj.Launch();
+				obj.LaunchOnStart();
 			}
 
 			Timer.Add(Time.deltaFixed, () => { PostSetup(); });
@@ -200,5 +201,7 @@ namespace Pixeye.Framework
 			initialized = false;
 		}
 
+	 
+		
 	}
 }

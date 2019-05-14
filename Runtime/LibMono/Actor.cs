@@ -1,10 +1,12 @@
-//  Project  : ACTORS
+﻿//  Project  : ACTORS
 //  Contacts : Pixeye - ask@pixeye.games
 
 //#if UNITY_EDITOR && ODIN_INSPECTOR && ACTORS_DEBUG
 //using System.Collections.Generic;
 //#endif
 
+using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Unity.IL2CPP.CompilerServices;
 using UnityEngine;
@@ -12,8 +14,6 @@ using UnityEngine;
 using Sirenix.OdinInspector;
 
 #endif
-
- 
 
 namespace Pixeye.Framework
 {
@@ -32,11 +32,10 @@ namespace Pixeye.Framework
 
 		[FoldoutGroup("Main")]
 		public bool isPooled;
- 
-	  [FoldoutGroup("Main")]
+
+		[FoldoutGroup("Main")]
 		public ScriptableBuild buildFrom;
 
-  
 		#endregion
 
 		#region METHODS UNITY
@@ -45,38 +44,36 @@ namespace Pixeye.Framework
 
 		protected bool manualRemoved;
 
-		protected virtual void OnEnable()
+		void Awake()
 		{
-			 
+			manualRemoved = !enabled;
+		}
+
+		void OnEnable()
+		{
 			if (!manualRemoved) return;
 			manualRemoved = false;
 			Entity.isAlive[entity.id] = true;
 			Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Activate);
 		}
 
-		protected virtual void OnDisable()
+		void OnDisable()
 		{
 			if (Toolbox.applicationIsQuitting || !Entity.isAlive[entity.id]) return;
 			manualRemoved = true;
 			Entity.isAlive[entity.id] = false;
 			Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Deactivate);
 		}
+
 		#endif
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public virtual void OnAdd()
-		{
-		}
+		public virtual void OnAdd() { }
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public virtual void OnRemove()
-		{
-		}
+		public virtual void OnRemove() { }
 
-		public virtual void Dispose()
-		{
-      
-		}
+		public virtual void Dispose() { }
 
 		#endregion
 
@@ -85,7 +82,7 @@ namespace Pixeye.Framework
 		/// <summary>
 		/// Don't use.
 		/// </summary>
-		public virtual void Launch()
+		public void Launch()
 		{
 			int id;
 			byte age = 0;
@@ -105,8 +102,7 @@ namespace Pixeye.Framework
 			else
 				id = ent.lastID++;
 
-			 
-			entity = Entity. SetupWithTransform(id, isPooled, age);
+			entity = Entity.SetupWithTransform(id, isPooled, age);
 
 			#if UNITY_EDITOR
 			_entity = id;
@@ -116,11 +112,48 @@ namespace Pixeye.Framework
 			Entity.transforms[id] = transform;
 
 			Setup();
- 
+
 			if (buildFrom != null)
-				buildFrom.Execute(entity,this);
-			else 
-			Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Activate);
+				buildFrom.Execute(entity, this);
+			else
+				Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Activate);
+		}
+
+		public virtual void LaunchOnStart()
+		{
+			int id;
+			byte age = 0;
+
+			if (ent.entityStackLength > 0)
+			{
+				var pop = ent.entityStack.Dequeue();
+				byte ageOld = pop.age;
+				id = pop.id;
+				unchecked
+				{
+					age = (byte) (ageOld + 1);
+				}
+
+				ent.entityStackLength--;
+			}
+			else
+				id = ent.lastID++;
+
+			entity = Entity.SetupWithTransform(id, isPooled, age);
+
+			#if UNITY_EDITOR
+			_entity = id;
+
+			#endif
+
+			Entity.transforms[id] = transform;
+
+			Setup();
+
+			if (buildFrom != null)
+				buildFrom.ExecuteOnStart(entity, this);
+			else if (isActiveAndEnabled)
+				Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Activate);
 		}
 
 		internal void LaunchFrom(HandleEntityComposer model)
@@ -143,8 +176,6 @@ namespace Pixeye.Framework
 			else
 				id = ent.lastID++;
 
- 
-
 			entity = Entity.SetupWithTransform(id, isPooled, age);
 
 			#if UNITY_EDITOR
@@ -163,9 +194,7 @@ namespace Pixeye.Framework
 			Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Activate);
 		}
 
-		protected virtual void Setup()
-		{
-		}
+		protected virtual void Setup() { }
 
 		protected void Add(int tag)
 		{
@@ -252,7 +281,7 @@ namespace Pixeye.Framework
 
 			return actor;
 		}
-		
+
 		public static Actor Create(string prefabID, Vector3 position, bool pooled = false)
 		{
 			var tr = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefabID, position) : HelperFramework.SpawnInternal(prefabID, position);
@@ -263,7 +292,6 @@ namespace Pixeye.Framework
 
 			return actor;
 		}
-		
 
 		public static Actor Create(GameObject prefab, bool pooled = false)
 		{
@@ -274,6 +302,7 @@ namespace Pixeye.Framework
 			return actor;
 		}
 
+		#if ODIN_INSPECTOR
 		public static Actor Create(string prefabID, BlueprintEntity bp, bool pooled = false)
 		{
 			var tr = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefabID) : HelperFramework.SpawnInternal(prefabID);
@@ -292,6 +321,24 @@ namespace Pixeye.Framework
 			actor.isPooled = pooled;
 			actor.Launch();
 			return actor;
+		}
+		#endif
+
+	}
+
+	public static class HelperActor
+	{
+
+		/// <summary>
+		/// Use only for first time activation of "sleeping" actors on the scene
+		/// </summary>
+		/// <param name="entity"></param>
+		public static void ActivateActor(in this ent entity)
+		{
+			entity.transform.GetComponent<Actor>().enabled = true;
+			#if !UNITY_EDITOR
+			Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Activate);
+			#endif
 		}
 
 	}
