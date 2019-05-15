@@ -12,37 +12,37 @@ namespace Pixeye.Framework
 
 		public static BufferStruct<T> Instance = new BufferStruct<T>();
 
-		public T[] container = new T[12];
+		public T[] source = new T[12];
 		public int length;
 
-		public ref T this[int index] => ref container[index];
+		public ref T this[int index] => ref source[index];
 
 		public void Add(T obj)
 		{
-			if (length == container.Length)
-				Array.Resize(ref container, length << 1);
+			if (length == source.Length)
+				Array.Resize(ref source, length << 1);
 
-			container[length++] = obj;
+			source[length++] = obj;
 		}
 
 		public void RemoveAt(int index)
 		{
 			--length;
 			for (int i = index; i < length; ++i)
-				SetElement(i, ref container[i + 1]);
+				SetElement(i, ref source[i + 1]);
 		}
 
 		public void SetElement(int index, ref T arg)
 		{
-			container[index] = arg;
+			source[index] = arg;
 		}
 
 		public ref T Add()
 		{
-			if (length == container.Length)
-				Array.Resize(ref container, length << 1);
+			if (length == source.Length)
+				Array.Resize(ref source, length << 1);
 
-			return ref container[length++];
+			return ref source[length++];
 		}
 
 	}

@@ -315,7 +315,7 @@ namespace Pixeye.Framework
 				throw new Exception("Tags limit reached!");
 			}
 			#endif
- 
+
 			tags.SetElement(tags.Length, tagID);
 			HandleChange(entity, tagID);
 		}
@@ -519,10 +519,9 @@ namespace Pixeye.Framework
 
 		internal static void Add(GroupCore groupCore)
 		{
-			DictionaryGroups container;
-			var filter = groupCore.composition;
-
-			foreach (var tagID in filter.tagsToInclude)
+			DictionaryGroup container;
+			var composition = groupCore.composition;
+			foreach (var tagID in composition.includeTags)
 			{
 				if (inUseGroups.TryGetValue(tagID, out container))
 				{
@@ -532,14 +531,14 @@ namespace Pixeye.Framework
 				}
 				else
 				{
-					container = new DictionaryGroups();
+					container = new DictionaryGroup();
 
 					container.Add(groupCore);
 					inUseGroups.Add(tagID, container);
 				}
 			}
 
-			foreach (var tagID in filter.tagsToExclude)
+			foreach (var tagID in composition.excludeTags)
 			{
 				if (inUseGroups.TryGetValue(tagID, out container))
 				{
@@ -548,14 +547,14 @@ namespace Pixeye.Framework
 				}
 				else
 				{
-					container = new DictionaryGroups();
+					container = new DictionaryGroup();
 					container.Add(groupCore);
 					inUseGroups.Add(tagID, container);
 				}
 			}
 
 			int index = -1;
-			foreach (var typeID in filter.typesToExclude)
+			foreach (var typeID in composition.excludeComponents)
 			{
 				index++;
 				if (!typeID) continue;
@@ -567,7 +566,7 @@ namespace Pixeye.Framework
 				}
 				else
 				{
-					container = new DictionaryGroups();
+					container = new DictionaryGroup();
 					container.Add(groupCore);
 					inUseGroupsTypes.Add(index, container);
 				}
@@ -578,7 +577,7 @@ namespace Pixeye.Framework
 		internal static void HandleChange(in ent entity, int tagID)
 		{
 			var indexGroup = inUseGroups.TryGetValue(tagID);
-		 
+
 			if (indexGroup == -1) return;
 			Entity.Delayed.Set(entity, indexGroup, Entity.Delayed.Action.ChangeTag);
 		}

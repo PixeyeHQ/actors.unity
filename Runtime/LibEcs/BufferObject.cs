@@ -2,48 +2,47 @@
 // Contacts : Pix - ask@pixeye.games
 
 using System;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace Pixeye.Framework
 {
-	public sealed class BufferObject<T>
-			where T : class
+	public sealed class BufferObject<T> where T : class
 	{
 
 		public static BufferObject<T> Instance = new BufferObject<T>();
 		public static Func<T> creator;
 
-		public T[] container = new T[12];
+		public T[] source = new T[12];
 		public int length;
 
 		public void Add(T obj)
 		{
-			if (length == container.Length)
-				Array.Resize(ref container, length << 1);
+			if (length == source.Length)
+				Array.Resize(ref source, length << 1);
 
-			container[length++] = obj;
+			source[length++] = obj;
 		}
 
-		public void RemoveAt(int i)
+		public void RemoveAt(int index)
 		{
-			var l = length--;
-			var next = i + 1;
-			var size = l - i;
-			Array.Copy(container, next, container, i, size);
+			if (index < --length)
+				Array.Copy(source, index + 1, source, index, length - index);
 		}
 
 		public void SetElement(int index, T arg)
 		{
-			container[index] = arg;
+			source[index] = arg;
 		}
 
 		public static T Add()
 		{
 			var source = Instance;
-			if (source.length == source.container.Length)
-				Array.Resize(ref source.container, source.length << 1);
+			if (source.length == source.source.Length)
+				Array.Resize(ref source.source, source.length << 1);
 
 			var l = source.length++;
-			ref var obj = ref source.container[l];
+			ref var obj = ref source.source[l];
 			if (obj == null) obj = creator();
 
 			return obj;
@@ -52,11 +51,11 @@ namespace Pixeye.Framework
 		public static T Create()
 		{
 			var source = Instance;
-			if (source.length == source.container.Length)
-				Array.Resize(ref source.container, source.length << 1);
+			if (source.length == source.source.Length)
+				Array.Resize(ref source.source, source.length << 1);
 
 			var l = source.length;
-			ref var obj = ref source.container[l];
+			ref var obj = ref source.source[l];
 			if (obj == null) obj = creator();
 
 			return obj;

@@ -2,48 +2,83 @@
 //  Contacts : Pixeye - ask@pixeye.games
 
 using System;
-using System.Collections.Generic;
+using System.Reflection;
 using Unity.IL2CPP.CompilerServices;
 using UnityEngine;
 
 namespace Pixeye.Framework
 {
 	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
-	static internal class ProcessorGroups
+	public sealed class ProcessorGroups
 	{
 
-		internal static DictionaryGroups container = new DictionaryGroups();
-    
+		internal static DictionaryGroup container = new DictionaryGroup();
+
+		public static void Setup(object b)
+		{
+			var type = b.GetType();
+			var objectFields = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
+			int length = objectFields.Length;
+
+			var groupType = typeof(GroupCore);
+
+			for (int i = 0; i < length; i++)
+			{
+				var myFieldInfo = objectFields[i];
+
+				var bindAttribute = Attribute.GetCustomAttribute(myFieldInfo, typeof(BindAttribute)) as BindAttribute;
+				if (bindAttribute != null)
+				{
+					var fType = myFieldInfo.FieldType;
+					var hash = fType.GetHashCode();
+
+					if (!DataSession.binds.TryGetValue(hash, out object o))
+					{
+						o = Activator.CreateInstance(fType);
+						DataSession.binds.Add(hash, o);
+					}
+
+					myFieldInfo.SetValue(b, o);
+				}
+				else if (myFieldInfo.FieldType.IsSubclassOf(groupType))
+				{
+					var groupByAttribute = Attribute.GetCustomAttribute(myFieldInfo, typeof(GroupByAttribute)) as GroupByAttribute;
+					var groupExcludeAttribute = Attribute.GetCustomAttribute(myFieldInfo, typeof(GroupExcludeAttribute)) as GroupExcludeAttribute;
+
+					var includeTagsFilter = groupByAttribute != null ? groupByAttribute.filter : new int[0];
+					var excludeTagsFilter = new int[0];
+					var excludeCompFilter = new int[0];
+					if (groupExcludeAttribute != null)
+					{
+						excludeTagsFilter = groupExcludeAttribute.filter;
+						excludeCompFilter = groupExcludeAttribute.filterType;
+					}
+
+					var composition = new Composition();
+					composition.excludeTags = excludeTagsFilter;
+					composition.includeTags = includeTagsFilter;
+					composition.AddTypesExclude(excludeCompFilter);
+
+					composition.hash = HashCode.OfEach(composition.includeTags).And(17).AndEach(composition.excludeTags).And(31).AndEach(excludeCompFilter);
+					myFieldInfo.SetValue(b, SetupGroup(myFieldInfo.FieldType, composition));
+				}
+			}
+		}
+
 		internal static GroupCore SetupGroup(Type groupType, Composition filter)
 		{
-			GroupCore groupCore;
+			if (container.TryGetValue(groupType, filter, out GroupCore group))
+			{
+				return group;
+			}
 
-			if (container.TryGet(groupType, filter, out groupCore))
-				return groupCore;
-
-			groupCore = Activator.CreateInstance(groupType, true) as GroupCore;
-			groupCore.Add(filter);
-			groupCore.Initialize();
-
-			container.Add(groupCore);
-			HelperTags.Add(groupCore);
-
-			return groupCore;
+			return container.Add((Activator.CreateInstance(groupType, true) as GroupCore).Start(filter));
 		}
 
 		public static void Dispose()
 		{
 			container.Dispose();
 		}
-
-	}
-
-	public enum RefType
-	{
-
-		Entity,
-		EntityMono
-	
 
 	}
 }

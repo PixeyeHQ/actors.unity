@@ -32,10 +32,10 @@ namespace Pixeye.Framework
 
  
 
-		internal GroupCore[] GroupCoreOfInterest = new GroupCore[8];
-		internal GroupCore[] GroupCoreOfInterestRemove = new GroupCore[8];
+		internal GroupCore[] groups = new GroupCore[8];
+		internal GroupCore[] groupsToRemove = new GroupCore[8];
 		internal int lenOfGroups;
-		internal int lenOfGroupsFiltered;
+		internal int lenOfGroupsToRemove;
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal abstract int GetComponentID();
@@ -72,18 +72,18 @@ namespace Pixeye.Framework
 
 		public void Add(GroupCore groupCore)
 		{
-			if (lenOfGroups == GroupCoreOfInterest.Length)
-				Array.Resize(ref GroupCoreOfInterest, lenOfGroups << 1);
+			if (lenOfGroups == groups.Length)
+				Array.Resize(ref groups, lenOfGroups << 1);
 
-			GroupCoreOfInterest[lenOfGroups++] = groupCore;
+			groups[lenOfGroups++] = groupCore;
 		}
 
 		internal override void AddGroupExclude(GroupCore groupCore)
 		{
-			if (lenOfGroupsFiltered == GroupCoreOfInterestRemove.Length)
-				Array.Resize(ref GroupCoreOfInterestRemove, lenOfGroupsFiltered << 1);
+			if (lenOfGroupsToRemove == groupsToRemove.Length)
+				Array.Resize(ref groupsToRemove, lenOfGroupsToRemove << 1);
 
-			GroupCoreOfInterestRemove[lenOfGroupsFiltered++] = groupCore;
+			groupsToRemove[lenOfGroupsToRemove++] = groupCore;
 		}
 
 		public Storage()

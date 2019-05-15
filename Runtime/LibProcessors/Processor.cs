@@ -10,7 +10,7 @@ namespace Pixeye.Framework
 
 		protected Processor()
 		{
-			ProcessorGroupAttributes.Setup(this);
+			ProcessorGroups.Setup(this);
 			ProcessorSignals.Default.Add(this);
 			Toolbox.disposables.Add(this);
 		}

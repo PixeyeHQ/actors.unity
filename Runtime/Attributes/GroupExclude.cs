@@ -26,9 +26,10 @@ namespace Pixeye.Framework
 
 			for (int i = 0; i < filterType.Length; i++)
 			{
-				this.filterType[i] =  Storage.allDict[filterType[i].GetHashCode()].GetComponentID();
+				this.filterType[i] = Storage.allDict[filterType[i].GetHashCode()].GetComponentID();
 			}
 		}
+ 
 
 	}
 }

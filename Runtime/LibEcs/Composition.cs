@@ -12,52 +12,16 @@ namespace Pixeye.Framework
 	public class Composition : IEquatable<Composition>
 	{
 
-		internal int[] tagsToInclude = new int[0];
-		internal int[] tagsToExclude = new int[0];
-
 		internal int[] generations = new int[0];
 		internal int[] ids = new int[0];
 
-		internal bool[] components = new bool[SettingsEngine.SizeComponents];
-		internal bool[] typesToExclude = new bool[SettingsEngine.SizeComponents];
+		internal int[] includeTags = new int[0];
+		internal int[] excludeTags = new int[0];
 
-		public override bool Equals(object obj)
-		{
-			var other = obj as Composition;
-			return other != null && Equals(other);
-		}
+		internal bool[] includeComponents = new bool[SettingsEngine.SizeComponents];
+		internal bool[] excludeComponents = new bool[SettingsEngine.SizeComponents];
 
-		// todo: Refactor composition GetHashCode shit.
-		public override int GetHashCode()
-		{
-			int hc = tagsToInclude.Length;
-			int len1 = tagsToInclude.Length;
-			int len2 = tagsToExclude.Length;
-			//	int len3 = typesToExclude.Length;
-
-			unchecked
-			{
-				for (int i = 0; i < len1; ++i)
-				{
-					hc = unchecked(hc * 17 + tagsToInclude[i]);
-				}
-
-				hc += tagsToExclude.Length;
-				for (int i = 0; i < len2; ++i)
-				{
-					hc = unchecked(hc * 31 + tagsToExclude[i]);
-				}
-
-//				hc += typesToExclude.Length;
-//
-//				for (int i = 0; i < len3; ++i)
-//				{
-//					hc = typesToExclude[i].GetHashCode();
-//				}
-			}
-
-			return hc;
-		}
+		internal HashCode hash;
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal bool OverlapComponents(in BufferComponents entityComponents)
@@ -65,7 +29,7 @@ namespace Pixeye.Framework
 			int match = 0;
 			for (int i = 0; i < entityComponents.length; i++)
 			{
-				if (components[entityComponents.components[i]])
+				if (includeComponents[entityComponents.ids[i]])
 					match++;
 			}
 			return ids.Length == match;
@@ -77,7 +41,7 @@ namespace Pixeye.Framework
 				for (int i = 0; i < types.Length; i++)
 				{
 					var t = types[i];
-					typesToExclude[t] = true;
+					excludeComponents[t] = true;
 				}
 		}
 
@@ -85,21 +49,35 @@ namespace Pixeye.Framework
 		{
 			for (int i = 0; i < Storage.lastID; i++)
 			{
-				var t = typesToExclude[i];
-				if (t)
-				{
-					Storage.all[i].AddGroupExclude(g);
-				}
+				var t = excludeComponents[i];
+				if (t) Storage.all[i].AddGroupExclude(g);
 			}
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		internal bool CheckTags(int entityID)
+		{
+			return CanProceed(entityID) && (includeTags.Length == 0 || IncludeTags(entityID)) & (excludeTags.Length == 0 || ExcludeTags(entityID));
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal bool Check(int entityID)
 		{
-			return (tagsToInclude.Length == 0 || Include(entityID)) & (tagsToExclude.Length == 0 || Exclude(entityID));
+			return CanProceed(entityID) && (includeTags.Length == 0 || IncludeTags(entityID)) & (excludeTags.Length == 0 || ExcludeTags(entityID)) & !ExcludeTypes(entityID);
 		}
 
-		internal bool Include(int entityID)
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		internal bool CanProceed(int entityID)
+		{
+			for (int ll = 0; ll < ids.Length; ll++)
+			{
+				var mask = ids[ll];
+				if ((Entity.generations[entityID, generations[ll]] & mask) != mask) return false;
+			}
+			return true;
+		}
+
+		internal bool IncludeTags(int entityID)
 		{
 			ref var tags = ref Entity.tags[entityID];
 			var len = tags.Length;
@@ -107,9 +85,9 @@ namespace Pixeye.Framework
 			if (len == 0) return false;
 			var match = 0;
 
-			for (int l = 0; l < tagsToInclude.Length; l++)
+			for (int l = 0; l < includeTags.Length; l++)
 			{
-				var tagToInclude = tagsToInclude[l];
+				var tagToInclude = includeTags[l];
 				for (int i = 0; i < len; i++)
 				{
 					ref var tag = ref tags.GetElementByRef(i);
@@ -117,18 +95,18 @@ namespace Pixeye.Framework
 				}
 			}
 
-			return match == tagsToInclude.Length;
+			return match == includeTags.Length;
 		}
 
-		internal bool Exclude(int entityID)
+		internal bool ExcludeTags(int entityID)
 		{
 			ref var tags = ref Entity.tags[entityID];
 			var len = tags.Length;
 			if (len == 0) return true;
 
-			for (int l = 0; l < tagsToExclude.Length; l++)
+			for (int l = 0; l < excludeTags.Length; l++)
 			{
-				var tagToExclude = tagsToExclude[l];
+				var tagToExclude = excludeTags[l];
 				for (int i = 0; i < len; i++)
 				{
 					ref var tag = ref tags.GetElementByRef(i);
@@ -141,46 +119,32 @@ namespace Pixeye.Framework
 
 		internal bool ExcludeTypes(int entityID)
 		{
-			BufferComponents entityComponents = Entity.components[entityID];
+			ref var components = ref Entity.components[entityID];
 
-			for (int i = 0; i < entityComponents.length; i++)
+			for (int i = 0; i < components.length; i++)
 			{
-				if (typesToExclude[entityComponents.components[i]])
+				if (excludeComponents[components.ids[i]])
 				{
-					return false;
+					return true;
 				}
 			}
-			return true;
+			return false;
 		}
 
-		// todo: Refactor composition Equals shit.
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public bool Equals(Composition other)
 		{
-			if (tagsToInclude.Length != other.tagsToInclude.Length) return false;
-			//	if (typesToExclude.Length != other.typesToExclude.Length) return false;
+			return GetHashCode() == other.GetHashCode();
+		}
 
-			int len1 = tagsToInclude.Length;
-			int len2 = tagsToExclude.Length;
-			//int len3 = typesToExclude.Length;
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public override int GetHashCode() => hash;
 
-			for (int i = 0; i < len1; i++)
-			{
-				if (tagsToInclude[i] != other.tagsToInclude[i]) return false;
-			}
-
-			if (tagsToExclude.Length != other.tagsToExclude.Length) return false;
-
-			for (int i = 0; i < len2; i++)
-			{
-				if (tagsToExclude[i] != other.tagsToExclude[i]) return false;
-			}
-
-//			for (int i = 0; i < len3; i++)
-//			{
-//				if (typesToExclude[i] != other.typesToExclude[i]) return false;
-//			}
-
-			return true;
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public override bool Equals(object obj)
+		{
+			var other = obj as Composition;
+			return other != null && Equals(other);
 		}
 
 	}

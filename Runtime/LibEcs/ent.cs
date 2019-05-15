@@ -24,7 +24,7 @@ namespace Pixeye.Framework
 
 		public ref readonly Transform transform => ref Entity.transforms[id];
 		//public ref readonly BufferTags tags => ref Entity.tags[id];
-	
+
 		#region ENTITY
 
 		internal EntityComposer Modify()
@@ -48,7 +48,7 @@ namespace Pixeye.Framework
 		{
 			return new ent(value);
 		}
-		 
+
 		public static ent operator +(ent a, int b)
 		{
 			return new ent(a.id + b, a.age);
@@ -87,6 +87,7 @@ namespace Pixeye.Framework
 			ent other = (ent) obj;
 			return id.CompareTo(other.id);
 		}
+
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public bool Has<T>()
 		{
@@ -104,6 +105,13 @@ namespace Pixeye.Framework
 
 		public void Release()
 		{
+			#if UNITY_EDITOR
+			if (!Entity.isAlive[id]) {
+				Debug.LogError($"Entity with id [{id}]  already destroyed.");
+				return;
+			}
+			#endif
+
 			Entity.isAlive[id] = false;
 			Entity.Delayed.Set(this, 0, Entity.Delayed.Action.Kill);
 			Entity.entitiesDebugCount--;
@@ -114,17 +122,17 @@ namespace Pixeye.Framework
 		{
 			return id > -1 && Entity.isAlive[id] && this.id == other.id && this.age == other.age;
 		}
-		
-	    	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool Equals(ent other)
-        {
-          return this.id == other.id && this.age ==  other.age;
-        }
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public bool Equals(ent other)
+		{
+			return id == other.id && age == other.age;
+		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public bool Exist()
 		{
-			return id > -1 && Entity.isAlive[id];
+			return id > -1 && Entity.isAlive[id] && Entity.components[id].ageCache == age;
 		}
 
 		#endregion
@@ -242,6 +250,6 @@ namespace Pixeye.Framework
 		}
 
 		#endregion
-		
+
 	}
 }

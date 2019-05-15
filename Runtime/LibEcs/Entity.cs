@@ -109,8 +109,6 @@ namespace Pixeye.Framework
 
 		#endregion
 
- 
-		
 		public static ent Create()
 		{
 			int id;
@@ -134,7 +132,7 @@ namespace Pixeye.Framework
 			return Setup(id, age);
 		}
 
-         #if ODIN_INSPECTOR
+		#if ODIN_INSPECTOR
 		public static ent Create(BlueprintEntity bpAsset)
 		{
 			int id;
@@ -159,8 +157,8 @@ namespace Pixeye.Framework
 			bpAsset.Execute(entity);
 			return entity;
 		}
-      #endif
-      
+		#endif
+
 		public static ent Create(HandleEntityComposer model)
 		{
 			int id;
@@ -396,7 +394,7 @@ namespace Pixeye.Framework
 			return SetupWithTransform(id, pooled, age);
 		}
 
-#if ODIN_INSPECTOR
+		#if ODIN_INSPECTOR
 		public static ent Create(string prefabID, BlueprintEntity bpAsset, bool pooled = false)
 		{
 			int id;
@@ -448,7 +446,7 @@ namespace Pixeye.Framework
 			bpAsset.Execute(entity);
 			return entity;
 		}
-#endif
+		#endif
 		public static void RenameGameobject(this ent entity)
 		{
 			var tr = transforms[entity.id];
@@ -541,6 +539,14 @@ namespace Pixeye.Framework
 		{
 			var storage = Storage<T>.Instance;
 			var entityID = entity.id;
+
+			#if UNITY_EDITOR
+			if (!isAlive[entity.id])
+			{
+				Debug.LogError($"-> Entity with id: [{entityID}] is not active. You should not add components to inactive entity. ");
+				return default;
+			}
+			#endif
 
 			if (entityID >= storage.components.Length)
 				Array.Resize(ref storage.components, entityID << 1);

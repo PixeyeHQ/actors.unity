@@ -10,18 +10,18 @@ namespace Pixeye.Framework
 	public struct BufferComponents
 	{
 
-		public ushort[] components;
+		public ushort[] ids;
 		public byte length;
 		public byte ageCache;  // caching age of entity for retrivieng it in future. ( ParseBy method )
 
-		public ref ushort GetComponent(int id)
+		public ref ushort Get(int id)
 		{
-			return ref components[id];
+			return ref ids[id];
 		}
 
 		public BufferComponents(int size)
 		{
-			components = new ushort[size];
+			ids = new ushort[size];
 			length = 0;
 			ageCache = 0;
 		}
@@ -30,7 +30,7 @@ namespace Pixeye.Framework
 		{
 			length = 0;
 			this.ageCache = ageCache;
-			if (components == null) components = new ushort[1];
+			if (ids == null) ids = new ushort[1];
 		}
 
 		public void Clear()
@@ -38,12 +38,13 @@ namespace Pixeye.Framework
 			length = 0;
 		}
 
+		
 		public void Add(int type)
 		{
-			if (length == components.Length)
-				Array.Resize(ref components, length << 1);
+			if (length == ids.Length)
+				Array.Resize(ref ids, length << 1);
 
-			components[length++] = (ushort) type;
+			ids[length++] = (ushort) type;
 		}
 
 		public void Remove(int type)
@@ -52,7 +53,7 @@ namespace Pixeye.Framework
 
 			for (int i = 0; i < length; i++)
 			{
-				if (components[i] == typeConverted)
+				if (ids[i] == typeConverted)
 				{
 					RemoveAt(i);
 					break;
@@ -63,20 +64,15 @@ namespace Pixeye.Framework
 		public void RemoveAt(int index)
 		{
 			for (int i = index; i < length - 1; ++i)
-				SetElement(i, components[i + 1]);
+				SetElement(i, ids[i + 1]);
 
 			length--;
 		}
 
 		public void SetElement(int index, int arg)
 		{
-			components[index] = (ushort) arg;
+			ids[index] = (ushort) arg;
 		}
-
-//		private ushort GetElement(int index)
-		//		{
-		//			return components[index];
-		//		}
-
+  
 	}
 }

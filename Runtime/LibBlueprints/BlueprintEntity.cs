@@ -41,7 +41,7 @@ namespace Pixeye.Framework
 		internal Dictionary<int, IComponentCopy> components = new Dictionary<int, IComponentCopy>(FastComparable.Default);
 
 		[SerializeField, TagFilter(typeof(ITag))]
-		internal int[] tags;
+		internal int[] tags = new int[0];
 
 		internal int[] hashesOnCreate = new int[0];
 

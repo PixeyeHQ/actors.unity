@@ -3,6 +3,7 @@
 //     Date : 3/7/2019 
 
 using System;
+using System.Runtime.CompilerServices;
 using Unity.IL2CPP.CompilerServices;
 using UnityEngine;
 
@@ -12,205 +13,169 @@ namespace Pixeye.Framework
 	sealed class ProcessorEntities : Processor, ITick
 	{
 
-		GroupCore[] groupsToClear = new GroupCore[100];
-		int groupsToClearLen;
+		GroupCore[] groupsChecked = new GroupCore[100];
+		int groupsCheckedLen;
 
-		bool CheckIfExists(GroupCore group)
+		bool AlreadyChecked(GroupCore group)
 		{
-			for (int i = 0; i < groupsToClearLen; i++)
-			{
-				if (groupsToClear[i].id == group.id) return true;
+			for (int i = 0; i < groupsCheckedLen; i++) {
+				if (groupsChecked[i].id == group.id) return true;
 			}
 
 			return false;
 		}
 
-		//todo: there must be a better way to filter entities. Need research / refactoring
-		
 		public void Tick(float delta)
 		{
 			if (!Starter.initialized) return;
 
 			if (Entity.Delayed.len == 0) return;
 
-			for (int i = 0; i < Entity.Delayed.len; i++)
-			{
+			for (int i = 0; i < Entity.Delayed.len; i++) {
 				ref var operation = ref Entity.Delayed.operations[i];
-
 				var entityID = operation.entity.id;
 
-				var components = Storage.all[operation.arg];
-
-				switch (operation.action)
-				{
+				switch (operation.action) {
 					case Entity.Delayed.Action.Add:
+					{
+						var componentID = operation.arg;
+						var storage = Storage.all[componentID];
 
-						if (!Entity.isAlive[entityID]) continue;
+						Entity.components[entityID].Add(componentID);
 
-						var generationAdd = Storage.generations[operation.arg];
-						var maskAdd = Storage.masks[operation.arg];
-
-						Entity.components[entityID].Add(operation.arg);
-
-						for (int l = 0; l < components.lenOfGroups; l++)
-						{
-							var group = components.GroupCoreOfInterest[l];
+						for (int l = 0; l < storage.lenOfGroups; l++) {
+							var group = storage.groups[l];
 							var composition = group.composition;
-
-							if (!CanProceed()) continue;
 							if (!composition.Check(entityID)) continue;
-
 							group.Insert(operation.entity);
-
-							bool CanProceed()
-							{
-								for (int ll = 0; ll < composition.ids.Length; ll++)
-								{
-									generationAdd = composition.generations[ll];
-									maskAdd = composition.ids[ll];
-
-									if ((Entity.generations[entityID, generationAdd] & maskAdd) != maskAdd) return false;
-								}
-								return true;
-							}
 						}
 
-						for (int l = 0; l < components.lenOfGroupsFiltered; l++)
-						{
-							var group = components.GroupCoreOfInterestRemove[l];
-
+						for (int l = 0; l < storage.lenOfGroupsToRemove; l++) {
+							var group = storage.groupsToRemove[l];
 							var composition = group.composition;
-
-							if (!CanProceed()) continue;
-
-							var inGroup = HelperArray.BinarySearch(ref group.entities, entityID, 0, group.length);
-							if (inGroup > -1) group.Remove(inGroup);
-
-							bool CanProceed()
-							{
-								for (int ll = 0; ll < composition.ids.Length; ll++)
-								{
-									generationAdd = composition.generations[ll];
-									maskAdd = composition.ids[ll];
-
-									if ((Entity.generations[entityID, generationAdd] & maskAdd) != maskAdd) return false;
-								}
-								return true;
-							}
+							if (!composition.CanProceed(entityID)) continue;
+							group.TryRemove(entityID);
+//							var inGroup = HelperArray.BinarySearch(ref group.entities, entityID, 0, group.length);
+//							if (inGroup > -1) group.Remove(inGroup);
 						}
-
 						break;
-
+					}
 					case Entity.Delayed.Action.Kill:
-						ref var componentsToKill = ref Entity.components[entityID];
-						var length = componentsToKill.length;
+					{
+						ref var components = ref Entity.components[entityID];
+						var length = components.length;
 
-						for (int j = 0; j < length; j++)
-						{
-							var componentOnKillId = componentsToKill.GetComponent(j);
-							var generationRemoveOnKill = Storage.generations[componentOnKillId];
-							var maskRemoveOnKill = Storage.masks[componentOnKillId];
+						for (int j = 0; j < length; j++) {
+							var componentID = components.Get(j);
+							var generation = Storage.generations[componentID];
+							var mask = Storage.masks[componentID];
 
-							//	if ((Entity.generations[entityID, generationRemoveOnKill] & maskRemoveOnKill) != maskAdd) c;
-							Entity.generations[entityID, generationRemoveOnKill] &= ~maskRemoveOnKill;
+							Entity.generations[entityID, generation] &= ~mask;
 
-							var storageOnKill = Storage.all[componentOnKillId];
+							var storage = Storage.all[componentID];
 
-							for (int l = 0; l < storageOnKill.lenOfGroups; l++)
-							{
-								var group = storageOnKill.GroupCoreOfInterest[l];
-								if (!CheckIfExists(group))
-								{
-									if (group.composition.OverlapComponents(componentsToKill))
-									{
+							for (int l = 0; l < storage.lenOfGroups; l++) {
+								var group = storage.groups[l];
+
+								if (!AlreadyChecked(group)) {
+									if (group.composition.OverlapComponents(components))
 										group.TryRemove(entityID);
-									}
 
-									if (groupsToClearLen == groupsToClear.Length)
-										Array.Resize(ref groupsToClear, groupsToClearLen << 1);
+									if (groupsCheckedLen == groupsChecked.Length)
+										Array.Resize(ref groupsChecked, groupsCheckedLen << 1);
 
-									groupsToClear[groupsToClearLen++] = group;
+									groupsChecked[groupsCheckedLen++] = group;
 								}
 							}
 						}
 
-						groupsToClearLen = 0;
+						groupsCheckedLen = 0;
 
-						for (int j = 0; j < Entity.components[entityID].length; j++)
-						{
-							var cID = (int) Entity.components[entityID].components[j];
+						for (int j = 0; j < components.length; j++) {
+							var cID = (int) components.ids[j];
 							Storage.all[cID].DisposeComponent(entityID);
 						}
 
-						Entity.components[entityID].Clear();
+						components.length = 0;
 
 						if (Entity.transforms.Length > entityID && Entity.transforms[entityID] != null)
 							Entity.transforms[entityID].gameObject.Release(Entity.isPooled[entityID] ? Pool.Entities : 0);
 
-						Entity.Delayed.Set(operation.entity, 0, Entity.Delayed.Action.KillFinalize);
+						Entity.tags[entityID].Clear();
 
+						Entity.Delayed.Set(operation.entity, 0, Entity.Delayed.Action.KillFinalize);
 						break;
+					}
+
+					case Entity.Delayed.Action.KillFinalize:
+					{
+						ent.entityStack.Enqueue(operation.entity);
+						ent.entityStackLength++;
+						break;
+					}
 
 					case Entity.Delayed.Action.Unbind:
-						ref var componentsToUnbind = ref Entity.components[entityID];
-						var lengthUnbind = componentsToUnbind.length;
+					{
+						ref var components = ref Entity.components[entityID];
+						var length = components.length;
 
-						for (int j = 0; j < lengthUnbind; j++)
-						{
-							var componentOnKillId = componentsToUnbind.GetComponent(j);
-							var generationRemoveOnKill = Storage.generations[componentOnKillId];
-							var maskRemoveOnKill = Storage.masks[componentOnKillId];
+						for (int j = 0; j < length; j++) {
+							var componentID = components.Get(j);
+							var generation = Storage.generations[componentID];
+							var mask = Storage.masks[componentID];
 
-							Entity.generations[entityID, generationRemoveOnKill] &= ~maskRemoveOnKill;
+							Entity.generations[entityID, generation] &= ~mask;
 
-							var storageOnKill = Storage.all[componentOnKillId];
+							var storage = Storage.all[componentID];
 
-							for (int l = 0; l < storageOnKill.lenOfGroups; l++)
-							{
-								var group = storageOnKill.GroupCoreOfInterest[l];
-								if (!CheckIfExists(group))
-								{
-									if (group.composition.OverlapComponents(componentsToUnbind))
-									{
+							for (int l = 0; l < storage.lenOfGroups; l++) {
+								var group = storage.groups[l];
+								if (!AlreadyChecked(group)) {
+									if (group.composition.OverlapComponents(components))
 										group.TryRemove(entityID);
-									}
 
-									if (groupsToClearLen == groupsToClear.Length)
-										Array.Resize(ref groupsToClear, groupsToClearLen << 1);
+									if (groupsCheckedLen == groupsChecked.Length)
+										Array.Resize(ref groupsChecked, groupsCheckedLen << 1);
 
-									groupsToClear[groupsToClearLen++] = group;
+									groupsChecked[groupsCheckedLen++] = group;
 								}
 							}
 						}
 
-						groupsToClearLen = 0;
+						groupsCheckedLen = 0;
 
-						Entity.components[entityID].Clear();
+						for (int j = 0; j < components.length; j++) {
+							var cID = (int) components.ids[j];
+							Storage.all[cID].DisposeComponent(entityID);
+						}
+
+						components.length = 0;
+						Entity.tags[entityID].Clear();
 
 						Entity.Delayed.Set(operation.entity, 0, Entity.Delayed.Action.KillFinalize);
-
 						break;
+					}
 
 					case Entity.Delayed.Action.Remove:
+					{
+						var generation = Storage.generations[operation.arg];
+						var mask = Storage.masks[operation.arg];
+						var storage = Storage.all[operation.arg];
 
-						var generationRemove = Storage.generations[operation.arg];
-						var maskRemove = Storage.masks[operation.arg];
+						Entity.generations[entityID, generation] &= ~mask;
 
-						Entity.generations[entityID, generationRemove] &= ~maskRemove;
-
-						for (int l = 0; l < components.lenOfGroups; l++)
-						{
-							var group = components.GroupCoreOfInterest[l];
+						for (int l = 0; l < storage.lenOfGroups; l++) {
+							var group = storage.groups[l];
 							group.TryRemove(entityID);
 						}
 
-						for (int l = 0; l < components.lenOfGroupsFiltered; l++)
-						{
-							var group = components.GroupCoreOfInterestRemove[l];
+						for (int l = 0; l < storage.lenOfGroupsToRemove; l++) {
+							var group = storage.groupsToRemove[l];
 
 							var composition = group.composition;
 
 							if (!composition.Check(entityID)) continue;
+
 							var inGroup = HelperArray.BinarySearch(ref group.entities, entityID, 0, group.length);
 							if (inGroup == -1)
 								group.Insert(operation.entity);
@@ -218,131 +183,82 @@ namespace Pixeye.Framework
 
 						Entity.components[entityID].Remove(operation.arg);
 						break;
-
+					}
 					case Entity.Delayed.Action.ChangeTag:
+					{
 						if (!Entity.isAlive[entityID]) continue;
 
 						var index = operation.arg;
-						var groups = HelperTags.inUseGroups.groups[index];
+						var groups = HelperTags.inUseGroups.groupStorage[index];
 
-						for (int l = 0; l < groups.len; l++)
-						{
+						for (int l = 0; l < groups.len; l++) {
 							var group = groups.storage[l];
 
 							var composition = group.composition;
-							var canBeAdded = true;
-
-							canBeAdded &= composition.tagsToInclude.Length == 0 || composition.Include(entityID);
-							canBeAdded &= composition.tagsToExclude.Length == 0 || composition.Exclude(entityID);
+							var canBeAdded = composition.CheckTags(entityID);
 
 							var inGroup = HelperArray.BinarySearch(ref group.entities, entityID, 0, group.length);
 
-							if (inGroup == -1 && canBeAdded)
-							{
-								var generation = Storage.generations[operation.arg];
-								var mask = Storage.masks[operation.arg];
-
-								for (int ll = 0; ll < composition.ids.Length; ll++)
-								{
-									generation = composition.generations[ll];
-									mask = composition.ids[ll];
-
-									if ((Entity.generations[entityID, generation] & mask) == mask) continue;
-									canBeAdded = false;
-									break;
-								}
-
-								if (canBeAdded)
-									group.Insert(operation.entity);
+							if (inGroup == -1 && canBeAdded) {
+								group.Insert(operation.entity);
 							}
-
-							else if (inGroup > -1 && !canBeAdded)
-							{
+							else if (inGroup > -1 && !canBeAdded) {
 								group.Remove(inGroup);
 							}
 						}
-
 						break;
-
-					case Entity.Delayed.Action.KillFinalize:
-
-						operation.entity.ClearTags();
-						ent.entityStack.Enqueue(operation.entity);
-						ent.entityStackLength++;
-
-						break;
+					}
 
 					case Entity.Delayed.Action.Activate:
-						ref var componentsToActivate = ref Entity.components[entityID];
-						var lenToActivate = componentsToActivate.length;
+					{
+						ref var components = ref Entity.components[entityID];
+						var length = components.length;
 
-						for (int j = 0; j < lenToActivate; j++)
-						{
-							ref var component = ref componentsToActivate.GetComponent(j);
-							var generationActivate = Storage.generations[component];
-							var maskActivate = Storage.masks[component];
+						for (int j = 0; j < length; j++) {
+							ref var componentID = ref components.Get(j);
+							var generation = Storage.generations[componentID];
+							var mask = Storage.masks[componentID];
+							var storage = Storage.all[operation.arg];
+							Entity.generations[entityID, generation] |= mask;
+							storage = Storage.all[componentID];
 
-							Entity.generations[entityID, generationActivate] |= maskActivate;
-							components = Storage.all[component];
-
-							for (int l = 0; l < components.lenOfGroups; l++)
-							{
-								var group = components.GroupCoreOfInterest[l];
+							for (int l = 0; l < storage.lenOfGroups; l++) {
+								var group = storage.groups[l];
 								var composition = group.composition;
-								bool canBeAdded = true;
-
-								for (int ll = 0; ll < composition.ids.Length; ll++)
-								{
-									generationActivate = composition.generations[ll];
-									maskActivate = composition.ids[ll];
-
-									if ((Entity.generations[entityID, generationActivate] & maskActivate) == maskActivate) continue;
-
-									canBeAdded = false;
-									break;
-								}
-
-								canBeAdded &= composition.tagsToInclude.Length == 0 || composition.Include(entityID);
-								canBeAdded &= composition.tagsToExclude.Length == 0 || composition.Exclude(entityID);
-
-								if (canBeAdded)
-								{
-									group.Insert(operation.entity);
-								}
+								if (!composition.Check(entityID)) continue;
+								group.Insert(operation.entity);
 							}
 						}
-
 						break;
+					}
 
 					case Entity.Delayed.Action.Deactivate:
-						ref var componentsToDeactivate = ref Entity.components[entityID];
-						var lenToDeactivate = componentsToDeactivate.length;
+					{
+						ref var componenets = ref Entity.components[entityID];
+						var length = componenets.length;
+						var storage = Storage.all[operation.arg];
 
-						for (int j = 0; j < lenToDeactivate; j++)
-						{
-							ref var component = ref componentsToDeactivate.GetComponent(j);
-							var generationDeactivate = Storage.generations[component];
-							var maskDeactivate = Storage.masks[component];
+						for (int j = 0; j < length; j++) {
+							ref var componentID = ref componenets.Get(j);
+							var generation = Storage.generations[componentID];
+							var mask = Storage.masks[componentID];
 
-							Entity.generations[entityID, generationDeactivate] &= ~maskDeactivate;
-							components = Storage.all[component];
-							for (int l = 0; l < components.lenOfGroups; l++)
-							{
-								var group = components.GroupCoreOfInterest[l];
+							Entity.generations[entityID, generation] &= ~mask;
+
+							storage = Storage.all[componentID];
+							for (int l = 0; l < storage.lenOfGroups; l++) {
+								var group = storage.groups[l];
 								group.TryRemove(entityID);
 							}
 						}
-
 						break;
+					}
 				}
 			}
-
 			Entity.Delayed.len = 0;
 		}
 
-		protected override void OnDispose()
-		{
-		}
+		protected override void OnDispose() { }
 
 	}
 }
