@@ -116,7 +116,7 @@ namespace Pixeye.Framework
 
 			if (i == -1) return;
 			if (onRemove != null) onRemove(entities[i]);
-			Debug.Log(length + "_" + i);
+		 
 			Array.Copy(entities, i + 1, entities, i, length-- - i);
 		}
 
