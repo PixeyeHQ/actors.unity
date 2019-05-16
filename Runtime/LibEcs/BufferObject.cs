@@ -23,6 +23,19 @@ namespace Pixeye.Framework
 
 			source[length++] = obj;
 		}
+		
+		public T Add()
+		{
+			if (length == source.Length)
+				Array.Resize(ref source, length << 1);
+			
+			ref var obj = ref  source[length++];
+			if (obj == null) obj = creator();
+
+			return obj;
+			
+		}
+		
 
 		public void RemoveAt(int index)
 		{
@@ -35,36 +48,21 @@ namespace Pixeye.Framework
 			source[index] = arg;
 		}
 
-		public static T Add()
+	 
+
+		public static T AddDefault()
 		{
 			var source = Instance;
 			if (source.length == source.source.Length)
 				Array.Resize(ref source.source, source.length << 1);
 
-			var l = source.length++;
-			ref var obj = ref source.source[l];
+		 
+			ref var obj = ref source.source[source.length++];
 			if (obj == null) obj = creator();
 
 			return obj;
 		}
-
-		public static T Create()
-		{
-			var source = Instance;
-			if (source.length == source.source.Length)
-				Array.Resize(ref source.source, source.length << 1);
-
-			var l = source.length;
-			ref var obj = ref source.source[l];
-			if (obj == null) obj = creator();
-
-			return obj;
-		}
-
-		public static void Deploy()
-		{
-			Instance.length++;
-		}
+ 
 
 	}
 }
