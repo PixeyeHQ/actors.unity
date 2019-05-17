@@ -21,7 +21,6 @@ namespace Pixeye.Framework
 
 		public static bool initialized;
 
-	 
 		#if ODIN_INSPECTOR
 		[FoldoutGroup("Setup")]
 		#else
@@ -161,8 +160,7 @@ namespace Pixeye.Framework
 			}
 
 			Add<ProcessorEntities>();
-		 
-		 
+
 			Setup();
 
 			initialized = true;
@@ -171,11 +169,10 @@ namespace Pixeye.Framework
 
 			foreach (var obj in objs)
 			{
-				
 				obj.LaunchOnStart();
 			}
 
-			Timer.Add(Time.deltaFixed, () => { PostSetup(); });
+			Timer.Add(Time.deltaFixed, PostSetup);
 		}
 
 		/// <summary>
@@ -188,20 +185,14 @@ namespace Pixeye.Framework
 			return Toolbox.Add<T>();
 		}
 
-		protected virtual void Setup()
-		{
-		}
+		protected virtual void Setup() { }
 
-		protected virtual void PostSetup()
-		{
-		}
+		protected virtual void PostSetup() { }
 
 		protected virtual void OnDestroy()
 		{
 			initialized = false;
 		}
 
-	 
-		
 	}
 }

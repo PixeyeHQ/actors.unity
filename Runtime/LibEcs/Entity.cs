@@ -12,6 +12,7 @@ using Object = UnityEngine.Object;
 
 namespace Pixeye.Framework
 {
+
 	[StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Unicode)]
 	public readonly struct EntityOperation
 	{

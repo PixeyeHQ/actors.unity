@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using Pixeye.Source;
 using UnityEngine;
 
 namespace Pixeye.Framework
@@ -110,9 +111,9 @@ namespace Pixeye.Framework
 				needToBeCleaned.Dispose();
 			}
 
-			HandleTimer.Default.Dispose();
 			HandlePool.Dispose();
 			ProcessorGroups.Dispose();
+			ProcessorTimer.Default.Dispose();
 			ProcessorScene.Default.Dispose();
 			ProcessorUpdate.Default.Dispose();
 			Box.Default.Dispose();

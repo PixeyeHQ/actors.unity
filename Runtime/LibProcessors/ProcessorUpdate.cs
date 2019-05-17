@@ -9,22 +9,29 @@ namespace Pixeye.Framework
 {
 	public sealed class ProcessorUpdate : MonoBehaviour, IDisposable, IKernel
 	{
+
+		public static ProcessorUpdate Default;
+
+		internal static List<Time> times = new List<Time>();
+		internal static int timesLen = 0;
+
 		List<ITick> ticks = new List<ITick>(1000);
 		List<ITickFixed> ticksFixed = new List<ITickFixed>();
 		List<ITickLate> ticksLate = new List<ITickLate>();
 
-		public static ProcessorUpdate Default;
-	
-		internal static List<Time> times = new List<Time>();
-    internal static int timesLen = 0;
-	
-    int countTicks;
+		int countTicks;
 		int countTicksFixed;
 		int countTicksLate;
 
-		void Awake() { Default = this; }
+		void Awake()
+		{
+			Default = this;
+		}
 
-		public int GetTicksCount() { return countTicks; }
+		public int GetTicksCount()
+		{
+			return countTicks;
+		}
 
 		public void Add(object updateble)
 		{
@@ -69,18 +76,17 @@ namespace Pixeye.Framework
 			}
 		}
 
-
 		void Update()
 		{
-			
 			if (Toolbox.changingScene) return;
+
+			var delta = Time.delta;
 
 			for (int i = 0; i < timesLen; i++)
 			{
 				times[i].Tick();
 			}
-			
-			var delta = Time.delta;
+
 			for (var i = 0; i < countTicks; i++)
 			{
 				ticks[i].Tick(delta);
@@ -103,7 +109,7 @@ namespace Pixeye.Framework
 				ticksLate[i].TickLate(delta);
 		}
 
-
+ 
 		public void Dispose()
 		{
 			countTicks = 0;
@@ -111,7 +117,6 @@ namespace Pixeye.Framework
 			countTicksLate = 0;
 
 			ticks.RemoveAll(t => t is IKernel == false);
-
 
 			ticksFixed.Clear();
 			ticksLate.Clear();
@@ -125,5 +130,6 @@ namespace Pixeye.Framework
 			DontDestroyOnLoad(obj);
 			Default = obj.AddComponent<ProcessorUpdate>();
 		}
+
 	}
 }

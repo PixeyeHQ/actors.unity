@@ -36,13 +36,11 @@ namespace Pixeye.Framework
 
 		void Awake()
 		{
-			
 			if (ProcessorUpdate.Default == null)
 			{
 				ProcessorUpdate.Create();
 			}
-			
-			
+
 			for (var i = 0; i < pluggables.Count; i++)
 			{
 				pluggables[i].Plug();
@@ -56,13 +54,6 @@ namespace Pixeye.Framework
 			{
 				Toolbox.Add(gameSettings);
 			}
-
-			HandleFastPool<Timer>.Instance.Populate(50);
-			
-			
-			
-			
-			
 		}
 
 		IEnumerator OnApplicationFocus(bool hasFocus)

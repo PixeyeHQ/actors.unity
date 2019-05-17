@@ -53,7 +53,9 @@ namespace Pixeye.Framework
 			var hasValue = cachedObjects.TryGetValue(key, out stack);
 			if (!hasValue) cachedObjects.Add(key, new Stack<GameObject>(amount));
 
-			Timer.Add(Time.delta * timeRate, () =>
+			Timer.Add(Time.delta * timeRate, Pop);
+
+			void Pop()
 			{
 				for (var i = 0; i < amountPerTick; i++)
 				{
@@ -66,7 +68,7 @@ namespace Pixeye.Framework
 				{
 					Timer.Add(Time.delta * timeRate, () => PopulateWith(prefab, amount, amountPerTick, timeRate));
 				}
-			});
+			}
 
 			return this;
 		}
@@ -110,8 +112,6 @@ namespace Pixeye.Framework
 			return false;
 		}
 
-	
-		
 		public GameObject Spawn(GameObject prefab, Transform parent = null)
 		{
 			var key = prefab.GetInstanceID();
@@ -125,7 +125,6 @@ namespace Pixeye.Framework
 				var transform = obj.transform;
 				if (transform.parent != parent)
 					transform.SetParent(parent);
- 
 
 				transform.gameObject.SetActive(true);
 
@@ -144,7 +143,7 @@ namespace Pixeye.Framework
 			cachedIds.Add(k, key);
 			return createdPrefab;
 		}
-	 
+
 		[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
 		public void Despawn(GameObject go)
 		{

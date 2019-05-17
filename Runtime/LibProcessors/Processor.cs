@@ -23,6 +23,8 @@ namespace Pixeye.Framework
 			OnDispose();
 		}
 
+
+		
 		protected virtual void OnDispose()
 		{
 		}
