@@ -275,6 +275,7 @@ namespace Pixeye.Framework
 			else
 				id = ent.lastID++;
 
+			
 			transforms[id] = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefabID) : HelperFramework.SpawnInternal(prefabID);
 
 			var entity = SetupWithTransform(id, pooled, age);
@@ -306,9 +307,9 @@ namespace Pixeye.Framework
 			else
 				id = ent.lastID++;
 
-			var entity = SetupWithTransform(id, pooled, age);
-
-			EntityComposer.Default.entity = entity;
+			EntityComposer.Default.entity  = SetupWithTransform(id, pooled, age);
+			ref var entity = ref EntityComposer.Default.entity;
+	
 			model(EntityComposer.Default);
 			Delayed.Set(entity, 0, Delayed.Action.Activate);
 
@@ -337,10 +338,11 @@ namespace Pixeye.Framework
 
 			transforms[id] = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefab) : HelperFramework.SpawnInternal(prefab);
 
-			var entity = SetupWithTransform(id, pooled, age);
-
-			EntityComposer.Default.entity = entity;
+			EntityComposer.Default.entity   = SetupWithTransform(id, pooled, age);
+			ref var entity = ref EntityComposer.Default.entity;
+ 
 			model(EntityComposer.Default);
+			
 			Delayed.Set(entity, 0, Delayed.Action.Activate);
 
 			return entity;
@@ -551,7 +553,7 @@ namespace Pixeye.Framework
 
 			if (entityID >= storage.components.Length)
 				Array.Resize(ref storage.components, entityID << 1);
-
+					 
 			ref T val = ref storage.components[entityID];
 
 			if (val == null)
