@@ -581,6 +581,9 @@ namespace Pixeye.Framework
 				Storage<T>.Instance.DisposeAction(val);
 
 			val = component;
+			
+			generations[entityID, Storage<T>.generation] |= Storage<T>.componentMask;
+			
 			Delayed.Set(entity, Storage<T>.componentID, Delayed.Action.Add);
 		}
 
