@@ -179,9 +179,11 @@ namespace Pixeye.Framework
 			else
 				id = ent.lastID++;
 
-			var entity = Setup(id, age);
+ 
 
-			EntityComposer.Default.entity = entity;
+			EntityComposer.Default.entity = Setup(id, age);
+			ref var entity = ref EntityComposer.Default.entity;
+			
 			model(EntityComposer.Default);
 			Delayed.Set(entity, 0, Delayed.Action.Activate);
 
