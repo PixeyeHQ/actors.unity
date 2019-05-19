@@ -74,9 +74,10 @@ namespace Pixeye.Framework
 			entitiesDebugCount++;
 			return new ent(id, age);
 		}
+ 
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		internal static ent SetupWithTransform(int id, bool pooled, byte age)
+		internal static void SetupWithTransform(int id, bool pooled, byte age)
 		{
 			if (id >= counter)
 			{
@@ -94,12 +95,10 @@ namespace Pixeye.Framework
 			}
 
 			components[id].Setup(age);
+
 			isAlive[id] = true;
-
 			isPooled[id] = pooled;
-
 			entitiesDebugCount++;
-			return new ent(id, age);
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -209,17 +208,14 @@ namespace Pixeye.Framework
 			else
 				id = ent.lastID++;
 
+			SetupWithTransform(id, pooled, age);
 			transforms[id] = prefab.transform;
+			EntityComposer.Default.entity = new ent(id, age);
 
-			var entity = SetupWithTransform(id, pooled, age);
+			ref var entity = ref EntityComposer.Default.entity;
 
-			EntityComposer.Default.entity = entity;
 			model(EntityComposer.Default);
 			Delayed.Set(entity, 0, Delayed.Action.Activate);
-
-			#if ACTORS_DEBUG
-			prefab.name += $" [{id}]";
-			#endif
 
 			return entity;
 		}
@@ -243,12 +239,13 @@ namespace Pixeye.Framework
 			}
 			else
 				id = ent.lastID++;
-
+			SetupWithTransform(id, pooled, age);
 			transforms[id] = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefabID, position) : HelperFramework.SpawnInternal(prefabID, position);
 
-			var entity = SetupWithTransform(id, pooled, age);
+			EntityComposer.Default.entity = new ent(id, age);
 
-			EntityComposer.Default.entity = entity;
+			ref var entity = ref EntityComposer.Default.entity;
+
 			model(EntityComposer.Default);
 			Delayed.Set(entity, 0, Delayed.Action.Activate);
 
@@ -275,41 +272,11 @@ namespace Pixeye.Framework
 			else
 				id = ent.lastID++;
 
-			
+			SetupWithTransform(id, pooled, age);
 			transforms[id] = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefabID) : HelperFramework.SpawnInternal(prefabID);
-
-			var entity = SetupWithTransform(id, pooled, age);
-
-			EntityComposer.Default.entity = entity;
-			model(EntityComposer.Default);
-			Delayed.Set(entity, 0, Delayed.Action.Activate);
-
-			return entity;
-		}
-
-		public static ent Create(HandleEntityComposer model, bool pooled)
-		{
-			int id;
-			byte age = 0;
-
-			if (ent.entityStackLength > 0)
-			{
-				var pop = ent.entityStack.Dequeue();
-				byte ageOld = pop.age;
-				id = pop.id;
-				unchecked
-				{
-					age = (byte) (ageOld + 1);
-				}
-
-				ent.entityStackLength--;
-			}
-			else
-				id = ent.lastID++;
-
-			EntityComposer.Default.entity  = SetupWithTransform(id, pooled, age);
+			EntityComposer.Default.entity = new ent(id, age);
 			ref var entity = ref EntityComposer.Default.entity;
-	
+
 			model(EntityComposer.Default);
 			Delayed.Set(entity, 0, Delayed.Action.Activate);
 
@@ -336,13 +303,13 @@ namespace Pixeye.Framework
 			else
 				id = ent.lastID++;
 
+			SetupWithTransform(id, pooled, age);
 			transforms[id] = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefab) : HelperFramework.SpawnInternal(prefab);
 
-			EntityComposer.Default.entity   = SetupWithTransform(id, pooled, age);
+			EntityComposer.Default.entity = new ent(id, age);
 			ref var entity = ref EntityComposer.Default.entity;
- 
+
 			model(EntityComposer.Default);
-			
 			Delayed.Set(entity, 0, Delayed.Action.Activate);
 
 			return entity;
@@ -368,8 +335,9 @@ namespace Pixeye.Framework
 			else
 				id = ent.lastID++;
 
+			SetupWithTransform(id, pooled, age);
 			transforms[id] = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefabID) : HelperFramework.SpawnInternal(prefabID);
-			return SetupWithTransform(id, pooled, age);
+			return new ent(id, age);
 		}
 
 		public static ent Create(GameObject prefab, bool pooled = false)
@@ -392,9 +360,10 @@ namespace Pixeye.Framework
 			else
 				id = ent.lastID++;
 
+			SetupWithTransform(id, pooled, age);
 			transforms[id] = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefab) : HelperFramework.SpawnInternal(prefab);
 
-			return SetupWithTransform(id, pooled, age);
+			return new ent(id, age);
 		}
 
 		#if ODIN_INSPECTOR
@@ -418,8 +387,9 @@ namespace Pixeye.Framework
 			else
 				id = ent.lastID++;
 
+			SetupWithTransform(id, pooled, age);
 			transforms[id] = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefabID) : HelperFramework.SpawnInternal(prefabID);
-			var entity = SetupWithTransform(id, pooled, age);
+			var entity = new ent(id, age);
 			bpAsset.Execute(entity);
 			return entity;
 		}
@@ -444,8 +414,9 @@ namespace Pixeye.Framework
 			else
 				id = ent.lastID++;
 
+			SetupWithTransform(id, pooled, age);
 			transforms[id] = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefab) : HelperFramework.SpawnInternal(prefab);
-			var entity = SetupWithTransform(id, pooled, age);
+			var entity = new ent(id, age);
 			bpAsset.Execute(entity);
 			return entity;
 		}
@@ -553,7 +524,7 @@ namespace Pixeye.Framework
 
 			if (entityID >= storage.components.Length)
 				Array.Resize(ref storage.components, entityID << 1);
-					 
+
 			ref T val = ref storage.components[entityID];
 
 			if (val == null)
@@ -583,9 +554,9 @@ namespace Pixeye.Framework
 				Storage<T>.Instance.DisposeAction(val);
 
 			val = component;
-			
+
 			generations[entityID, Storage<T>.generation] |= Storage<T>.componentMask;
-			
+
 			Delayed.Set(entity, Storage<T>.componentID, Delayed.Action.Add);
 		}
 
