@@ -306,6 +306,18 @@ namespace Pixeye.Framework
 
 			return actor;
 		}
+		
+		public static Actor Create(GameObject prefab, Vector3 position, bool pooled = false)
+		{
+			var tr = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefab, position) : HelperFramework.SpawnInternal(prefab, position);
+			var actor = tr.AddGetActor();
+
+			actor.isPooled = pooled;
+			actor.Launch();
+
+			return actor;
+		}
+		
 
 		public static Actor Create(GameObject prefab, bool pooled = false)
 		{
