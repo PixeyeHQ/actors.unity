@@ -164,6 +164,8 @@ namespace Pixeye.Framework
 
 						Entity.generations[entityID, generation] &= ~mask;
 
+						
+						
 						for (int l = 0; l < storage.lenOfGroups; l++) {
 							var group = storage.groups[l];
 							group.TryRemove(entityID);
@@ -180,7 +182,7 @@ namespace Pixeye.Framework
 							if (inGroup == -1)
 								group.Insert(operation.entity);
 						}
-						var components = Entity.components[entityID];
+						ref var components = ref Entity.components[entityID];
 						
 						
 						components.Remove(operation.arg);

@@ -113,7 +113,7 @@ namespace Pixeye.Framework
 		internal void TryRemove(int entityID)
 		{
 			var i = HelperArray.BinarySearch(ref entities, entityID, 0, length);
-
+		 
 			if (i == -1) return;
 			if (onRemove != null) onRemove(entities[i]);
 		 
