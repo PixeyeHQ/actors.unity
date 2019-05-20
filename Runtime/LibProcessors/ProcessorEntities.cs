@@ -184,12 +184,12 @@ namespace Pixeye.Framework
 						
 						
 						components.Remove(operation.arg);
-						if (components.length == 0)
-						{
-							Entity.isAlive[entityID] = false;
-							Entity.Delayed.Set(operation.entity, 0, Entity.Delayed.Action.Kill);
-							Entity.entitiesDebugCount--;
-						}
+//						if (components.length == 0)
+//						{
+//							Entity.isAlive[entityID] = false;
+//							Entity.Delayed.Set(operation.entity, 0, Entity.Delayed.Action.Kill);
+//							Entity.entitiesDebugCount--;
+//						}
 						break;
 					}
 					case Entity.Delayed.Action.ChangeTag:
