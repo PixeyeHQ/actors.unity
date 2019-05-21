@@ -29,6 +29,8 @@ namespace Pixeye.Framework
 			if (property.serializedObject.isEditingMultipleObjects)
 				return;
 
+
+			label.text = "";
 			EditorGUI.BeginProperty(position, label, property);
 			position = EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), label);
 
@@ -80,12 +82,14 @@ namespace Pixeye.Framework
 			var raw = listNames[currentIndex].Split('/');
 			var name = raw[raw.Length - 1];
 
-			var l = new GUIContent(label);
+			var l = label;
+			 
 			l.text = string.Format("{0} [ {1} ]", name, property.intValue);
 
-			if (EditorGUI.DropdownButton(position, l, FocusType.Passive))
+			if (EditorGUI.DropdownButton(position, l, FocusType.Keyboard))
 			{
 				GenericMenu menu = new GenericMenu();
+		    
 				for (var i = 0; i < listNames.Count; i++)
 				{
 					AddMenuItemForTags(menu, listNames[i], i);
