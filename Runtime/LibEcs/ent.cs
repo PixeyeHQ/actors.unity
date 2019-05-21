@@ -129,10 +129,11 @@ namespace Pixeye.Framework
 			return id == other.id && age == other.age;
 		}
 
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public bool Exist()
+	 
+		public bool Exist
 		{
-			return id > -1 && Entity.isAlive[id] && Entity.components[id].ageCache == age;
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			get { return id > -1 && Entity.isAlive[id] && Entity.components[id].ageCache == age; }
 		}
 
 		#endregion
