@@ -25,7 +25,7 @@ namespace Pixeye.Framework
 		[FoldoutGroup("Settings")]
 		public int sizeEntities = 2048;
 		[FoldoutGroup("Settings")]
-		public int sizeComponents = 256;
+		public int sizeComponents = 2048;
 
 		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
 		void PreStart()

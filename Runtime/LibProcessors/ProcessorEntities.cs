@@ -10,7 +10,7 @@ using UnityEngine;
 namespace Pixeye.Framework
 {
 	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
-	sealed class ProcessorEntities : Processor, ITick
+	sealed unsafe class ProcessorEntities : Processor, ITick
 	{
 
 		GroupCore[] groupsChecked = new GroupCore[100];
@@ -55,8 +55,7 @@ namespace Pixeye.Framework
 							var composition = group.composition;
 							if (!composition.CanProceed(entityID)) continue;
 							group.TryRemove(entityID);
-//							var inGroup = HelperArray.BinarySearch(ref group.entities, entityID, 0, group.length);
-//							if (inGroup > -1) group.Remove(inGroup);
+
 						}
 						break;
 					}
@@ -164,8 +163,6 @@ namespace Pixeye.Framework
 
 						Entity.generations[entityID, generation] &= ~mask;
 
-						
-						
 						for (int l = 0; l < storage.lenOfGroups; l++) {
 							var group = storage.groups[l];
 							group.TryRemove(entityID);
@@ -182,16 +179,16 @@ namespace Pixeye.Framework
 							if (inGroup == -1)
 								group.Insert(operation.entity);
 						}
-						ref var components = ref Entity.components[entityID];
+						var components = Entity.components[entityID];
 						
 						
 						components.Remove(operation.arg);
-//						if (components.length == 0)
-//						{
-//							Entity.isAlive[entityID] = false;
-//							Entity.Delayed.Set(operation.entity, 0, Entity.Delayed.Action.Kill);
-//							Entity.entitiesDebugCount--;
-//						}
+						if (components.length == 0)
+						{
+							Entity.isAlive[entityID] = false;
+							Entity.Delayed.Set(operation.entity, 0, Entity.Delayed.Action.Kill);
+							Entity.entitiesDebugCount--;
+						}
 						break;
 					}
 					case Entity.Delayed.Action.ChangeTag:
