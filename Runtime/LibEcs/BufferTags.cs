@@ -34,6 +34,8 @@ namespace Pixeye.Framework
 
 		public byte length;
 
+		public int Length => length;
+		
 		public void Clear()
 		{
 			for (int i = 0; i < length; i++)

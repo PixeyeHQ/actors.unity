@@ -9,7 +9,7 @@ using UnityEngine;
 namespace Pixeye.Framework
 {
 	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
-	public unsafe class Composition : IEquatable<Composition>
+	public class Composition : IEquatable<Composition>
 	{
 
 		internal int[] generations = new int[0];
@@ -77,10 +77,10 @@ namespace Pixeye.Framework
 			return true;
 		}
 
-		internal   bool IncludeTags(int entityID)
+		internal bool IncludeTags(int entityID)
 		{
 			ref var tags = ref Entity.tags[entityID];
-			int len = tags.length;
+			var len = tags.Length;
 
 			if (len == 0) return false;
 			var match = 0;
@@ -101,7 +101,7 @@ namespace Pixeye.Framework
 		internal bool ExcludeTags(int entityID)
 		{
 			ref var tags = ref Entity.tags[entityID];
-			int len = tags.length;
+			var len = tags.Length;
 			if (len == 0) return true;
 
 			for (int l = 0; l < excludeTags.Length; l++)
