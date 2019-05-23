@@ -62,13 +62,16 @@ namespace Pixeye.Framework
 		{
 			tags[index] = (ushort) arg;
 			size[index] = 1;
-		 
+
 			length++;
 		}
 
 		public void Increase(int index)
 		{
-			size[index]++;
+			unchecked
+			{
+				size[index] += 1;
+			}
 		}
 
 		public bool Decrease(int index)
@@ -165,7 +168,7 @@ namespace Pixeye.Framework
 			int len = buffer.length;
 			for (int i = 0; i < len; i++)
 			{
-				buffer.size[i] = 0;
+				buffer.tags[i] = 0;
 			}
 		}
 
@@ -186,14 +189,16 @@ namespace Pixeye.Framework
 
 					return;
 				}
-
-				#if UNITY_EDITOR
-				if (len == BufferTags.Capacity)
-				{
-					throw new Exception("Tags limit reached!");
-				}
-				#endif
 			}
+			
+			
+			#if UNITY_EDITOR
+			if (len == BufferTags.Capacity)
+			{
+				throw new Exception("Tags limit reached!");
+			}
+			#endif
+			
 			buffer.SetElement(buffer.length, tagID);
 			HandleChange(entity, tagID);
 		}
@@ -228,7 +233,7 @@ namespace Pixeye.Framework
 					throw new Exception("Tags limit reached!");
 				}
 				#endif
-	 
+
 				buffer.SetElement(buffer.length, tID);
 				HandleChange(entity, tID);
 			}

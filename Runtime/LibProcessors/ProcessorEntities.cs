@@ -182,6 +182,7 @@ namespace Pixeye.Framework
 						
 						
 						components.Remove(operation.arg);
+						
 						if (components.length == 0)
 						{
 							Entity.isAlive[entityID] = false;
