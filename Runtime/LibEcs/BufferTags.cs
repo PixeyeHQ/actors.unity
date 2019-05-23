@@ -33,8 +33,7 @@ namespace Pixeye.Framework
 		#endif
 
 		public byte length;
-
-		public ref ushort this[int index] => ref GetElementByRef(index);
+ 
 		public int Length => length;
 
 		public void Clear()
@@ -164,11 +163,11 @@ namespace Pixeye.Framework
 
 		public static void Clear(int entityID)
 		{
-			ref var tags = ref Entity.tags[entityID];
-			var len = tags.Length;
+			ref var buffer = ref Entity.tags[entityID];
+			int len = buffer.length;
 			for (int i = 0; i < len; i++)
 			{
-				tags[i] = 0;
+				buffer.size[i] = 0;
 			}
 		}
 
