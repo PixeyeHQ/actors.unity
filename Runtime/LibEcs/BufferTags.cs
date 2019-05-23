@@ -164,15 +164,7 @@ namespace Pixeye.Framework
 			Entity.tags[entity.id].Clear();
 		}
 
-		public static void Clear(int entityID)
-		{
-			ref var buffer = ref Entity.tags[entityID];
-			int len = buffer.length;
-			for (int i = 0; i < len; i++)
-			{
-				buffer.tags[i] = 0;
-			}
-		}
+		 
 
 		public static void Add(in this ent entity, int tagID)
 		{
