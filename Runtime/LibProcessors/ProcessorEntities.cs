@@ -10,7 +10,7 @@ using UnityEngine;
 namespace Pixeye.Framework
 {
 	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
-	sealed class ProcessorEntities : Processor, ITick
+	sealed unsafe class ProcessorEntities : Processor, ITick
 	{
 
 		GroupCore[] groupsChecked = new GroupCore[100];

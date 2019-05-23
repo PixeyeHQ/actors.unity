@@ -6,6 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Unity.Collections.LowLevel.Unsafe;
 using Unity.IL2CPP.CompilerServices;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -31,8 +32,10 @@ namespace Pixeye.Framework
 	}
 
 	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
-	public static class Entity
+	public static unsafe class Entity
 	{
+
+		static readonly int sizeBufferTags = UnsafeUtility.SizeOf<BufferTags>();
 
 		public static int entitiesDebugCount;
 
@@ -46,10 +49,21 @@ namespace Pixeye.Framework
 		public static CoreDB[] db = new CoreDB[SettingsEngine.SizeEntities];
 
 		internal static int[,] generations = new int[SettingsEngine.SizeEntities, SettingsEngine.SizeGenerations];
-		internal static BufferTags[] tags = new BufferTags[SettingsEngine.SizeEntities];
+
+		internal static BufferTags* tags = (BufferTags*) Marshal.AllocHGlobal(sizeBufferTags * SettingsEngine.SizeEntities);
+		//internal static BufferTags[] tags = new BufferTags[SettingsEngine.SizeEntities];
 		internal static BufferComponents[] components = new BufferComponents[SettingsEngine.SizeEntities];
 
 		#region SETUP
+
+		[RuntimeInitializeOnLoadMethod]
+		internal static void Start()
+		{
+			for (int i = 0; i < SettingsEngine.SizeEntities; i++)
+			{
+				tags[i] = new BufferTags();
+			}
+		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal static ent Setup(int id, byte age)
@@ -61,9 +75,15 @@ namespace Pixeye.Framework
 				isPooled.Length = l;
 				HelperArray.ResizeInt(ref generations, l, SettingsEngine.SizeGenerations);
 				Array.Resize(ref db, l);
-				Array.Resize(ref tags, l);
+				tags = (BufferTags*) Marshal.ReAllocHGlobal((IntPtr) tags, (IntPtr) (sizeBufferTags * l));
+				//Array.Resize(ref tags, l);
 				Array.Resize(ref transforms, l);
 				Array.Resize(ref components, l);
+
+				for (int i = counter; i < l; i++)
+				{
+					tags[i] = new BufferTags();
+				}
 
 				counter = l;
 			}
@@ -74,7 +94,6 @@ namespace Pixeye.Framework
 			entitiesDebugCount++;
 			return new ent(id, age);
 		}
- 
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal static void SetupWithTransform(int id, bool pooled, byte age)
@@ -87,9 +106,15 @@ namespace Pixeye.Framework
 
 				HelperArray.ResizeInt(ref generations, l, SettingsEngine.SizeGenerations);
 				Array.Resize(ref db, l);
-				Array.Resize(ref tags, l);
+				tags = (BufferTags*) Marshal.ReAllocHGlobal((IntPtr) tags, (IntPtr) (sizeBufferTags * l));
+				//Array.Resize(ref tags, l);
 				Array.Resize(ref transforms, l);
 				Array.Resize(ref components, l);
+
+				for (int i = counter; i < l; i++)
+				{
+					tags[i] = new BufferTags();
+				}
 
 				counter = l;
 			}
@@ -179,11 +204,9 @@ namespace Pixeye.Framework
 			else
 				id = ent.lastID++;
 
- 
-
 			EntityComposer.Default.entity = Setup(id, age);
 			ref var entity = ref EntityComposer.Default.entity;
-			
+
 			model(EntityComposer.Default);
 			Delayed.Set(entity, 0, Delayed.Action.Activate);
 

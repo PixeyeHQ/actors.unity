@@ -9,7 +9,7 @@ using UnityEngine;
 namespace Pixeye.Framework
 {
 	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
-	public class Composition : IEquatable<Composition>
+	public unsafe class Composition : IEquatable<Composition>
 	{
 
 		internal int[] generations = new int[0];
