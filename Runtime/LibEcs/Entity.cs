@@ -90,7 +90,7 @@ namespace Pixeye.Framework
 
 				counter = l;
 			}
-			tags[id].length = 0;
+
 			components[id].Setup(age);
 			isPooled[id] = false;
 			isAlive[id] = true;
@@ -124,7 +124,6 @@ namespace Pixeye.Framework
 				counter = l;
 			}
 
-			tags[id].length = 0;
 			components[id].Setup(age);
 
 			isAlive[id] = true;

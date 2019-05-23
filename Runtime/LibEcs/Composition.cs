@@ -80,7 +80,7 @@ namespace Pixeye.Framework
 		internal   bool IncludeTags(int entityID)
 		{
 			ref var tags = ref Entity.tags[entityID];
-			var len = tags.Length;
+			int len = tags.length;
 
 			if (len == 0) return false;
 			var match = 0;
@@ -101,7 +101,7 @@ namespace Pixeye.Framework
 		internal bool ExcludeTags(int entityID)
 		{
 			ref var tags = ref Entity.tags[entityID];
-			var len = tags.Length;
+			int len = tags.length;
 			if (len == 0) return true;
 
 			for (int l = 0; l < excludeTags.Length; l++)
