@@ -172,9 +172,8 @@ namespace Pixeye.Framework
 							var group = storage.groupsToRemove[l];
 
 							var composition = group.composition;
-
-							if (!composition.Check(entityID)) continue;
-
+							if (composition.Check(entityID)) continue;
+ 
 							var inGroup = HelperArray.BinarySearch(ref group.entities, entityID, 0, group.length);
 							if (inGroup == -1)
 								group.Insert(operation.entity);
