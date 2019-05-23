@@ -24,6 +24,8 @@ namespace Pixeye.Framework
 
 		public static List<IDisposable> disposables = new List<IDisposable>(64);
 
+		public static Action OnDestroyAction = delegate { };
+
 		/// <summary>
 		/// <para>Creates an object to the toolbox by type.</para> 
 		/// </summary>
@@ -135,12 +137,14 @@ namespace Pixeye.Framework
 			}
 		}
 
-		private void OnDestroy()
+		void OnDestroy()
 		{
 			for (int i = 0; i < disposables.Count; i++)
 			{
 				disposables[i].Dispose();
 			}
+
+			OnDestroyAction();
 		}
 
 	}

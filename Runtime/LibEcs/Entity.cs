@@ -63,6 +63,13 @@ namespace Pixeye.Framework
 			{
 				tags[i] = new BufferTags();
 			}
+
+			Toolbox.OnDestroyAction += Dispose;
+		}
+
+		static void Dispose()
+		{
+			Marshal.FreeHGlobal((IntPtr) tags);
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
