@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Unity.IL2CPP.CompilerServices;
 using UnityEngine;
+
 #if ODIN_INSPECTOR
 using Sirenix.OdinInspector;
 
@@ -51,18 +52,24 @@ namespace Pixeye.Framework
 
 		void OnEnable()
 		{
-			if (!manualRemoved) return;
-			manualRemoved = false;
-			Entity.isAlive[entity.id] = true;
-			Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Activate);
+			unsafe
+			{
+				if (!manualRemoved) return;
+				manualRemoved = false;
+				Entity.utils[entity.id].isAlive = true;
+				Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Activate);
+			}
 		}
 
 		void OnDisable()
 		{
-			if (Toolbox.applicationIsQuitting || !Entity.isAlive[entity.id]) return;
-			manualRemoved = true;
-			Entity.isAlive[entity.id] = false;
-			Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Deactivate);
+			unsafe
+			{
+				if (Toolbox.applicationIsQuitting || !Entity.utils[entity.id].isAlive) return;
+				manualRemoved = true;
+				Entity.utils[entity.id].isAlive = false;
+				Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Deactivate);
+			}
 		}
 
 		#endif
@@ -102,8 +109,8 @@ namespace Pixeye.Framework
 			else
 				id = ent.lastID++;
 
-			entity = new ent(id,age);
-		  Entity.SetupWithTransform(id, isPooled, age);
+			entity = new ent(id, age);
+			Entity.SetupWithTransform(id, isPooled, age);
 
 			#if UNITY_EDITOR
 			_entity = id;
@@ -140,10 +147,9 @@ namespace Pixeye.Framework
 			else
 				id = ent.lastID++;
 
-			
-			entity = new ent(id,age);
+			entity = new ent(id, age);
 			Entity.SetupWithTransform(id, isPooled, age);
-	 
+
 			#if UNITY_EDITOR
 			_entity = id;
 
@@ -179,7 +185,7 @@ namespace Pixeye.Framework
 			else
 				id = ent.lastID++;
 
-			entity = new ent(id,age);
+			entity = new ent(id, age);
 			Entity.SetupWithTransform(id, isPooled, age);
 
 			#if UNITY_EDITOR
@@ -273,7 +279,6 @@ namespace Pixeye.Framework
 			actor.LaunchFrom(model);
 			return actor;
 		}
-		
 
 		public static Actor Create(GameObject prefab, HandleEntityComposer model, bool pooled = false)
 		{
@@ -306,7 +311,7 @@ namespace Pixeye.Framework
 
 			return actor;
 		}
-		
+
 		public static Actor Create(GameObject prefab, Vector3 position, bool pooled = false)
 		{
 			var tr = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefab, position) : HelperFramework.SpawnInternal(prefab, position);
@@ -317,7 +322,6 @@ namespace Pixeye.Framework
 
 			return actor;
 		}
-		
 
 		public static Actor Create(GameObject prefab, bool pooled = false)
 		{

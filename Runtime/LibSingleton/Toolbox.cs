@@ -144,6 +144,12 @@ namespace Pixeye.Framework
 				disposables[i].Dispose();
 			}
 
+	 
+		}
+
+		protected override void OnApplicationQuit()
+		{
+			base.OnApplicationQuit();
 			OnDestroyAction();
 		}
 

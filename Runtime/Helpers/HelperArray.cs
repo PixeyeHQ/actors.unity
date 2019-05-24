@@ -78,7 +78,7 @@ namespace Pixeye.Framework
 			while (left<=right)
 			{
 				var m = (left + right) / 2;
-				if (entries[m] == value) return m;
+				if (entries[m].id == value) return m;
 				if (entries[m].id < value) left = m + 1;
 				else right = m - 1;
 			}

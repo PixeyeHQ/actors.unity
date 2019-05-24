@@ -2,7 +2,7 @@
 // Contacts : Pix - info@pixeye.games
 //     Date : 3/16/2019 
 
-using System;
+ 
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -12,7 +12,7 @@ using UnityEngine;
 namespace Pixeye.Framework
 {
 	[StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Unicode)]
-	public readonly struct ent
+	public unsafe readonly struct ent
 	{
 
 		internal static Queue<ent> entityStack = new Queue<ent>(0);
@@ -98,7 +98,7 @@ namespace Pixeye.Framework
 
 		public void Unbind()
 		{
-			Entity.isAlive[id] = false;
+			Entity.utils[id].isAlive = false;
 			Entity.Delayed.Set(this, 0, Entity.Delayed.Action.Unbind);
 			Entity.entitiesDebugCount--;
 		}
@@ -106,13 +106,13 @@ namespace Pixeye.Framework
 		public void Release()
 		{
 			#if UNITY_EDITOR
-			if (!Entity.isAlive[id]) {
+			if (!Entity.utils[id].isAlive) {
 				Debug.LogError($"Entity with id [{id}]  already destroyed.");
 				return;
 			}
 			#endif
 
-			Entity.isAlive[id] = false;
+			Entity.utils[id].isAlive = false;
 			Entity.Delayed.Set(this, 0, Entity.Delayed.Action.Kill);
 			Entity.entitiesDebugCount--;
 		}
@@ -120,7 +120,7 @@ namespace Pixeye.Framework
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public bool EqualsAndExist(ent other)
 		{
-			return id > -1 && Entity.isAlive[id] && this.id == other.id && this.age == other.age;
+			return id > -1 && Entity.utils[id].isAlive && this.id == other.id && this.age == other.age;
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -133,7 +133,7 @@ namespace Pixeye.Framework
 		public bool Exist
 		{
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			get { return id > -1 && Entity.isAlive[id] && Entity.components[id].ageCache == age; }
+			get { return id > -1 && Entity.utils[id].isAlive && Entity.utils[id].ageCache == age; }
 		}
 
 		#endregion

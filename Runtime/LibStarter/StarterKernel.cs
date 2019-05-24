@@ -22,18 +22,6 @@ namespace Pixeye.Framework
 		[FoldoutGroup("SetupData")]
 		public List<Pluggable> pluggables = new List<Pluggable>();
 
-		[FoldoutGroup("Settings")]
-		public int sizeEntities = 2048;
-		[FoldoutGroup("Settings")]
-		public int sizeComponents = 256;
-
-		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-		void PreStart()
-		{
-			SettingsEngine.SizeEntities = sizeEntities;
-			SettingsEngine.SizeComponents = sizeComponents;
-		}
-
 		void Awake()
 		{
 			if (ProcessorUpdate.Default == null)

@@ -12,25 +12,16 @@ namespace Pixeye.Framework
 
 		public ushort[] ids;
 		public byte length;
-		public byte ageCache;  // caching age of entity for retrivieng it in future. ( ParseBy method )
 
-		public ref ushort Get(int id)
+		public int Get(int id)
 		{
-			return ref ids[id];
+			return ids[id];
 		}
 
 		public BufferComponents(int size)
 		{
 			ids = new ushort[size];
 			length = 0;
-			ageCache = 0;
-		}
-
-		public void Setup(byte ageCache)
-		{
-			length = 0;
-			this.ageCache = ageCache;
-			if (ids == null) ids = new ushort[1];
 		}
 
 		public void Clear()
@@ -38,7 +29,6 @@ namespace Pixeye.Framework
 			length = 0;
 		}
 
-		
 		public void Add(int type)
 		{
 			if (length == ids.Length)
@@ -73,6 +63,6 @@ namespace Pixeye.Framework
 		{
 			ids[index] = (ushort) arg;
 		}
-  
+
 	}
 }

@@ -18,7 +18,8 @@ namespace Pixeye.Framework
 
 		bool AlreadyChecked(GroupCore group)
 		{
-			for (int i = 0; i < groupsCheckedLen; i++) {
+			for (int i = 0; i < groupsCheckedLen; i++)
+			{
 				if (groupsChecked[i].id == group.id) return true;
 			}
 
@@ -31,11 +32,13 @@ namespace Pixeye.Framework
 
 			if (Entity.Delayed.len == 0) return;
 
-			for (int i = 0; i < Entity.Delayed.len; i++) {
+			for (int i = 0; i < Entity.Delayed.len; i++)
+			{
 				ref var operation = ref Entity.Delayed.operations[i];
 				var entityID = operation.entity.id;
 
-				switch (operation.action) {
+				switch (operation.action)
+				{
 					case Entity.Delayed.Action.Add:
 					{
 						var componentID = operation.arg;
@@ -43,14 +46,16 @@ namespace Pixeye.Framework
 
 						Entity.components[entityID].Add(componentID);
 
-						for (int l = 0; l < storage.lenOfGroups; l++) {
+						for (int l = 0; l < storage.lenOfGroups; l++)
+						{
 							var group = storage.groups[l];
 							var composition = group.composition;
 							if (!composition.Check(entityID)) continue;
 							group.Insert(operation.entity);
 						}
 
-						for (int l = 0; l < storage.lenOfGroupsToRemove; l++) {
+						for (int l = 0; l < storage.lenOfGroupsToRemove; l++)
+						{
 							var group = storage.groupsToRemove[l];
 							var composition = group.composition;
 							if (!composition.CanProceed(entityID)) continue;
@@ -65,7 +70,8 @@ namespace Pixeye.Framework
 						ref var components = ref Entity.components[entityID];
 						var length = components.length;
 
-						for (int j = 0; j < length; j++) {
+						for (int j = 0; j < length; j++)
+						{
 							var componentID = components.Get(j);
 							var generation = Storage.generations[componentID];
 							var mask = Storage.masks[componentID];
@@ -74,10 +80,12 @@ namespace Pixeye.Framework
 
 							var storage = Storage.all[componentID];
 
-							for (int l = 0; l < storage.lenOfGroups; l++) {
+							for (int l = 0; l < storage.lenOfGroups; l++)
+							{
 								var group = storage.groups[l];
 
-								if (!AlreadyChecked(group)) {
+								if (!AlreadyChecked(group))
+								{
 									if (group.composition.OverlapComponents(components))
 										group.TryRemove(entityID);
 
@@ -91,7 +99,8 @@ namespace Pixeye.Framework
 
 						groupsCheckedLen = 0;
 
-						for (int j = 0; j < components.length; j++) {
+						for (int j = 0; j < components.length; j++)
+						{
 							var cID = (int) components.ids[j];
 							Storage.all[cID].DisposeComponent(entityID);
 						}
@@ -99,7 +108,7 @@ namespace Pixeye.Framework
 						components.length = 0;
 
 						if (Entity.transforms.Length > entityID && Entity.transforms[entityID] != null)
-							Entity.transforms[entityID].gameObject.Release(Entity.isPooled[entityID] ? Pool.Entities : 0);
+							Entity.transforms[entityID].gameObject.Release(Entity.utils[entityID].isPooled ? Pool.Entities : 0);
 
 						Entity.tags[entityID].Clear();
 
@@ -119,7 +128,8 @@ namespace Pixeye.Framework
 						ref var components = ref Entity.components[entityID];
 						var length = components.length;
 
-						for (int j = 0; j < length; j++) {
+						for (int j = 0; j < length; j++)
+						{
 							var componentID = components.Get(j);
 							var generation = Storage.generations[componentID];
 							var mask = Storage.masks[componentID];
@@ -128,9 +138,11 @@ namespace Pixeye.Framework
 
 							var storage = Storage.all[componentID];
 
-							for (int l = 0; l < storage.lenOfGroups; l++) {
+							for (int l = 0; l < storage.lenOfGroups; l++)
+							{
 								var group = storage.groups[l];
-								if (!AlreadyChecked(group)) {
+								if (!AlreadyChecked(group))
+								{
 									if (group.composition.OverlapComponents(components))
 										group.TryRemove(entityID);
 
@@ -144,7 +156,8 @@ namespace Pixeye.Framework
 
 						groupsCheckedLen = 0;
 
-						for (int j = 0; j < components.length; j++) {
+						for (int j = 0; j < components.length; j++)
+						{
 							var cID = (int) components.ids[j];
 							Storage.all[cID].DisposeComponent(entityID);
 						}
@@ -164,26 +177,25 @@ namespace Pixeye.Framework
 
 						Entity.generations[entityID, generation] &= ~mask;
 
-						
-						
-						for (int l = 0; l < storage.lenOfGroups; l++) {
+						for (int l = 0; l < storage.lenOfGroups; l++)
+						{
 							var group = storage.groups[l];
 							group.TryRemove(entityID);
 						}
 
-						for (int l = 0; l < storage.lenOfGroupsToRemove; l++) {
+						for (int l = 0; l < storage.lenOfGroupsToRemove; l++)
+						{
 							var group = storage.groupsToRemove[l];
 
 							var composition = group.composition;
 							if (composition.Check(entityID)) continue;
- 
+
 							var inGroup = HelperArray.BinarySearch(ref group.entities, entityID, 0, group.length);
 							if (inGroup == -1)
 								group.Insert(operation.entity);
 						}
 						ref var components = ref Entity.components[entityID];
-						
-						
+
 						components.Remove(operation.arg);
 //						if (components.length == 0)
 //						{
@@ -195,12 +207,13 @@ namespace Pixeye.Framework
 					}
 					case Entity.Delayed.Action.ChangeTag:
 					{
-						if (!Entity.isAlive[entityID]) continue;
+						if (!Entity.utils[entityID].isAlive) continue;
 
 						var index = operation.arg;
 						var groups = HelperTags.inUseGroups.groupStorage[index];
 
-						for (int l = 0; l < groups.len; l++) {
+						for (int l = 0; l < groups.len; l++)
+						{
 							var group = groups.storage[l];
 
 							var composition = group.composition;
@@ -208,10 +221,12 @@ namespace Pixeye.Framework
 
 							var inGroup = HelperArray.BinarySearch(ref group.entities, entityID, 0, group.length);
 
-							if (inGroup == -1 && canBeAdded) {
+							if (inGroup == -1 && canBeAdded)
+							{
 								group.Insert(operation.entity);
 							}
-							else if (inGroup > -1 && !canBeAdded) {
+							else if (inGroup > -1 && !canBeAdded)
+							{
 								group.Remove(inGroup);
 							}
 						}
@@ -223,15 +238,17 @@ namespace Pixeye.Framework
 						ref var components = ref Entity.components[entityID];
 						var length = components.length;
 
-						for (int j = 0; j < length; j++) {
-							ref var componentID = ref components.Get(j);
+						for (int j = 0; j < length; j++)
+						{
+							var componentID = components.Get(j);
 							var generation = Storage.generations[componentID];
 							var mask = Storage.masks[componentID];
 							var storage = Storage.all[operation.arg];
 							Entity.generations[entityID, generation] |= mask;
 							storage = Storage.all[componentID];
 
-							for (int l = 0; l < storage.lenOfGroups; l++) {
+							for (int l = 0; l < storage.lenOfGroups; l++)
+							{
 								var group = storage.groups[l];
 								var composition = group.composition;
 								if (!composition.Check(entityID)) continue;
@@ -247,15 +264,17 @@ namespace Pixeye.Framework
 						var length = componenets.length;
 						var storage = Storage.all[operation.arg];
 
-						for (int j = 0; j < length; j++) {
-							ref var componentID = ref componenets.Get(j);
+						for (int j = 0; j < length; j++)
+						{
+							var componentID = componenets.Get(j);
 							var generation = Storage.generations[componentID];
 							var mask = Storage.masks[componentID];
 
 							Entity.generations[entityID, generation] &= ~mask;
 
 							storage = Storage.all[componentID];
-							for (int l = 0; l < storage.lenOfGroups; l++) {
+							for (int l = 0; l < storage.lenOfGroups; l++)
+							{
 								var group = storage.groups[l];
 								group.TryRemove(entityID);
 							}

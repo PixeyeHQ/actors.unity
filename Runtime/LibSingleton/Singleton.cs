@@ -66,7 +66,7 @@ namespace Pixeye.Framework
 			applicationIsQuitting = true;
 		}
 
-		void OnApplicationQuit()
+		virtual protected void OnApplicationQuit()
 		{
 			applicationIsQuitting = true;
 		}

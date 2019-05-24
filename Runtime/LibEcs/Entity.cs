@@ -31,45 +31,79 @@ namespace Pixeye.Framework
 
 	}
 
+	public struct Utils
+	{
+
+		public bool isAlive;
+		public bool isPooled;
+		public byte ageCache; // caching age of entity for retrivieng it in future. ( ParseBy method )
+
+	}
+
+	public readonly struct bitBool
+	{
+
+		public readonly byte Arg;
+
+		public bitBool(int val)
+		{
+			Arg = (byte) val;
+		}
+
+		static public implicit operator bool(bitBool value)
+		{
+			return value.Arg == 1;
+		}
+
+		static public implicit operator bitBool(bool value)
+		{
+			return new bitBool(value ? 1 : 0);
+		}
+
+	}
+
 	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
 	public static unsafe class Entity
 	{
 
-		static readonly int sizeBufferTags = UnsafeUtility.SizeOf<BufferTags>();
-
 		public static int entitiesDebugCount;
-
-		internal static int counter = SettingsEngine.SizeEntities;
-		internal static readonly int self = "self".GetHashCode();
-
-		internal static BitArray isAlive = new BitArray(SettingsEngine.SizeEntities);
-		internal static BitArray isPooled = new BitArray(SettingsEngine.SizeEntities);
 
 		public static Transform[] transforms = new Transform[SettingsEngine.SizeEntities];
 		public static CoreDB[] db = new CoreDB[SettingsEngine.SizeEntities];
 
+		static readonly int sizeBufferTags = UnsafeUtility.SizeOf<BufferTags>();
+		static readonly int sizeUtils = UnsafeUtility.SizeOf<Utils>();
+
+		internal static int counter = SettingsEngine.SizeEntities;
+		internal static readonly int self = "self".GetHashCode();
+		
 		internal static int[,] generations = new int[SettingsEngine.SizeEntities, SettingsEngine.SizeGenerations];
+	
+		internal static BufferComponents[] components;
+		internal static BufferTags* tags;
+		internal static Utils* utils;
+		//	internal static BufferComponents* components;
+		//===============================//
+		// Initialize 
+		//===============================//
 
-		internal static BufferTags* tags = (BufferTags*) Marshal.AllocHGlobal(sizeBufferTags * SettingsEngine.SizeEntities);
-		//internal static BufferTags[] tags = new BufferTags[SettingsEngine.SizeEntities];
-		internal static BufferComponents[] components = new BufferComponents[SettingsEngine.SizeEntities];
-
-		#region SETUP
-
-		[RuntimeInitializeOnLoadMethod]
+		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
 		internal static void Start()
 		{
+			components = new BufferComponents[SettingsEngine.SizeEntities];
+			tags = (BufferTags*) UnmanagedMemory.Alloc(sizeBufferTags * SettingsEngine.SizeEntities);
+			utils = (Utils*) UnmanagedMemory.Alloc(sizeUtils * SettingsEngine.SizeEntities);
+
 			for (int i = 0; i < SettingsEngine.SizeEntities; i++)
 			{
 				tags[i] = new BufferTags();
+				utils[i] = new Utils();
+				components[i] = new BufferComponents(1);
 			}
 
+			#if UNITY_EDITOR
 			Toolbox.OnDestroyAction += Dispose;
-		}
-
-		static void Dispose()
-		{
-			Marshal.FreeHGlobal((IntPtr) tags);
+			#endif
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -78,26 +112,30 @@ namespace Pixeye.Framework
 			if (id >= counter)
 			{
 				var l = id << 1;
-				isAlive.Length = l;
-				isPooled.Length = l;
 				HelperArray.ResizeInt(ref generations, l, SettingsEngine.SizeGenerations);
 				Array.Resize(ref db, l);
-				tags = (BufferTags*) Marshal.ReAllocHGlobal((IntPtr) tags, (IntPtr) (sizeBufferTags * l));
-				//Array.Resize(ref tags, l);
+
 				Array.Resize(ref transforms, l);
 				Array.Resize(ref components, l);
+				tags = (BufferTags*) UnmanagedMemory.ReAlloc(tags, sizeBufferTags * l);
+				utils = (Utils*) UnmanagedMemory.ReAlloc(utils, sizeUtils * l);
 
 				for (int i = counter; i < l; i++)
 				{
 					tags[i] = new BufferTags();
+					utils[i] = new Utils();
+					components[i] = new BufferComponents(1);
 				}
 
 				counter = l;
 			}
 
-			components[id].Setup(age);
-			isPooled[id] = false;
-			isAlive[id] = true;
+			components[id].length = 0;
+
+			utils[id].ageCache = age;
+			utils[id].isAlive = true;
+			utils[id].isPooled = false;
+
 			entitiesDebugCount++;
 			return new ent(id, age);
 		}
@@ -108,28 +146,32 @@ namespace Pixeye.Framework
 			if (id >= counter)
 			{
 				var l = id << 1;
-				isAlive.Length = l;
-				isPooled.Length = l;
 
 				HelperArray.ResizeInt(ref generations, l, SettingsEngine.SizeGenerations);
 				Array.Resize(ref db, l);
-				tags = (BufferTags*) Marshal.ReAllocHGlobal((IntPtr) tags, (IntPtr) (sizeBufferTags * l));
-				//Array.Resize(ref tags, l);
+
 				Array.Resize(ref transforms, l);
 				Array.Resize(ref components, l);
+
+				tags = (BufferTags*) UnmanagedMemory.ReAlloc(tags, sizeBufferTags * l);
+				utils = (Utils*) UnmanagedMemory.ReAlloc(utils, sizeUtils * l);
 
 				for (int i = counter; i < l; i++)
 				{
 					tags[i] = new BufferTags();
+					utils[i] = new Utils();
+					components[i] = new BufferComponents(1);
 				}
 
 				counter = l;
 			}
 
-			components[id].Setup(age);
+			components[id].length = 0;
 
-			isAlive[id] = true;
-			isPooled[id] = pooled;
+			utils[id].ageCache = age;
+			utils[id].isAlive = true;
+			utils[id].isPooled = pooled;
+
 			entitiesDebugCount++;
 		}
 
@@ -138,8 +180,6 @@ namespace Pixeye.Framework
 		{
 			Entity.db[entity.id] = db;
 		}
-
-		#endregion
 
 		public static ent Create()
 		{
@@ -453,6 +493,7 @@ namespace Pixeye.Framework
 			return entity;
 		}
 		#endif
+
 		public static void RenameGameobject(this ent entity)
 		{
 			var tr = transforms[entity.id];
@@ -477,7 +518,7 @@ namespace Pixeye.Framework
 				index = index * 10 + (name[i] - '0');
 			#endif
 
-			return new ent(index, components[index].ageCache);
+			return new ent(index, utils[index].ageCache);
 		}
 		#endif
 
@@ -547,7 +588,7 @@ namespace Pixeye.Framework
 			var entityID = entity.id;
 
 			#if UNITY_EDITOR
-			if (!isAlive[entity.id])
+			if (!utils[entity.id].isAlive)
 			{
 				Debug.LogError($"-> Entity with id: [{entityID}] is not active. You should not add components to inactive entity. ");
 				return default;
@@ -637,12 +678,13 @@ namespace Pixeye.Framework
 			return transforms[entity].GetChild(index1).GetChild(index2).GetChild(index3).GetChild(index4).GetComponent<T>();
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static T Get<T>(this in ent entity, string path)
 		{
 			return transforms[entity].Find(path).GetComponent<T>();
 		}
 
-		[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static T Get<T>(this in ent entity, in int[] path)
 		{
 			var transform = transforms[entity];
@@ -653,7 +695,7 @@ namespace Pixeye.Framework
 			return transform.GetComponent<T>();
 		}
 
-		[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal static Component Get(this in ent entity, in int[] path, Type t)
 		{
 			var transform = transforms[entity];
@@ -665,6 +707,7 @@ namespace Pixeye.Framework
 		}
 
 		#endregion
+
 		#region TRANSFORMS
 
 		/// <summary>
@@ -672,19 +715,16 @@ namespace Pixeye.Framework
 		/// </summary>
 		/// <param name="entity"></param>
 		/// <returns>Returns the transform linked to the entity.</returns>
-		[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
 		public static Transform transform(this in ent entity, int index)
 		{
 			return transforms[entity].GetChild(index);
 		}
 
-		[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
 		public static Transform transform(this in ent entity, int index1, int index2)
 		{
 			return transforms[entity].GetChild(index1).GetChild(index2);
 		}
 
-		[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
 		public static Transform transform(this in ent entity, int index1, int index2, int index3)
 		{
 			return transforms[entity].GetChild(index1).GetChild(index2).GetChild(index3);
@@ -706,6 +746,12 @@ namespace Pixeye.Framework
 		}
 
 		#endregion
+
+		static void Dispose()
+		{
+			UnmanagedMemory.Cleanup();
+		}
+
 		public static class Delayed
 		{
 
