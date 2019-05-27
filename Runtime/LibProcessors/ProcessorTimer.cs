@@ -1,4 +1,4 @@
-//  Project : unity.imgui
+//  Project : ecs
 // Contacts : Pix - ask@pixeye.games
 
 using System;

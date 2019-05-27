@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using Unity.IL2CPP.CompilerServices;
 using UnityEngine;
 
@@ -30,7 +31,7 @@ namespace Pixeye.Framework
 	}
 
 	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
-	public abstract class GroupCore : IEnumerable, IEquatable<GroupCore>, IDisposable
+	public unsafe abstract class GroupCore : IEnumerable, IEquatable<GroupCore>, IDisposable
 	{
 
 		static int idCounter;
@@ -40,12 +41,19 @@ namespace Pixeye.Framework
 		public EntityAction onAdd;
 		public EntityAction onRemove;
 
-		public ref ent this[int index] => ref entities[index];
+		public ref ent this[int index]
+		{
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			get
+			{
+				return ref entities[index];
+			}
+		}
 		public ent[] entities = new ent[SettingsEngine.SizeEntities];
-
+		//public int[] entitiesID = new int[SettingsEngine.SizeEntities];
 		int position;
 
-		internal Composition composition;
+		protected internal Composition composition;
 		internal int id;
 
 		public void Release(int index)
@@ -70,31 +78,39 @@ namespace Pixeye.Framework
 			var indexLast = length++;
 
 			if (length >= entities.Length)
+			{
 				Array.Resize(ref entities, length << 1);
-
+				//Array.Resize(ref entitiesID, length << 1);
+			}
 			var pointer = indexLast;
 			var index = indexLast - 1;
 
-			if (index >= 0) {
-				if (entityID < entities[index].id) {
+			if (index >= 0)
+			{
+				if (entityID < entities[index].id)
+				{
 					var startIndex = 0;
 					var endIndex = indexLast;
 
-					while (endIndex > startIndex) {
+					while (endIndex > startIndex)
+					{
 						var middleIndex = (endIndex + startIndex) / 2;
 						var middleValue = entities[middleIndex].id;
 
-						if (middleValue == entityID) {
+						if (middleValue == entityID)
+						{
 							pointer = middleIndex;
 
 							break;
 						}
 
-						if (middleValue < entityID) {
+						if (middleValue < entityID)
+						{
 							startIndex = middleIndex + 1;
 							pointer = startIndex;
 						}
-						else {
+						else
+						{
 							endIndex = middleIndex;
 							pointer = endIndex;
 						}
@@ -103,22 +119,32 @@ namespace Pixeye.Framework
 			}
 
 			for (int i = indexLast; i >= pointer; i--)
+			{
 				entities[i + 1] = entities[i];
+				//entitiesID[i + 1] = entities[i].id;
+			}
 
 			entities[pointer] = entity;
+			//entitiesID[pointer] = entity.id;
+
+			UpdateComponents(pointer);
 
 			if (onAdd != null) onAdd(entity);
 		}
 
-		internal void TryRemove(int entityID)
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public virtual void UpdateComponents(int poiner) { }
+
+		internal unsafe void TryRemove(int entityID)
 		{
 			var i = HelperArray.BinarySearch(ref entities, entityID, 0, length);
-		 
 			if (i == -1) return;
 			if (onRemove != null) onRemove(entities[i]);
-		 
+
 			Array.Copy(entities, i + 1, entities, i, length-- - i);
 		}
+
+		int size = sizeof(int);
 
 		internal void Remove(int i)
 		{
@@ -131,25 +157,12 @@ namespace Pixeye.Framework
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public int GetIndex(int id)
 		{
-			for (int i = 0; i < length; i++) {
+			for (int i = 0; i < length; i++)
+			{
 				if (entities[i].id == id) return i;
 			}
 
 			return -1;
-		}
-
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public bool next(out ent entity)
-		{
-			if (length == 0) {
-				entity = -1;
-				return false;
-			}
-			if (position == length)
-				position = 0;
-
-			entity = entities[position++];
-			return true;
 		}
 
 		public GroupCore()
@@ -198,7 +211,7 @@ namespace Pixeye.Framework
 
 		public Enumerator GetEnumerator()
 		{
-			return new Enumerator(entities, length);
+			return new Enumerator(this, length);
 		}
 
 		IEnumerator IEnumerable.GetEnumerator()
@@ -209,15 +222,16 @@ namespace Pixeye.Framework
 		public struct Enumerator : IEnumerator<ent>
 		{
 
-			ent[] entities;
+			GroupCore g;
 			int position;
 			int length;
 
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			internal Enumerator(ent[] entities, int length)
+			internal Enumerator(GroupCore g, int length)
 			{
 				position = -1;
-				this.entities = entities;
+				this.g = g;
+				//	this.entities = entities;
 				this.length = length;
 			}
 
@@ -238,7 +252,10 @@ namespace Pixeye.Framework
 			public ent Current
 			{
 				[MethodImpl(MethodImplOptions.AggressiveInlining)]
-				get { return entities[position]; }
+				get
+				{
+					return g.entities[position];
+				}
 			}
 
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -250,7 +267,7 @@ namespace Pixeye.Framework
 
 	}
 
-	public sealed class Group<T> : GroupCore
+	public class Group<T> : GroupCore
 	{
 
 		public override void Initialize()

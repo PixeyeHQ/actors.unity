@@ -14,8 +14,10 @@ using System.Runtime.CompilerServices;
   	}
   	
     #region HELPERS
-    static partial class HelperComponents
+    static partial class Components
     {
+    
+            public const string ##NAME2## = "##NAMESPACE2##.##NAME##";
     
         	[RuntimeInitializeOnLoadMethod]
     		static void ##NAME##Init()
@@ -32,9 +34,9 @@ using System.Runtime.CompilerServices;
     
     		 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            internal static ##NAME## ##NAME##(in this ent entity)
+            internal static ref ##NAME## ##NAME##(in this ent entity)
             {
-               return Storage<##NAME##>.Instance.components[entity.id];
+               return ref Storage<##NAME##>.Instance.components[entity.id];
             }
     }
     #endregion

@@ -2,6 +2,7 @@
 //  Contacts : Pixeye - ask@pixeye.games
 
 using System;
+using UnityEngine;
 
 namespace Pixeye.Framework
 {
@@ -29,5 +30,11 @@ namespace Pixeye.Framework
 		{
 		}
 
+		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+		static void Initialize()
+		{
+			SettingsEngine.SizeEntities = 200000;
+		}
+		
 	}
 }

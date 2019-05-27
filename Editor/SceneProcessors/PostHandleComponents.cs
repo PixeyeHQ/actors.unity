@@ -64,7 +64,10 @@ namespace Pixeye.Framework
 
 			templateContents = templateContents.Replace("##NAMESPACE##", string.Format($"{Environment.NewLine}namespace {DataFramework.nameSpace}"));
 			templateContents = templateContents.Replace("##NAME##", className);
-
+			
+			
+			templateContents = templateContents.Replace("##NAMESPACE2##", string.Format($"{DataFramework.nameSpace}"));
+			templateContents = templateContents.Replace("##NAME2##", string.Format($"{className.Replace("Component","")}"));
 			var encoding = new UTF8Encoding(true, false);
 
 			using (var tc = new StreamWriter(filePath, false, encoding))

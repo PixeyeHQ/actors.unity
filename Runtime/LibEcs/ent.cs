@@ -2,7 +2,6 @@
 // Contacts : Pix - info@pixeye.games
 //     Date : 3/16/2019 
 
- 
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -15,15 +14,18 @@ namespace Pixeye.Framework
 	public unsafe readonly struct ent
 	{
 
-		internal static Queue<ent> entityStack = new Queue<ent>(0);
+		internal static Queue<ent> entityStack = new Queue<ent>(SettingsEngine.SizeEntities);
 		internal static int entityStackLength;
 		internal static int lastID;
 
 		public readonly int id;
 		internal readonly byte age;
 
-		public ref readonly Transform transform => ref Entity.transforms[id];
-		//public ref readonly BufferTags tags => ref Entity.tags[id];
+		public ref readonly Transform transform
+		{
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			get => ref Entity.transforms[id];
+		}
 
 		#region ENTITY
 
@@ -106,7 +108,8 @@ namespace Pixeye.Framework
 		public void Release()
 		{
 			#if UNITY_EDITOR
-			if (!Entity.utils[id].isAlive) {
+			if (!Entity.utils[id].isAlive)
+			{
 				Debug.LogError($"Entity with id [{id}]  already destroyed.");
 				return;
 			}
@@ -129,11 +132,13 @@ namespace Pixeye.Framework
 			return id == other.id && age == other.age;
 		}
 
-	 
 		public bool Exist
 		{
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			get { return id > -1 && Entity.utils[id].isAlive && Entity.utils[id].ageCache == age; }
+			get
+			{
+				return id > -1 && Entity.utils[id].isAlive && Entity.utils[id].ageCache == age;
+			}
 		}
 
 		#endregion

@@ -12,13 +12,13 @@ namespace Pixeye.Framework
 	public unsafe class Composition : IEquatable<Composition>
 	{
 
-		internal int[] generations = new int[0];
-		internal int[] ids = new int[0];
+		public int[] generations = new int[0];
+		public int[] ids = new int[0];
 
 		internal int[] includeTags = new int[0];
 		internal int[] excludeTags = new int[0];
 
-		internal bool[] includeComponents = new bool[SettingsEngine.SizeComponents];
+		public bool[] includeComponents = new bool[SettingsEngine.SizeComponents];
 		internal bool[] excludeComponents = new bool[SettingsEngine.SizeComponents];
 
 		internal HashCode hash;

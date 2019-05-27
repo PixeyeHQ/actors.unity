@@ -1,11 +1,8 @@
-/*===============================================================
-Product:    Cryoshock
-Developer:  Dimitry Pixeye - pixeye@hbrew.store
-Company:    Homebrew - http://hbrew.store
-Date:       5/14/2018  6:34 PM
-================================================================*/
+//  Project : ecs.unity.structs
+// Contacts : Pix - ask@pixeye.games
 
 using System;
+using System.Collections.Generic;
 
 namespace Pixeye.Framework
 {
@@ -20,16 +17,36 @@ namespace Pixeye.Framework
 			this.filter = filter;
 		}
 
-		public GroupExcludeAttribute(params Type[] filterType)
+		public GroupExcludeAttribute(params object[] args)
 		{
-			this.filterType = new int[filterType.Length];
-
-			for (int i = 0; i < filterType.Length; i++)
+			List<int> f = new List<int>();
+			List<int> fType = new List<int>();
+			for (int i = 0; i < args.Length; i++)
 			{
-				this.filterType[i] = Storage.allDict[filterType[i].GetHashCode()].GetComponentID();
+				var o = args[i];
+				if (o is string)
+				{
+					fType.Add(Storage.allDict[ByName(o.ToString()).GetHashCode()].GetComponentID());
+				}
+				else f.Add((int) o);
 			}
+
+			filterType = fType.ToArray();
+			filter = f.ToArray();
 		}
- 
+
+		public static Type ByName(string name)
+		{
+			foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+			{
+				var tt = assembly.GetType(name);
+				if (tt != null)
+				{
+					return tt;
+				}
+			}
+			return null;
+		}
 
 	}
 }

@@ -3,6 +3,7 @@
 //     Date : 3/7/2019 
 
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Unity.IL2CPP.CompilerServices;
 using UnityEngine;
@@ -60,8 +61,6 @@ namespace Pixeye.Framework
 							var composition = group.composition;
 							if (!composition.CanProceed(entityID)) continue;
 							group.TryRemove(entityID);
-//							var inGroup = HelperArray.BinarySearch(ref group.entities, entityID, 0, group.length);
-//							if (inGroup > -1) group.Remove(inGroup);
 						}
 						break;
 					}
@@ -197,12 +196,7 @@ namespace Pixeye.Framework
 						ref var components = ref Entity.components[entityID];
 
 						components.Remove(operation.arg);
-//						if (components.length == 0)
-//						{
-//							Entity.isAlive[entityID] = false;
-//							Entity.Delayed.Set(operation.entity, 0, Entity.Delayed.Action.Kill);
-//							Entity.entitiesDebugCount--;
-//						}
+
 						break;
 					}
 					case Entity.Delayed.Action.ChangeTag:
@@ -221,8 +215,9 @@ namespace Pixeye.Framework
 
 							var inGroup = HelperArray.BinarySearch(ref group.entities, entityID, 0, group.length);
 
-							if (inGroup == -1 && canBeAdded)
+							if (inGroup == -1)
 							{
+								if (!canBeAdded) continue;
 								group.Insert(operation.entity);
 							}
 							else if (inGroup > -1 && !canBeAdded)

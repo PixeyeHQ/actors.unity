@@ -9,6 +9,7 @@ using Sirenix.OdinInspector;
 #endif
 using System.Collections.Generic;
 using System.Linq;
+using Pixeye.Source;
 using UnityEngine;
 
 namespace Pixeye.Framework
@@ -159,6 +160,7 @@ namespace Pixeye.Framework
 				Toolbox.Add(factory);
 			}
 
+			Add<ProcessorObserver>();
 			Add<ProcessorEntities>();
 
 			Setup();
