@@ -2,15 +2,13 @@
 // Contacts : Pix - ask@pixeye.games
 
 using System;
-using System.Collections.Generic;
-using UnityEngine;
-
+ 
 namespace Pixeye.Framework
 {
 	public sealed class BufferObject<T> where T : class
 	{
 
-		public static BufferObject<T> Instance = new BufferObject<T>();
+		public static BufferObject<T> Default = new BufferObject<T>();
 		public static Func<T> creator;
 
 		public T[] source = new T[12];
@@ -37,7 +35,7 @@ namespace Pixeye.Framework
 
 		public static T Add()
 		{
-			var source = Instance;
+			var source = Default;
 			if (source.length == source.source.Length)
 				Array.Resize(ref source.source, source.length << 1);
 
@@ -50,7 +48,7 @@ namespace Pixeye.Framework
 
 		public static T Create()
 		{
-			var source = Instance;
+			var source = Default;
 			if (source.length == source.source.Length)
 				Array.Resize(ref source.source, source.length << 1);
 
@@ -63,7 +61,7 @@ namespace Pixeye.Framework
 
 		public static void Deploy()
 		{
-			Instance.length++;
+			Default.length++;
 		}
 
 	}

@@ -2,6 +2,7 @@
 // Contacts : Pix - ask@pixeye.games
 
 using System;
+ 
 
 namespace Pixeye.Framework
 {
@@ -34,6 +35,14 @@ namespace Pixeye.Framework
 		public void SetElement(int index, ref T arg)
 		{
 			source[index] = arg;
+		}
+
+		public ref T Add()
+		{
+			if (length == source.Length)
+				Array.Resize(ref source, length << 1);
+
+			return ref source[length++];
 		}
 
 	}
