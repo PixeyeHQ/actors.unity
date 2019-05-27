@@ -9,7 +9,7 @@ namespace Pixeye.Framework
 	sealed class ProcessorObserver : Processor, ITick
 	{
 
-		GroupObservers groupObservers;
+		internal GroupObservers groupObservers;
 
 		public void Tick(float delta)
 		{
