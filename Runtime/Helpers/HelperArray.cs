@@ -88,6 +88,14 @@ namespace Pixeye.Framework
 			return -1;
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static int FindIndex<T>(this T[] array, Predicate<T> predicate)
+		{
+			return Array.FindIndex(array, predicate);
+		}
+		
+		
+
 		/*
 		 * OLD
 		 */
