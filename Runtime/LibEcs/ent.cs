@@ -41,26 +41,31 @@ namespace Pixeye.Framework
 			this.age = age;
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		static public implicit operator int(ent value)
 		{
 			return value.id;
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		static public implicit operator ent(int value)
 		{
 			return new ent(value);
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static ent operator +(ent a, int b)
 		{
 			return new ent(a.id + b, a.age);
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static ent operator -(ent a, int b)
 		{
 			return new ent(a.id - b, a.age);
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public int CompareTo(int value)
 		{
 			if (id < value)
@@ -68,22 +73,26 @@ namespace Pixeye.Framework
 			return id > value ? 1 : 0;
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public override bool Equals(object obj)
 		{
 			if (ReferenceEquals(null, obj)) return false;
 			return obj is ent other && Equals(other);
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public bool Equals(int other)
 		{
 			return id == other;
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public override int GetHashCode()
 		{
 			return age;
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public int CompareTo(object obj)
 		{
 			ent other = (ent) obj;
@@ -98,6 +107,7 @@ namespace Pixeye.Framework
 			return (Entity.generations[id, Storage<T>.generation] & mask) == mask;
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void Unbind()
 		{
 			Entity.utils[id].isAlive = false;
@@ -105,6 +115,7 @@ namespace Pixeye.Framework
 			Entity.entitiesDebugCount--;
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void Release()
 		{
 			#if UNITY_EDITOR

@@ -771,6 +771,7 @@ namespace Pixeye.Framework
 			public static EntityOperation[] operations = new EntityOperation[SettingsEngine.SizeEntities];
 			public static int len;
 
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			internal static void Set(in ent entity, int arg, Action action)
 			{
 				if (len >= operations.Length)
@@ -782,7 +783,7 @@ namespace Pixeye.Framework
 				ref var operation = ref operations[pointer];
 				operation = new EntityOperation(entity, arg, action);
 			}
-
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			internal static void Set(in ent entity, Action action)
 			{
 				if (len >= operations.Length)

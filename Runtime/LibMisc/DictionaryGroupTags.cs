@@ -40,7 +40,7 @@ namespace Pixeye.Framework
 
 		internal int TryGetValue(int tagID)
 		{
-			return HelperArray.BinarySearch(ref tagsID, tagID, 0, len);
+			return len == 0 ? -1 : HelperArray.BinarySearch(ref tagsID, tagID, 0, len);
 		}
 
 		internal void Add(int tagID, DictionaryGroup anotherGroupStorage)

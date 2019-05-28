@@ -3,10 +3,7 @@
 //     Date : 3/7/2019 
 
 using System;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using Unity.IL2CPP.CompilerServices;
-using UnityEngine;
 
 namespace Pixeye.Framework
 {
@@ -14,7 +11,7 @@ namespace Pixeye.Framework
 	sealed unsafe class ProcessorEntities : Processor, ITick
 	{
 
-		GroupCore[] groupsChecked = new GroupCore[100];
+		GroupCore[] groupsChecked = new GroupCore[256];
 		int groupsCheckedLen;
 
 		bool AlreadyChecked(GroupCore group)
@@ -50,16 +47,14 @@ namespace Pixeye.Framework
 						for (int l = 0; l < storage.lenOfGroups; l++)
 						{
 							var group = storage.groups[l];
-							var composition = group.composition;
-							if (!composition.Check(entityID)) continue;
+							if (!group.composition.Check(entityID)) continue;
 							group.Insert(operation.entity);
 						}
 
 						for (int l = 0; l < storage.lenOfGroupsToRemove; l++)
 						{
 							var group = storage.groupsToRemove[l];
-							var composition = group.composition;
-							if (!composition.CanProceed(entityID)) continue;
+							if (!group.composition.CanProceed(entityID)) continue;
 							group.TryRemove(entityID);
 						}
 						break;
@@ -189,7 +184,7 @@ namespace Pixeye.Framework
 							var composition = group.composition;
 							if (composition.Check(entityID)) continue;
 
-							var inGroup = HelperArray.BinarySearch(ref group.entities, entityID, 0, group.length);
+							var inGroup = group.length == 0 ? -1 : HelperArray.BinarySearch(ref group.entities, entityID, 0, group.length);
 							if (inGroup == -1)
 								group.Insert(operation.entity);
 						}
@@ -213,7 +208,7 @@ namespace Pixeye.Framework
 							var composition = group.composition;
 							var canBeAdded = composition.CheckTags(entityID);
 
-							var inGroup = HelperArray.BinarySearch(ref group.entities, entityID, 0, group.length);
+							var inGroup = group.length == 0 ? -1 : HelperArray.BinarySearch(ref group.entities, entityID, 0, group.length);
 
 							if (inGroup == -1)
 							{

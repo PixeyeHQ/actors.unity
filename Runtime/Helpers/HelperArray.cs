@@ -23,6 +23,7 @@ namespace Pixeye.Framework
 				newArray[i, j] = original[i, j];
 			original = newArray;
 		}
+
 		public static void Resize<T>(ref T[,] original, int newLength, int cols)
 		{
 			var newArray = new T[newLength, cols];
@@ -33,6 +34,7 @@ namespace Pixeye.Framework
 				newArray[i, j] = original[i, j];
 			original = newArray;
 		}
+
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static void ResizeTags<Tag>(ref Tag[][] original, int newLength)
 		{
@@ -45,6 +47,7 @@ namespace Pixeye.Framework
 
 			original = newArray;
 		}
+
 		public static void Resize<T>(ref T[][] original, int newLength)
 		{
 			var newArray = new T[newLength][];
@@ -60,8 +63,8 @@ namespace Pixeye.Framework
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static int BinarySearch(ref int[] entries, int value, int left, int right)
 		{
-			if (right == 0) return -1;
-			while (left<=right)
+		  //if (right == 0) return -1;
+			while (left <= right)
 			{
 				var m = (left + right) / 2;
 				if (entries[m] == value) return m;
@@ -70,12 +73,12 @@ namespace Pixeye.Framework
 			}
 			return -1;
 		}
-		
+
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static int BinarySearch(ref ent[] entries, int value, int left, int right)
 		{
-			if (right == 0) return -1;
-			while (left<=right)
+	  	//if (right == 0) return -1;
+			while (left <= right)
 			{
 				var m = (left + right) / 2;
 				if (entries[m].id == value) return m;
@@ -84,11 +87,11 @@ namespace Pixeye.Framework
 			}
 			return -1;
 		}
-		
- /*
-  * OLD
-  */
-		
+
+		/*
+		 * OLD
+		 */
+
 //		while (left<=right)
 //		{
 //			var m = (left + right) / 2;
@@ -97,7 +100,7 @@ namespace Pixeye.Framework
 //			else right = m - 1;
 //		}
 //		return -1;
- 
+
 // 			if (right == 0) return -1;
 // 
 //			var len = right;
@@ -113,7 +116,7 @@ namespace Pixeye.Framework
 //			if (left > len) return -1;
 //			if (entries[left] != value) return -1;
 //			return left;
- 
+
 //			var len = right;
 //
 //			while (left < right)
@@ -134,7 +137,7 @@ namespace Pixeye.Framework
 //			if (left > len) return -1;
 //			if (entries[left] != value) return -1;
 //			return left;
- 
+
 		internal class ArrayTraverse
 		{
 

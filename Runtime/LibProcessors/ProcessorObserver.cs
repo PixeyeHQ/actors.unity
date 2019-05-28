@@ -1,4 +1,4 @@
-//  Project : ecs.unity.structs
+//  Project : ecs
 // Contacts : Pix - ask@pixeye.games
 
 using System;

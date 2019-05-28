@@ -31,7 +31,7 @@ namespace Pixeye.Framework
 	}
 
 	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
-	public unsafe abstract class GroupCore : IEnumerable, IEquatable<GroupCore>, IDisposable
+	public abstract class GroupCore : IEnumerable, IEquatable<GroupCore>, IDisposable
 	{
 
 		static int idCounter;
@@ -80,7 +80,6 @@ namespace Pixeye.Framework
 			if (length >= entities.Length)
 			{
 				Array.Resize(ref entities, length << 1);
-				//Array.Resize(ref entitiesID, length << 1);
 			}
 			var pointer = indexLast;
 			var index = indexLast - 1;
@@ -121,11 +120,9 @@ namespace Pixeye.Framework
 			for (int i = indexLast; i >= pointer; i--)
 			{
 				entities[i + 1] = entities[i];
-				//entitiesID[i + 1] = entities[i].id;
 			}
 
 			entities[pointer] = entity;
-			//entitiesID[pointer] = entity.id;
 
 			UpdateComponents(pointer);
 
@@ -135,8 +132,10 @@ namespace Pixeye.Framework
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public virtual void UpdateComponents(int poiner) { }
 
-		internal unsafe void TryRemove(int entityID)
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		internal void TryRemove(int entityID)
 		{
+			if (length == 0) return;
 			var i = HelperArray.BinarySearch(ref entities, entityID, 0, length);
 			if (i == -1) return;
 			if (onRemove != null) onRemove(entities[i]);
