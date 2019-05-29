@@ -43,7 +43,7 @@ namespace Pixeye.Framework
 
 		public void Add(db db)
 		{
-			Entity.coreDb[entity.id] = db;
+			Entity.db[entity.id] = db;
 		}
 
 	}
