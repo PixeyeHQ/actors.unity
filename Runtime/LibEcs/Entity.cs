@@ -606,7 +606,7 @@ namespace Pixeye.Framework
 			if ((generations[entityID, Storage<T>.generation] & Storage<T>.componentMask) == Storage<T>.componentMask)
 				return storage.components[entityID];
 
-			generations[entityID, Storage<T>.generation] |= Storage<T>.componentMask;
+			//generations[entityID, Storage<T>.generation] |= Storage<T>.componentMask;
 
 			Delayed.Set(entity, Storage<T>.componentID, Delayed.Action.Add);
 			return val;

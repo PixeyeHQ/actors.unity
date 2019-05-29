@@ -27,6 +27,11 @@ namespace Pixeye.Framework
 			get => ref Entity.transforms[id];
 		}
 
+		public override string ToString()
+		{
+			return id.ToString();
+		}
+
 		#region ENTITY
 
 		internal EntityComposer Modify()

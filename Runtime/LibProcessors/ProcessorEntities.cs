@@ -4,6 +4,7 @@
 
 using System;
 using Unity.IL2CPP.CompilerServices;
+using UnityEngine;
 
 namespace Pixeye.Framework
 {
@@ -41,13 +42,16 @@ namespace Pixeye.Framework
 					{
 						var componentID = operation.arg;
 						var storage = Storage.all[componentID];
-
+						var generation = Storage.generations[componentID];
+						var mask = Storage.masks[componentID];
 						Entity.components[entityID].Add(componentID);
-
+						Entity.generations[entityID, generation] |= mask;
+						
 						for (int l = 0; l < storage.lenOfGroups; l++)
 						{
 							var group = storage.groups[l];
 							if (!group.composition.Check(entityID)) continue;
+
 							group.Insert(operation.entity);
 						}
 
@@ -276,7 +280,9 @@ namespace Pixeye.Framework
 			Entity.Delayed.len = 0;
 		}
 
-		protected override void OnDispose() { }
+		protected override void OnDispose()
+		{
+		}
 
 	}
 }

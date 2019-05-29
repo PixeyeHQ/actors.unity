@@ -63,6 +63,7 @@ namespace Pixeye.Framework
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal bool Check(int entityID)
 		{
+			 
 			return CanProceed(entityID) && (includeTags.Length == 0 || IncludeTags(entityID)) & (excludeTags.Length == 0 || ExcludeTags(entityID)) & !ExcludeTypes(entityID);
 		}
 
