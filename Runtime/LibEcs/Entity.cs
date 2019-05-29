@@ -69,7 +69,7 @@ namespace Pixeye.Framework
 		public static int entitiesDebugCount;
 
 		public static Transform[] transforms = new Transform[SettingsEngine.SizeEntities];
-		public static DataBaseCore[] db = new DataBaseCore[SettingsEngine.SizeEntities];
+		public static CoreScriptableDB[] db = new CoreScriptableDB[SettingsEngine.SizeEntities];
 
 		static readonly int sizeBufferTags = UnsafeUtility.SizeOf<BufferTags>();
 		static readonly int sizeUtils = UnsafeUtility.SizeOf<Utils>();
