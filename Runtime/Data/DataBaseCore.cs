@@ -8,7 +8,7 @@ using UnityEngine;
 namespace Pixeye.Framework
 {
 
-	public abstract class CoreDataBase : ScriptableObject
+	public abstract class DataBaseCore : ScriptableObject
 	{
 
 		public object[] components = new object[1];
