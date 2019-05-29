@@ -16,14 +16,15 @@ namespace Pixeye.Framework
 	public class StorageData<T> : StorageDataCore
 	{
 
-		public readonly static StorageData<T> Instance = new StorageData<T>();
+		public static StorageData<T> Instance;
 
 		public int id;
 		public Func<T> create;
 
-		public StorageData()
+		public StorageData(Func<T> create)
 		{
 			id = lastID++;
+			this.create = create;
 		}
 
 	}
