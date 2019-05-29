@@ -9,7 +9,7 @@ using UnityEngine;
 namespace Pixeye.Framework
 {
 
-	public abstract class DBCore : ScriptableObject
+	public abstract class CoreDB : ScriptableObject
 	{
 
 		public object[] components = new object[1];

@@ -69,7 +69,7 @@ namespace Pixeye.Framework
 		public static int entitiesDebugCount;
 
 		public static Transform[] transforms = new Transform[SettingsEngine.SizeEntities];
-		public static DBCore[] db = new DBCore[SettingsEngine.SizeEntities];
+		public static CoreDB[] coreDb = new CoreDB[SettingsEngine.SizeEntities];
 
 		static readonly int sizeBufferTags = UnsafeUtility.SizeOf<BufferTags>();
 		static readonly int sizeUtils = UnsafeUtility.SizeOf<Utils>();
@@ -113,7 +113,7 @@ namespace Pixeye.Framework
 			{
 				var l = id << 1;
 				HelperArray.ResizeInt(ref generations, l, SettingsEngine.SizeGenerations);
-				Array.Resize(ref db, l);
+				Array.Resize(ref coreDb, l);
 
 				Array.Resize(ref transforms, l);
 				Array.Resize(ref components, l);
@@ -148,7 +148,7 @@ namespace Pixeye.Framework
 				var l = id << 1;
 
 				HelperArray.ResizeInt(ref generations, l, SettingsEngine.SizeGenerations);
-				Array.Resize(ref db, l);
+				Array.Resize(ref coreDb, l);
 
 				Array.Resize(ref transforms, l);
 				Array.Resize(ref components, l);
@@ -178,7 +178,7 @@ namespace Pixeye.Framework
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static void Link(in this ent entity, db db)
 		{
-			Entity.db[entity.id] = db;
+			Entity.coreDb[entity.id] = db;
 		}
 
 		public static ent Create()
