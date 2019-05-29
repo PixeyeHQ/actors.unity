@@ -91,6 +91,12 @@ namespace Pixeye.Framework
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static int FindIndex<T>(this T[] array, Predicate<T> predicate)
 		{
+			return Array.FindIndex(array, predicate);
+		}
+		
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static int FindIndexFast<T>(this T[] array, Predicate<T> predicate)
+		{
 			for (int i = 0; i < array.Length; i++)
 			{
 				ref var val = ref array[i];
