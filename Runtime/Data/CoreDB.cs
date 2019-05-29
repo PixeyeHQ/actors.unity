@@ -16,7 +16,7 @@ namespace Pixeye.Framework
 
 		protected T Add<T>() where T : class, new()
 		{
-			var source = StorageData<T>.Instance.create();
+			var source = StorageData<T>.Instance?.create() ?? new T();
 			var id = StorageData<T>.Instance.id;
 			if (components.Length <= id)
 			{
