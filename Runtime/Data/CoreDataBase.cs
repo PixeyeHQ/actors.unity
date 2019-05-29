@@ -2,13 +2,11 @@
 // Contacts : Pix - ask@pixeye.games
 
 using System;
-using System.Reflection;
-using UnityEngine;
-
+ 
 namespace Pixeye.Framework
 {
 
-	public abstract class CoreScriptableDB : ScriptableObject
+	public abstract class CoreDataBase
 	{
 
 		public object[] components = new object[1];
@@ -26,11 +24,11 @@ namespace Pixeye.Framework
 
 		internal void Setup()
 		{
-			var t = GetType();
-			var n = name.Substring(2).Replace(" ", string.Empty);
-
-			MethodInfo method = t.GetMethod(n, BindingFlags.Public | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Instance);
-			method.Invoke(this, null);
+//			var t = GetType();
+//			var n = name.Substring(2).Replace(" ", string.Empty);
+//
+//			MethodInfo method = t.GetMethod(n, BindingFlags.Public | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Instance);
+//			method.Invoke(this, null);
 		}
 
 	}

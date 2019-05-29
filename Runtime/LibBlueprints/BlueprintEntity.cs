@@ -24,7 +24,7 @@ namespace Pixeye.Framework
 
 		public static Dictionary<int, BlueprintEntity> storage = new Dictionary<int, BlueprintEntity>(FastComparable.Default);
 
-		public CoreScriptableDB db;
+		public CoreDataBase db;
 
 		[SerializeField, HideReferenceObjectPicker, TypeFilter("GetFilteredTypeList"), OnValueChanged("HandleAdd"), Title("Components")]
 		internal IComponentCopy[] onCreate = new IComponentCopy[0];
@@ -251,7 +251,7 @@ namespace Pixeye.Framework
 //	public class BlueprintEntity : ScriptableBuild
 //	{
 //
-//    public CoreScriptableDB db;
+//    public CoreDataBase db;
 //
 //
 //		[NonSerialized]
