@@ -244,6 +244,14 @@ namespace Pixeye.Framework
 			return ref entity;
 		}
 
+		public static Actor CreateFor(GameObject obj, bool pooled = false)
+		{
+			var actor = obj.transform.AddGetActor();
+			actor.isPooled = pooled;
+			actor.LaunchOnStart();
+			return actor;
+		}
+		
 		public static Actor CreateFor(GameObject obj, HandleEntityComposer model, bool pooled = false)
 		{
 			var actor = obj.transform.AddGetActor();
