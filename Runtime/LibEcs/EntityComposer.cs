@@ -41,7 +41,7 @@ namespace Pixeye.Framework
 			entity.AddLater(tags);
 		}
 
-		public void Add(db db)
+		public void Add(CoreDataBase db)
 		{
 			Entity.db[entity.id] = db;
 		}

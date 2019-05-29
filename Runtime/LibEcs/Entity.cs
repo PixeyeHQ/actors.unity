@@ -176,7 +176,7 @@ namespace Pixeye.Framework
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static void Link(in this ent entity, db db)
+		public static void Link(in this ent entity, CoreDataBase db)
 		{
 			Entity.db[entity.id] = db;
 		}
