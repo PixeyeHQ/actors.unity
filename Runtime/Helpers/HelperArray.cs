@@ -63,7 +63,7 @@ namespace Pixeye.Framework
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static int BinarySearch(ref int[] entries, int value, int left, int right)
 		{
-		  //if (right == 0) return -1;
+			//if (right == 0) return -1;
 			while (left <= right)
 			{
 				var m = (left + right) / 2;
@@ -77,7 +77,7 @@ namespace Pixeye.Framework
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static int BinarySearch(ref ent[] entries, int value, int left, int right)
 		{
-	  	//if (right == 0) return -1;
+			//if (right == 0) return -1;
 			while (left <= right)
 			{
 				var m = (left + right) / 2;
@@ -91,10 +91,13 @@ namespace Pixeye.Framework
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static int FindIndex<T>(this T[] array, Predicate<T> predicate)
 		{
-			return Array.FindIndex(array, predicate);
+			for (int i = 0; i < array.Length; i++)
+			{
+				ref var val = ref array[i];
+				if (predicate(val)) return i;
+			}
+			return -1;
 		}
-		
-		
 
 		/*
 		 * OLD
