@@ -2,6 +2,7 @@
 // Contacts : Pix - ask@pixeye.games
 
 #if ODIN_INSPECTOR
+ 
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -24,7 +25,7 @@ namespace Pixeye.Framework
 
 		public static Dictionary<int, BlueprintEntity> storage = new Dictionary<int, BlueprintEntity>(FastComparable.Default);
 
-		public CoreDataBase db;
+ 
 
 		[SerializeField, HideReferenceObjectPicker, TypeFilter("GetFilteredTypeList"), OnValueChanged("HandleAdd"), Title("Components")]
 		internal IComponentCopy[] onCreate = new IComponentCopy[0];
@@ -123,10 +124,7 @@ namespace Pixeye.Framework
 		internal override void Execute(in ent entity, Actor a = null)
 		{
 			var id = entity.id;
-
-			if (db != null)
-				Entity.db[id] = db;
-
+ 
 			for (int i = 0; i < lenOnCreate; i++)
 			{
 				var component = onCreate[i];
@@ -150,9 +148,7 @@ namespace Pixeye.Framework
 		{
 			var id = entity.id;
 
-			if (db != null)
-				Entity.db[id] = db;
-
+ 
 			for (int i = 0; i < lenOnCreate; i++)
 			{
 				var component = onCreate[i];
@@ -237,181 +233,4 @@ namespace Pixeye.Framework
 	#endif
 }
 #endif
-
-//#else 
-//using System;
-//using System.Collections.Generic;
-//#if UNITY_EDITOR
-//using UnityEditor;
-//#endif
-//using UnityEngine;
-//
-//namespace Pixeye.Framework
-//{
-//	public class BlueprintEntity : ScriptableBuild
-//	{
-//
-//    public CoreDataBase db;
-//
-//
-//		[NonSerialized]
-//		public static Dictionary<int, BlueprintEntity> storage = new Dictionary<int, BlueprintEntity>(new FastComparable());
-//
-//		internal int lenOnCreate;
-//		internal int lenAddLater;
-//
-//		internal List<IComponentCopy> onCreate = new List<IComponentCopy>();
-//		internal List<IComponentCopy> onLater = new List<IComponentCopy>();
-//
-//		internal int[] hashesOnCreate = new int[1];
-//
-//		//[FoldoutGroup("Setup")]
-//		//[TagFilter(typeof(ITag))]
-//		[HideInInspector]
-//		public int[] tags = new int[0];
-//
-//	  protected override void OnEnable()
-//		{
-//			lenOnCreate = 0;
-//			lenAddLater = 0;
-//			tags = new int[0];
-//			hashesOnCreate = new int[10];
-//			Setup();
-//		}
-//
-//    protected override void OnDisable()
-//		{
-//			
-//		}
-//
-//		protected virtual void Setup()
-//		{
-//		}
-//
-//		internal override void Execute(in ent entity, Actor a = null)
-//		{
-//			var id = entity.id;
-//
-//	if (db != null)
-//				Entity.db[id] = db;
-//
-//			for (int i = 0; i < lenOnCreate; i++)
-//			{
-//				var component = onCreate[i];
-//
-//				var storage = Storage.allDict[hashesOnCreate[i]];
-//				component.Copy(id);
-//				Entity.components[id].Add(storage.GetComponentID());
-//			}
-//
-//			for (int i = 0; i < lenAddLater; i++)
-//			{
-//				var component = onLater[i];
-//				component.Copy(id);
-//			}
-//
-//			entity.AddLater(tags);
-//			Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Activate);
-//		}
-//
-//
-//	internal override void ExecuteOnStart(in ent entity, Actor a)
-//		{
-//			var id = entity.id;
-//
-//			if (db != null)
-//				Entity.db[id] = db;
-//		 
-// 
-//			for (int i = 0; i < lenOnCreate; i++)
-//			{
-//				var component = onCreate[i];
-//
-//				var storage = Storage.allDict[hashesOnCreate[i]];
-//				component.Copy(id);
-//				Entity.components[id].Add(storage.GetComponentID());
-//			}
-//
-//			for (int i = 0; i < lenAddLater; i++)
-//			{
-//				var component = onLater[i];
-//				component.Copy(id);
-//			}
-//
-//			entity.AddLater(tags);
-//	
-//			if (a.isActiveAndEnabled)
-//			Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Activate);
-//		}
-//
-//		#region REFS OBJECT
-//
-//		/// <summary>
-//		/// <para>Adds tags to the entity</para>
-//		/// </summary>
-//		/// <param name="tags"></param>
-//		public void Add(params int[] tags)
-//		{
-//			this.tags = tags;
-//		}
-//
-//		#endregion
-//
-//		#region ADD COMPONENTS
-//
-//		/// <summary>
-//		/// Add a component when creating an entity.
-//		/// </summary>
-//		/// <typeparam name="T"></typeparam>
-//		/// <returns></returns>
-//		public T Add<T>()
-//		{
-//			var instance = Storage<T>.Instance.Creator();
-//			onCreate.Add(instance as IComponentCopy);
-//
-//			if (lenOnCreate == hashesOnCreate.Length)
-//			{
-//				Array.Resize(ref hashesOnCreate, lenOnCreate << 1);
-//			}
-//			hashesOnCreate[lenOnCreate++] = typeof(T).GetHashCode();
-//
-//			return instance;
-//		}
-//
-//		/// <summary>
-//		/// Setup a component when creating an entity but don't add it.
-//		/// </summary>
-//		/// <typeparam name="T"></typeparam>
-//		public T AddLater<T>()
-//		{
-//			var instance = Storage<T>.Instance.Creator();
-//			onLater.Add(instance as IComponentCopy);
-//			lenAddLater++;
-//			return instance;
-//		}
-//
-//		public T Add<T>(T component) 
-//		{
-//			onCreate.Add(component as IComponentCopy);
-//			if (lenOnCreate == hashesOnCreate.Length)
-//			{
-//				Array.Resize(ref hashesOnCreate, lenOnCreate << 1);
-//			}
-//			hashesOnCreate[lenOnCreate++] = typeof(T).GetHashCode();
-//			return component;
-//		}
-//
-//		public T AddLater<T>(T component) 
-//		{
-//			onLater.Add(component as IComponentCopy);
-//			lenAddLater++;
-//			return component;
-//		}
-//
-//		#endregion
-//
-//	}
-//}
-//#endif
-
  
