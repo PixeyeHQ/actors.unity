@@ -19,7 +19,7 @@ namespace Pixeye.Framework
 		public readonly static StorageData<T> Instance = new StorageData<T>();
 
 		public int id;
-		public Func<T> create;
+		public static Func<T> create;
 
 		public StorageData()
 		{

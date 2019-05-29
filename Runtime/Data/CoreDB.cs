@@ -3,7 +3,6 @@
 
 using System;
 using System.Reflection;
-using UnityEditor;
 using UnityEngine;
 
 namespace Pixeye.Framework
@@ -16,12 +15,10 @@ namespace Pixeye.Framework
 
 		protected T Add<T>() where T : class, new()
 		{
-			var source = new T();
+			var source = StorageData<T>.create();
 			var id = StorageData<T>.Instance.id;
 			if (components.Length <= id)
-			{
 				Array.Resize(ref components, id << 1);
-			}
 
 			components[id] = source;
 			return source;
