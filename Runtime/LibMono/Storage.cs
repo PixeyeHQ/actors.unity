@@ -7,12 +7,8 @@ Date:       7/25/2018 11:49 AM
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 using Unity.IL2CPP.CompilerServices;
-using UnityEngine;
-using Object = System.Object;
 
 namespace Pixeye.Framework
 {
@@ -30,8 +26,6 @@ namespace Pixeye.Framework
 		internal ArrayEntities entitiesToPopulate = new ArrayEntities();
 		internal ArrayEntities entitiesToRemove = new ArrayEntities();
 
- 
-
 		internal GroupCore[] groups = new GroupCore[8];
 		internal GroupCore[] groupsToRemove = new GroupCore[8];
 		internal int lenOfGroups;
@@ -39,15 +33,18 @@ namespace Pixeye.Framework
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal abstract int GetComponentID();
+
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal abstract void DisposeComponent(int entityID);
+
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal abstract void RemoveNoCheck(int entityID);
+
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal abstract void AddGroupExclude(GroupCore groupCore);
+
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal abstract object GetComponent(int entityID);
-		
 
 	}
 
@@ -114,7 +111,7 @@ namespace Pixeye.Framework
 		{
 			return componentID;
 		}
-    
+
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal override void DisposeComponent(int entityID)
 		{
@@ -132,7 +129,6 @@ namespace Pixeye.Framework
 		{
 			return components[entityID];
 		}
- 
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public T TryGet(int entityID)

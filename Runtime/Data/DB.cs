@@ -16,8 +16,7 @@ namespace Pixeye.Framework
 		static public implicit operator db(string value)
 		{
 			var hash = value.GetHashCode();
-			var d = Box.Get<CoreDB>(value);
-			d.Setup();
+			var d = Box.Get<DBCore>(value);
 			return new db(hash);
 		}
 
@@ -26,9 +25,9 @@ namespace Pixeye.Framework
 			return value.hash;
 		}
 
-		static public implicit operator CoreDB(db value)
+		static public implicit operator DBCore(db value)
 		{
-			return Box.Default.items[value.hash] as CoreDB;
+			return Box.Default.items[value.hash] as DBCore;
 		}
 
 	}
