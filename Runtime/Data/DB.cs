@@ -1,13 +1,13 @@
 //  Project : ecs
 // Contacts : Pix - ask@pixeye.games
 
- 
- 
 namespace Pixeye.Framework
 {
 	public readonly struct db
 	{
+
 		public readonly int hash;
+
 		public db(int hash)
 		{
 			this.hash = hash;
@@ -17,6 +17,7 @@ namespace Pixeye.Framework
 		{
 			var hash = value.GetHashCode();
 			var d = Box.Get<CoreDB>(value);
+			d.Setup();
 			return new db(hash);
 		}
 
@@ -32,4 +33,3 @@ namespace Pixeye.Framework
 
 	}
 }
- 
