@@ -22,7 +22,7 @@ namespace Pixeye.Framework
 			{
 				Array.Resize(ref components, id << 1);
 			}
-
+			Debug.Log(id);
 			components[id] = source;
 			return source;
 		}
