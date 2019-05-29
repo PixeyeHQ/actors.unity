@@ -69,16 +69,15 @@ namespace Pixeye.Framework
 		public static int entitiesDebugCount;
 
 		public static Transform[] transforms = new Transform[SettingsEngine.SizeEntities];
-		public static CoreDataBase[] db = new CoreDataBase[SettingsEngine.SizeEntities];
 
 		static readonly int sizeBufferTags = UnsafeUtility.SizeOf<BufferTags>();
 		static readonly int sizeUtils = UnsafeUtility.SizeOf<Utils>();
 
 		internal static int counter = SettingsEngine.SizeEntities;
 		internal static readonly int self = "self".GetHashCode();
-		
+
 		internal static int[,] generations = new int[SettingsEngine.SizeEntities, SettingsEngine.SizeGenerations];
-	
+
 		internal static BufferComponents[] components;
 		internal static BufferTags* tags;
 		internal static Utils* utils;
@@ -113,7 +112,6 @@ namespace Pixeye.Framework
 			{
 				var l = id << 1;
 				HelperArray.ResizeInt(ref generations, l, SettingsEngine.SizeGenerations);
-				Array.Resize(ref db, l);
 
 				Array.Resize(ref transforms, l);
 				Array.Resize(ref components, l);
@@ -148,7 +146,6 @@ namespace Pixeye.Framework
 				var l = id << 1;
 
 				HelperArray.ResizeInt(ref generations, l, SettingsEngine.SizeGenerations);
-				Array.Resize(ref db, l);
 
 				Array.Resize(ref transforms, l);
 				Array.Resize(ref components, l);
@@ -173,12 +170,6 @@ namespace Pixeye.Framework
 			utils[id].isPooled = pooled;
 
 			entitiesDebugCount++;
-		}
-
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static void Link(in this ent entity, CoreDataBase db)
-		{
-			Entity.db[entity.id] = db;
 		}
 
 		public static ent Create()
@@ -783,6 +774,7 @@ namespace Pixeye.Framework
 				ref var operation = ref operations[pointer];
 				operation = new EntityOperation(entity, arg, action);
 			}
+
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			internal static void Set(in ent entity, Action action)
 			{
