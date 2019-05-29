@@ -6,14 +6,14 @@ using System;
 namespace Pixeye.Framework
 {
 
-	abstract class StorageDataCore
+	public abstract class StorageDataCore
 	{
 
 		public static int lastID;
 
 	}
 
-	class StorageData<T> : StorageDataCore
+	public class StorageData<T> : StorageDataCore
 	{
 
 		public static int id;
