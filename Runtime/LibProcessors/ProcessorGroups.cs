@@ -16,9 +16,9 @@ namespace Pixeye.Framework
 
 		public static void Setup(object b)
 		{
-			var type = b.GetType();
+			var type         = b.GetType();
 			var objectFields = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
-			int length = objectFields.Length;
+			int length       = objectFields.Length;
 
 			var groupType = typeof(GroupCore);
 
@@ -30,7 +30,7 @@ namespace Pixeye.Framework
 				if (bindAttribute != null)
 				{
 					var fType = myFieldInfo.FieldType;
-					var hash = fType.GetHashCode();
+					var hash  = fType.GetHashCode();
 
 					if (!DataSession.binds.TryGetValue(hash, out object o))
 					{
@@ -42,7 +42,7 @@ namespace Pixeye.Framework
 				}
 				else if (myFieldInfo.FieldType.IsSubclassOf(groupType))
 				{
-					var groupByAttribute = Attribute.GetCustomAttribute(myFieldInfo, typeof(GroupByAttribute)) as GroupByAttribute;
+					var groupByAttribute      = Attribute.GetCustomAttribute(myFieldInfo, typeof(GroupByAttribute)) as GroupByAttribute;
 					var groupExcludeAttribute = Attribute.GetCustomAttribute(myFieldInfo, typeof(GroupExcludeAttribute)) as GroupExcludeAttribute;
 
 					var includeTagsFilter = groupByAttribute != null ? groupByAttribute.filter : new int[0];
@@ -60,16 +60,22 @@ namespace Pixeye.Framework
 					composition.AddTypesExclude(excludeCompFilter);
 
 					composition.hash = HashCode.OfEach(composition.includeTags).And(17).AndEach(composition.excludeTags).And(31).AndEach(excludeCompFilter);
-					myFieldInfo.SetValue(b, SetupGroup(myFieldInfo.FieldType, composition));
+					myFieldInfo.SetValue(b, SetupGroup(myFieldInfo.FieldType, composition, myFieldInfo.GetValue(b)));
 				}
 			}
 		}
 
-		internal static GroupCore SetupGroup(Type groupType, Composition filter)
+		internal static GroupCore SetupGroup(Type groupType, Composition filter, object fieldObj)
 		{
 			if (container.TryGetValue(groupType, filter, out GroupCore group))
 			{
 				return group;
+			}
+
+			if (fieldObj != null)
+			{
+				group = fieldObj as GroupCore;
+				return group.Start(filter);
 			}
 
 			return container.Add((Activator.CreateInstance(groupType, true) as GroupCore).Start(filter));
