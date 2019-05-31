@@ -36,10 +36,16 @@ namespace Pixeye.Framework
 
 		static int idCounter;
 
+		public ent[] entities = new ent[SettingsEngine.SizeEntities];
 		public int length;
 
 		public EntityAction onAdd;
 		public EntityAction onRemove;
+
+		protected internal Composition composition;
+		internal int id;
+
+		int position;
 
 		public ref ent this[int index]
 		{
@@ -49,12 +55,6 @@ namespace Pixeye.Framework
 				return ref entities[index];
 			}
 		}
-		public ent[] entities = new ent[SettingsEngine.SizeEntities];
-		//public int[] entitiesID = new int[SettingsEngine.SizeEntities];
-		int position;
-
-		protected internal Composition composition;
-		internal int id;
 
 		public void Release(int index)
 		{
@@ -82,14 +82,14 @@ namespace Pixeye.Framework
 				Array.Resize(ref entities, length << 1);
 			}
 			var pointer = indexLast;
-			var index = indexLast - 1;
+			var index   = indexLast - 1;
 
 			if (index >= 0)
 			{
 				if (entityID < entities[index].id)
 				{
 					var startIndex = 0;
-					var endIndex = indexLast;
+					var endIndex   = indexLast;
 
 					while (endIndex > startIndex)
 					{
@@ -130,7 +130,9 @@ namespace Pixeye.Framework
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public virtual void UpdateComponents(int poiner) { }
+		public virtual void UpdateComponents(int poiner)
+		{
+		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal void TryRemove(int entityID)
@@ -258,7 +260,9 @@ namespace Pixeye.Framework
 			}
 
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			public void Dispose() { }
+			public void Dispose()
+			{
+			}
 
 		}
 
