@@ -2,14 +2,11 @@
 // Contacts : Pix - ask@pixeye.games
 
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.IL2CPP.CompilerServices;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace Pixeye.Framework
 {
@@ -174,12 +171,12 @@ namespace Pixeye.Framework
 
 		public static ent Create()
 		{
-			int id;
+			int  id;
 			byte age = 0;
 
 			if (ent.entityStackLength > 0)
 			{
-				var pop = ent.entityStack.Dequeue();
+				var  pop    = ent.entityStack.Dequeue();
 				byte ageOld = pop.age;
 				id = pop.id;
 				unchecked
@@ -222,14 +219,14 @@ namespace Pixeye.Framework
 		}
 		#endif
 
-		public static ent Create(HandleEntityComposer model)
+		public static ent Create(ModelComposer model)
 		{
-			int id;
+			int  id;
 			byte age = 0;
 
 			if (ent.entityStackLength > 0)
 			{
-				var pop = ent.entityStack.Dequeue();
+				var  pop    = ent.entityStack.Dequeue();
 				byte ageOld = pop.age;
 				id = pop.id;
 				unchecked
@@ -242,23 +239,22 @@ namespace Pixeye.Framework
 			else
 				id = ent.lastID++;
 
-			EntityComposer.Default.entity = Setup(id, age);
-			ref var entity = ref EntityComposer.Default.entity;
+			var entity = Setup(id, age);
 
-			model(EntityComposer.Default);
+			model(entity, null);
 			Delayed.Set(entity, 0, Delayed.Action.Activate);
 
 			return entity;
 		}
 
-		public static ent Bind(GameObject prefab, HandleEntityComposer model, bool pooled = false)
+		public static ent Bind(GameObject prefab, ModelComposer model, bool pooled = false)
 		{
-			int id;
+			int  id;
 			byte age = 0;
 
 			if (ent.entityStackLength > 0)
 			{
-				var pop = ent.entityStack.Dequeue();
+				var  pop    = ent.entityStack.Dequeue();
 				byte ageOld = pop.age;
 				id = pop.id;
 				unchecked
@@ -273,24 +269,23 @@ namespace Pixeye.Framework
 
 			SetupWithTransform(id, pooled, age);
 			transforms[id] = prefab.transform;
-			EntityComposer.Default.entity = new ent(id, age);
 
-			ref var entity = ref EntityComposer.Default.entity;
+			var entity = new ent(id, age);
 
-			model(EntityComposer.Default);
+			model(entity, null);
 			Delayed.Set(entity, 0, Delayed.Action.Activate);
 
 			return entity;
 		}
 
-		public static ent Create(string prefabID, Vector3 position, HandleEntityComposer model, bool pooled = false)
+		public static ent Create(string prefabID, Vector3 position, ModelComposer model, bool pooled = false)
 		{
-			int id;
+			int  id;
 			byte age = 0;
 
 			if (ent.entityStackLength > 0)
 			{
-				var pop = ent.entityStack.Dequeue();
+				var  pop    = ent.entityStack.Dequeue();
 				byte ageOld = pop.age;
 				id = pop.id;
 				unchecked
@@ -305,24 +300,22 @@ namespace Pixeye.Framework
 			SetupWithTransform(id, pooled, age);
 			transforms[id] = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefabID, position) : HelperFramework.SpawnInternal(prefabID, position);
 
-			EntityComposer.Default.entity = new ent(id, age);
+			var entity = new ent(id, age);
 
-			ref var entity = ref EntityComposer.Default.entity;
-
-			model(EntityComposer.Default);
+			model(entity, null);
 			Delayed.Set(entity, 0, Delayed.Action.Activate);
 
 			return entity;
 		}
 
-		public static ent Create(string prefabID, HandleEntityComposer model, bool pooled = false)
+		public static ent Create(string prefabID, ModelComposer model, bool pooled = false)
 		{
-			int id;
+			int  id;
 			byte age = 0;
 
 			if (ent.entityStackLength > 0)
 			{
-				var pop = ent.entityStack.Dequeue();
+				var  pop    = ent.entityStack.Dequeue();
 				byte ageOld = pop.age;
 				id = pop.id;
 				unchecked
@@ -337,23 +330,22 @@ namespace Pixeye.Framework
 
 			SetupWithTransform(id, pooled, age);
 			transforms[id] = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefabID) : HelperFramework.SpawnInternal(prefabID);
-			EntityComposer.Default.entity = new ent(id, age);
-			ref var entity = ref EntityComposer.Default.entity;
+			var entity = new ent(id, age);
 
-			model(EntityComposer.Default);
+			model(entity, null);
 			Delayed.Set(entity, 0, Delayed.Action.Activate);
 
 			return entity;
 		}
 
-		public static ent Create(GameObject prefab, HandleEntityComposer model, bool pooled = false)
+		public static ent Create(GameObject prefab, ModelComposer model, bool pooled = false)
 		{
-			int id;
+			int  id;
 			byte age = 0;
 
 			if (ent.entityStackLength > 0)
 			{
-				var pop = ent.entityStack.Dequeue();
+				var  pop    = ent.entityStack.Dequeue();
 				byte ageOld = pop.age;
 				id = pop.id;
 				unchecked
@@ -369,10 +361,9 @@ namespace Pixeye.Framework
 			SetupWithTransform(id, pooled, age);
 			transforms[id] = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefab) : HelperFramework.SpawnInternal(prefab);
 
-			EntityComposer.Default.entity = new ent(id, age);
-			ref var entity = ref EntityComposer.Default.entity;
+			var entity = new ent(id, age);
 
-			model(EntityComposer.Default);
+			model(entity, null);
 			Delayed.Set(entity, 0, Delayed.Action.Activate);
 
 			return entity;
@@ -380,12 +371,12 @@ namespace Pixeye.Framework
 
 		public static ent Create(string prefabID, bool pooled = false)
 		{
-			int id;
+			int  id;
 			byte age = 0;
 
 			if (ent.entityStackLength > 0)
 			{
-				var pop = ent.entityStack.Dequeue();
+				var  pop    = ent.entityStack.Dequeue();
 				byte ageOld = pop.age;
 				id = pop.id;
 				unchecked
@@ -405,12 +396,12 @@ namespace Pixeye.Framework
 
 		public static ent Create(GameObject prefab, bool pooled = false)
 		{
-			int id;
+			int  id;
 			byte age = 0;
 
 			if (ent.entityStackLength > 0)
 			{
-				var pop = ent.entityStack.Dequeue();
+				var  pop    = ent.entityStack.Dequeue();
 				byte ageOld = pop.age;
 				id = pop.id;
 				unchecked
@@ -515,31 +506,21 @@ namespace Pixeye.Framework
 
 		#region ADD/REMOVE
 
-		public static void SetMonoReference(in this ent entity)
+		/// <summary>
+		/// Use in Model classes for setting up components to Storage. Doesn't send the component to systems.
+		/// </summary>
+		/// <param name="entity"></param>
+		/// <typeparam name="T"></typeparam>
+		/// <returns></returns>
+		public static T Set<T>(in this ent entity)
 		{
-			var entityID = entity.id;
-			var mono = transforms[entityID].AddGetActor();
-			#if UNITY_EDITOR
-			mono._entity = entityID;
-			#endif
-			mono.entity = entity;
-		}
-
-		internal static void Add(in this ent entity, Transform instance)
-		{
-			ref var transforms = ref Entity.transforms;
-			var entityID = entity.id;
-			if (entityID >= transforms.Length)
-			{
-				var l = entityID << 1;
-				Array.Resize(ref transforms, l);
-			}
-			transforms[entityID] = instance;
+			components[entity.id].Add(Storage<T>.componentID);
+			return Storage<T>.Instance.GetFromStorage(entity.id);
 		}
 
 		public static T AddLater<T>(in this ent entity)
 		{
-			var storage = Storage<T>.Instance;
+			var storage  = Storage<T>.Instance;
 			var entityID = entity.id;
 			if (entityID >= storage.components.Length)
 			{
@@ -555,9 +536,10 @@ namespace Pixeye.Framework
 			return val;
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static void AddLater<T>(in this ent entity, T component)
 		{
-			var storage = Storage<T>.Instance;
+			var storage  = Storage<T>.Instance;
 			var entityID = entity.id;
 			if (entityID >= storage.components.Length)
 			{
@@ -565,17 +547,14 @@ namespace Pixeye.Framework
 				Array.Resize(ref storage.components, l);
 			}
 			ref T val = ref storage.components[entityID];
-//			if (val != null)
-//			{
-//				val.Dispose();
-//			}
 
 			val = component;
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static T Add<T>(in this ent entity)
 		{
-			var storage = Storage<T>.Instance;
+			var storage  = Storage<T>.Instance;
 			var entityID = entity.id;
 
 			#if UNITY_EDITOR
@@ -597,15 +576,14 @@ namespace Pixeye.Framework
 			if ((generations[entityID, Storage<T>.generation] & Storage<T>.componentMask) == Storage<T>.componentMask)
 				return storage.components[entityID];
 
-			//generations[entityID, Storage<T>.generation] |= Storage<T>.componentMask;
-
 			Delayed.Set(entity, Storage<T>.componentID, Delayed.Action.Add);
 			return val;
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static void Add<T>(in this ent entity, T component)
 		{
-			var storage = Storage<T>.Instance;
+			var storage  = Storage<T>.Instance;
 			var entityID = entity.id;
 			if (entityID >= storage.components.Length)
 			{
@@ -628,6 +606,19 @@ namespace Pixeye.Framework
 		public static void Remove<T>(this in ent entity)
 		{
 			Delayed.Set(entity, Storage<T>.componentID, Delayed.Action.Remove);
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		internal static void Add(in this ent entity, Transform instance)
+		{
+			ref var transforms = ref Entity.transforms;
+			var     entityID   = entity.id;
+			if (entityID >= transforms.Length)
+			{
+				var l = entityID << 1;
+				Array.Resize(ref transforms, l);
+			}
+			transforms[entityID] = instance;
 		}
 
 		#endregion
@@ -770,7 +761,7 @@ namespace Pixeye.Framework
 					var l = len << 1;
 					Array.Resize(ref operations, l);
 				}
-				var pointer = len++;
+				var     pointer   = len++;
 				ref var operation = ref operations[pointer];
 				operation = new EntityOperation(entity, arg, action);
 			}
@@ -783,7 +774,7 @@ namespace Pixeye.Framework
 					var l = len << 1;
 					Array.Resize(ref operations, l);
 				}
-				var pointer = len++;
+				var     pointer   = len++;
 				ref var operation = ref operations[pointer];
 				operation = new EntityOperation(entity, 0, action);
 			}

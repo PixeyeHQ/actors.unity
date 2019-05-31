@@ -234,7 +234,7 @@ namespace Pixeye.Framework
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		internal static void AddLater(in this ent entity, int tagID)
+		internal static void Set(in this ent entity, int tagID)
 		{
 			ref var buffer = ref Entity.tags[entity.id];
 			int len = buffer.length;
@@ -263,7 +263,7 @@ namespace Pixeye.Framework
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		internal static void AddLater(in this ent entity, params int[] tagsID)
+		internal static void Set(in this ent entity, params int[] tagsID)
 		{
 			ref var buffer = ref Entity.tags[entity.id];
 

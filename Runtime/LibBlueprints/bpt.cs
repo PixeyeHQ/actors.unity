@@ -3,8 +3,7 @@
 
 namespace Pixeye.Framework
 {
-	public delegate void HandleEntityComposer(EntityComposer composer);
-	
+ 
 	#if ODIN_INSPECTOR
 	public readonly struct bpt
 	{

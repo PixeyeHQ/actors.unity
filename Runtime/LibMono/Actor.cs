@@ -1,9 +1,6 @@
 ﻿//  Project  : ACTORS
 //  Contacts : Pixeye - ask@pixeye.games
 
-
-
-
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
@@ -74,12 +71,18 @@ namespace Pixeye.Framework
 		#endif
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public virtual void OnAdd() { }
+		public virtual void OnAdd()
+		{
+		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public virtual void OnRemove() { }
+		public virtual void OnRemove()
+		{
+		}
 
-		public virtual void Dispose() { }
+		public virtual void Dispose()
+		{
+		}
 
 		#endregion
 
@@ -90,12 +93,12 @@ namespace Pixeye.Framework
 		/// </summary>
 		public void Launch()
 		{
-			int id;
+			int  id;
 			byte age = 0;
 
 			if (ent.entityStackLength > 0)
 			{
-				var pop = ent.entityStack.Dequeue();
+				var  pop    = ent.entityStack.Dequeue();
 				byte ageOld = pop.age;
 				id = pop.id;
 				unchecked
@@ -128,12 +131,12 @@ namespace Pixeye.Framework
 
 		public virtual void LaunchOnStart()
 		{
-			int id;
+			int  id;
 			byte age = 0;
 
 			if (ent.entityStackLength > 0)
 			{
-				var pop = ent.entityStack.Dequeue();
+				var  pop    = ent.entityStack.Dequeue();
 				byte ageOld = pop.age;
 				id = pop.id;
 				unchecked
@@ -164,14 +167,14 @@ namespace Pixeye.Framework
 				Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Activate);
 		}
 
-		internal void LaunchFrom(HandleEntityComposer model)
+		internal void LaunchFrom(ModelComposer model)
 		{
-			int id;
+			int  id;
 			byte age = 0;
 
 			if (ent.entityStackLength > 0)
 			{
-				var pop = ent.entityStack.Dequeue();
+				var  pop    = ent.entityStack.Dequeue();
 				byte ageOld = pop.age;
 				id = pop.id;
 				unchecked
@@ -196,23 +199,23 @@ namespace Pixeye.Framework
 
 			Setup();
 
-			EntityComposer.Default.entity = entity;
-			EntityComposer.Default.actor = this;
-			model(EntityComposer.Default);
+			model(entity, this);
 
 			Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Activate);
 		}
 
-		protected virtual void Setup() { }
+		protected virtual void Setup()
+		{
+		}
 
 		protected void Add(int tag)
 		{
-			entity.AddLater(tag);
+			entity.Set(tag);
 		}
 
 		protected void Add(params int[] tags)
 		{
-			entity.AddLater(tags);
+			entity.Set(tags);
 		}
 
 		protected T Add<T>()
@@ -251,8 +254,8 @@ namespace Pixeye.Framework
 			actor.LaunchOnStart();
 			return actor;
 		}
-		
-		public static Actor CreateFor(GameObject obj, HandleEntityComposer model, bool pooled = false)
+
+		public static Actor CreateFor(GameObject obj, ModelComposer model, bool pooled = false)
 		{
 			var actor = obj.transform.AddGetActor();
 			actor.isPooled = pooled;
@@ -260,36 +263,36 @@ namespace Pixeye.Framework
 			return actor;
 		}
 
-		public static Actor Create(string prefabID, Vector3 position, HandleEntityComposer model, bool pooled = false)
+		public static Actor Create(string prefabID, Vector3 position, ModelComposer model, bool pooled = false)
 		{
-			var tr = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefabID, position) : HelperFramework.SpawnInternal(prefabID, position);
+			var tr    = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefabID, position) : HelperFramework.SpawnInternal(prefabID, position);
 			var actor = tr.AddGetActor();
 			actor.isPooled = pooled;
 			actor.LaunchFrom(model);
 			return actor;
 		}
 
-		public static Actor Create(string prefabID, HandleEntityComposer model, bool pooled = false)
+		public static Actor Create(string prefabID, ModelComposer model, bool pooled = false)
 		{
-			var tr = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefabID) : HelperFramework.SpawnInternal(prefabID);
+			var tr    = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefabID) : HelperFramework.SpawnInternal(prefabID);
 			var actor = tr.AddGetActor();
 			actor.isPooled = pooled;
 			actor.LaunchFrom(model);
 			return actor;
 		}
 
-		public static Actor Create(GameObject prefab, Vector3 position, HandleEntityComposer model, bool pooled = false)
+		public static Actor Create(GameObject prefab, Vector3 position, ModelComposer model, bool pooled = false)
 		{
-			var tr = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefab, position) : HelperFramework.SpawnInternal(prefab, position);
+			var tr    = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefab, position) : HelperFramework.SpawnInternal(prefab, position);
 			var actor = tr.AddGetActor();
 			actor.isPooled = pooled;
 			actor.LaunchFrom(model);
 			return actor;
 		}
 
-		public static Actor Create(GameObject prefab, HandleEntityComposer model, bool pooled = false)
+		public static Actor Create(GameObject prefab, ModelComposer model, bool pooled = false)
 		{
-			var tr = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefab) : HelperFramework.SpawnInternal(prefab);
+			var tr    = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefab) : HelperFramework.SpawnInternal(prefab);
 			var actor = tr.AddGetActor();
 			actor.isPooled = pooled;
 			actor.LaunchFrom(model);
@@ -299,7 +302,7 @@ namespace Pixeye.Framework
 
 		public static Actor Create(string prefabID, bool pooled = false)
 		{
-			var tr = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefabID) : HelperFramework.SpawnInternal(prefabID);
+			var tr    = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefabID) : HelperFramework.SpawnInternal(prefabID);
 			var actor = tr.AddGetActor();
 
 			actor.isPooled = pooled;
@@ -310,7 +313,7 @@ namespace Pixeye.Framework
 
 		public static Actor Create(string prefabID, Vector3 position, bool pooled = false)
 		{
-			var tr = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefabID, position) : HelperFramework.SpawnInternal(prefabID, position);
+			var tr    = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefabID, position) : HelperFramework.SpawnInternal(prefabID, position);
 			var actor = tr.AddGetActor();
 
 			actor.isPooled = pooled;
@@ -321,7 +324,7 @@ namespace Pixeye.Framework
 
 		public static Actor Create(GameObject prefab, Vector3 position, bool pooled = false)
 		{
-			var tr = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefab, position) : HelperFramework.SpawnInternal(prefab, position);
+			var tr    = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefab, position) : HelperFramework.SpawnInternal(prefab, position);
 			var actor = tr.AddGetActor();
 
 			actor.isPooled = pooled;
@@ -332,7 +335,7 @@ namespace Pixeye.Framework
 
 		public static Actor Create(GameObject prefab, bool pooled = false)
 		{
-			var tr = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefab) : HelperFramework.SpawnInternal(prefab);
+			var tr    = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefab) : HelperFramework.SpawnInternal(prefab);
 			var actor = tr.AddGetActor();
 			actor.isPooled = pooled;
 			actor.Launch();

@@ -18,7 +18,7 @@ namespace Pixeye.Framework
 	{
 
 		[HideInInspector]
-		public Dictionary<int, Action<EntityComposer>> helpers = new Dictionary<int, Action<EntityComposer>>();
+		public Dictionary<int,ModelComposer> helpers = new Dictionary<int,ModelComposer>();
 
 		protected virtual void OnEnable()
 		{
@@ -28,7 +28,7 @@ namespace Pixeye.Framework
 
 			Type t = GetType();
 			var n = name.Substring(5).Replace(" ", string.Empty);
-			helpers.Add(GetInstanceID(), (Action<EntityComposer>) Delegate.CreateDelegate(typeof(Action<EntityComposer>), null, t.GetMethod(n, BindingFlags.Public | BindingFlags.Static | BindingFlags.Default)));
+			helpers.Add(GetInstanceID(), (ModelComposer) Delegate.CreateDelegate(typeof(ModelComposer), null, t.GetMethod(n, BindingFlags.Public | BindingFlags.Static | BindingFlags.Default)));
 		}
 
 		protected virtual void OnDisable()
@@ -38,55 +38,49 @@ namespace Pixeye.Framework
 
 		internal virtual void Execute(in ent entity, Actor a = null)
 		{
-			EntityComposer.Default.entity = entity;
-			EntityComposer.Default.actor = a;
-			helpers[GetInstanceID()](EntityComposer.Default);
+ 
+			helpers[GetInstanceID()](entity, a);
 			Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Activate);
 		}
 
 		internal virtual void ExecuteOnStart(in ent entity, Actor a)
 		{
-			EntityComposer.Default.entity = entity;
-			EntityComposer.Default.actor = a;
-			helpers[GetInstanceID()](EntityComposer.Default);
+			 
+			helpers[GetInstanceID()](entity, a);
 			if (a.isActiveAndEnabled)
 				Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Activate);
 		}
 
 	}
 	#else
-	using UnityEngine;
+
 	public class ScriptableBuild : ScriptableObject
 	{
-    public Dictionary<int,Action<EntityComposer>> helpers = new Dictionary<int, Action<EntityComposer>>();
- 
+
+		public Dictionary<int, ModelComposer> helpers = new Dictionary<int, ModelComposer>();
+
 		internal virtual void Execute(in ent entity, Actor a = null)
 		{
-	 
-			EntityComposer.Default.entity = entity;
-			EntityComposer.Default.actor = a;
-			helpers[GetInstanceID()](EntityComposer.Default);
+			helpers[GetInstanceID()](entity, a);
 			Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Activate);
 		}
 
 		internal virtual void ExecuteOnStart(in ent entity, Actor a)
 		{
-			EntityComposer.Default.entity = entity;
-			EntityComposer.Default.actor = a;
-			helpers[GetInstanceID()](EntityComposer.Default);
+			helpers[GetInstanceID()](entity, a);
 			if (!a.isActiveAndEnabled) return;
 			Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Activate);
 		}
-		
-	  protected virtual void OnEnable()
+
+		protected virtual void OnEnable()
 		{
 			#if UNITY_EDITOR
 			if (!EditorApplication.isPlayingOrWillChangePlaymode) return;
 			#endif
 
 			Type t = GetType();
-			var n = name.Substring(5).Replace(" ", string.Empty);
-			helpers.Add(GetInstanceID(), (Action<EntityComposer>) Delegate.CreateDelegate(typeof(Action<EntityComposer>), null, t.GetMethod(n, BindingFlags.Public | BindingFlags.Static)));
+			var  n = name.Substring(5).Replace(" ", string.Empty);
+			helpers.Add(GetInstanceID(), (ModelComposer) Delegate.CreateDelegate(typeof(ModelComposer), null, t.GetMethod(n, BindingFlags.Public | BindingFlags.Static)));
 		}
 
 		protected virtual void OnDisable()

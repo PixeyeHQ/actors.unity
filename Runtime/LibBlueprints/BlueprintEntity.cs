@@ -140,7 +140,7 @@ namespace Pixeye.Framework
 				component.Copy(id);
 			}
 
-			entity.AddLater(tags);
+			entity.Set(tags);
 			Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Activate);
 		}
 
@@ -164,7 +164,7 @@ namespace Pixeye.Framework
 				component.Copy(id);
 			}
 
-			entity.AddLater(tags);
+			entity.Set(tags);
 
 			if (a.isActiveAndEnabled)
 				Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Activate);

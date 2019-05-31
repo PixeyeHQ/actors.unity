@@ -34,12 +34,6 @@ namespace Pixeye.Framework
 
 		#region ENTITY
 
-		internal EntityComposer Modify()
-		{
-			EntityComposer.Default.entity = this;
-			return EntityComposer.Default;
-		}
-
 		public ent(int id = -1, byte age = 0)
 		{
 			this.id = id;
