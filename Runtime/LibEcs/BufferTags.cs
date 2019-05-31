@@ -35,7 +35,7 @@ namespace Pixeye.Framework
 		public byte length;
 
 		public int Length => length;
-		
+
 		public void Clear()
 		{
 			for (int i = 0; i < length; i++)
@@ -164,13 +164,11 @@ namespace Pixeye.Framework
 			Entity.tags[entity.id].Clear();
 		}
 
-		 
-
 		public static void Add(in this ent entity, int tagID)
 		{
 			ref var buffer = ref Entity.tags[entity.id];
-			int len = buffer.length;
-			var tID = (ushort) tagID;
+			int     len    = buffer.length;
+			var     tID    = (ushort) tagID;
 
 			for (int index = 0; index < len; index++)
 			{
@@ -184,15 +182,14 @@ namespace Pixeye.Framework
 					return;
 				}
 			}
-			
-			
+
 			#if UNITY_EDITOR
 			if (len == BufferTags.Capacity)
 			{
 				throw new Exception("Tags limit reached!");
 			}
 			#endif
-			
+
 			buffer.SetElement(buffer.length, tagID);
 			HandleChange(entity, tagID);
 		}
@@ -200,11 +197,11 @@ namespace Pixeye.Framework
 		public static void Add(in this ent entity, params int[] tagsID)
 		{
 			ref var buffer = ref Entity.tags[entity.id];
-			int len = buffer.length;
+			int     len    = buffer.length;
 
 			for (int i = 0; i < tagsID.Length; i++)
 			{
-				var tID = (ushort) tagsID[i];
+				var tID        = (ushort) tagsID[i];
 				var allowToAdd = true;
 
 				for (int index = 0; index < len; index++)
@@ -234,11 +231,11 @@ namespace Pixeye.Framework
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		internal static void Set(in this ent entity, int tagID)
+		public static void Set(in this ent entity, int tagID)
 		{
 			ref var buffer = ref Entity.tags[entity.id];
-			int len = buffer.length;
-			var tID = (ushort) tagID;
+			int     len    = buffer.length;
+			var     tID    = (ushort) tagID;
 			for (int index = 0; index < len; index++)
 			{
 				if (buffer.tags[index] == tID)
@@ -263,7 +260,7 @@ namespace Pixeye.Framework
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		internal static void Set(in this ent entity, params int[] tagsID)
+		public static void Set(in this ent entity, params int[] tagsID)
 		{
 			ref var buffer = ref Entity.tags[entity.id];
 
@@ -271,7 +268,7 @@ namespace Pixeye.Framework
 
 			for (int i = 0; i < tagsID.Length; i++)
 			{
-				var tID = (ushort) tagsID[i];
+				var tID        = (ushort) tagsID[i];
 				var allowToAdd = true;
 				for (int index = 0; index < len; index++)
 				{
@@ -301,7 +298,7 @@ namespace Pixeye.Framework
 		public static void Remove(in this ent entity, int tagID)
 		{
 			ref var buffer = ref Entity.tags[entity.id];
-			int len = buffer.length;
+			int     len    = buffer.length;
 			for (int index = 0; index < len; index++)
 			{
 				if (buffer.tags[index] == tagID)
@@ -319,7 +316,7 @@ namespace Pixeye.Framework
 		public static void RemoveAll(in this ent entity, params int[] tagsID)
 		{
 			ref var buffer = ref Entity.tags[entity.id];
-			var len = buffer.length;
+			var     len    = buffer.length;
 
 			for (int i = 0; i < tagsID.Length; i++)
 			{
@@ -340,8 +337,8 @@ namespace Pixeye.Framework
 		public static void RemoveAll(in this ent entity, int tagID)
 		{
 			ref var buffer = ref Entity.tags[entity.id];
-			int len = buffer.length;
-			var tID = (ushort) tagID;
+			int     len    = buffer.length;
+			var     tID    = (ushort) tagID;
 
 			for (int index = 0; index < len; index++)
 			{
@@ -376,7 +373,7 @@ namespace Pixeye.Framework
 		internal static void Add(GroupCore groupCore)
 		{
 			DictionaryGroup container;
-			var composition = groupCore.composition;
+			var             composition = groupCore.composition;
 			foreach (var tagID in composition.includeTags)
 			{
 				if (inUseGroups.TryGetValue(tagID, out container))
