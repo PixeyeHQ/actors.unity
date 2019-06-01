@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Pixeye.Framework
 {
-	sealed class MonoEntity : MonoBehaviour, IActor
+	sealed public class MonoEntity : MonoBehaviour, IActor
 	{
 
 		public ent entity;
