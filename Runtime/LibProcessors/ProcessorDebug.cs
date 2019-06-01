@@ -35,16 +35,18 @@ namespace Pixeye.Framework
 					scaler.referenceResolution = new Vector2(12, 12);
 					canvas.worldCamera = Camera.main;
 					canvas.renderMode = RenderMode.ScreenSpaceCamera;
-					canvas.planeDistance = 60;
+					canvas.planeDistance = 30;
+					canvas.sortingOrder = 10;
 					canvas.transform.SetParent(Camera.main.transform);
 
 					rectTransform = go.GetComponent<RectTransform>();
 				}
 				rectTransform.gameObject.SetActive(true);
-
+								 
 				for (int i = 0; i < Entity.Count; i++)
 				{
 					var tr = Entity.transforms[i];
+					if (tr==null) continue;
 					var t  = Obj.Spawn<TextMesh>(prefabEntityLabel, rectTransform.transform, tr.position, Quaternion.identity);
 					t.text = $"Entity ID: {Entity.cache[i].id}";
 					Vector2 screenP = RectTransformUtility.WorldToScreenPoint(null, tr.position + new Vector3(0, 0.6f, 0));
