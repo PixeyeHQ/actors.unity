@@ -72,10 +72,10 @@ namespace Pixeye.Framework
 
 		public void AddToNode(GameObject prefab, GameObject instance, int pool)
 		{
-			var id = prefab.GetInstanceID();
-			var nodesValid = nodes.FindValidNodes(id);
-			var conditionNodeCreate = true;
-			List<int> nodesToKill = new List<int>();
+			var       id                  = prefab.GetInstanceID();
+			var       nodesValid          = nodes.FindValidNodes(id);
+			var       conditionNodeCreate = true;
+			List<int> nodesToKill         = new List<int>();
 
 			for (int i = 0; i < nodesValid.Count; i++)
 			{
@@ -131,7 +131,7 @@ namespace Pixeye.Framework
 			#endif
 
 			if (prefab == null) return;
-			var id = prefab.GetInstanceID();
+			var id    = prefab.GetInstanceID();
 			var index = nodes.FindValidNode(id, pool);
 			if (index != -1)
 			{
@@ -160,6 +160,9 @@ namespace Pixeye.Framework
 				Toolbox.Add(factory);
 			}
 
+			if (SettingsEngine.DefineDebugMode)
+				Add<ProcessorDebug>();
+
 			Add<ProcessorObserver>();
 			Add<ProcessorEntities>();
 
@@ -187,9 +190,13 @@ namespace Pixeye.Framework
 			return Toolbox.Add<T>();
 		}
 
-		protected virtual void Setup() { }
+		protected virtual void Setup()
+		{
+		}
 
-		protected virtual void PostSetup() { }
+		protected virtual void PostSetup()
+		{
+		}
 
 		protected virtual void OnDestroy()
 		{

@@ -106,7 +106,7 @@ namespace Pixeye.Framework
 						components.length = 0;
 
 						if (Entity.transforms.Length > entityID && Entity.transforms[entityID] != null)
-							Entity.transforms[entityID].gameObject.Release(Entity.utils[entityID].isPooled ? Pool.Entities : 0);
+							Entity.transforms[entityID].gameObject.Release(Entity.cache[entityID].isPooled ? Pool.Entities : 0);
 
 						Entity.tags[entityID].Clear();
 
@@ -200,7 +200,7 @@ namespace Pixeye.Framework
 					}
 					case Entity.Delayed.Action.ChangeTag:
 					{
-						if (!Entity.utils[entityID].isAlive) continue;
+						if (!Entity.cache[entityID].isAlive) continue;
 
 						var index = operation.arg;
 						var groups = HelperTags.inUseGroups.groupStorage[index];

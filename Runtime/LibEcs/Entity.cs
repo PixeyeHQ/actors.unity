@@ -27,13 +27,14 @@ namespace Pixeye.Framework
 		}
 
 	}
-
+	[StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Unicode)]
 	public struct Utils
 	{
 
+		public int id;
 		public bool isAlive;
 		public bool isPooled;
-		public byte ageCache; // caching age of entity for retrivieng it in future. ( ParseBy method )
+		public byte age; // caching age of entity for retrivieng it in future. ( ParseBy method )
 
 	}
 
@@ -63,7 +64,7 @@ namespace Pixeye.Framework
 	public static unsafe class Entity
 	{
 
-		public static int entitiesDebugCount;
+		public static int Count;
 
 		public static Transform[] transforms = new Transform[SettingsEngine.SizeEntities];
 
@@ -77,7 +78,7 @@ namespace Pixeye.Framework
 
 		internal static BufferComponents[] components;
 		internal static BufferTags* tags;
-		internal static Utils* utils;
+		internal static Utils* cache;
 		//	internal static BufferComponents* components;
 		//===============================//
 		// Initialize 
@@ -88,12 +89,12 @@ namespace Pixeye.Framework
 		{
 			components = new BufferComponents[SettingsEngine.SizeEntities];
 			tags = (BufferTags*) UnmanagedMemory.Alloc(sizeBufferTags * SettingsEngine.SizeEntities);
-			utils = (Utils*) UnmanagedMemory.Alloc(sizeUtils * SettingsEngine.SizeEntities);
+			cache = (Utils*) UnmanagedMemory.Alloc(sizeUtils * SettingsEngine.SizeEntities);
 
 			for (int i = 0; i < SettingsEngine.SizeEntities; i++)
 			{
 				tags[i] = new BufferTags();
-				utils[i] = new Utils();
+				cache[i] = new Utils();
 				components[i] = new BufferComponents(1);
 			}
 
@@ -113,12 +114,12 @@ namespace Pixeye.Framework
 				Array.Resize(ref transforms, l);
 				Array.Resize(ref components, l);
 				tags = (BufferTags*) UnmanagedMemory.ReAlloc(tags, sizeBufferTags * l);
-				utils = (Utils*) UnmanagedMemory.ReAlloc(utils, sizeUtils * l);
+				cache = (Utils*) UnmanagedMemory.ReAlloc(cache, sizeUtils * l);
 
 				for (int i = counter; i < l; i++)
 				{
 					tags[i] = new BufferTags();
-					utils[i] = new Utils();
+					cache[i] = new Utils();
 					components[i] = new BufferComponents(1);
 				}
 
@@ -127,11 +128,13 @@ namespace Pixeye.Framework
 
 			components[id].length = 0;
 
-			utils[id].ageCache = age;
-			utils[id].isAlive = true;
-			utils[id].isPooled = false;
+			var ptrCache = &cache[id];
+			ptrCache->id = id;
+			ptrCache->age = age;
+			ptrCache->isAlive = true;
+			ptrCache->isPooled = true;
 
-			entitiesDebugCount++;
+			Count++;
 			return new ent(id, age);
 		}
 
@@ -148,12 +151,12 @@ namespace Pixeye.Framework
 				Array.Resize(ref components, l);
 
 				tags = (BufferTags*) UnmanagedMemory.ReAlloc(tags, sizeBufferTags * l);
-				utils = (Utils*) UnmanagedMemory.ReAlloc(utils, sizeUtils * l);
+				cache = (Utils*) UnmanagedMemory.ReAlloc(cache, sizeUtils * l);
 
 				for (int i = counter; i < l; i++)
 				{
 					tags[i] = new BufferTags();
-					utils[i] = new Utils();
+					cache[i] = new Utils();
 					components[i] = new BufferComponents(1);
 				}
 
@@ -162,11 +165,13 @@ namespace Pixeye.Framework
 
 			components[id].length = 0;
 
-			utils[id].ageCache = age;
-			utils[id].isAlive = true;
-			utils[id].isPooled = pooled;
+			var ptrCache = &cache[id];
+			ptrCache->id = id;
+			ptrCache->age = age;
+			ptrCache->isAlive = true;
+			ptrCache->isPooled = pooled;
 
-			entitiesDebugCount++;
+			Count++;
 		}
 
 		public static ent Create()
@@ -191,33 +196,6 @@ namespace Pixeye.Framework
 
 			return Setup(id, age);
 		}
-
-		#if ODIN_INSPECTOR
-		public static ent Create(BlueprintEntity bpAsset)
-		{
-			int id;
-			byte age = 0;
-
-			if (ent.entityStackLength > 0)
-			{
-				var pop = ent.entityStack.Dequeue();
-				byte ageOld = pop.age;
-				id = pop.id;
-				unchecked
-				{
-					age = (byte) (ageOld + 1);
-				}
-
-				ent.entityStackLength--;
-			}
-			else
-				id = ent.lastID++;
-
-			var entity = Setup(id, age);
-			bpAsset.Execute(entity);
-			return entity;
-		}
-		#endif
 
 		public static ent Create(ModelComposer model)
 		{
@@ -369,6 +347,31 @@ namespace Pixeye.Framework
 			return entity;
 		}
 
+		public static ent Create(string prefabID, Vector3 position, bool pooled = false)
+		{
+			int  id;
+			byte age = 0;
+
+			if (ent.entityStackLength > 0)
+			{
+				var  pop    = ent.entityStack.Dequeue();
+				byte ageOld = pop.age;
+				id = pop.id;
+				unchecked
+				{
+					age = (byte) (ageOld + 1);
+				}
+
+				ent.entityStackLength--;
+			}
+			else
+				id = ent.lastID++;
+
+			SetupWithTransform(id, pooled, age);
+			transforms[id] = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefabID, position) : HelperFramework.SpawnInternal(prefabID, position);
+			return new ent(id, age);
+		}
+		
 		public static ent Create(string prefabID, bool pooled = false)
 		{
 			int  id;
@@ -421,6 +424,31 @@ namespace Pixeye.Framework
 		}
 
 		#if ODIN_INSPECTOR
+			public static ent Create(BlueprintEntity bpAsset)
+		{
+			int id;
+			byte age = 0;
+
+			if (ent.entityStackLength > 0)
+			{
+				var pop = ent.entityStack.Dequeue();
+				byte ageOld = pop.age;
+				id = pop.id;
+				unchecked
+				{
+					age = (byte) (ageOld + 1);
+				}
+
+				ent.entityStackLength--;
+			}
+			else
+				id = ent.lastID++;
+
+			var entity = Setup(id, age);
+			bpAsset.Execute(entity);
+			return entity;
+		}
+		
 		public static ent Create(string prefabID, BlueprintEntity bpAsset, bool pooled = false)
 		{
 			int id;
@@ -500,7 +528,7 @@ namespace Pixeye.Framework
 				index = index * 10 + (name[i] - '0');
 			#endif
 
-			return new ent(index, utils[index].ageCache);
+			return new ent(index, cache[index].age);
 		}
 		#endif
 
@@ -558,7 +586,7 @@ namespace Pixeye.Framework
 			var entityID = entity.id;
 
 			#if UNITY_EDITOR
-			if (!utils[entity.id].isAlive)
+			if (!cache[entity.id].isAlive)
 			{
 				Debug.LogError($"-> Entity with id: [{entityID}] is not active. You should not add components to inactive entity. ");
 				return default;

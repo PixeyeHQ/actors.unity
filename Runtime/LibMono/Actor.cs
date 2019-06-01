@@ -52,7 +52,7 @@ namespace Pixeye.Framework
 			{
 				if (!manualRemoved) return;
 				manualRemoved = false;
-				Entity.utils[entity.id].isAlive = true;
+				Entity.cache[entity.id].isAlive = true;
 				Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Activate);
 			}
 		}
@@ -61,9 +61,9 @@ namespace Pixeye.Framework
 		{
 			unsafe
 			{
-				if (Toolbox.applicationIsQuitting || !Entity.utils[entity.id].isAlive) return;
+				if (Toolbox.applicationIsQuitting || !Entity.cache[entity.id].isAlive) return;
 				manualRemoved = true;
-				Entity.utils[entity.id].isAlive = false;
+				Entity.cache[entity.id].isAlive = false;
 				Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Deactivate);
 			}
 		}

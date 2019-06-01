@@ -109,31 +109,31 @@ namespace Pixeye.Framework
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void Unbind()
 		{
-			Entity.utils[id].isAlive = false;
+			Entity.cache[id].isAlive = false;
 			Entity.Delayed.Set(this, 0, Entity.Delayed.Action.Unbind);
-			Entity.entitiesDebugCount--;
+			Entity.Count--;
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void Release()
 		{
 			#if UNITY_EDITOR
-			if (!Entity.utils[id].isAlive)
+			if (!Entity.cache[id].isAlive)
 			{
 				Debug.LogError($"Entity with id [{id}]  already destroyed.");
 				return;
 			}
 			#endif
 
-			Entity.utils[id].isAlive = false;
+			Entity.cache[id].isAlive = false;
 			Entity.Delayed.Set(this, 0, Entity.Delayed.Action.Kill);
-			Entity.entitiesDebugCount--;
+			Entity.Count--;
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public bool EqualsAndExist(ent other)
 		{
-			return id > -1 && Entity.utils[id].isAlive && this.id == other.id && this.age == other.age;
+			return id > -1 && Entity.cache[id].isAlive && this.id == other.id && this.age == other.age;
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -147,7 +147,7 @@ namespace Pixeye.Framework
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			get
 			{
-				return id > -1 && Entity.utils[id].isAlive && Entity.utils[id].ageCache == age;
+				return id > -1 && Entity.cache[id].isAlive && Entity.cache[id].age == age;
 			}
 		}
 

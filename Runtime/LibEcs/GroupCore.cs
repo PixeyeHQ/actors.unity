@@ -5,9 +5,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using Unity.IL2CPP.CompilerServices;
-using UnityEngine;
+
 
 namespace Pixeye.Framework
 {
@@ -232,7 +231,6 @@ namespace Pixeye.Framework
 			{
 				position = -1;
 				this.g = g;
-				//	this.entities = entities;
 				this.length = length;
 			}
 
