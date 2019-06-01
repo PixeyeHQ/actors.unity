@@ -10,9 +10,9 @@ namespace Pixeye.Framework
 
 		public ent entity;
 
-		public ref ent GetEntity
+		public ref ent GetEntity()
 		{
-			get => ref entity;
+			return ref entity;
 		}
 
 	}

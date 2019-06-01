@@ -33,9 +33,9 @@ namespace Pixeye.Framework
 		[FoldoutGroup("Main")]
 		public ScriptableBuild buildFrom;
 
-		public ref ent GetEntity
+		public ref ent GetEntity()
 		{
-			get => ref entity;
+			return ref entity;
 		}
 
 		#endregion
@@ -246,8 +246,6 @@ namespace Pixeye.Framework
 		}
 
 		#endregion
-
- 
 
 		public static Actor CreateFor(GameObject obj, bool pooled = false)
 		{

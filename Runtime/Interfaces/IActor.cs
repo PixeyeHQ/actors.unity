@@ -6,7 +6,7 @@ namespace Pixeye.Framework
 	public interface IActor
 	{
 
-		ref ent GetEntity { get; }
+		ref ent GetEntity();
 
 	}
 }
