@@ -174,6 +174,33 @@ namespace Pixeye.Framework
 			Count++;
 		}
 
+		public static ent CreateFor(GameObject obj, bool pooled = false)
+		{
+			int  id;
+			byte age = 0;
+
+			if (ent.entityStackLength > 0)
+			{
+				var  pop    = ent.entityStack.Dequeue();
+				byte ageOld = pop.age;
+				id = pop.id;
+				unchecked
+				{
+					age = (byte) (ageOld + 1);
+				}
+
+				ent.entityStackLength--;
+			}
+			else
+				id = ent.lastID++;
+
+			SetupWithTransform(id, pooled, age);
+			transforms[id] = obj.transform;
+
+			var entity = new ent(id, age);
+			return entity;
+		}
+		
 		public static ent Create()
 		{
 			int  id;
@@ -507,30 +534,43 @@ namespace Pixeye.Framework
 		public static void RenameGameobject(this ent entity)
 		{
 			var tr = transforms[entity.id];
-			#if UNITY_EDITOR
-			tr.name = $"{entity.id} {tr.name}";
-			#else
+//			#if UNITY_EDITOR
+//			tr.name = $"{entity.id} {tr.name}";
+//			#else
 			tr.name = entity.id.ToString();
-			#endif
+		//	#endif
 		}
 
-		#if UNITY_EDITOR
+ 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static ent ParseBy(string name)
 		{
 			var index = 0;
-			#if UNITY_EDITOR
-			var len = name.Split(' ')[0].Length;
-			for (int i = 0; i < len; i++)
-				index = index * 10 + (name[i] - '0');
-			#else
+//			#if UNITY_EDITOR
+//			var len = name.Split(' ')[0].Length;
+//			for (int i = 0; i < len; i++)
+//				index = index * 10 + (name[i] - '0');
+//			#else
 			for (int i = 0; i < name.Length; i++)
 				index = index * 10 + (name[i] - '0');
-			#endif
-
+		//	#endif
 			return new ent(index, cache[index].age);
 		}
-		#endif
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static int ParseByIn(string name)
+		{
+			var index = 0;
+//			#if UNITY_EDITOR
+//			var len = name.Split(' ')[0].Length;
+//			for (int i = 0; i < len; i++)
+//				index = index * 10 + (name[i] - '0');
+//			#else
+			for (int i = 0; i < name.Length; i++)
+				index = index * 10 + (name[i] - '0');
+			//	#endif
+			return index;
+		}
+
 
 		#region ADD/REMOVE
 
