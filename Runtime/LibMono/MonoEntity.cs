@@ -11,7 +11,7 @@ namespace Pixeye.Framework
 		#if UNITY_EDITOR
 
 		[FoldoutGroup("Main"), SerializeField, ReadOnly]
-		int _entity;
+		int _entity = -1;
 
 		ent entityCached;
 
