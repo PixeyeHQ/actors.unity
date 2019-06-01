@@ -2,7 +2,9 @@
 // Contacts : Pix - ask@pixeye.games
 
 using UnityEngine;
-
+#if ODIN_INSPECTOR
+using Sirenix.OdinInspector;
+#endif
 namespace Pixeye.Framework
 {
 	sealed public class MonoEntity : MonoBehaviour, IActor
