@@ -15,12 +15,12 @@ using Sirenix.OdinInspector;
 namespace Pixeye.Framework
 {
 	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
-	public class Actor : MonoBehaviour, IRequireStarter
+	public class Actor : MonoBehaviour, IRequireStarter, IActor
 	{
 
 		#region MEMBERS
 
-		public ent entity = -1;
+		public ent entity;
 
 		#if UNITY_EDITOR
 		[FoldoutGroup("Main"), SerializeField, ReadOnly]
@@ -32,6 +32,11 @@ namespace Pixeye.Framework
 
 		[FoldoutGroup("Main")]
 		public ScriptableBuild buildFrom;
+
+		public ref ent GetEntity
+		{
+			get => ref entity;
+		}
 
 		#endregion
 
@@ -242,10 +247,7 @@ namespace Pixeye.Framework
 
 		#endregion
 
-		public ref readonly ent GetEntity()
-		{
-			return ref entity;
-		}
+ 
 
 		public static Actor CreateFor(GameObject obj, bool pooled = false)
 		{
