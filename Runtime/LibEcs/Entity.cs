@@ -424,6 +424,32 @@ namespace Pixeye.Framework
 			return new ent(id, age);
 		}
 
+		public static ent Create(GameObject prefab, Vector3 position, bool pooled = false)
+		{
+			int  id;
+			byte age = 0;
+
+			if (ent.entityStackLength > 0)
+			{
+				var  pop    = ent.entityStack.Dequeue();
+				byte ageOld = pop.age;
+				id = pop.id;
+				unchecked
+				{
+					age = (byte) (ageOld + 1);
+				}
+
+				ent.entityStackLength--;
+			}
+			else
+				id = ent.lastID++;
+
+			SetupWithTransform(id, pooled, age);
+			transforms[id] = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefab, position) : HelperFramework.SpawnInternal(prefab,position);
+
+			return new ent(id, age);
+		}
+		
 		public static ent Create(GameObject prefab, bool pooled = false)
 		{
 			int  id;
@@ -640,9 +666,7 @@ namespace Pixeye.Framework
 
 			if (val == null)
 				val = storage.Creator();
-
-			if ((generations[entityID, Storage<T>.generation] & Storage<T>.componentMask) == Storage<T>.componentMask)
-				return storage.components[entityID];
+			
 
 			Delayed.Set(entity, Storage<T>.componentID, Delayed.Action.Add);
 			return val;

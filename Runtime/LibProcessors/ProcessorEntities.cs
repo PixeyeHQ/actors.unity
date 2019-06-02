@@ -44,23 +44,35 @@ namespace Pixeye.Framework
 						var storage = Storage.all[componentID];
 						var generation = Storage.generations[componentID];
 						var mask = Storage.masks[componentID];
-						Entity.components[entityID].Add(componentID);
-						Entity.generations[entityID, generation] |= mask;
+
+
+						if ((Entity.generations[entityID, generation] & mask) != mask)
+					 continue;
+
+
+							Entity.components[entityID].Add(componentID);
+							Entity.generations[entityID, generation] |= mask;
+
+							for (int l = 0; l < storage.lenOfGroups; l++)
+							{
+								var group = storage.groups[l];
+								if (!group.composition.Check(entityID)) continue;
+
+								group.Insert(operation.entity);
+							}
+
+					 
 						
-						for (int l = 0; l < storage.lenOfGroups; l++)
-						{
-							var group = storage.groups[l];
-							if (!group.composition.Check(entityID)) continue;
-
-							group.Insert(operation.entity);
-						}
-
 						for (int l = 0; l < storage.lenOfGroupsToRemove; l++)
 						{
 							var group = storage.groupsToRemove[l];
 							if (!group.composition.CanProceed(entityID)) continue;
 							group.TryRemove(entityID);
 						}
+						
+						
+						
+						
 						break;
 					}
 					case Entity.Delayed.Action.Kill:
