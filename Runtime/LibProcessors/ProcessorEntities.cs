@@ -46,7 +46,7 @@ namespace Pixeye.Framework
 						var mask = Storage.masks[componentID];
 
 
-						if ((Entity.generations[entityID, generation] & mask) != mask)
+						if ((Entity.generations[entityID, generation] & mask) == mask)
 					 continue;
 
 
