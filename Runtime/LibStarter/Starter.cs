@@ -160,12 +160,15 @@ namespace Pixeye.Framework
 				Toolbox.Add(factory);
 			}
 
+		 
+
+ 
+			Add<ProcessorEntities>();
+			Add<ProcessorObserver>();
+
 			if (SettingsEngine.DefineDebugMode)
 				Add<ProcessorDebug>();
-
-			Add<ProcessorObserver>();
-			Add<ProcessorEntities>();
-
+			
 			Setup();
 
 			initialized = true;
