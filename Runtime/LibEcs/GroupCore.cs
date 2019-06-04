@@ -122,7 +122,6 @@ namespace Pixeye.Framework
 			}
 
 			entities[pointer] = entity;
-
 			UpdateComponents(pointer);
 
 			if (onAdd != null) onAdd(entity);
