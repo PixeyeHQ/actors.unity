@@ -27,6 +27,12 @@ namespace Pixeye.Framework
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public void FirstTime()
+		{
+			callback(val);
+		}
+		
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void Check()
 		{
 			var arg = prop(source);

@@ -11,6 +11,16 @@ namespace Pixeye.Framework
 
 		public Group<ComponentObserver> groupObservers = new Group<ComponentObserver>();
 
+		public ProcessorObserver()
+		{
+			groupObservers.onAdd += (in ent entity) =>
+			{
+				var cObserver = entity.ComponentObserver();
+				for (int j = 0; j < cObserver.length; j++)
+					cObserver.wrappers[j].FirstTime();
+			};
+		}
+		
 		public void Tick(float delta)
 		{
 			for (int i = 0; i < groupObservers.length; i++)
