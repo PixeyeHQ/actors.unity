@@ -13,12 +13,12 @@ namespace Pixeye.Framework
 
 		public ProcessorObserver()
 		{
-			groupObservers.onAdd += (in ent entity) =>
-			{
-				var cObserver = entity.ComponentObserver();
-				for (int j = 0; j < cObserver.length; j++)
-					cObserver.wrappers[j].FirstTime();
-			};
+			// groupObservers.onAdd += (in ent entity) =>
+			// {
+			// 	var cObserver = entity.ComponentObserver();
+			// 	for (int j = 0; j < cObserver.length; j++)
+			// 		cObserver.wrappers[j].FirstTime();
+			// };
 		}
 		
 		public void Tick(float delta)
