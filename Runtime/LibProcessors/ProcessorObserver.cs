@@ -19,6 +19,15 @@ namespace Pixeye.Framework
 			// 	for (int j = 0; j < cObserver.length; j++)
 			// 		cObserver.wrappers[j].FirstTime();
 			// };
+	
+			groupObservers.onRemove +=(in ent entity) => 
+			{
+     		var cObserver = entity.ComponentObserver();
+				for (int j = 0; j < cObserver.length; j++)
+					cObserver.wrappers[j].Check();
+			} ;
+
+
 		}
 		
 		public void Tick(float delta)
