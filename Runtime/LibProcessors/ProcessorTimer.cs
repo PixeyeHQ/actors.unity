@@ -19,7 +19,7 @@ namespace Pixeye.Source
 
 		public ProcessorTimer()
 		{
-			ProcessorUpdate.Default.Add(this);
+			ProcessorUpdate.Add(this);
 		}
 
 		public void Tick(float delta)

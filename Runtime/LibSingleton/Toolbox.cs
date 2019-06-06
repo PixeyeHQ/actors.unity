@@ -83,7 +83,7 @@ namespace Pixeye.Framework
 		{
 			var awakeble = obj as IAwake;
 			if (awakeble != null) awakeble.OnAwake();
-			ProcessorUpdate.Default.Add(obj);
+			ProcessorUpdate.Add(obj);
 		}
 
 		/// <summary>

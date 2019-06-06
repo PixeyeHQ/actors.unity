@@ -1,7 +1,7 @@
 ﻿//  Project  : ACTORS
 //  Contacts : Pixeye - ask@pixeye.games
 
- 
+
 using System.Runtime.CompilerServices;
 using Unity.IL2CPP.CompilerServices;
 using UnityEngine;
@@ -16,81 +16,28 @@ namespace Pixeye.Framework
 	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
 	public class Actor : MonoBehaviour, IRequireStarter, IActor
 	{
-
 		#region MEMBERS
 
 		public ent entity;
 
-		#if UNITY_EDITOR
+#if UNITY_EDITOR
 		[FoldoutGroup("Main"), SerializeField, ReadOnly]
 		internal int _entity = -1;
-		#endif
+#endif
 
-		[FoldoutGroup("Main")]
-		public bool isPooled;
+		[FoldoutGroup("Main")] public bool isPooled;
 
-		[FoldoutGroup("Main")]
-		public ScriptableBuild buildFrom;
+		[FoldoutGroup("Main")] public ScriptableBuild buildFrom;
+
+		#endregion
+
+
+		#region METHODS
 
 		public ref ent GetEntity()
 		{
 			return ref entity;
 		}
-
-		#endregion
-
-		#region METHODS UNITY
-
-		#if UNITY_EDITOR
-
-		protected bool manualRemoved;
-
-		void Awake()
-		{
-			manualRemoved = !enabled;
-		}
-
-		void OnEnable()
-		{
-			unsafe
-			{
-				if (!manualRemoved) return;
-				manualRemoved = false;
-				Entity.cache[entity.id].isAlive = true;
-				Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Activate);
-			}
-		}
-
-		void OnDisable()
-		{
-			unsafe
-			{
-				if (Toolbox.applicationIsQuitting || !Entity.cache[entity.id].isAlive) return;
-				manualRemoved = true;
-				Entity.cache[entity.id].isAlive = false;
-				Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Deactivate);
-			}
-		}
-
-		#endif
-
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public virtual void OnAdd()
-		{
-		}
-
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public virtual void OnRemove()
-		{
-		}
-
-		public virtual void Dispose()
-		{
-		}
-
-		#endregion
-
-		#region METHODS
 
 		/// <summary>
 		/// Don't use.
@@ -118,10 +65,10 @@ namespace Pixeye.Framework
 			entity = new ent(id, age);
 			Entity.SetupWithTransform(id, isPooled, age);
 
-			#if UNITY_EDITOR
+#if UNITY_EDITOR
 			_entity = id;
 
-			#endif
+#endif
 
 			Entity.transforms[id] = transform;
 
@@ -156,10 +103,10 @@ namespace Pixeye.Framework
 			entity = new ent(id, age);
 			Entity.SetupWithTransform(id, isPooled, age);
 
-			#if UNITY_EDITOR
+#if UNITY_EDITOR
 			_entity = id;
 
-			#endif
+#endif
 
 			Entity.transforms[id] = transform;
 
@@ -194,10 +141,10 @@ namespace Pixeye.Framework
 			entity = new ent(id, age);
 			Entity.SetupWithTransform(id, isPooled, age);
 
-			#if UNITY_EDITOR
+#if UNITY_EDITOR
 			_entity = id;
 
-			#endif
+#endif
 
 			Entity.transforms[id] = transform;
 
@@ -341,7 +288,7 @@ namespace Pixeye.Framework
 			return actor;
 		}
 
-		#if ODIN_INSPECTOR
+#if ODIN_INSPECTOR
 		public static Actor Create(string prefabID, BlueprintEntity bp, bool pooled = false)
 		{
 			var tr = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefabID) : HelperFramework.SpawnInternal(prefabID);
@@ -361,13 +308,11 @@ namespace Pixeye.Framework
 			actor.Launch();
 			return actor;
 		}
-		#endif
-
+#endif
 	}
 
 	public static class HelperActor
 	{
-
 		/// <summary>
 		/// Use only for first time activation of "sleeping" actors on the scene
 		/// </summary>
@@ -375,10 +320,9 @@ namespace Pixeye.Framework
 		public static void ActivateActor(in this ent entity)
 		{
 			entity.transform.GetComponent<Actor>().enabled = true;
-			#if !UNITY_EDITOR
+#if !UNITY_EDITOR
 			Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Activate);
-			#endif
+#endif
 		}
-
 	}
 }

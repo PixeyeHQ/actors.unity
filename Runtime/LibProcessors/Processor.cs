@@ -19,7 +19,7 @@ namespace Pixeye.Framework
 		public void Dispose()
 		{
 			ProcessorSignals.Default.Remove(this);
-			ProcessorUpdate.Default.Remove(this);
+			ProcessorUpdate.Remove(this);
 
 			OnDispose();
 		}

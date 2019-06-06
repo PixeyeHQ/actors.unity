@@ -44,14 +44,14 @@ namespace Pixeye.Framework
 			if (conditionSignals)
 				ProcessorSignals.Default.Add(this);
 
-			ProcessorUpdate.Default.Add(this);
+			ProcessorUpdate.Add(this);
 		}
 
 		void OnDisable()
 		{
 			if (conditionSignals)
 				ProcessorSignals.Default.Remove(this);
-			ProcessorUpdate.Default.Remove(this);
+			ProcessorUpdate.Remove(this);
 
 			HandleDisable();
 		}
