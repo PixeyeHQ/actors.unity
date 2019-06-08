@@ -69,6 +69,7 @@ namespace Pixeye.Framework
 
 		internal static BufferComponents[] components;
 		internal static BufferTags* tags;
+		
 		internal static Utils* cache;
 
 		//===============================//
@@ -126,7 +127,7 @@ namespace Pixeye.Framework
 			ptrCache->isPooled = pooled;
 
 			Count++;
-			//	return new ent(id, age);
+ 
 		}
 
 

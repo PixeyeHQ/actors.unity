@@ -18,9 +18,7 @@ namespace Pixeye.Framework
 		public ent entity;
 
 		#if UNITY_EDITOR
-
-		protected bool manualRemoved;
-
+ 
 		[FoldoutGroup("Main"), SerializeField, ReadOnly]
 		internal int _entity = -1;
 
@@ -37,8 +35,10 @@ namespace Pixeye.Framework
 
 		#if UNITY_EDITOR
 
-		void Awake() => manualRemoved = !enabled;
+		protected bool manualRemoved;
 
+		void Awake() => manualRemoved = !enabled;
+		
 		protected virtual void OnEnable()
 		{
 			unsafe
@@ -49,7 +49,7 @@ namespace Pixeye.Framework
 				Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Activate);
 			}
 		}
-
+		
 		protected virtual void OnDisable()
 		{
 			unsafe
@@ -60,7 +60,7 @@ namespace Pixeye.Framework
 				Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Deactivate);
 			}
 		}
-
+		
 		#else
 				protected virtual void OnEnable(){}
 				protected virtual void OnDisable(){}

@@ -81,7 +81,7 @@ namespace Pixeye.Framework
 				id = ent.lastID++;
 
 
-			Initialize(id, age);
+			Initialize(id, age, pooled);
 			transforms[id] = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefabID) : HelperFramework.SpawnInternal(prefabID);
 			return new ent(id, age);
 		}

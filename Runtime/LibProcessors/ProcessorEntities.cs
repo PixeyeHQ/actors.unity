@@ -118,7 +118,10 @@ namespace Pixeye.Framework
 						components.length = 0;
 
 						if (Entity.transforms.Length > entityID && Entity.transforms[entityID] != null)
+						{
 							Entity.transforms[entityID].gameObject.Release(Entity.cache[entityID].isPooled ? Pool.Entities : 0);
+							Entity.transforms[entityID] = null;
+						}
 
 						Entity.tags[entityID].Clear();
 
