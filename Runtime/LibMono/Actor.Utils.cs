@@ -161,7 +161,7 @@ namespace Pixeye.Framework
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static Actor Create(string prefabID , ModelComposer model, , Vector3 position,  bool pooled = false)
+		public static Actor Create(string prefabID , ModelComposer model,  Vector3 position,  bool pooled = false)
 		{
 			var tr    = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefabID, position) : HelperFramework.SpawnInternal(prefabID, position);
 			var actor = tr.AddGetActor();
