@@ -2,6 +2,7 @@
 // Contacts : Pix - ask@pixeye.games
 
 using UnityEngine;
+
 #if ODIN_INSPECTOR
 using Sirenix.OdinInspector;
 #endif
@@ -9,7 +10,6 @@ namespace Pixeye.Framework
 {
 	sealed public class MonoEntity : MonoBehaviour, IActor
 	{
-
 		#if UNITY_EDITOR
 
 		[FoldoutGroup("Main"), SerializeField, ReadOnly]
@@ -19,20 +19,19 @@ namespace Pixeye.Framework
 
 		public ent entity
 		{
-			get
-			{
-				return entityCached;
-			}
+			get { return entityCached; }
 			set
 			{
 				entityCached = value;
-				_entity = entityCached.id;
+				_entity      = entityCached.id;
 			}
 		}
+
 		public ref ent GetEntity()
 		{
 			return ref entityCached;
 		}
+
 		#else
 			public ent entity;
 
@@ -41,6 +40,5 @@ namespace Pixeye.Framework
 			return ref entity;
 		}
 		#endif
-
 	}
 }

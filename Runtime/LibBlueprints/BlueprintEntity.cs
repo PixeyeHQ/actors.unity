@@ -2,7 +2,6 @@
 // Contacts : Pix - ask@pixeye.games
 
 #if ODIN_INSPECTOR
- 
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -20,6 +19,9 @@ using Sirenix.Utilities.Editor;
 
 namespace Pixeye.Framework
 {
+
+  
+
 	public class BlueprintEntity : ScriptableBuild
 	{
 
@@ -230,7 +232,12 @@ namespace Pixeye.Framework
 		}
 
 	}
+
+    public interface IComponentCopy
+    {
+	    void Copy(int entityID);
+    } 
+
 	#endif
 }
 #endif
- 

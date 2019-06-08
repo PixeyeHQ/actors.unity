@@ -22,12 +22,7 @@ namespace Pixeye.Framework
 
 		public HashCode AndEach<T>(IEnumerable<T> items)
 		{
-			if (items == null)
-			{
-				return new HashCode(value);
-			}
-
-			return new HashCode(GetHashCode(items, value));
+			return items == null ? new HashCode(value) : new HashCode(GetHashCode(items, value));
 		}
 
 		static int CombineHashCodes(int h1, int h2)

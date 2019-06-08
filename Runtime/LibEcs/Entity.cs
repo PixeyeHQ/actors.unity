@@ -10,11 +10,9 @@ using UnityEngine;
 
 namespace Pixeye.Framework
 {
-
 	[StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Unicode)]
 	public readonly struct EntityOperation
 	{
-
 		public readonly ent entity;
 		public readonly int arg;
 		public readonly Entity.Delayed.Action action;
@@ -22,25 +20,22 @@ namespace Pixeye.Framework
 		public EntityOperation(in ent entity, int arg, Entity.Delayed.Action action)
 		{
 			this.entity = entity;
-			this.arg = arg;
+			this.arg    = arg;
 			this.action = action;
 		}
-
 	}
+
 	[StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Unicode)]
 	public struct Utils
 	{
-
 		public int id;
 		public bool isAlive;
 		public bool isPooled;
 		public byte age; // caching age of entity for retrivieng it in future. ( ParseBy method )
-
 	}
 
 	public readonly struct bitBool
 	{
-
 		public readonly byte Arg;
 
 		public bitBool(int val)
@@ -57,13 +52,11 @@ namespace Pixeye.Framework
 		{
 			return new bitBool(value ? 1 : 0);
 		}
-
 	}
 
 	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
-	public static unsafe class Entity
+	public static unsafe partial class Entity
 	{
-
 		public static int Count;
 
 		public static Transform[] transforms = new Transform[SettingsEngine.SizeEntities];
@@ -72,14 +65,12 @@ namespace Pixeye.Framework
 		static readonly int sizeUtils = UnsafeUtility.SizeOf<Utils>();
 
 		internal static int counter = SettingsEngine.SizeEntities;
-		internal static readonly int self = "self".GetHashCode();
-
 		internal static int[,] generations = new int[SettingsEngine.SizeEntities, SettingsEngine.SizeGenerations];
 
 		internal static BufferComponents[] components;
 		internal static BufferTags* tags;
 		internal static Utils* cache;
-		//	internal static BufferComponents* components;
+
 		//===============================//
 		// Initialize 
 		//===============================//
@@ -88,13 +79,13 @@ namespace Pixeye.Framework
 		internal static void Start()
 		{
 			components = new BufferComponents[SettingsEngine.SizeEntities];
-			tags = (BufferTags*) UnmanagedMemory.Alloc(sizeBufferTags * SettingsEngine.SizeEntities);
-			cache = (Utils*) UnmanagedMemory.Alloc(sizeUtils * SettingsEngine.SizeEntities);
+			tags       = (BufferTags*) UnmanagedMemory.Alloc(sizeBufferTags * SettingsEngine.SizeEntities);
+			cache      = (Utils*) UnmanagedMemory.Alloc(sizeUtils * SettingsEngine.SizeEntities);
 
 			for (int i = 0; i < SettingsEngine.SizeEntities; i++)
 			{
-				tags[i] = new BufferTags();
-				cache[i] = new Utils();
+				tags[i]       = new BufferTags();
+				cache[i]      = new Utils();
 				components[i] = new BufferComponents(1);
 			}
 
@@ -104,7 +95,7 @@ namespace Pixeye.Framework
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		internal static ent Setup(int id, byte age)
+		internal static void Initialize(int id, byte age, bool pooled = false)
 		{
 			if (id >= counter)
 			{
@@ -113,13 +104,13 @@ namespace Pixeye.Framework
 
 				Array.Resize(ref transforms, l);
 				Array.Resize(ref components, l);
-				tags = (BufferTags*) UnmanagedMemory.ReAlloc(tags, sizeBufferTags * l);
+				tags  = (BufferTags*) UnmanagedMemory.ReAlloc(tags, sizeBufferTags * l);
 				cache = (Utils*) UnmanagedMemory.ReAlloc(cache, sizeUtils * l);
 
 				for (int i = counter; i < l; i++)
 				{
-					tags[i] = new BufferTags();
-					cache[i] = new Utils();
+					tags[i]       = new BufferTags();
+					cache[i]      = new Utils();
 					components[i] = new BufferComponents(1);
 				}
 
@@ -129,476 +120,53 @@ namespace Pixeye.Framework
 			components[id].length = 0;
 
 			var ptrCache = &cache[id];
-			ptrCache->id = id;
-			ptrCache->age = age;
-			ptrCache->isAlive = true;
-			ptrCache->isPooled = true;
-
-			Count++;
-			return new ent(id, age);
-		}
-
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		internal static void SetupWithTransform(int id, bool pooled, byte age)
-		{
-			if (id >= counter)
-			{
-				var l = id << 1;
-
-				HelperArray.ResizeInt(ref generations, l, SettingsEngine.SizeGenerations);
-
-				Array.Resize(ref transforms, l);
-				Array.Resize(ref components, l);
-
-				tags = (BufferTags*) UnmanagedMemory.ReAlloc(tags, sizeBufferTags * l);
-				cache = (Utils*) UnmanagedMemory.ReAlloc(cache, sizeUtils * l);
-
-				for (int i = counter; i < l; i++)
-				{
-					tags[i] = new BufferTags();
-					cache[i] = new Utils();
-					components[i] = new BufferComponents(1);
-				}
-
-				counter = l;
-			}
-
-			components[id].length = 0;
-
-			var ptrCache = &cache[id];
-			ptrCache->id = id;
-			ptrCache->age = age;
-			ptrCache->isAlive = true;
+			ptrCache->id       = id;
+			ptrCache->age      = age;
+			ptrCache->isAlive  = true;
 			ptrCache->isPooled = pooled;
 
 			Count++;
+			//	return new ent(id, age);
 		}
 
-		public static ent CreateFor(GameObject obj, bool pooled = false)
-		{
-			int  id;
-			byte age = 0;
 
-			if (ent.entityStackLength > 0)
-			{
-				var  pop    = ent.entityStack.Dequeue();
-				byte ageOld = pop.age;
-				id = pop.id;
-				unchecked
-				{
-					age = (byte) (ageOld + 1);
-				}
+		//===============================//
+		// Naming
+		//===============================//
 
-				ent.entityStackLength--;
-			}
-			else
-				id = ent.lastID++;
-
-			SetupWithTransform(id, pooled, age);
-			transforms[id] = obj.transform;
-
-			var entity = new ent(id, age);
-			return entity;
-		}
-		
-		public static ent Create()
-		{
-			int  id;
-			byte age = 0;
-
-			if (ent.entityStackLength > 0)
-			{
-				var  pop    = ent.entityStack.Dequeue();
-				byte ageOld = pop.age;
-				id = pop.id;
-				unchecked
-				{
-					age = (byte) (ageOld + 1);
-				}
-
-				ent.entityStackLength--;
-			}
-			else
-				id = ent.lastID++;
-
-			return Setup(id, age);
-		}
-
-		public static ent Create(ModelComposer model)
-		{
-			int  id;
-			byte age = 0;
-
-			if (ent.entityStackLength > 0)
-			{
-				var  pop    = ent.entityStack.Dequeue();
-				byte ageOld = pop.age;
-				id = pop.id;
-				unchecked
-				{
-					age = (byte) (ageOld + 1);
-				}
-
-				ent.entityStackLength--;
-			}
-			else
-				id = ent.lastID++;
-
-			var entity = Setup(id, age);
-
-			model(entity, null);
-			Delayed.Set(entity, 0, Delayed.Action.Activate);
-
-			return entity;
-		}
-
-		public static ent Bind(GameObject prefab, ModelComposer model, bool pooled = false)
-		{
-			int  id;
-			byte age = 0;
-
-			if (ent.entityStackLength > 0)
-			{
-				var  pop    = ent.entityStack.Dequeue();
-				byte ageOld = pop.age;
-				id = pop.id;
-				unchecked
-				{
-					age = (byte) (ageOld + 1);
-				}
-
-				ent.entityStackLength--;
-			}
-			else
-				id = ent.lastID++;
-
-			SetupWithTransform(id, pooled, age);
-			transforms[id] = prefab.transform;
-
-			var entity = new ent(id, age);
-
-			model(entity, null);
-			Delayed.Set(entity, 0, Delayed.Action.Activate);
-
-			return entity;
-		}
-
-		public static ent Create(string prefabID, Vector3 position, ModelComposer model, bool pooled = false)
-		{
-			int  id;
-			byte age = 0;
-
-			if (ent.entityStackLength > 0)
-			{
-				var  pop    = ent.entityStack.Dequeue();
-				byte ageOld = pop.age;
-				id = pop.id;
-				unchecked
-				{
-					age = (byte) (ageOld + 1);
-				}
-
-				ent.entityStackLength--;
-			}
-			else
-				id = ent.lastID++;
-			SetupWithTransform(id, pooled, age);
-			transforms[id] = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefabID, position) : HelperFramework.SpawnInternal(prefabID, position);
-
-			var entity = new ent(id, age);
-
-			model(entity, null);
-			Delayed.Set(entity, 0, Delayed.Action.Activate);
-
-			return entity;
-		}
-
-		public static ent Create(string prefabID, ModelComposer model, bool pooled = false)
-		{
-			int  id;
-			byte age = 0;
-
-			if (ent.entityStackLength > 0)
-			{
-				var  pop    = ent.entityStack.Dequeue();
-				byte ageOld = pop.age;
-				id = pop.id;
-				unchecked
-				{
-					age = (byte) (ageOld + 1);
-				}
-
-				ent.entityStackLength--;
-			}
-			else
-				id = ent.lastID++;
-
-			SetupWithTransform(id, pooled, age);
-			transforms[id] = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefabID) : HelperFramework.SpawnInternal(prefabID);
-			var entity = new ent(id, age);
-
-			model(entity, null);
-			Delayed.Set(entity, 0, Delayed.Action.Activate);
-
-			return entity;
-		}
-
-		public static ent Create(GameObject prefab, ModelComposer model, bool pooled = false)
-		{
-			int  id;
-			byte age = 0;
-
-			if (ent.entityStackLength > 0)
-			{
-				var  pop    = ent.entityStack.Dequeue();
-				byte ageOld = pop.age;
-				id = pop.id;
-				unchecked
-				{
-					age = (byte) (ageOld + 1);
-				}
-
-				ent.entityStackLength--;
-			}
-			else
-				id = ent.lastID++;
-
-			SetupWithTransform(id, pooled, age);
-			transforms[id] = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefab) : HelperFramework.SpawnInternal(prefab);
-
-			var entity = new ent(id, age);
-
-			model(entity, null);
-			Delayed.Set(entity, 0, Delayed.Action.Activate);
-
-			return entity;
-		}
-
-		public static ent Create(string prefabID, Vector3 position, bool pooled = false)
-		{
-			int  id;
-			byte age = 0;
-
-			if (ent.entityStackLength > 0)
-			{
-				var  pop    = ent.entityStack.Dequeue();
-				byte ageOld = pop.age;
-				id = pop.id;
-				unchecked
-				{
-					age = (byte) (ageOld + 1);
-				}
-
-				ent.entityStackLength--;
-			}
-			else
-				id = ent.lastID++;
-
-			SetupWithTransform(id, pooled, age);
-			transforms[id] = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefabID, position) : HelperFramework.SpawnInternal(prefabID, position);
-			return new ent(id, age);
-		}
-		
-		public static ent Create(string prefabID, bool pooled = false)
-		{
-			int  id;
-			byte age = 0;
-
-			if (ent.entityStackLength > 0)
-			{
-				var  pop    = ent.entityStack.Dequeue();
-				byte ageOld = pop.age;
-				id = pop.id;
-				unchecked
-				{
-					age = (byte) (ageOld + 1);
-				}
-
-				ent.entityStackLength--;
-			}
-			else
-				id = ent.lastID++;
-
-			SetupWithTransform(id, pooled, age);
-			transforms[id] = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefabID) : HelperFramework.SpawnInternal(prefabID);
-			return new ent(id, age);
-		}
-
-		public static ent Create(GameObject prefab, Vector3 position, bool pooled = false)
-		{
-			int  id;
-			byte age = 0;
-
-			if (ent.entityStackLength > 0)
-			{
-				var  pop    = ent.entityStack.Dequeue();
-				byte ageOld = pop.age;
-				id = pop.id;
-				unchecked
-				{
-					age = (byte) (ageOld + 1);
-				}
-
-				ent.entityStackLength--;
-			}
-			else
-				id = ent.lastID++;
-
-			SetupWithTransform(id, pooled, age);
-			transforms[id] = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefab, position) : HelperFramework.SpawnInternal(prefab,position);
-
-			return new ent(id, age);
-		}
-		
-		public static ent Create(GameObject prefab, bool pooled = false)
-		{
-			int  id;
-			byte age = 0;
-
-			if (ent.entityStackLength > 0)
-			{
-				var  pop    = ent.entityStack.Dequeue();
-				byte ageOld = pop.age;
-				id = pop.id;
-				unchecked
-				{
-					age = (byte) (ageOld + 1);
-				}
-
-				ent.entityStackLength--;
-			}
-			else
-				id = ent.lastID++;
-
-			SetupWithTransform(id, pooled, age);
-			transforms[id] = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefab) : HelperFramework.SpawnInternal(prefab);
-
-			return new ent(id, age);
-		}
-
-		#if ODIN_INSPECTOR
-			public static ent Create(BlueprintEntity bpAsset)
-		{
-			int id;
-			byte age = 0;
-
-			if (ent.entityStackLength > 0)
-			{
-				var pop = ent.entityStack.Dequeue();
-				byte ageOld = pop.age;
-				id = pop.id;
-				unchecked
-				{
-					age = (byte) (ageOld + 1);
-				}
-
-				ent.entityStackLength--;
-			}
-			else
-				id = ent.lastID++;
-
-			var entity = Setup(id, age);
-			bpAsset.Execute(entity);
-			return entity;
-		}
-		
-		public static ent Create(string prefabID, BlueprintEntity bpAsset, bool pooled = false)
-		{
-			int id;
-			byte age = 0;
-
-			if (ent.entityStackLength > 0)
-			{
-				var pop = ent.entityStack.Dequeue();
-				byte ageOld = pop.age;
-				id = pop.id;
-				unchecked
-				{
-					age = (byte) (ageOld + 1);
-				}
-
-				ent.entityStackLength--;
-			}
-			else
-				id = ent.lastID++;
-
-			SetupWithTransform(id, pooled, age);
-			transforms[id] = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefabID) : HelperFramework.SpawnInternal(prefabID);
-			var entity = new ent(id, age);
-			bpAsset.Execute(entity);
-			return entity;
-		}
-
-		public static ent Create(GameObject prefab, BlueprintEntity bpAsset, bool pooled = false)
-		{
-			int id;
-			byte age = 0;
-
-			if (ent.entityStackLength > 0)
-			{
-				var pop = ent.entityStack.Dequeue();
-				byte ageOld = pop.age;
-				id = pop.id;
-				unchecked
-				{
-					age = (byte) (ageOld + 1);
-				}
-
-				ent.entityStackLength--;
-			}
-			else
-				id = ent.lastID++;
-
-			SetupWithTransform(id, pooled, age);
-			transforms[id] = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefab) : HelperFramework.SpawnInternal(prefab);
-			var entity = new ent(id, age);
-			bpAsset.Execute(entity);
-			return entity;
-		}
-		#endif
-
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static void RenameGameobject(this ent entity)
 		{
 			var tr = transforms[entity.id];
-//			#if UNITY_EDITOR
-//			tr.name = $"{entity.id} {tr.name}";
-//			#else
 			tr.name = entity.id.ToString();
-		//	#endif
 		}
 
- 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static ent ParseBy(string name)
 		{
 			var index = 0;
-//			#if UNITY_EDITOR
-//			var len = name.Split(' ')[0].Length;
-//			for (int i = 0; i < len; i++)
-//				index = index * 10 + (name[i] - '0');
-//			#else
+
 			for (int i = 0; i < name.Length; i++)
 				index = index * 10 + (name[i] - '0');
-		//	#endif
+
 			return new ent(index, cache[index].age);
 		}
+
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static int ParseByIn(string name)
 		{
 			var index = 0;
-//			#if UNITY_EDITOR
-//			var len = name.Split(' ')[0].Length;
-//			for (int i = 0; i < len; i++)
-//				index = index * 10 + (name[i] - '0');
-//			#else
+
 			for (int i = 0; i < name.Length; i++)
 				index = index * 10 + (name[i] - '0');
-			//	#endif
+
 			return index;
 		}
 
 
-		#region ADD/REMOVE
+		//===============================//
+		// Add & Set
+		//===============================//
 
 		/// <summary>
 		/// Use in Model classes for setting up components to Storage. Doesn't send the component to systems.
@@ -606,43 +174,11 @@ namespace Pixeye.Framework
 		/// <param name="entity"></param>
 		/// <typeparam name="T"></typeparam>
 		/// <returns></returns>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static T Set<T>(in this ent entity)
 		{
 			components[entity.id].Add(Storage<T>.componentID);
 			return Storage<T>.Instance.GetFromStorage(entity.id);
-		}
-
-		public static T AddLater<T>(in this ent entity)
-		{
-			var storage  = Storage<T>.Instance;
-			var entityID = entity.id;
-			if (entityID >= storage.components.Length)
-			{
-				var l = entityID << 1;
-				Array.Resize(ref storage.components, l);
-			}
-			ref T val = ref storage.components[entityID];
-			if (val == null)
-			{
-				val = storage.Creator();
-			}
-
-			return val;
-		}
-
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static void AddLater<T>(in this ent entity, T component)
-		{
-			var storage  = Storage<T>.Instance;
-			var entityID = entity.id;
-			if (entityID >= storage.components.Length)
-			{
-				var l = entityID << 1;
-				Array.Resize(ref storage.components, l);
-			}
-			ref T val = ref storage.components[entityID];
-
-			val = component;
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -666,7 +202,7 @@ namespace Pixeye.Framework
 
 			if (val == null)
 				val = storage.Creator();
-			
+
 
 			Delayed.Set(entity, Storage<T>.componentID, Delayed.Action.Add);
 			return val;
@@ -682,6 +218,7 @@ namespace Pixeye.Framework
 				var l = entityID << 1;
 				Array.Resize(ref storage.components, l);
 			}
+
 			ref T val = ref storage.components[entityID];
 
 			if (val != null)
@@ -695,12 +232,6 @@ namespace Pixeye.Framework
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static void Remove<T>(this in ent entity)
-		{
-			Delayed.Set(entity, Storage<T>.componentID, Delayed.Action.Remove);
-		}
-
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal static void Add(in this ent entity, Transform instance)
 		{
 			ref var transforms = ref Entity.transforms;
@@ -710,15 +241,59 @@ namespace Pixeye.Framework
 				var l = entityID << 1;
 				Array.Resize(ref transforms, l);
 			}
+
 			transforms[entityID] = instance;
 		}
 
-		#endregion
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static T AddLater<T>(in this ent entity)
+		{
+			var storage  = Storage<T>.Instance;
+			var entityID = entity.id;
+			if (entityID >= storage.components.Length)
+			{
+				var l = entityID << 1;
+				Array.Resize(ref storage.components, l);
+			}
 
-		#region COMPONENTS
+			ref T val = ref storage.components[entityID];
+			if (val == null)
+			{
+				val = storage.Creator();
+			}
+
+			return val;
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static void AddLater<T>(in this ent entity, T component)
+		{
+			var storage  = Storage<T>.Instance;
+			var entityID = entity.id;
+			if (entityID >= storage.components.Length)
+			{
+				var l = entityID << 1;
+				Array.Resize(ref storage.components, l);
+			}
+
+			ref T val = ref storage.components[entityID];
+
+			val = component;
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static void Remove<T>(this in ent entity)
+		{
+			Delayed.Set(entity, Storage<T>.componentID, Delayed.Action.Remove);
+		}
+
+		//===============================//
+		// Get
+		//===============================//
+
 
 		/// <summary>
-		/// <para>Returns the transform linked to the entity.</para>
+		/// Returns the transform linked to the entity.
 		/// </summary>
 		/// <param name="entity"></param>
 		/// <returns>Returns the transform linked to the entity.</returns>
@@ -763,9 +338,8 @@ namespace Pixeye.Framework
 		{
 			var transform = transforms[entity];
 			foreach (var sibling in path)
-			{
 				transform = transform.GetChild(sibling);
-			}
+
 			return transform.GetComponent<T>();
 		}
 
@@ -774,104 +348,16 @@ namespace Pixeye.Framework
 		{
 			var transform = transforms[entity];
 			foreach (var sibling in path)
-			{
 				transform = transform.GetChild(sibling);
-			}
+
+
 			return transform.GetComponent(t);
 		}
 
-		#endregion
-
-		#region TRANSFORMS
-
-		/// <summary>
-		/// <para>Returns the transform linked to the entity.</para>
-		/// </summary>
-		/// <param name="entity"></param>
-		/// <returns>Returns the transform linked to the entity.</returns>
-		public static Transform transform(this in ent entity, int index)
-		{
-			return transforms[entity].GetChild(index);
-		}
-
-		public static Transform transform(this in ent entity, int index1, int index2)
-		{
-			return transforms[entity].GetChild(index1).GetChild(index2);
-		}
-
-		public static Transform transform(this in ent entity, int index1, int index2, int index3)
-		{
-			return transforms[entity].GetChild(index1).GetChild(index2).GetChild(index3);
-		}
-
-		public static Transform transform(this in ent entity, int index1, int index2, int index3, int index4)
-		{
-			return transforms[entity].GetChild(index1).GetChild(index2).GetChild(index3).GetChild(index4);
-		}
-
-		public static Transform transform(this in ent entity, int[] siblings)
-		{
-			var transform = transforms[entity];
-			foreach (var sibling in siblings)
-			{
-				transform = transform.GetChild(sibling);
-			}
-			return transform;
-		}
-
-		#endregion
 
 		static void Dispose()
 		{
 			UnmanagedMemory.Cleanup();
 		}
-
-		public static class Delayed
-		{
-
-			public enum Action : byte
-			{
-
-				Add,
-				ChangeTag,
-				Remove,
-				Kill,
-				KillFinalize,
-				Activate,
-				Deactivate,
-				Unbind,
-
-			}
-			public static EntityOperation[] operations = new EntityOperation[SettingsEngine.SizeEntities];
-			public static int len;
-
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			internal static void Set(in ent entity, int arg, Action action)
-			{
-				if (len >= operations.Length)
-				{
-					var l = len << 1;
-					Array.Resize(ref operations, l);
-				}
-				var     pointer   = len++;
-				ref var operation = ref operations[pointer];
-				operation = new EntityOperation(entity, arg, action);
-			}
-
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			internal static void Set(in ent entity, Action action)
-			{
-				if (len >= operations.Length)
-				{
-					var l = len << 1;
-					Array.Resize(ref operations, l);
-				}
-				var     pointer   = len++;
-				ref var operation = ref operations[pointer];
-				operation = new EntityOperation(entity, 0, action);
-			}
-
-		}
-
 	}
 }

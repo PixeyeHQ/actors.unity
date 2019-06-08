@@ -2,13 +2,11 @@
 // Contacts : Pix - ask@pixeye.games
 
 using System;
-using UnityEngine;
 
 namespace Pixeye.Framework
 {
 	sealed class DictionaryGroupTags
 	{
-
 		internal DictionaryGroup[] groupStorage = new DictionaryGroup[10];
 		internal int[] tagsID = new int[10];
 
@@ -52,16 +50,16 @@ namespace Pixeye.Framework
 				Array.Resize(ref tagsID, l);
 			}
 
-			var pointer = len++;
+			var pointer   = len++;
 			var indexLast = pointer;
-			var index = pointer - 1;
+			var index     = pointer - 1;
 
 			if (index >= 0)
 			{
 				if (tagID < tagsID[index])
 				{
 					var startIndex = 0;
-					var endIndex = indexLast;
+					var endIndex   = indexLast;
 
 					while (endIndex > startIndex)
 					{
@@ -78,12 +76,12 @@ namespace Pixeye.Framework
 						if (middleValue < tagID)
 						{
 							startIndex = middleIndex + 1;
-							pointer = startIndex;
+							pointer    = startIndex;
 						}
 						else
 						{
 							endIndex = middleIndex;
-							pointer = endIndex;
+							pointer  = endIndex;
 						}
 					}
 				}
@@ -91,13 +89,12 @@ namespace Pixeye.Framework
 
 			for (int i = indexLast; i >= pointer; i--)
 			{
-				tagsID[i + 1] = tagsID[i];
+				tagsID[i + 1]            = tagsID[i];
 				this.groupStorage[i + 1] = groupStorage[i];
 			}
 
 			this.groupStorage[pointer] = anotherGroupStorage;
-			tagsID[pointer] = tagID;
+			tagsID[pointer]            = tagID;
 		}
-
 	}
 }

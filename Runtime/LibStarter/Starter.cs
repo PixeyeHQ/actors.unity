@@ -177,7 +177,7 @@ namespace Pixeye.Framework
 
 			foreach (var obj in objs)
 			{
-				obj.LaunchOnStart();
+				obj.Launch();
 			}
 
 			Timer.Add(Time.deltaFixed, PostSetup);
