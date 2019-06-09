@@ -51,9 +51,12 @@ namespace Pixeye.Framework
 			Entity.Initialize(id, age, isPooled);
 			Entity.transforms[id] = transform;
 			Setup();
- 
-			buildFrom?.helpers[buildFrom.GetInstanceID()](entity, this);
-			Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Activate);
+
+			if (buildFrom != null)
+				buildFrom.ExecuteOnStart(entity, this);
+			else if (isActiveAndEnabled)
+				Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Activate);
+			
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
