@@ -233,11 +233,14 @@ namespace Pixeye.Framework
 
 	}
 
+ 
+	#endif
+
     public interface IComponentCopy
     {
 	    void Copy(int entityID);
     } 
 
-	#endif
+
 }
 #endif
