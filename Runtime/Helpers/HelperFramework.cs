@@ -538,6 +538,9 @@ namespace Pixeye.Framework
 			return Rand.Source.NextDouble() > chance ? arg0 : arg1;
 		}
 
+
+	 
+
 		public static int Between(this object o, int a, int b, float chance = 0.5f)
 		{
 			return UnityEngine.Random.value > chance ? a : b;

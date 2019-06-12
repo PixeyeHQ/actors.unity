@@ -6,6 +6,8 @@ namespace Pixeye.Framework
 	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
 	public static partial class Entity
 	{
+
+ 
 		public static ent Create()
 		{
 			int  id;

@@ -68,8 +68,8 @@ namespace Pixeye.Framework
 		internal static int[,] generations = new int[SettingsEngine.SizeEntities, SettingsEngine.SizeGenerations];
 
 		internal static BufferComponents[] components;
-		internal static BufferTags* tags;
 		
+		internal static BufferTags* tags;
 		internal static Utils* cache;
 
 		//===============================//

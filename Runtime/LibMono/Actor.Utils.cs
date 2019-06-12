@@ -56,7 +56,9 @@ namespace Pixeye.Framework
 				buildFrom.ExecuteOnStart(entity, this);
 			else if (isActiveAndEnabled)
 				Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Activate);
-			
+
+ 
+
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
