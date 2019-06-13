@@ -17,15 +17,13 @@ ACTORS is a complete game framework with multiscene editing, game object pooling
 - Actors ( visual entity composer in the Unity Inspector window )
 - Built-in support for pooling
 - Built-in support for Unity multiscene editing 
-- Built-in support for plugins with a pluggable wrapper that you can share with others/through projects
 - Built-in support for updates through ITick, ITickFixed, ITickLate - ( faster than Unity Update methods )
 - Signals ( in-memory publish/subscribe system and effectively replace Unity3d SendMessage )
 - Tags ( add simple tags to entities to define states )
 - Editor extensions ( foldout group in the inspector and tags editing )
-- Numerous monobehavior components to help interact with the framework
 - Templates for creating scriptable objects
 - Game console plugin for commands and cheats
-- Framework can be extended with ODIN inspector
+
 
 ## Requirements
 
