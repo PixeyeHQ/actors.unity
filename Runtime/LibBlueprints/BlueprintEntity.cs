@@ -143,7 +143,7 @@ namespace Pixeye.Framework
 			}
 
 			entity.Set(tags);
-			Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Activate);
+			EntityOperations.Set(entity, 0, EntityOperations.Action.Activate);
 		}
 
 		internal override void ExecuteOnStart(in ent entity, Actor a)
@@ -169,7 +169,7 @@ namespace Pixeye.Framework
 			entity.Set(tags);
 
 			if (a.isActiveAndEnabled)
-				Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Activate);
+				EntityOperations.Set(entity, 0, EntityOperations.Action.Activate);
 		}
 
 	}

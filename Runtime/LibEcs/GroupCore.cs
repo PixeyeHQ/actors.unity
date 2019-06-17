@@ -121,16 +121,22 @@ namespace Pixeye.Framework
 				entities[i + 1] = entities[i];
 			}
 
+		 
 			entities[pointer] = entity;
-			UpdateComponents(pointer);
+			//UpdateComponents(indexLast,pointer);
 
 			if (onAdd != null) onAdd(entity);
 		}
 
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public virtual void UpdateComponents(int poiner)
-		{
-		}
+		// [MethodImpl(MethodImplOptions.AggressiveInlining)]
+		// public virtual void UpdateComponents(int indexLast, int pointer)
+		// {
+		// }
+		// [MethodImpl(MethodImplOptions.AggressiveInlining)]
+		// public virtual void FreeComponents(int pointer)
+		// {
+		// }
+		
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal void TryRemove(int entityID)
@@ -139,7 +145,9 @@ namespace Pixeye.Framework
 			var i = HelperArray.BinarySearch(ref entities, entityID, 0, length);
 			if (i == -1) return;
 			if (onRemove != null) onRemove(entities[i]);
-
+		
+			//FreeComponents(i);
+		
 			Array.Copy(entities, i + 1, entities, i, length-- - i);
 		}
 
@@ -150,6 +158,8 @@ namespace Pixeye.Framework
 			if (onRemove != null)
 				onRemove(entities[i]);
 
+			//FreeComponents(i);
+			
 			Array.Copy(entities, i + 1, entities, i, length-- - i);
 		}
 
@@ -287,7 +297,7 @@ namespace Pixeye.Framework
 
 	}
 
-	public sealed class Group<T, Y> : GroupCore
+	public class Group<T, Y> : GroupCore
 	{
 
 		public override void Initialize()

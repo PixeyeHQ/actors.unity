@@ -11,5 +11,5 @@ namespace Pixeye.Framework
 
 	public delegate void EntityActionUpdated(in ent entity, float delta);
 
-	public delegate void ModelComposer(in ent entity, Actor actor);
+	public delegate void ModelComposer(in ent entity);
 }

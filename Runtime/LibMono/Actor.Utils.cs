@@ -15,6 +15,10 @@ namespace Pixeye.Framework
 			return ref entity;
 		}
 
+
+		/// <summary>
+		/// Initialize entity here.
+		/// </summary>
 		protected virtual void Setup()
 		{
 		}
@@ -50,15 +54,18 @@ namespace Pixeye.Framework
 			entity = new ent(id, age);
 			Entity.Initialize(id, age, isPooled);
 			Entity.transforms[id] = transform;
-			Setup();
+
 
 			if (buildFrom != null)
+			{
 				buildFrom.ExecuteOnStart(entity, this);
+				Setup();
+			}
 			else if (isActiveAndEnabled)
-				Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Activate);
-
- 
-
+			{
+				Setup();
+				EntityOperations.Set(entity, 0, EntityOperations.Action.Activate);
+			}
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -89,10 +96,9 @@ namespace Pixeye.Framework
 			entity = new ent(id, age);
 			Entity.Initialize(id, age, isPooled);
 			Entity.transforms[id] = transform;
+			model(entity);
 			Setup();
-	 
-			model(entity, this);
-			Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Activate);
+			EntityOperations.Set(entity, 0, EntityOperations.Action.Activate);
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -101,53 +107,19 @@ namespace Pixeye.Framework
 			Launch();
 		}
 
-		//===============================//
-		// Add methods
-		//===============================//
-
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		protected void Add(int tag)
-		{
-			entity.Set(tag);
-		}
-
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		protected void Add(params int[] tags)
-		{
-			entity.Set(tags);
-		}
-
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		protected T Add<T>()
-		{
-			Entity.components[entity.id].Add(Storage<T>.componentID);
-			return entity.AddLater<T>();
-		}
-
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		protected void Add<T>(T component)
-		{
-			Entity.components[entity.id].Add(Storage<T>.componentID);
-			entity.AddLater(component);
-		}
-
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		protected T AddLater<T>()
-		{
-			return entity.AddLater<T>();
-		}
-
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		protected void AddLater<T>(T component)
-		{
-			entity.AddLater(component);
-		}
 
 		//===============================//
 		// Create methods
 		//===============================//
 
 
+		/// <summary>
+		/// Add Actor to existing game object.
+		/// </summary>
+		/// <param name="obj"></param>
+		/// <param name="pooled"></param>
+		/// <returns></returns>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static Actor CreateFor(GameObject obj, bool pooled = false)
 		{
 			var actor = obj.transform.AddGetActor();
@@ -156,6 +128,12 @@ namespace Pixeye.Framework
 			return actor;
 		}
 
+		/// <summary>
+		/// Add Actor to existing game object.
+		/// </summary>
+		/// <param name="obj"></param>
+		/// <param name="pooled"></param>
+		/// <returns></returns>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static Actor CreateFor(GameObject obj, ModelComposer model, bool pooled = false)
 		{
@@ -165,73 +143,9 @@ namespace Pixeye.Framework
 			return actor;
 		}
 
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static Actor Create(string prefabID , ModelComposer model,  Vector3 position,  bool pooled = false)
-		{
-			var tr    = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefabID, position) : HelperFramework.SpawnInternal(prefabID, position);
-			var actor = tr.AddGetActor();
-			actor.isPooled = pooled;
-			actor.Launch(model);
-			return actor;
-		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static Actor Create(string prefabID, ModelComposer model, bool pooled = false)
-		{
-			var tr    = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefabID) : HelperFramework.SpawnInternal(prefabID);
-			var actor = tr.AddGetActor();
-			actor.isPooled = pooled;
-			actor.Launch(model);
-			return actor;
-		}
-
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static Actor Create(GameObject prefab , ModelComposer model, Vector3 position, bool pooled = false)
-		{
-			var tr    = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefab, position) : HelperFramework.SpawnInternal(prefab, position);
-			var actor = tr.AddGetActor();
-			actor.isPooled = pooled;
-			actor.Launch(model);
-			return actor;
-		}
-
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static Actor Create(GameObject prefab, ModelComposer model, bool pooled = false)
-		{
-			var tr    = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefab) : HelperFramework.SpawnInternal(prefab);
-			var actor = tr.AddGetActor();
-			actor.isPooled = pooled;
-			actor.Launch(model);
-
-			return actor;
-		}
-
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static Actor Create(string prefabID, bool pooled = false)
-		{
-			var tr    = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefabID) : HelperFramework.SpawnInternal(prefabID);
-			var actor = tr.AddGetActor();
-
-			actor.isPooled = pooled;
-			actor.Launch();
-
-			return actor;
-		}
-
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static Actor Create(string prefabID, Vector3 position, bool pooled = false)
-		{
-			var tr    = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefabID, position) : HelperFramework.SpawnInternal(prefabID, position);
-			var actor = tr.AddGetActor();
-
-			actor.isPooled = pooled;
-			actor.Launch();
-
-			return actor;
-		}
-
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static Actor Create(GameObject prefab, Vector3 position, bool pooled = false)
+		public static Actor Create(GameObject prefab, Vector3 position = default, bool pooled = false)
 		{
 			var tr    = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefab, position) : HelperFramework.SpawnInternal(prefab, position);
 			var actor = tr.AddGetActor();
@@ -241,14 +155,35 @@ namespace Pixeye.Framework
 
 			return actor;
 		}
-
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static Actor Create(GameObject prefab, bool pooled = false)
+		public static Actor Create(GameObject prefab, ModelComposer model, Vector3 position = default, bool pooled = false)
 		{
-			var tr    = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefab) : HelperFramework.SpawnInternal(prefab);
+			var tr    = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefab, position) : HelperFramework.SpawnInternal(prefab, position);
 			var actor = tr.AddGetActor();
 			actor.isPooled = pooled;
+			actor.Launch(model);
+			return actor;
+		}
+
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static Actor Create(string prefabID, Vector3 position = default, bool pooled = false)
+		{
+			var tr    = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefabID, position) : HelperFramework.SpawnInternal(prefabID, position);
+			var actor = tr.AddGetActor();
+
+			actor.isPooled = pooled;
 			actor.Launch();
+
+			return actor;
+		}
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static Actor Create(string prefabID, ModelComposer model, Vector3 position = default, bool pooled = false)
+		{
+			var tr    = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefabID, position) : HelperFramework.SpawnInternal(prefabID, position);
+			var actor = tr.AddGetActor();
+			actor.isPooled = pooled;
+			actor.Launch(model);
 			return actor;
 		}
 
@@ -256,7 +191,6 @@ namespace Pixeye.Framework
 		#region OBSOLETE
 
 		#if ODIN_INSPECTOR
- 
 		public static Actor Create(string prefabID, BlueprintEntity bp, bool pooled = false)
 		{
 			var tr = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefabID) : HelperFramework.SpawnInternal(prefabID);
@@ -291,7 +225,7 @@ namespace Pixeye.Framework
 		{
 			entity.transform.GetComponent<Actor>().enabled = true;
 			#if !UNITY_EDITOR
-			Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Activate);
+			EntityOperations.Set(entity, 0, EntityOperations.Action.Activate);
 			#endif
 		}
 	}

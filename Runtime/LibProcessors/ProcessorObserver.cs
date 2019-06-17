@@ -1,7 +1,6 @@
 //  Project : ecs
 // Contacts : Pix - ask@pixeye.games
 
-using System;
 
 namespace Pixeye.Framework
 {

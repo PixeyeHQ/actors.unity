@@ -110,7 +110,7 @@ namespace Pixeye.Framework
 		public void Unbind()
 		{
 			Entity.cache[id].isAlive = false;
-			Entity.Delayed.Set(this, 0, Entity.Delayed.Action.Unbind);
+			EntityOperations.Set(this, 0, EntityOperations.Action.Unbind);
 			Entity.Count--;
 		}
 
@@ -126,7 +126,7 @@ namespace Pixeye.Framework
 			#endif
 
 			Entity.cache[id].isAlive = false;
-			Entity.Delayed.Set(this, 0, Entity.Delayed.Action.Kill);
+			EntityOperations.Set(this, 0, EntityOperations.Action.Kill);
 			Entity.Count--;
 		}
 

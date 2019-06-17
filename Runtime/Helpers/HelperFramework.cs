@@ -180,14 +180,14 @@ namespace Pixeye.Framework
 			GameObject.Destroy(tr.gameObject);
 		}
 
-		/// <summary>
-		/// Must have actor component.
-		/// </summary>
-		/// <param name="e"></param>
-		public static void ForceDeploy(this in ent e)
-		{
-			Entity.Delayed.Set(e, 0, Entity.Delayed.Action.Activate);
-		}
+		// /// <summary>
+		// /// Must have actor component.
+		// /// </summary>
+		// /// <param name="e"></param>
+		// public static void ForceDeploy(this in ent e)
+		// {
+		// 	Entity.Delayed.Set(e, 0, EntityOperations.Action.Activate);
+		// }
 
 		#endregion
 

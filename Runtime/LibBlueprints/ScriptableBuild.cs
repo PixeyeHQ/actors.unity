@@ -39,16 +39,16 @@ namespace Pixeye.Framework
 		internal virtual void Execute(in ent entity, Actor a = null)
 		{
  
-			helpers[GetInstanceID()](entity, a);
-			Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Activate);
+			helpers[GetInstanceID()](entity);
+			EntityOperations.Set(entity, 0, EntityOperations.Action.Activate);
 		}
 
 		internal virtual void ExecuteOnStart(in ent entity, Actor a)
 		{
 			 
-			helpers[GetInstanceID()](entity, a);
+			helpers[GetInstanceID()](entity);
 			if (a.isActiveAndEnabled)
-				Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Activate);
+				EntityOperations.Set(entity, 0, EntityOperations.Action.Activate);
 		}
 
 	}
@@ -61,15 +61,15 @@ namespace Pixeye.Framework
 
 		internal virtual void Execute(in ent entity, Actor a = null)
 		{
-			helpers[GetInstanceID()](entity, a);
-			Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Activate);
+			helpers[GetInstanceID()](entity);
+			EntityOperations.Set(entity, 0, EntityOperations.Action.Activate);
 		}
 
 		internal virtual void ExecuteOnStart(in ent entity, Actor a)
 		{
-			helpers[GetInstanceID()](entity, a);
+			helpers[GetInstanceID()](entity);
 			if (!a.isActiveAndEnabled) return;
-			Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Activate);
+			EntityOperations.Set(entity, 0, EntityOperations.Action.Activate);
 		}
 
 		protected virtual void OnEnable()

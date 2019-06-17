@@ -15,7 +15,6 @@ namespace Pixeye.Framework
 	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
 	public abstract class Storage
 	{
-
 		internal static int[] masks = new int[32];
 		internal static int[] generations = new int[32];
 		internal static Storage[] all = new Storage[32];
@@ -45,13 +44,11 @@ namespace Pixeye.Framework
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal abstract object GetComponent(int entityID);
-
 	}
 
 	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
 	public sealed class Storage<T> : Storage
 	{
-
 		public Func<T> Creator;
 		public Action<T> DisposeAction = delegate { };
 
@@ -93,13 +90,13 @@ namespace Pixeye.Framework
 				Array.Resize(ref generations, l);
 			}
 
-			componentID = lastID++;
+			componentID      = lastID++;
 			all[componentID] = this;
 
 			componentMask = 1 << (componentID % 32);
-			generation = componentID / 32;
+			generation    = componentID / 32;
 
-			masks[componentID] = componentMask;
+			masks[componentID]       = componentMask;
 			generations[componentID] = generation;
 
 			var type = typeof(T);
@@ -137,24 +134,24 @@ namespace Pixeye.Framework
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public T GetFromStorage(int entityID)
+		public static T Get(int entityID)
 		{
-			T val;
-			if (entityID >= components.Length)
+			var source = Instance;
+			T   val;
+			if (entityID >= source.components.Length)
 			{
 				var l = entityID << 1;
-				Array.Resize(ref components, l);
+				Array.Resize(ref source.components, l);
 			}
 
-			val = components[entityID];
+			val = source.components[entityID];
 			if (val == null)
 			{
-				val = Creator();
-				components[entityID] = val;
+				val                         = source.Creator();
+				source.components[entityID] = val;
 			}
 
 			return val;
 		}
-
 	}
 }

@@ -29,25 +29,27 @@ namespace Pixeye.Framework
 		{
 			if (!Starter.initialized) return;
 
-			if (Entity.Delayed.len == 0) return;
+			if (EntityOperations.len == 0) return;
 
-			for (int i = 0; i < Entity.Delayed.len; i++)
+	 
+			for (int i = 0; i < EntityOperations.len; i++)
 			{
-				ref var operation = ref Entity.Delayed.operations[i];
+				ref var operation = ref EntityOperations.operations[i];
 				var entityID = operation.entity.id;
 
 				switch (operation.action)
-				{
-					case Entity.Delayed.Action.Add:
+				{ 
+					case EntityOperations.Action.Add:
 					{
+					 
+			 
 						var componentID = operation.arg;
 						var storage = Storage.all[componentID];
 						var generation = Storage.generations[componentID];
 						var mask = Storage.masks[componentID];
 
 
-						if ((Entity.generations[entityID, generation] & mask) == mask)
-					 continue;
+						if ((Entity.generations[entityID, generation] & mask) == mask) continue;
 
 
 							Entity.components[entityID].Add(componentID);
@@ -69,13 +71,11 @@ namespace Pixeye.Framework
 							if (!group.composition.CanProceed(entityID)) continue;
 							group.TryRemove(entityID);
 						}
-						
-						
-						
-						
+
+ 
 						break;
 					}
-					case Entity.Delayed.Action.Kill:
+					case EntityOperations.Action.Kill:
 					{
 						ref var components = ref Entity.components[entityID];
 						var length = components.length;
@@ -125,18 +125,18 @@ namespace Pixeye.Framework
 
 						Entity.tags[entityID].Clear();
 
-						Entity.Delayed.Set(operation.entity, 0, Entity.Delayed.Action.KillFinalize);
+						EntityOperations.Set(operation.entity, 0, EntityOperations.Action.KillFinalize);
 						break;
 					}
 
-					case Entity.Delayed.Action.KillFinalize:
+					case EntityOperations.Action.KillFinalize:
 					{
 						ent.entityStack.Enqueue(operation.entity);
 						ent.entityStackLength++;
 						break;
 					}
 
-					case Entity.Delayed.Action.Unbind:
+					case EntityOperations.Action.Unbind:
 					{
 						ref var components = ref Entity.components[entityID];
 						var length = components.length;
@@ -178,11 +178,11 @@ namespace Pixeye.Framework
 						components.length = 0;
 						Entity.tags[entityID].Clear();
 
-						Entity.Delayed.Set(operation.entity, 0, Entity.Delayed.Action.KillFinalize);
+						EntityOperations.Set(operation.entity, 0, EntityOperations.Action.KillFinalize);
 						break;
 					}
 
-					case Entity.Delayed.Action.Remove:
+					case EntityOperations.Action.Remove:
 					{
 						var generation = Storage.generations[operation.arg];
 						var mask = Storage.masks[operation.arg];
@@ -213,7 +213,7 @@ namespace Pixeye.Framework
 
 						break;
 					}
-					case Entity.Delayed.Action.ChangeTag:
+					case EntityOperations.Action.ChangeTag:
 					{
 						if (!Entity.cache[entityID].isAlive) continue;
 
@@ -242,8 +242,9 @@ namespace Pixeye.Framework
 						break;
 					}
 
-					case Entity.Delayed.Action.Activate:
+					case EntityOperations.Action.Activate:
 					{
+				  
 						ref var components = ref Entity.components[entityID];
 						var length = components.length;
 
@@ -264,10 +265,11 @@ namespace Pixeye.Framework
 								group.Insert(operation.entity);
 							}
 						}
+ 
 						break;
 					}
 
-					case Entity.Delayed.Action.Deactivate:
+					case EntityOperations.Action.Deactivate:
 					{
 						ref var componenets = ref Entity.components[entityID];
 						var length = componenets.length;
@@ -292,7 +294,9 @@ namespace Pixeye.Framework
 					}
 				}
 			}
-			Entity.Delayed.len = 0;
+
+			 
+			EntityOperations.len = 0;
 		}
 
 		protected override void OnDispose()

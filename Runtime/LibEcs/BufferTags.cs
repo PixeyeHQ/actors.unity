@@ -432,7 +432,7 @@ namespace Pixeye.Framework
 			var indexGroup = inUseGroups.TryGetValue(tagID);
 
 			if (indexGroup == -1) return;
-			Entity.Delayed.Set(entity, indexGroup, Entity.Delayed.Action.ChangeTag);
+			EntityOperations.Set(entity, indexGroup, EntityOperations.Action.ChangeTag);
 		}
 
 	}

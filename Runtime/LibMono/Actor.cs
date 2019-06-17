@@ -46,7 +46,7 @@ namespace Pixeye.Framework
 				if (!manualRemoved) return;
 				manualRemoved                   = false;
 				Entity.cache[entity.id].isAlive = true;
-				Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Activate);
+				EntityOperations.Set(entity, 0, EntityOperations.Action.Activate);
 			}
 		}
 		
@@ -57,7 +57,7 @@ namespace Pixeye.Framework
 				if (Toolbox.applicationIsQuitting || !Entity.cache[entity.id].isAlive) return;
 				manualRemoved                   = true;
 				Entity.cache[entity.id].isAlive = false;
-				Entity.Delayed.Set(entity, 0, Entity.Delayed.Action.Deactivate);
+				EntityOperations.Set(entity, 0, EntityOperations.Action.Deactivate);
 			}
 		}
 		

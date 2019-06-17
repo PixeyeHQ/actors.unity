@@ -1,56 +1,55 @@
 using System;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using Unity.IL2CPP.CompilerServices;
 
 namespace Pixeye.Framework
 {
-	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
-	public static partial class Entity
+	[StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Unicode)]
+	readonly struct EntityOperation
 	{
-		public static class Delayed
+		public readonly ent entity;
+		public readonly int arg;
+		public readonly EntityOperations.Action action;
+
+		public EntityOperation(in ent entity, int arg, EntityOperations.Action action)
 		{
-			public enum Action : byte
+			this.entity = entity;
+			this.arg    = arg;
+			this.action = action;
+		}
+	}
+
+	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
+	static class EntityOperations
+	{
+		public enum Action : byte
+		{
+			Add,
+			ChangeTag,
+			Remove,
+			Kill,
+			KillFinalize,
+			Activate,
+			Deactivate,
+			Unbind,
+		}
+
+		public static EntityOperation[] operations = new EntityOperation[SettingsEngine.SizeEntities];
+		public static int len;
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		internal static void Set(in ent entity, int arg, Action action)
+		{
+			if (len >= operations.Length)
 			{
-				Add,
-				ChangeTag,
-				Remove,
-				Kill,
-				KillFinalize,
-				Activate,
-				Deactivate,
-				Unbind,
+				var l = len << 1;
+				Array.Resize(ref operations, l);
 			}
 
-			public static EntityOperation[] operations = new EntityOperation[SettingsEngine.SizeEntities];
-			public static int len;
-
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			internal static void Set(in ent entity, int arg, Action action)
-			{
-				if (len >= operations.Length)
-				{
-					var l = len << 1;
-					Array.Resize(ref operations, l);
-				}
-
-				var     pointer   = len++;
-				ref var operation = ref operations[pointer];
-				operation = new EntityOperation(entity, arg, action);
-			}
-
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			internal static void Set(in ent entity, Action action)
-			{
-				if (len >= operations.Length)
-				{
-					var l = len << 1;
-					Array.Resize(ref operations, l);
-				}
-
-				var     pointer   = len++;
-				ref var operation = ref operations[pointer];
-				operation = new EntityOperation(entity, 0, action);
-			}
+			var     pointer   = len++;
+			ref var operation = ref operations[pointer];
+			operation = new EntityOperation(entity, arg, action);
 		}
 	}
 }
