@@ -14,7 +14,6 @@ namespace Pixeye.Framework
 
 	class GroupCoreComparer : IEqualityComparer<GroupCore>
 	{
-
 		public static GroupCoreComparer Default = new GroupCoreComparer();
 
 		public bool Equals(GroupCore x, GroupCore y)
@@ -26,13 +25,11 @@ namespace Pixeye.Framework
 		{
 			return obj.id;
 		}
-
 	}
 
 	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
 	public abstract class GroupCore : IEnumerable, IEquatable<GroupCore>, IDisposable
 	{
-
 		static int idCounter;
 
 		public ent[] entities = new ent[SettingsEngine.SizeEntities];
@@ -49,10 +46,7 @@ namespace Pixeye.Framework
 		public ref ent this[int index]
 		{
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			get
-			{
-				return ref entities[index];
-			}
+			get { return ref entities[index]; }
 		}
 
 		public void Release(int index)
@@ -80,6 +74,7 @@ namespace Pixeye.Framework
 			{
 				Array.Resize(ref entities, length << 1);
 			}
+
 			var pointer = indexLast;
 			var index   = indexLast - 1;
 
@@ -105,12 +100,12 @@ namespace Pixeye.Framework
 						if (middleValue < entityID)
 						{
 							startIndex = middleIndex + 1;
-							pointer = startIndex;
+							pointer    = startIndex;
 						}
 						else
 						{
 							endIndex = middleIndex;
-							pointer = endIndex;
+							pointer  = endIndex;
 						}
 					}
 				}
@@ -121,22 +116,11 @@ namespace Pixeye.Framework
 				entities[i + 1] = entities[i];
 			}
 
-		 
-			entities[pointer] = entity;
-			//UpdateComponents(indexLast,pointer);
 
+			entities[pointer] = entity;
 			if (onAdd != null) onAdd(entity);
 		}
 
-		// [MethodImpl(MethodImplOptions.AggressiveInlining)]
-		// public virtual void UpdateComponents(int indexLast, int pointer)
-		// {
-		// }
-		// [MethodImpl(MethodImplOptions.AggressiveInlining)]
-		// public virtual void FreeComponents(int pointer)
-		// {
-		// }
-		
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal void TryRemove(int entityID)
@@ -145,9 +129,7 @@ namespace Pixeye.Framework
 			var i = HelperArray.BinarySearch(ref entities, entityID, 0, length);
 			if (i == -1) return;
 			if (onRemove != null) onRemove(entities[i]);
-		
-			//FreeComponents(i);
-		
+
 			Array.Copy(entities, i + 1, entities, i, length-- - i);
 		}
 
@@ -157,9 +139,6 @@ namespace Pixeye.Framework
 		{
 			if (onRemove != null)
 				onRemove(entities[i]);
-
-			//FreeComponents(i);
-			
 			Array.Copy(entities, i + 1, entities, i, length-- - i);
 		}
 
@@ -167,9 +146,9 @@ namespace Pixeye.Framework
 		public int GetIndex(int id)
 		{
 			for (int i = 0; i < length; i++)
-			{
-				if (entities[i].id == id) return i;
-			}
+				if (entities[i].id == id)
+					return i;
+
 
 			return -1;
 		}
@@ -183,9 +162,9 @@ namespace Pixeye.Framework
 
 		public void Dispose()
 		{
-			onAdd = null;
+			onAdd    = null;
 			onRemove = null;
-			length = 0;
+			length   = 0;
 			entities = new ent[SettingsEngine.SizeEntities];
 		}
 
@@ -205,8 +184,7 @@ namespace Pixeye.Framework
 		{
 			if (ReferenceEquals(null, obj)) return false;
 			if (ReferenceEquals(this, obj)) return true;
-			if (obj.GetType() != GetType()) return false;
-			return Equals((GroupCore) obj);
+			return obj.GetType() == GetType() && Equals((GroupCore) obj);
 		}
 
 		public override int GetHashCode()
@@ -230,7 +208,6 @@ namespace Pixeye.Framework
 
 		public struct Enumerator : IEnumerator<ent>
 		{
-
 			GroupCore g;
 			int position;
 			int length;
@@ -238,8 +215,8 @@ namespace Pixeye.Framework
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			internal Enumerator(GroupCore g, int length)
 			{
-				position = -1;
-				this.g = g;
+				position    = -1;
+				this.g      = g;
 				this.length = length;
 			}
 
@@ -260,26 +237,20 @@ namespace Pixeye.Framework
 			public ent Current
 			{
 				[MethodImpl(MethodImplOptions.AggressiveInlining)]
-				get
-				{
-					return g.entities[position];
-				}
+				get { return g.entities[position]; }
 			}
 
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			public void Dispose()
 			{
 			}
-
 		}
 
 		#endregion
-
 	}
 
 	public class Group<T> : GroupCore
 	{
-
 		public override void Initialize()
 		{
 			Storage<T>.Instance.Add(this);
@@ -287,19 +258,17 @@ namespace Pixeye.Framework
 			var len = 1;
 
 			composition.generations = new int[len];
-			composition.ids = new int[len];
+			composition.ids         = new int[len];
 
 			composition.generations[0] = Storage<T>.generation;
-			composition.ids[0] = Storage<T>.componentMask;
+			composition.ids[0]         = Storage<T>.componentMask;
 
 			composition.includeComponents[Storage<T>.componentID] = true;
 		}
-
 	}
 
 	public class Group<T, Y> : GroupCore
 	{
-
 		public override void Initialize()
 		{
 			Storage<T>.Instance.Add(this);
@@ -308,22 +277,20 @@ namespace Pixeye.Framework
 			var len = 2;
 
 			composition.generations = new int[len];
-			composition.ids = new int[len];
+			composition.ids         = new int[len];
 
-			composition.generations[0] = Storage<T>.generation;
-			composition.ids[0] = Storage<T>.componentMask;
+			composition.generations[0]                            = Storage<T>.generation;
+			composition.ids[0]                                    = Storage<T>.componentMask;
 			composition.includeComponents[Storage<T>.componentID] = true;
 
-			composition.generations[1] = Storage<Y>.generation;
-			composition.ids[1] = Storage<Y>.componentMask;
+			composition.generations[1]                            = Storage<Y>.generation;
+			composition.ids[1]                                    = Storage<Y>.componentMask;
 			composition.includeComponents[Storage<Y>.componentID] = true;
 		}
-
 	}
 
 	public sealed class Group<T, Y, U> : GroupCore
 	{
-
 		public override void Initialize()
 		{
 			Storage<T>.Instance.Add(this);
@@ -333,26 +300,24 @@ namespace Pixeye.Framework
 			var len = 3;
 
 			composition.generations = new int[len];
-			composition.ids = new int[len];
+			composition.ids         = new int[len];
 
-			composition.generations[0] = Storage<T>.generation;
-			composition.ids[0] = Storage<T>.componentMask;
+			composition.generations[0]                            = Storage<T>.generation;
+			composition.ids[0]                                    = Storage<T>.componentMask;
 			composition.includeComponents[Storage<T>.componentID] = true;
 
-			composition.generations[1] = Storage<Y>.generation;
-			composition.ids[1] = Storage<Y>.componentMask;
+			composition.generations[1]                            = Storage<Y>.generation;
+			composition.ids[1]                                    = Storage<Y>.componentMask;
 			composition.includeComponents[Storage<Y>.componentID] = true;
 
-			composition.generations[2] = Storage<U>.generation;
-			composition.ids[2] = Storage<U>.componentMask;
+			composition.generations[2]                            = Storage<U>.generation;
+			composition.ids[2]                                    = Storage<U>.componentMask;
 			composition.includeComponents[Storage<U>.componentID] = true;
 		}
-
 	}
 
 	public sealed class Group<T, Y, U, I> : GroupCore
 	{
-
 		public override void Initialize()
 		{
 			Storage<T>.Instance.Add(this);
@@ -363,30 +328,28 @@ namespace Pixeye.Framework
 			var len = 4;
 
 			composition.generations = new int[len];
-			composition.ids = new int[len];
+			composition.ids         = new int[len];
 
-			composition.generations[0] = Storage<T>.generation;
-			composition.ids[0] = Storage<T>.componentMask;
+			composition.generations[0]                            = Storage<T>.generation;
+			composition.ids[0]                                    = Storage<T>.componentMask;
 			composition.includeComponents[Storage<T>.componentID] = true;
 
-			composition.generations[1] = Storage<Y>.generation;
-			composition.ids[1] = Storage<Y>.componentMask;
+			composition.generations[1]                            = Storage<Y>.generation;
+			composition.ids[1]                                    = Storage<Y>.componentMask;
 			composition.includeComponents[Storage<Y>.componentID] = true;
 
-			composition.generations[2] = Storage<U>.generation;
-			composition.ids[2] = Storage<U>.componentMask;
+			composition.generations[2]                            = Storage<U>.generation;
+			composition.ids[2]                                    = Storage<U>.componentMask;
 			composition.includeComponents[Storage<U>.componentID] = true;
 
-			composition.generations[3] = Storage<I>.generation;
-			composition.ids[3] = Storage<I>.componentMask;
+			composition.generations[3]                            = Storage<I>.generation;
+			composition.ids[3]                                    = Storage<I>.componentMask;
 			composition.includeComponents[Storage<I>.componentID] = true;
 		}
-
 	}
 
 	public sealed class Group<T, Y, U, I, O> : GroupCore
 	{
-
 		public override void Initialize()
 		{
 			Storage<T>.Instance.Add(this);
@@ -397,30 +360,28 @@ namespace Pixeye.Framework
 			var len = 5;
 
 			composition.generations = new int[len];
-			composition.ids = new int[len];
+			composition.ids         = new int[len];
 
 			composition.generations[0] = Storage<T>.generation;
-			composition.ids[0] = Storage<T>.componentMask;
+			composition.ids[0]         = Storage<T>.componentMask;
 
 			composition.generations[1] = Storage<Y>.generation;
-			composition.ids[1] = Storage<Y>.componentMask;
+			composition.ids[1]         = Storage<Y>.componentMask;
 
 			composition.generations[2] = Storage<U>.generation;
-			composition.ids[2] = Storage<U>.componentMask;
+			composition.ids[2]         = Storage<U>.componentMask;
 
 			composition.generations[3] = Storage<I>.generation;
-			composition.ids[3] = Storage<I>.componentMask;
+			composition.ids[3]         = Storage<I>.componentMask;
 
 			composition.generations[4] = Storage<O>.generation;
-			composition.ids[4] = Storage<O>.componentMask;
+			composition.ids[4]         = Storage<O>.componentMask;
 		}
-
 	}
 
 	public sealed class Group<T, Y, U, I, O, P> : GroupCore
 
 	{
-
 		public override void Initialize()
 		{
 			Storage<T>.Instance.Add(this);
@@ -433,38 +394,36 @@ namespace Pixeye.Framework
 			var len = 6;
 
 			composition.generations = new int[len];
-			composition.ids = new int[len];
+			composition.ids         = new int[len];
 
-			composition.generations[0] = Storage<T>.generation;
-			composition.ids[0] = Storage<T>.componentMask;
+			composition.generations[0]                            = Storage<T>.generation;
+			composition.ids[0]                                    = Storage<T>.componentMask;
 			composition.includeComponents[Storage<T>.componentID] = true;
 
-			composition.generations[1] = Storage<Y>.generation;
-			composition.ids[1] = Storage<Y>.componentMask;
+			composition.generations[1]                            = Storage<Y>.generation;
+			composition.ids[1]                                    = Storage<Y>.componentMask;
 			composition.includeComponents[Storage<Y>.componentID] = true;
 
-			composition.generations[2] = Storage<U>.generation;
-			composition.ids[2] = Storage<U>.componentMask;
+			composition.generations[2]                            = Storage<U>.generation;
+			composition.ids[2]                                    = Storage<U>.componentMask;
 			composition.includeComponents[Storage<U>.componentID] = true;
 
-			composition.generations[3] = Storage<I>.generation;
-			composition.ids[3] = Storage<I>.componentMask;
+			composition.generations[3]                            = Storage<I>.generation;
+			composition.ids[3]                                    = Storage<I>.componentMask;
 			composition.includeComponents[Storage<I>.componentID] = true;
 
-			composition.generations[4] = Storage<O>.generation;
-			composition.ids[4] = Storage<O>.componentMask;
+			composition.generations[4]                            = Storage<O>.generation;
+			composition.ids[4]                                    = Storage<O>.componentMask;
 			composition.includeComponents[Storage<O>.componentID] = true;
 
-			composition.generations[5] = Storage<P>.generation;
-			composition.ids[5] = Storage<P>.componentMask;
+			composition.generations[5]                            = Storage<P>.generation;
+			composition.ids[5]                                    = Storage<P>.componentMask;
 			composition.includeComponents[Storage<P>.componentID] = true;
 		}
-
 	}
 
 	public sealed class Group<T, Y, U, I, O, P, A> : GroupCore
 	{
-
 		public override void Initialize()
 		{
 			Storage<T>.Instance.Add(this);
@@ -478,42 +437,40 @@ namespace Pixeye.Framework
 			var len = 7;
 
 			composition.generations = new int[len];
-			composition.ids = new int[len];
+			composition.ids         = new int[len];
 
-			composition.generations[0] = Storage<T>.generation;
-			composition.ids[0] = Storage<T>.componentMask;
+			composition.generations[0]                            = Storage<T>.generation;
+			composition.ids[0]                                    = Storage<T>.componentMask;
 			composition.includeComponents[Storage<T>.componentID] = true;
 
-			composition.generations[1] = Storage<Y>.generation;
-			composition.ids[1] = Storage<Y>.componentMask;
+			composition.generations[1]                            = Storage<Y>.generation;
+			composition.ids[1]                                    = Storage<Y>.componentMask;
 			composition.includeComponents[Storage<Y>.componentID] = true;
 
-			composition.generations[2] = Storage<U>.generation;
-			composition.ids[2] = Storage<U>.componentMask;
+			composition.generations[2]                            = Storage<U>.generation;
+			composition.ids[2]                                    = Storage<U>.componentMask;
 			composition.includeComponents[Storage<U>.componentID] = true;
 
-			composition.generations[3] = Storage<I>.generation;
-			composition.ids[3] = Storage<I>.componentMask;
+			composition.generations[3]                            = Storage<I>.generation;
+			composition.ids[3]                                    = Storage<I>.componentMask;
 			composition.includeComponents[Storage<I>.componentID] = true;
 
-			composition.generations[4] = Storage<O>.generation;
-			composition.ids[4] = Storage<O>.componentMask;
+			composition.generations[4]                            = Storage<O>.generation;
+			composition.ids[4]                                    = Storage<O>.componentMask;
 			composition.includeComponents[Storage<O>.componentID] = true;
 
-			composition.generations[5] = Storage<P>.generation;
-			composition.ids[5] = Storage<P>.componentMask;
+			composition.generations[5]                            = Storage<P>.generation;
+			composition.ids[5]                                    = Storage<P>.componentMask;
 			composition.includeComponents[Storage<P>.componentID] = true;
 
-			composition.generations[6] = Storage<A>.generation;
-			composition.ids[6] = Storage<A>.componentMask;
+			composition.generations[6]                            = Storage<A>.generation;
+			composition.ids[6]                                    = Storage<A>.componentMask;
 			composition.includeComponents[Storage<A>.componentID] = true;
 		}
-
 	}
 
 	public sealed class Group<T, Y, U, I, O, P, A, S> : GroupCore
 	{
-
 		public override void Initialize()
 		{
 			Storage<T>.Instance.Add(this);
@@ -528,46 +485,44 @@ namespace Pixeye.Framework
 			var len = 8;
 
 			composition.generations = new int[len];
-			composition.ids = new int[len];
+			composition.ids         = new int[len];
 
-			composition.generations[0] = Storage<T>.generation;
-			composition.ids[0] = Storage<T>.componentMask;
+			composition.generations[0]                            = Storage<T>.generation;
+			composition.ids[0]                                    = Storage<T>.componentMask;
 			composition.includeComponents[Storage<T>.componentID] = true;
 
-			composition.generations[1] = Storage<Y>.generation;
-			composition.ids[1] = Storage<Y>.componentMask;
+			composition.generations[1]                            = Storage<Y>.generation;
+			composition.ids[1]                                    = Storage<Y>.componentMask;
 			composition.includeComponents[Storage<Y>.componentID] = true;
 
-			composition.generations[2] = Storage<U>.generation;
-			composition.ids[2] = Storage<U>.componentMask;
+			composition.generations[2]                            = Storage<U>.generation;
+			composition.ids[2]                                    = Storage<U>.componentMask;
 			composition.includeComponents[Storage<U>.componentID] = true;
 
-			composition.generations[3] = Storage<I>.generation;
-			composition.ids[3] = Storage<I>.componentMask;
+			composition.generations[3]                            = Storage<I>.generation;
+			composition.ids[3]                                    = Storage<I>.componentMask;
 			composition.includeComponents[Storage<I>.componentID] = true;
 
-			composition.generations[4] = Storage<O>.generation;
-			composition.ids[4] = Storage<O>.componentMask;
+			composition.generations[4]                            = Storage<O>.generation;
+			composition.ids[4]                                    = Storage<O>.componentMask;
 			composition.includeComponents[Storage<O>.componentID] = true;
 
-			composition.generations[5] = Storage<P>.generation;
-			composition.ids[5] = Storage<P>.componentMask;
+			composition.generations[5]                            = Storage<P>.generation;
+			composition.ids[5]                                    = Storage<P>.componentMask;
 			composition.includeComponents[Storage<P>.componentID] = true;
 
-			composition.generations[6] = Storage<A>.generation;
-			composition.ids[6] = Storage<A>.componentMask;
+			composition.generations[6]                            = Storage<A>.generation;
+			composition.ids[6]                                    = Storage<A>.componentMask;
 			composition.includeComponents[Storage<A>.componentID] = true;
 
-			composition.generations[7] = Storage<S>.generation;
-			composition.ids[7] = Storage<S>.componentMask;
+			composition.generations[7]                            = Storage<S>.generation;
+			composition.ids[7]                                    = Storage<S>.componentMask;
 			composition.includeComponents[Storage<S>.componentID] = true;
 		}
-
 	}
 
 	public sealed class Group<T, Y, U, I, O, P, A, S, D> : GroupCore
 	{
-
 		public override void Initialize()
 		{
 			Storage<T>.Instance.Add(this);
@@ -582,49 +537,48 @@ namespace Pixeye.Framework
 			var len = 9;
 
 			composition.generations = new int[len];
-			composition.ids = new int[len];
+			composition.ids         = new int[len];
 
-			composition.generations[0] = Storage<T>.generation;
-			composition.ids[0] = Storage<T>.componentMask;
+			composition.generations[0]                            = Storage<T>.generation;
+			composition.ids[0]                                    = Storage<T>.componentMask;
 			composition.includeComponents[Storage<T>.componentID] = true;
 
-			composition.generations[1] = Storage<Y>.generation;
-			composition.ids[1] = Storage<Y>.componentMask;
+			composition.generations[1]                            = Storage<Y>.generation;
+			composition.ids[1]                                    = Storage<Y>.componentMask;
 			composition.includeComponents[Storage<Y>.componentID] = true;
 
-			composition.generations[2] = Storage<U>.generation;
-			composition.ids[2] = Storage<U>.componentMask;
+			composition.generations[2]                            = Storage<U>.generation;
+			composition.ids[2]                                    = Storage<U>.componentMask;
 			composition.includeComponents[Storage<U>.componentID] = true;
 
-			composition.generations[3] = Storage<I>.generation;
-			composition.ids[3] = Storage<I>.componentMask;
+			composition.generations[3]                            = Storage<I>.generation;
+			composition.ids[3]                                    = Storage<I>.componentMask;
 			composition.includeComponents[Storage<I>.componentID] = true;
 
-			composition.generations[4] = Storage<O>.generation;
-			composition.ids[4] = Storage<O>.componentMask;
+			composition.generations[4]                            = Storage<O>.generation;
+			composition.ids[4]                                    = Storage<O>.componentMask;
 			composition.includeComponents[Storage<O>.componentID] = true;
 
-			composition.generations[5] = Storage<P>.generation;
-			composition.ids[5] = Storage<P>.componentMask;
+			composition.generations[5]                            = Storage<P>.generation;
+			composition.ids[5]                                    = Storage<P>.componentMask;
 			composition.includeComponents[Storage<P>.componentID] = true;
 
-			composition.generations[6] = Storage<A>.generation;
-			composition.ids[6] = Storage<A>.componentMask;
+			composition.generations[6]                            = Storage<A>.generation;
+			composition.ids[6]                                    = Storage<A>.componentMask;
 			composition.includeComponents[Storage<A>.componentID] = true;
 
-			composition.generations[7] = Storage<S>.generation;
-			composition.ids[7] = Storage<S>.componentMask;
+			composition.generations[7]                            = Storage<S>.generation;
+			composition.ids[7]                                    = Storage<S>.componentMask;
 			composition.includeComponents[Storage<S>.componentID] = true;
 
-			composition.generations[8] = Storage<D>.generation;
-			composition.ids[8] = Storage<D>.componentMask;
+			composition.generations[8]                            = Storage<D>.generation;
+			composition.ids[8]                                    = Storage<D>.componentMask;
 			composition.includeComponents[Storage<D>.componentID] = true;
 		}
-
 	}
+
 	public sealed class Group<T, Y, U, I, O, P, A, S, D, F> : GroupCore
 	{
-
 		public override void Initialize()
 		{
 			Storage<T>.Instance.Add(this);
@@ -640,48 +594,47 @@ namespace Pixeye.Framework
 			var len = 10;
 
 			composition.generations = new int[len];
-			composition.ids = new int[len];
+			composition.ids         = new int[len];
 
-			composition.generations[0] = Storage<T>.generation;
-			composition.ids[0] = Storage<T>.componentMask;
+			composition.generations[0]                            = Storage<T>.generation;
+			composition.ids[0]                                    = Storage<T>.componentMask;
 			composition.includeComponents[Storage<T>.componentID] = true;
 
-			composition.generations[1] = Storage<Y>.generation;
-			composition.ids[1] = Storage<Y>.componentMask;
+			composition.generations[1]                            = Storage<Y>.generation;
+			composition.ids[1]                                    = Storage<Y>.componentMask;
 			composition.includeComponents[Storage<Y>.componentID] = true;
 
-			composition.generations[2] = Storage<U>.generation;
-			composition.ids[2] = Storage<U>.componentMask;
+			composition.generations[2]                            = Storage<U>.generation;
+			composition.ids[2]                                    = Storage<U>.componentMask;
 			composition.includeComponents[Storage<U>.componentID] = true;
 
-			composition.generations[3] = Storage<I>.generation;
-			composition.ids[3] = Storage<I>.componentMask;
+			composition.generations[3]                            = Storage<I>.generation;
+			composition.ids[3]                                    = Storage<I>.componentMask;
 			composition.includeComponents[Storage<I>.componentID] = true;
 
-			composition.generations[4] = Storage<O>.generation;
-			composition.ids[4] = Storage<O>.componentMask;
+			composition.generations[4]                            = Storage<O>.generation;
+			composition.ids[4]                                    = Storage<O>.componentMask;
 			composition.includeComponents[Storage<O>.componentID] = true;
 
-			composition.generations[5] = Storage<P>.generation;
-			composition.ids[5] = Storage<P>.componentMask;
+			composition.generations[5]                            = Storage<P>.generation;
+			composition.ids[5]                                    = Storage<P>.componentMask;
 			composition.includeComponents[Storage<P>.componentID] = true;
 
-			composition.generations[6] = Storage<A>.generation;
-			composition.ids[6] = Storage<A>.componentMask;
+			composition.generations[6]                            = Storage<A>.generation;
+			composition.ids[6]                                    = Storage<A>.componentMask;
 			composition.includeComponents[Storage<A>.componentID] = true;
 
-			composition.generations[7] = Storage<S>.generation;
-			composition.ids[7] = Storage<S>.componentMask;
+			composition.generations[7]                            = Storage<S>.generation;
+			composition.ids[7]                                    = Storage<S>.componentMask;
 			composition.includeComponents[Storage<S>.componentID] = true;
 
-			composition.generations[8] = Storage<D>.generation;
-			composition.ids[8] = Storage<D>.componentMask;
+			composition.generations[8]                            = Storage<D>.generation;
+			composition.ids[8]                                    = Storage<D>.componentMask;
 			composition.includeComponents[Storage<D>.componentID] = true;
 
-			composition.generations[9] = Storage<F>.generation;
-			composition.ids[9] = Storage<F>.componentMask;
+			composition.generations[9]                            = Storage<F>.generation;
+			composition.ids[9]                                    = Storage<F>.componentMask;
 			composition.includeComponents[Storage<F>.componentID] = true;
 		}
-
 	}
 }

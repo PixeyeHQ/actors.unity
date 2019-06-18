@@ -134,7 +134,7 @@ namespace Pixeye.Framework
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static T Get(int entityID)
+		public static ref T Get(int entityID)
 		{
 			var source = Instance;
 			T   val;
@@ -151,7 +151,7 @@ namespace Pixeye.Framework
 				source.components[entityID] = val;
 			}
 
-			return val;
+			return ref source.components[entityID];
 		}
 	}
 }

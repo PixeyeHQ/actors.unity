@@ -147,7 +147,7 @@ namespace Pixeye.Framework
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static Actor Create(GameObject prefab, Vector3 position = default, bool pooled = false)
 		{
-			var tr    = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefab, position) : HelperFramework.SpawnInternal(prefab, position);
+			var tr    = pooled ? Obj.Spawn(Pool.Entities, prefab, position) : Obj.Spawn(prefab, position);
 			var actor = tr.AddGetActor();
 
 			actor.isPooled = pooled;
@@ -158,7 +158,7 @@ namespace Pixeye.Framework
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static Actor Create(GameObject prefab, ModelComposer model, Vector3 position = default, bool pooled = false)
 		{
-			var tr    = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefab, position) : HelperFramework.SpawnInternal(prefab, position);
+			var tr    = pooled ? Obj.Spawn(Pool.Entities, prefab, position) : Obj.Spawn(prefab, position);
 			var actor = tr.AddGetActor();
 			actor.isPooled = pooled;
 			actor.Launch(model);
@@ -169,7 +169,7 @@ namespace Pixeye.Framework
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static Actor Create(string prefabID, Vector3 position = default, bool pooled = false)
 		{
-			var tr    = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefabID, position) : HelperFramework.SpawnInternal(prefabID, position);
+			var tr    = pooled ? Obj.Spawn(Pool.Entities, prefabID, position) : Obj.Spawn(prefabID, position);
 			var actor = tr.AddGetActor();
 
 			actor.isPooled = pooled;
@@ -180,7 +180,7 @@ namespace Pixeye.Framework
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static Actor Create(string prefabID, ModelComposer model, Vector3 position = default, bool pooled = false)
 		{
-			var tr    = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefabID, position) : HelperFramework.SpawnInternal(prefabID, position);
+			var tr    = pooled ? Obj.Spawn(Pool.Entities, prefabID, position) : Obj.Spawn(prefabID, position);
 			var actor = tr.AddGetActor();
 			actor.isPooled = pooled;
 			actor.Launch(model);
@@ -193,7 +193,7 @@ namespace Pixeye.Framework
 		#if ODIN_INSPECTOR
 		public static Actor Create(string prefabID, BlueprintEntity bp, bool pooled = false)
 		{
-			var tr = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefabID) : HelperFramework.SpawnInternal(prefabID);
+			var tr = pooled ? Obj.Spawn(Pool.Entities, prefabID) : Obj.Spawn(prefabID);
 			var actor = tr.AddGetActor();
 			actor.buildFrom = bp;
 			actor.isPooled = pooled;
@@ -203,7 +203,7 @@ namespace Pixeye.Framework
  
 		public static Actor Create(GameObject prefab, BlueprintEntity bp, bool pooled = false)
 		{
-			var tr = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefab) : HelperFramework.SpawnInternal(prefab);
+			var tr = pooled ? Obj.Spawn(Pool.Entities, prefab) : Obj.Spawn(prefab);
 			var actor = tr.AddGetActor();
 			actor.buildFrom = bp;
 			actor.isPooled = pooled;

@@ -202,6 +202,23 @@ namespace Pixeye.Framework
 			EntityOperations.Set(entity, Storage<T>.componentID, EntityOperations.Action.Add);
 			return Storage<T>.Get(entity.id);
 		}
+
+		// [MethodImpl(MethodImplOptions.AggressiveInlining)]
+		// public static ref T AddRef<T>(in this ent entity)
+		// {
+		// 	#if UNITY_EDITOR
+		// 	var entityID = entity.id;
+		// 	if (!cache[entity.id].isAlive)
+		// 	{
+		// 		Debug.LogError($"-> Entity with id: [{entityID}] is not active. You should not add components to inactive entity. ");
+		// 		 
+		// 	}
+		// 	#endif
+		//
+		// 	EntityOperations.Set(entity, Storage<T>.componentID, EntityOperations.Action.Add);
+		// 	return  Storage<T>.Get(entity.id);
+		// }
+
 		/// <summary>
 		/// Attach component to an entity and systems.
 		/// </summary>
@@ -216,7 +233,7 @@ namespace Pixeye.Framework
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static void Remove<T>(this in ent entity)
+		public static void Remove<T>(in this ent entity)
 		{
 			EntityOperations.Set(entity, Storage<T>.componentID, EntityOperations.Action.Remove);
 		}
@@ -231,7 +248,7 @@ namespace Pixeye.Framework
 		/// <param name="entity"></param>
 		/// <returns>Returns the transform linked to the entity.</returns>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static T Get<T>(this in ent entity)
+		public static T GetMono<T>(in this ent entity) where T : Component
 		{
 			return transforms[entity].GetComponentInChildren<T>();
 		}
@@ -241,7 +258,7 @@ namespace Pixeye.Framework
 		/// <param name="entity"></param>
 		/// <returns>Returns the transform linked to the entity.</returns>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static T Get<T>(this in ent entity, int index1)
+		public static T GetMono<T>(in this ent entity, int index1) where T : Component
 		{
 			return transforms[entity].GetChild(index1).GetComponent<T>();
 		}
@@ -251,7 +268,7 @@ namespace Pixeye.Framework
 		/// <param name="entity"></param>
 		/// <returns>Returns the transform linked to the entity.</returns>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static T Get<T>(this in ent entity, int index1, int index2)
+		public static T GetMono<T>(in this ent entity, int index1, int index2) where T : Component
 		{
 			return transforms[entity].GetChild(index1).GetChild(index2).GetComponent<T>();
 		}
@@ -261,7 +278,7 @@ namespace Pixeye.Framework
 		/// <param name="entity"></param>
 		/// <returns>Returns the transform linked to the entity.</returns>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static T Get<T>(this in ent entity, int index1, int index2, int index3)
+		public static T GetMono<T>(in this ent entity, int index1, int index2, int index3) where T : Component
 		{
 			return transforms[entity].GetChild(index1).GetChild(index2).GetChild(index3).GetComponent<T>();
 		}
@@ -271,7 +288,7 @@ namespace Pixeye.Framework
 		/// <param name="entity"></param>
 		/// <returns>Returns the transform linked to the entity.</returns>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static T Get<T>(this in ent entity, int index1, int index2, int index3, int index4)
+		public static T GetMono<T>(in this ent entity, int index1, int index2, int index3, int index4) where T : Component
 		{
 			return transforms[entity].GetChild(index1).GetChild(index2).GetChild(index3).GetChild(index4).GetComponent<T>();
 		}
@@ -281,7 +298,7 @@ namespace Pixeye.Framework
 		/// <param name="entity"></param>
 		/// <returns>Returns the transform linked to the entity.</returns>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static T Get<T>(this in ent entity, string path)
+		public static T GetMono<T>(in this ent entity, string path) where T : Component
 		{
 			return transforms[entity].Find(path).GetComponent<T>();
 		}
@@ -291,7 +308,7 @@ namespace Pixeye.Framework
 		/// <param name="entity"></param>
 		/// <returns>Returns the transform linked to the entity.</returns>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static T Get<T>(this in ent entity, in int[] path)
+		public static T GetMono<T>(in this ent entity, in int[] path) where T : Component
 		{
 			var transform = transforms[entity];
 			foreach (var sibling in path)
@@ -305,7 +322,7 @@ namespace Pixeye.Framework
 		/// <param name="entity"></param>
 		/// <returns>Returns the transform linked to the entity.</returns>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		internal static Component Get(this in ent entity, in int[] path, Type t)
+		internal static Component GetMono(in this ent entity, in int[] path, Type t)
 		{
 			var transform = transforms[entity];
 			foreach (var sibling in path)

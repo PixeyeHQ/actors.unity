@@ -10,12 +10,11 @@ namespace Pixeye.Framework
 	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
 	public static class HelperArray
 	{
-
 		public static void ResizeInt(ref int[,] original, int newLength, int cols)
 		{
 			var newArray = new int[newLength, cols];
-			int minRows = Math.Min(newLength, original.GetLength(0));
-			int minCols = Math.Min(cols, original.GetLength(1));
+			int minRows  = Math.Min(newLength, original.GetLength(0));
+			int minCols  = Math.Min(cols, original.GetLength(1));
 			for (int i = 0; i < minRows; i++)
 			for (int j = 0; j < minCols; j++)
 				newArray[i, j] = original[i, j];
@@ -25,8 +24,8 @@ namespace Pixeye.Framework
 		public static void Resize<T>(ref T[,] original, int newLength, int cols)
 		{
 			var newArray = new T[newLength, cols];
-			int minRows = Math.Min(newLength, original.GetLength(0));
-			int minCols = Math.Min(cols, original.GetLength(1));
+			int minRows  = Math.Min(newLength, original.GetLength(0));
+			int minCols  = Math.Min(cols, original.GetLength(1));
 			for (int i = 0; i < minRows; i++)
 			for (int j = 0; j < minCols; j++)
 				newArray[i, j] = original[i, j];
@@ -67,8 +66,9 @@ namespace Pixeye.Framework
 				var m = (left + right) / 2;
 				if (entries[m] == value) return m;
 				if (entries[m] < value) left = m + 1;
-				else right = m - 1;
+				else right                   = m - 1;
 			}
+
 			return -1;
 		}
 
@@ -81,8 +81,9 @@ namespace Pixeye.Framework
 				var m = (left + right) / 2;
 				if (entries[m].id == value) return m;
 				if (entries[m].id < value) left = m + 1;
-				else right = m - 1;
+				else right                      = m - 1;
 			}
+
 			return -1;
 		}
 
@@ -91,7 +92,7 @@ namespace Pixeye.Framework
 		{
 			return Array.FindIndex(array, predicate);
 		}
-		
+
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static int FindIndexFast<T>(this T[] array, Predicate<T> predicate)
 		{
@@ -100,62 +101,13 @@ namespace Pixeye.Framework
 				ref var val = ref array[i];
 				if (predicate(val)) return i;
 			}
+
 			return -1;
 		}
 
-		/*
-		 * OLD
-		 */
-
-//		while (left<=right)
-//		{
-//			var m = (left + right) / 2;
-//			if (entries[m] == value) return m;
-//			if (entries[m] < value) left = m + 1;
-//			else right = m - 1;
-//		}
-//		return -1;
-
-// 			if (right == 0) return -1;
-// 
-//			var len = right;
-//			while (left <= right)
-//			{
-//				var middle = (left + right) / 2;
-//				if (entries[middle] < value)
-//					left = middle + 1;
-//				else
-//					right = middle -1 ;
-//			}
-//
-//			if (left > len) return -1;
-//			if (entries[left] != value) return -1;
-//			return left;
-
-//			var len = right;
-//
-//			while (left < right)
-//			{
-//				var middle = (left + right) / 2;
-//
-//				if (entries[middle].id == value)
-//				{
-//					return middle;
-//				}
-//
-//				if (entries[middle].id < value)
-//					left = middle + 1;
-//				else
-//					right = middle - 1;
-//			}
-//
-//			if (left > len) return -1;
-//			if (entries[left] != value) return -1;
-//			return left;
 
 		internal class ArrayTraverse
 		{
-
 			public int[] Position;
 			int[] maxLengths;
 
@@ -187,8 +139,6 @@ namespace Pixeye.Framework
 
 				return false;
 			}
-
 		}
-
 	}
 }

@@ -2,7 +2,6 @@
 //  Contacts : Pixeye - ask@pixeye.games
 
 
-using System.Runtime.CompilerServices;
 using Unity.IL2CPP.CompilerServices;
 using UnityEngine;
 
@@ -18,15 +17,18 @@ namespace Pixeye.Framework
 		public ent entity;
 
 		#if UNITY_EDITOR
- 
+
 		[FoldoutGroup("Main"), SerializeField, ReadOnly]
 		internal int _entity = -1;
 
 
 		#endif
 
-		[FoldoutGroup("Main")] public bool isPooled;
-		[FoldoutGroup("Main")] public ScriptableBuild buildFrom;
+		[FoldoutGroup("Main")]
+		public bool isPooled;
+
+		[FoldoutGroup("Main")]
+		public ScriptableBuild buildFrom;
 
 
 		//===============================//
@@ -38,7 +40,7 @@ namespace Pixeye.Framework
 		protected bool manualRemoved;
 
 		void Awake() => manualRemoved = !enabled;
-		
+
 		protected virtual void OnEnable()
 		{
 			unsafe
@@ -49,7 +51,7 @@ namespace Pixeye.Framework
 				EntityOperations.Set(entity, 0, EntityOperations.Action.Activate);
 			}
 		}
-		
+
 		protected virtual void OnDisable()
 		{
 			unsafe
@@ -60,7 +62,7 @@ namespace Pixeye.Framework
 				EntityOperations.Set(entity, 0, EntityOperations.Action.Deactivate);
 			}
 		}
-		
+
 		#else
 				protected virtual void OnEnable(){}
 				protected virtual void OnDisable(){}

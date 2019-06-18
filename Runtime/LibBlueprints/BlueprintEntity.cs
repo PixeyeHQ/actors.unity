@@ -12,6 +12,7 @@ using Object = UnityEngine.Object;
 using Sirenix.OdinInspector;
 #if UNITY_EDITOR
 using UnityEditor;
+
 #if ODIN_INSPECTOR
 using Sirenix.Utilities.Editor;
 #endif
@@ -19,15 +20,10 @@ using Sirenix.Utilities.Editor;
 
 namespace Pixeye.Framework
 {
-
-  
-
 	public class BlueprintEntity : ScriptableBuild
 	{
-
 		public static Dictionary<int, BlueprintEntity> storage = new Dictionary<int, BlueprintEntity>(FastComparable.Default);
 
- 
 
 		[SerializeField, HideReferenceObjectPicker, TypeFilter("GetFilteredTypeList"), OnValueChanged("HandleAdd"), Title("Components")]
 		internal IComponentCopy[] onCreate = new IComponentCopy[0];
@@ -88,7 +84,7 @@ namespace Pixeye.Framework
 
 			for (int i = 0; i < lenOnCreate; i++)
 			{
-				var c = onCreate[i];
+				var c    = onCreate[i];
 				var hash = c.GetType().GetHashCode();
 				components.Add(hash, c);
 				hashesOnCreate[i] = hash;
@@ -101,7 +97,9 @@ namespace Pixeye.Framework
 			}
 		}
 
-		protected override void OnDisable() { }
+		protected override void OnDisable()
+		{
+		}
 
 		#if UNITY_EDITOR
 
@@ -126,7 +124,7 @@ namespace Pixeye.Framework
 		internal override void Execute(in ent entity, Actor a = null)
 		{
 			var id = entity.id;
- 
+
 			for (int i = 0; i < lenOnCreate; i++)
 			{
 				var component = onCreate[i];
@@ -150,7 +148,7 @@ namespace Pixeye.Framework
 		{
 			var id = entity.id;
 
- 
+
 			for (int i = 0; i < lenOnCreate; i++)
 			{
 				var component = onCreate[i];
@@ -171,20 +169,18 @@ namespace Pixeye.Framework
 			if (a.isActiveAndEnabled)
 				EntityOperations.Set(entity, 0, EntityOperations.Action.Activate);
 		}
-
 	}
 
 	#if UNITY_EDITOR
 	public static class PostHandleBlueprintTags
 	{
-
 		public const string PATH_TO_TEMPLATE = @"Assets\Framework\Editor\Templates\TmpBlueprintTags.txt";
 
 		public static void Generate()
 		{
 			var path = HelperFramework.GetPathLibrary();
 			if (path == string.Empty)
-				path = PATH_TO_TEMPLATE;
+				path    = PATH_TO_TEMPLATE;
 			else path = string.Format($"{path}/Editor/Templates/TmpBlueprintTags.txt");
 
 			var o = CreateScript("Assets/Source/Runtime/Tags/Blueprints.cs", path);
@@ -205,8 +201,8 @@ namespace Pixeye.Framework
 				templateContents = t.ReadToEnd();
 			}
 
-			FastString gen = new FastString(6000);
-			string[] guids1 = AssetDatabase.FindAssets("l:Blueprint", null);
+			FastString gen    = new FastString(6000);
+			string[]   guids1 = AssetDatabase.FindAssets("l:Blueprint", null);
 
 			foreach (var guid in guids1)
 			{
@@ -230,17 +226,54 @@ namespace Pixeye.Framework
 
 			return (MonoScript) AssetDatabase.LoadAssetAtPath(pathName, typeof(MonoScript));
 		}
+	}
+	#endif
 
+	public interface IComponentCopy
+	{
+		void Copy(int entityID);
 	}
 
  
-	#endif
+	public readonly struct bpt
+	{
 
-    public interface IComponentCopy
-    {
-	    void Copy(int entityID);
-    } 
+		public readonly int hash;
 
+		public bpt(int hash)
+		{
+			this.hash = hash;
+		}
 
+		static public implicit operator BlueprintEntity(bpt value)
+		{
+			return BlueprintEntity.storage[value.hash];
+		}
+
+		static public implicit operator bpt(string value)
+		{
+			var hash = value.GetHashCode();
+			if (!BlueprintEntity.storage.TryGetValue(hash, out BlueprintEntity bp))
+			{
+				bp = Box.Get<BlueprintEntity>(value);
+				BlueprintEntity.storage.Add(hash, bp);
+			}
+
+			return new bpt(hash);
+		}
+
+	}
+
+	public static class HelperBlueprints
+	{
+
+		public static BlueprintEntity Get(in this bpt value)
+		{
+			return BlueprintEntity.storage[value.hash];
+		}
+
+	}
+ 
+	
 }
 #endif

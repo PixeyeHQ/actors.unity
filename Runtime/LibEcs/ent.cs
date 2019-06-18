@@ -13,7 +13,6 @@ namespace Pixeye.Framework
 	[StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Unicode)]
 	public unsafe readonly struct ent
 	{
-
 		internal static Queue<ent> entityStack = new Queue<ent>(SettingsEngine.SizeEntities);
 		internal static int entityStackLength;
 		internal static int lastID;
@@ -36,7 +35,7 @@ namespace Pixeye.Framework
 
 		public ent(int id = -1, byte age = 0)
 		{
-			this.id = id;
+			this.id  = id;
 			this.age = age;
 		}
 
@@ -145,15 +144,20 @@ namespace Pixeye.Framework
 		public bool Exist
 		{
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			get
-			{
-				return id > -1 && Entity.cache[id].isAlive && Entity.cache[id].age == age;
-			}
+			get { return id > -1 && Entity.cache[id].isAlive && Entity.cache[id].age == age; }
 		}
 
 		#endregion
 
 		#region GET
+
+		[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public T Get<T>()
+		{
+			return Storage<T>.Instance.components[id];
+			//(arg0 = (Entity.generations[id, Storage<T>.generation] & Storage<T>.componentMask) == Storage<T>.componentMask ? Storage<T>.Instance.components[id] : default) != null;
+		}
 
 		/// <summary>
 		/// <para>Safely gets the component by type from the entity.</para>
@@ -266,6 +270,5 @@ namespace Pixeye.Framework
 		}
 
 		#endregion
-
 	}
 }

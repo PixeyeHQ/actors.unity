@@ -1,17 +1,20 @@
 //  Project  : ACTORS
 //  Contacts : Pixeye - ask@pixeye.games
 
+// #define ACTORS_TAGS_FILTER_DEFAULT
+// #if ACTORS_NO_TAGS
+// #undef ACTORS_TAGS_FILTER_DEFAULT
+// #endif
+
 using System;
 using System.Runtime.CompilerServices;
 using Unity.IL2CPP.CompilerServices;
-using UnityEngine;
 
 namespace Pixeye.Framework
 {
 	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
 	public unsafe class Composition : IEquatable<Composition>
 	{
-
 		public int[] generations = new int[0];
 		public int[] ids = new int[0];
 
@@ -32,6 +35,7 @@ namespace Pixeye.Framework
 				if (includeComponents[entityComponents.ids[i]])
 					match++;
 			}
+
 			return ids.Length == match;
 		}
 
@@ -54,17 +58,15 @@ namespace Pixeye.Framework
 			}
 		}
 
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		internal bool CheckTags(int entityID)
-		{
-			return CanProceed(entityID) && (includeTags.Length == 0 || IncludeTags(entityID)) & (excludeTags.Length == 0 || ExcludeTags(entityID)) & !ExcludeTypes(entityID);
-		}
-
+	 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal bool Check(int entityID)
 		{
-			 
+			#if ACTORS_NO_TAGS
+			return CanProceed(entityID) && !ExcludeTypes(entityID);
+			#else
 			return CanProceed(entityID) && (includeTags.Length == 0 || IncludeTags(entityID)) & (excludeTags.Length == 0 || ExcludeTags(entityID)) & !ExcludeTypes(entityID);
+			#endif
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -75,13 +77,14 @@ namespace Pixeye.Framework
 				var mask = ids[ll];
 				if ((Entity.generations[entityID, generations[ll]] & mask) != mask) return false;
 			}
+
 			return true;
 		}
 
 		internal bool IncludeTags(int entityID)
 		{
 			ref var tags = ref Entity.tags[entityID];
-			var len = tags.Length;
+			var     len  = tags.Length;
 
 			if (len == 0) return false;
 			var match = 0;
@@ -102,7 +105,7 @@ namespace Pixeye.Framework
 		internal bool ExcludeTags(int entityID)
 		{
 			ref var tags = ref Entity.tags[entityID];
-			var len = tags.Length;
+			var     len  = tags.Length;
 			if (len == 0) return true;
 
 			for (int l = 0; l < excludeTags.Length; l++)
@@ -129,6 +132,7 @@ namespace Pixeye.Framework
 					return true;
 				}
 			}
+
 			return false;
 		}
 
@@ -147,6 +151,5 @@ namespace Pixeye.Framework
 			var other = obj as Composition;
 			return other != null && Equals(other);
 		}
-
 	}
 }

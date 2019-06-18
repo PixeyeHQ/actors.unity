@@ -19,16 +19,8 @@ namespace Pixeye.Framework
 	/// </summary>
 	public class Starter : MonoBehaviour
 	{
-
 		public static bool initialized;
-
-		#if ODIN_INSPECTOR
-		[FoldoutGroup("Setup")]
-		#else
-		[FoldoutGroup("Setup"), Reorderable]
-		#endif
-		public List<Factory> factories;
-
+		
 		#if ODIN_INSPECTOR
 		[FoldoutGroup("Setup")]
 		#else
@@ -72,10 +64,10 @@ namespace Pixeye.Framework
 
 		public void AddToNode(GameObject prefab, GameObject instance, int pool)
 		{
-			var       id                  = prefab.GetInstanceID();
-			var       nodesValid          = nodes.FindValidNodes(id);
-			var       conditionNodeCreate = true;
-			List<int> nodesToKill         = new List<int>();
+			var id                  = prefab.GetInstanceID();
+			var nodesValid          = nodes.FindValidNodes(id);
+			var conditionNodeCreate = true;
+			var nodesToKill         = new List<int>();
 
 			for (int i = 0; i < nodesValid.Count; i++)
 			{
@@ -112,9 +104,9 @@ namespace Pixeye.Framework
 			if (conditionNodeCreate)
 			{
 				var node = new PoolNode();
-				node.id = id;
-				node.prefab = prefab;
-				node.pool = pool;
+				node.id          = id;
+				node.prefab      = prefab;
+				node.pool        = pool;
 				node.createdObjs = new List<GameObject>();
 				node.createdObjs.Add(instance);
 				nodes.Add(node);
@@ -155,20 +147,12 @@ namespace Pixeye.Framework
 				nodes[i].Populate();
 			}
 
-			foreach (var factory in factories)
-			{
-				Toolbox.Add(factory);
-			}
-
-		 
-
- 
 			Add<ProcessorEntities>();
 			Add<ProcessorObserver>();
 
 			if (SettingsEngine.DefineDebugMode)
 				Add<ProcessorDebug>();
-			
+
 			Setup();
 
 			initialized = true;
@@ -205,6 +189,5 @@ namespace Pixeye.Framework
 		{
 			initialized = false;
 		}
-
 	}
 }

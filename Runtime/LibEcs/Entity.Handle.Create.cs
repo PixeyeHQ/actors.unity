@@ -80,7 +80,7 @@ namespace Pixeye.Framework
 				id = ent.lastID++;
 
 			Initialize(id, age, pooled);
-			transforms[id] = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefabID, position) : HelperFramework.SpawnInternal(prefabID, position);
+			transforms[id] = pooled ? Obj.Spawn(Pool.Entities, prefabID, position) : Obj.Spawn(prefabID, position);
 			return new ent(id, age);
 		}
 		public static ent Create(string prefabID, ModelComposer model, Vector3 position = default, bool pooled = false)
@@ -105,7 +105,7 @@ namespace Pixeye.Framework
 
 			var entity = new ent(id, age);
 			Initialize(id, age, pooled);
-			transforms[id] = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefabID, position) : HelperFramework.SpawnInternal(prefabID, position);
+			transforms[id] = pooled ? Obj.Spawn(Pool.Entities, prefabID, position) : Obj.Spawn(prefabID, position);
 			model(entity);
 			EntityOperations.Set(entity, 0, EntityOperations.Action.Activate);
 
@@ -134,7 +134,7 @@ namespace Pixeye.Framework
 
 
 			Initialize(id, age, pooled);
-			transforms[id] = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefab, position) : HelperFramework.SpawnInternal(prefab, position);
+			transforms[id] = pooled ? Obj.Spawn(Pool.Entities, prefab, position) : Obj.Spawn(prefab, position);
 
 			return new ent(id, age);
 		}
@@ -160,7 +160,7 @@ namespace Pixeye.Framework
 
 			var entity = new ent(id, age);
 			Initialize(id, age, pooled);
-			transforms[id] = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefab, position) : HelperFramework.SpawnInternal(prefab, position);
+			transforms[id] = pooled ? Obj.Spawn(Pool.Entities, prefab, position) : Obj.Spawn(prefab, position);
 			model(entity);
 			EntityOperations.Set(entity, 0, EntityOperations.Action.Activate);
 
@@ -222,8 +222,8 @@ namespace Pixeye.Framework
 		//===============================//
 		// Blueprints
 		//===============================//
-
-		#if ODIN_INSPECTOR
+		 #if ODIN_INSPECTOR
+	 
 		public static ent Create(BlueprintEntity bpAsset)
 		{
 			int  id;
@@ -272,7 +272,7 @@ namespace Pixeye.Framework
 
 			var entity = new ent(id, age);
 			Initialize(id, age, pooled);
-			transforms[id] = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefabID) : HelperFramework.SpawnInternal(prefabID);
+			transforms[id] = pooled ? Obj.Spawn(Pool.Entities, prefabID) : Obj.Spawn(prefabID);
 			bpAsset.Execute(entity);
 			return entity;
 		}
@@ -299,7 +299,7 @@ namespace Pixeye.Framework
 
 			var entity = new ent(id, age);
 			Initialize(id, age, pooled);
-			transforms[id] = pooled ? HelperFramework.SpawnInternal(Pool.Entities, prefab) : HelperFramework.SpawnInternal(prefab);
+			transforms[id] = pooled ? Obj.Spawn(Pool.Entities, prefab) : Obj.Spawn(prefab);
 			bpAsset.Execute(entity);
 			return entity;
 		}

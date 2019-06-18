@@ -2,7 +2,6 @@
 // Contacts : Pix - ask@pixeye.games
 
 #define ACTORS_TAGS_DEFAULT
-
 #if ACTORS_TAGS_6 || ACTORS_TAGS_12
 #undef ACTORS_TAGS_DEFAULT
 #endif
@@ -10,7 +9,7 @@
 using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using UnityEngine;
+
 
 namespace Pixeye.Framework
 {
@@ -432,7 +431,7 @@ namespace Pixeye.Framework
 			var indexGroup = inUseGroups.TryGetValue(tagID);
 
 			if (indexGroup == -1) return;
-			EntityOperations.Set(entity, indexGroup, EntityOperations.Action.ChangeTag);
+		  EntityOperations.Set(entity, indexGroup, EntityOperations.Action.ChangeTag);
 		}
 
 	}
