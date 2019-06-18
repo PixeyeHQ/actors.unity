@@ -36,12 +36,12 @@ namespace Pixeye.Framework
 		}
 		public static T Spawn<T>(GameObject prefab, Transform parent , Vector3 startPosition = default, Quaternion startRotation = default)
 		{
-			return Spawn(prefab, parent, startPosition, startRotation).GetComponent<T>();
+			return Spawn(prefab, parent, startPosition, startRotation).GetComponentInChildren<T>();
 		}
 
 		public static T Spawn<T>(GameObject prefab, Vector3 startPosition = default, Quaternion startRotation = default)
 		{
-			return Spawn(prefab, startPosition, startRotation).GetComponent<T>();
+			return Spawn(prefab, startPosition, startRotation).GetComponentInChildren<T>();
 		}
 		
 		//Pooled
@@ -54,12 +54,12 @@ namespace Pixeye.Framework
 		}
 		public static T Spawn<T>(int poolID, GameObject prefab, Transform parent , Vector3 startPosition = default, Quaternion startRotation = default)
 		{
-			return Spawn(poolID, prefab, parent, startPosition, startRotation).GetComponent<T>();
+			return Spawn(poolID, prefab, parent, startPosition, startRotation).GetComponentInChildren<T>();
 		}
 
 		public static T Spawn<T>(int poolID, GameObject prefab, Vector3 startPosition = default, Quaternion startRotation = default)
 		{
-			return Spawn(poolID , prefab, startPosition, startRotation).GetComponent<T>();
+			return Spawn(poolID , prefab, startPosition, startRotation).GetComponentInChildren<T>();
 		}
 		
 		public static Transform Spawn(int poolID, GameObject prefab, Vector3 startPosition = default, Quaternion startRotation = default)
@@ -92,11 +92,11 @@ namespace Pixeye.Framework
 		}
 		public static T Spawn<T>(string prefabID, Transform parent , Vector3 startPosition = default, Quaternion startRotation = default)
 		{
-			return Spawn(prefabID, parent, startPosition, startRotation).GetComponent<T>();
+			return Spawn(prefabID, parent, startPosition, startRotation).GetComponentInChildren<T>();
 		}
 		public static T Spawn<T>(string prefabID, Vector3 startPosition = default, Quaternion startRotation = default)
 		{
-			return Spawn(prefabID, startPosition, startRotation).GetComponent<T>();
+			return Spawn(prefabID, startPosition, startRotation).GetComponentInChildren<T>();
 		}
 		
 		
@@ -119,12 +119,12 @@ namespace Pixeye.Framework
 
 		public static T Spawn<T>(int poolID, string prefabID, Transform parent , Vector3 startPosition = default, Quaternion startRotation = default)
 		{
-			return Spawn(poolID, prefabID, parent, startPosition, startRotation).GetComponent<T>();
+			return Spawn(poolID, prefabID, parent, startPosition, startRotation).GetComponentInChildren<T>();
 		}
 
 		public static T Spawn<T>(int poolID, string prefabID, Vector3 startPosition = default, Quaternion startRotation = default)
 		{
-			return Spawn(poolID, prefabID, startPosition, startRotation).GetComponent<T>();
+			return Spawn(poolID, prefabID, startPosition, startRotation).GetComponentInChildren<T>();
 		}
 	}
 }
