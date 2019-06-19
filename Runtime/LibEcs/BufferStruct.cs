@@ -9,13 +9,20 @@ namespace Pixeye.Framework
 	[Serializable]
 	public class BufferStruct<T> where T : struct
 	{
-		public static BufferStruct<T> Default = new BufferStruct<T>();
+		public static BufferStruct<T> Default = new BufferStruct<T>(500);
 
-		public T[] source = new T[12];
+		public T[] source;
 		public int length;
 
 		public ref T this[int index] => ref source[index];
 
+
+		public BufferStruct(int size)
+		{
+			source = new T[size];
+		}
+		
+		
 		public void Add(in T obj)
 		{
 			if (length == source.Length)
