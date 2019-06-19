@@ -1,5 +1,6 @@
 #if ODIN_INSPECTOR
 using Unity.IL2CPP.CompilerServices;
+using UnityEngine;
 
 namespace Pixeye.Framework
 {
