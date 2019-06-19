@@ -2,14 +2,13 @@
 // Contacts : Pix - ask@pixeye.games
 
 using System;
- 
+
 
 namespace Pixeye.Framework
 {
 	[Serializable]
 	public class BufferStruct<T> where T : struct
 	{
-
 		public static BufferStruct<T> Default = new BufferStruct<T>();
 
 		public T[] source = new T[12];
@@ -36,14 +35,5 @@ namespace Pixeye.Framework
 		{
 			source[index] = arg;
 		}
-
-		public ref T Add()
-		{
-			if (length == source.Length)
-				Array.Resize(ref source, length << 1);
-
-			return ref source[length++];
-		}
-
 	}
 }
