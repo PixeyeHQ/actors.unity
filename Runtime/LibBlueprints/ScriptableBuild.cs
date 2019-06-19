@@ -5,58 +5,22 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
+#if ODIN_INSPECTOR
+using Sirenix.OdinInspector;
+#endif
 #if UNITY_EDITOR
 using UnityEditor;
 
 #endif
+
 namespace Pixeye.Framework
 {
-	#if ODIN_INSPECTOR
-	using Sirenix.OdinInspector;
-
-	public abstract class ScriptableBuild : SerializedScriptableObject
-	{
-
-		[HideInInspector]
-		public Dictionary<int,ModelComposer> helpers = new Dictionary<int,ModelComposer>();
-
-		protected virtual void OnEnable()
-		{
-			#if UNITY_EDITOR
-			if (!EditorApplication.isPlayingOrWillChangePlaymode) return;
-			#endif
-
-			Type t = GetType();
-			var n = name.Substring(5).Replace(" ", string.Empty);
-			helpers.Add(GetInstanceID(), (ModelComposer) Delegate.CreateDelegate(typeof(ModelComposer), null, t.GetMethod(n, BindingFlags.Public | BindingFlags.Static | BindingFlags.Default)));
-		}
-
-		protected virtual void OnDisable()
-		{
-			helpers.Clear();
-		}
-
-		internal virtual void Execute(in ent entity, Actor a = null)
-		{
- 
-			helpers[GetInstanceID()](entity);
-			EntityOperations.Set(entity, 0, EntityOperations.Action.Activate);
-		}
-
-		internal virtual void ExecuteOnStart(in ent entity, Actor a)
-		{
-			 
-			helpers[GetInstanceID()](entity);
-			if (a.isActiveAndEnabled)
-				EntityOperations.Set(entity, 0, EntityOperations.Action.Activate);
-		}
-
-	}
-	#else
-
+	#if !ODIN_INSPECTOR
 	public class ScriptableBuild : ScriptableObject
+			#else
+  public class ScriptableBuild : SerializedScriptableObject
+			#endif
 	{
-
 		public Dictionary<int, ModelComposer> helpers = new Dictionary<int, ModelComposer>();
 
 		internal virtual void Execute(in ent entity, Actor a = null)
@@ -80,15 +44,12 @@ namespace Pixeye.Framework
 
 			Type t = GetType();
 			var  n = name.Substring(5).Replace(" ", string.Empty);
-			helpers.Add(GetInstanceID(), (ModelComposer) Delegate.CreateDelegate(typeof(ModelComposer), null, t.GetMethod(n, BindingFlags.Public | BindingFlags.Static)));
+			helpers.Add(GetInstanceID(), (ModelComposer) Delegate.CreateDelegate(typeof(ModelComposer), null, t.GetMethod(n, BindingFlags.Public | BindingFlags.Static | BindingFlags.Default)));
 		}
 
 		protected virtual void OnDisable()
 		{
 			helpers.Clear();
 		}
-
 	}
-
-	#endif
 }

@@ -202,23 +202,7 @@ namespace Pixeye.Framework
 			EntityOperations.Set(entity, Storage<T>.componentID, EntityOperations.Action.Add);
 			return Storage<T>.Get(entity.id);
 		}
-
-		// [MethodImpl(MethodImplOptions.AggressiveInlining)]
-		// public static ref T AddRef<T>(in this ent entity)
-		// {
-		// 	#if UNITY_EDITOR
-		// 	var entityID = entity.id;
-		// 	if (!cache[entity.id].isAlive)
-		// 	{
-		// 		Debug.LogError($"-> Entity with id: [{entityID}] is not active. You should not add components to inactive entity. ");
-		// 		 
-		// 	}
-		// 	#endif
-		//
-		// 	EntityOperations.Set(entity, Storage<T>.componentID, EntityOperations.Action.Add);
-		// 	return  Storage<T>.Get(entity.id);
-		// }
-
+		
 		/// <summary>
 		/// Attach component to an entity and systems.
 		/// </summary>

@@ -187,32 +187,7 @@ namespace Pixeye.Framework
 			return actor;
 		}
 
-
-		#region OBSOLETE
-
-		#if ODIN_INSPECTOR
-		public static Actor Create(string prefabID, BlueprintEntity bp, bool pooled = false)
-		{
-			var tr = pooled ? Obj.Spawn(Pool.Entities, prefabID) : Obj.Spawn(prefabID);
-			var actor = tr.AddGetActor();
-			actor.buildFrom = bp;
-			actor.isPooled = pooled;
-			actor.Launch();
-			return actor;
-		}
  
-		public static Actor Create(GameObject prefab, BlueprintEntity bp, bool pooled = false)
-		{
-			var tr = pooled ? Obj.Spawn(Pool.Entities, prefab) : Obj.Spawn(prefab);
-			var actor = tr.AddGetActor();
-			actor.buildFrom = bp;
-			actor.isPooled = pooled;
-			actor.Launch();
-			return actor;
-		}
-		#endif
-
-		#endregion
 	}
 
 	public static class HelperActor

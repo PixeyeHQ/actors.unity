@@ -1,6 +1,7 @@
 ﻿//  Project : ecs
 // Contacts : Pix - ask@pixeye.games
 
+
 #if ODIN_INSPECTOR
 using System;
 using System.Collections.Generic;
@@ -84,7 +85,7 @@ namespace Pixeye.Framework
 
 			for (int i = 0; i < lenOnCreate; i++)
 			{
-				var c    = onCreate[i];
+				var c = onCreate[i];
 				var hash = c.GetType().GetHashCode();
 				components.Add(hash, c);
 				hashesOnCreate[i] = hash;
@@ -180,7 +181,7 @@ namespace Pixeye.Framework
 		{
 			var path = HelperFramework.GetPathLibrary();
 			if (path == string.Empty)
-				path    = PATH_TO_TEMPLATE;
+				path = PATH_TO_TEMPLATE;
 			else path = string.Format($"{path}/Editor/Templates/TmpBlueprintTags.txt");
 
 			var o = CreateScript("Assets/Source/Runtime/Tags/Blueprints.cs", path);
@@ -201,7 +202,7 @@ namespace Pixeye.Framework
 				templateContents = t.ReadToEnd();
 			}
 
-			FastString gen    = new FastString(6000);
+			FastString gen = new FastString(6000);
 			string[]   guids1 = AssetDatabase.FindAssets("l:Blueprint", null);
 
 			foreach (var guid in guids1)
@@ -273,6 +274,11 @@ namespace Pixeye.Framework
 		}
 
 	}
+
+
+ 
+ 
+
  
 	
 }
