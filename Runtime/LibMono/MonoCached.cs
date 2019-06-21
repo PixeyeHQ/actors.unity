@@ -16,14 +16,10 @@ namespace Pixeye.Framework
 {
 	public abstract class MonoCached : MonoBehaviour, IRequireStarter
 	{
-		#region FIELDS
-		[HideInInspector] public Transform selfTransform;
-		#endregion
-
+		 
 
 		void Awake()
 		{
-			selfTransform = transform;
 			if (Starter.initialized == false) return;
 			Setup();
 		}
