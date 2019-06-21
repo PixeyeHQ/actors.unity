@@ -73,7 +73,7 @@ namespace Pixeye.Framework
 					case EntityOperations.Action.Kill:
 					{
 						ref var components = ref Entity.components[entityID];
-						var     length     = components.length;
+						var     length     = components.amount;
 
 						for (int j = 0; j < length; j++)
 						{
@@ -104,13 +104,13 @@ namespace Pixeye.Framework
 
 						groupsCheckedLen = 0;
 
-						for (int j = 0; j < components.length; j++)
+						for (int j = 0; j < components.amount; j++)
 						{
 							var cID = (int) components.ids[j];
 							Storage.all[cID].DisposeComponent(entityID);
 						}
 
-						components.length = 0;
+						components.amount = 0;
 
 						if (Entity.transforms.Length > entityID && Entity.transforms[entityID] != null)
 						{
@@ -134,7 +134,7 @@ namespace Pixeye.Framework
 					case EntityOperations.Action.Unbind:
 					{
 						ref var components = ref Entity.components[entityID];
-						var     length     = components.length;
+						var     length     = components.amount;
 
 						for (int j = 0; j < length; j++)
 						{
@@ -164,13 +164,13 @@ namespace Pixeye.Framework
 
 						groupsCheckedLen = 0;
 
-						for (int j = 0; j < components.length; j++)
+						for (int j = 0; j < components.amount; j++)
 						{
 							var cID = (int) components.ids[j];
 							Storage.all[cID].DisposeComponent(entityID);
 						}
 
-						components.length = 0;
+						components.amount = 0;
 						Entity.tags[entityID].Clear();
 
 						EntityOperations.Set(operation.entity, 0, EntityOperations.Action.KillFinalize);
@@ -243,7 +243,7 @@ namespace Pixeye.Framework
 					case EntityOperations.Action.Activate:
 					{
 						ref var components = ref Entity.components[entityID];
-						var     length     = components.length;
+						var     length     = components.amount;
 
 						for (int j = 0; j < length; j++)
 						{
@@ -270,7 +270,7 @@ namespace Pixeye.Framework
 					case EntityOperations.Action.Deactivate:
 					{
 						ref var componenets = ref Entity.components[entityID];
-						var     length      = componenets.length;
+						var     length      = componenets.amount;
 						var     storage     = Storage.all[operation.arg];
 
 						for (int j = 0; j < length; j++)

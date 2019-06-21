@@ -11,14 +11,14 @@ using UnityEngine;
 namespace Pixeye.Framework
 {
 	[StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Unicode)]
-	public unsafe readonly struct ent
+	public unsafe struct ent
 	{
 		internal static Queue<ent> entityStack = new Queue<ent>(SettingsEngine.SizeEntities);
 		internal static int entityStackLength;
 		internal static int lastID;
 
-		public readonly int id;
-		internal readonly byte age;
+		public int id;
+		internal byte age;
 
 		public ref readonly Transform transform
 		{
@@ -132,7 +132,7 @@ namespace Pixeye.Framework
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public bool EqualsAndExist(ent other)
 		{
-			return id > -1 && Entity.cache[id].isAlive && this.id == other.id && this.age == other.age;
+			return id > -1 && Entity.cache[id].isAlive && id == other.id && age == other.age;
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]

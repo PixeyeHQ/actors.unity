@@ -46,14 +46,14 @@ namespace Pixeye.Framework
 
 		public static Transform[] transforms = new Transform[SettingsEngine.SizeEntities];
 
+		static readonly int sizeBufferComponents = UnsafeUtility.SizeOf<BufferComponents>();
 		static readonly int sizeBufferTags = UnsafeUtility.SizeOf<BufferTags>();
 		static readonly int sizeUtils = UnsafeUtility.SizeOf<Utils>();
 
 		internal static int counter = SettingsEngine.SizeEntities;
 		internal static int[,] generations = new int[SettingsEngine.SizeEntities, SettingsEngine.SizeGenerations];
 
-		internal static BufferComponents[] components;
-
+		internal static BufferComponents* components;
 		internal static BufferTags* tags;
 		internal static Utils* cache;
 
@@ -64,7 +64,7 @@ namespace Pixeye.Framework
 		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
 		internal static void Start()
 		{
-			components = new BufferComponents[SettingsEngine.SizeEntities];
+			components = (BufferComponents*) UnmanagedMemory.Alloc(sizeBufferComponents * SettingsEngine.SizeEntities);
 			tags       = (BufferTags*) UnmanagedMemory.Alloc(sizeBufferTags * SettingsEngine.SizeEntities);
 			cache      = (Utils*) UnmanagedMemory.Alloc(sizeUtils * SettingsEngine.SizeEntities);
 
@@ -72,7 +72,7 @@ namespace Pixeye.Framework
 			{
 				tags[i]       = new BufferTags();
 				cache[i]      = new Utils();
-				components[i] = new BufferComponents(1);
+				components[i] = new BufferComponents(6);
 			}
 
 			#if UNITY_EDITOR
@@ -87,23 +87,23 @@ namespace Pixeye.Framework
 			{
 				var l = id << 1;
 				HelperArray.ResizeInt(ref generations, l, SettingsEngine.SizeGenerations);
-
 				Array.Resize(ref transforms, l);
-				Array.Resize(ref components, l);
-				tags  = (BufferTags*) UnmanagedMemory.ReAlloc(tags, sizeBufferTags * l);
-				cache = (Utils*) UnmanagedMemory.ReAlloc(cache, sizeUtils * l);
+
+				components = (BufferComponents*) UnmanagedMemory.ReAlloc(components, sizeBufferComponents * l);
+				tags       = (BufferTags*) UnmanagedMemory.ReAlloc(tags, sizeBufferTags * l);
+				cache      = (Utils*) UnmanagedMemory.ReAlloc(cache, sizeUtils * l);
 
 				for (int i = counter; i < l; i++)
 				{
 					tags[i]       = new BufferTags();
 					cache[i]      = new Utils();
-					components[i] = new BufferComponents(1);
+					components[i] = new BufferComponents(6);
 				}
 
 				counter = l;
 			}
 
-			components[id].length = 0;
+			components[id].amount = 0;
 
 			var ptrCache = &cache[id];
 			ptrCache->id       = id;
@@ -202,7 +202,7 @@ namespace Pixeye.Framework
 			EntityOperations.Set(entity, Storage<T>.componentID, EntityOperations.Action.Add);
 			return Storage<T>.Get(entity.id);
 		}
-		
+
 		/// <summary>
 		/// Attach component to an entity and systems.
 		/// </summary>
@@ -318,6 +318,9 @@ namespace Pixeye.Framework
 
 		static void Dispose()
 		{
+			for (int i = 0; i < counter; i++)
+				Marshal.FreeHGlobal((IntPtr)components[i].ids);
+			
 			UnmanagedMemory.Cleanup();
 		}
 	}

@@ -21,7 +21,7 @@ using Sirenix.Utilities.Editor;
 
 namespace Pixeye.Framework
 {
-	public class BlueprintEntity : ScriptableBuild
+	public unsafe class BlueprintEntity : ScriptableBuild
 	{
 		public static Dictionary<int, BlueprintEntity> storage = new Dictionary<int, BlueprintEntity>(FastComparable.Default);
 

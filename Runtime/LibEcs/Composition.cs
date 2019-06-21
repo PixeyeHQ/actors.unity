@@ -30,7 +30,7 @@ namespace Pixeye.Framework
 		internal bool OverlapComponents(in BufferComponents entityComponents)
 		{
 			int match = 0;
-			for (int i = 0; i < entityComponents.length; i++)
+			for (int i = 0; i < entityComponents.amount; i++)
 			{
 				if (includeComponents[entityComponents.ids[i]])
 					match++;
@@ -125,7 +125,7 @@ namespace Pixeye.Framework
 		{
 			ref var components = ref Entity.components[entityID];
 
-			for (int i = 0; i < components.length; i++)
+			for (int i = 0; i < components.amount; i++)
 			{
 				if (excludeComponents[components.ids[i]])
 				{
