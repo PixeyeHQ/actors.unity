@@ -33,16 +33,11 @@ namespace Pixeye.Framework
 		{
 			if (Starter.initialized == false) return;
 			HandleEnable();
-
-			ProcessorSignals.Default.Add(this);
-			ProcessorUpdate.Add(this);
 		}
 
 		void OnDisable()
 		{
 			HandleDisable();
-			ProcessorUpdate.Remove(this);
-			ProcessorSignals.Default.Remove(this);
 		}
 
 

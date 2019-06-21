@@ -6,94 +6,79 @@ using System.Collections.Generic;
 
 namespace Pixeye.Framework
 {
-	public sealed class ProcessorSignals : IDisposable, IKernel
-	{
+	 public sealed class ProcessorSignals : IDisposable, IKernel
+  {
+    public static ProcessorSignals Default = new ProcessorSignals();
+    private readonly Dictionary<int, List<IReceive>> signals = new Dictionary<int, List<IReceive>>((IEqualityComparer<int>) new FastComparable());
 
-		public static ProcessorSignals Default = new ProcessorSignals();
-		readonly Dictionary<int, List<IReceive>> signals = new Dictionary<int, List<IReceive>>(new FastComparable());
+    public static void Send<T>(in T val)
+    {
+      ProcessorSignals.Default.Dispatch<T>(in val);
+    }
 
-		#region LOGIC
+    private void Dispatch<T>(in T val)
+    {
+      List<IReceive> receiveList;
+      if (!this.signals.TryGetValue(typeof (T).GetHashCode(), out receiveList))
+        return;
+      int count = receiveList.Count;
+      for (int index = 0; index < count; ++index)
+        (receiveList[index] as IReceive<T>).HandleSignal(in val);
+    }
 
-		public static void Send<T>(in T val)
-		{
-			Default.Dispatch(in val);
-		}
+    private void Add(IReceive receive, Type type)
+    {
+      int hashCode = type.GetHashCode();
+      List<IReceive> receiveList;
+      if (this.signals.TryGetValue(hashCode, out receiveList))
+        receiveList.Add(receive);
+      else
+        this.signals.Add(hashCode, new List<IReceive>()
+        {
+          receive
+        });
+    }
 
-		void Dispatch<T>(in T val)
-		{
-			List<IReceive> cachedSignals;
+    private void Remove(IReceive receive, Type type)
+    {
+      List<IReceive> receiveList;
+      if (!this.signals.TryGetValue(type.GetHashCode(), out receiveList))
+        return;
+      receiveList.Remove(receive);
+    }
 
-			if (!signals.TryGetValue(typeof(T).GetHashCode(), out cachedSignals)) return;
+    public static bool Check(object obj)
+    {
+      return obj is IReceive;
+    }
 
-			var len = cachedSignals.Count;
+    public static void Add(object obj)
+    {
+      var processor = Default;
+      Type[] interfaces = obj.GetType().GetInterfaces();
+      IReceive receive = obj as IReceive;
+      foreach (Type type in interfaces)
+      {
+        if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof (IReceive<>))
+          processor.Add(receive, type.GetGenericArguments()[0]);
+      }
+    }
 
-			for ( var i = 0; i < len; i++ )
-			{
-				(cachedSignals[i] as IReceive<T>).HandleSignal(in val);
-			}
-		}
+    public static void Remove(object obj)
+    {
+      var processor = Default;
+      Type[] interfaces = obj.GetType().GetInterfaces();
+      IReceive receive = obj as IReceive;
+      foreach (Type type in interfaces)
+      {
+        if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof (IReceive<>))
+          processor.Remove(receive, type.GetGenericArguments()[0]);
+      }
+    }
 
-		void Add(IReceive receive, Type type)
-		{
-			List<IReceive> cachedSignals;
-			var            key = type.GetHashCode();
-
-			if (signals.TryGetValue(key, out cachedSignals))
-			{
-				cachedSignals.Add(receive);
-				return;
-			}
-
-			signals.Add(key, new List<IReceive> {receive});
-		}
-
-		void Remove(IReceive receive, Type type)
-		{
-			List<IReceive> cachedSignals;
-			if (signals.TryGetValue(type.GetHashCode(), out cachedSignals))
-			{
-				cachedSignals.Remove(receive);
-			}
-		}
-
-		public static bool Check(object obj)
-		{
-			var reciever = obj as IReceive;
-			return reciever != null;
-		}
-
-		public void Add(object obj)
-		{
-			var all      = obj.GetType().GetInterfaces();
-			var reciever = obj as IReceive;
-			foreach ( var intType in all )
-			{
-				if (intType.IsGenericType && intType.GetGenericTypeDefinition() == typeof(IReceive<>))
-				{
-					Add(reciever, intType.GetGenericArguments()[0]);
-				}
-			}
-		}
-
-		public void Remove(object obj)
-		{
-			var all      = obj.GetType().GetInterfaces();
-			var reciever = obj as IReceive;
-			foreach ( var intType in all )
-			{
-				if (intType.IsGenericType && intType.GetGenericTypeDefinition() == typeof(IReceive<>))
-				{
-					Remove(reciever, intType.GetGenericArguments()[0]);
-				}
-			}
-		}
-
-		public void Dispose()
-		{
-			signals.Clear();
-		}
-
-		#endregion
-
-	}
+    public void Dispose()
+    {
+      this.signals.Clear();
+    }
+  }
 }
