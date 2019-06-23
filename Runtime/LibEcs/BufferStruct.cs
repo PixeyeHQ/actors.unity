@@ -21,6 +21,14 @@ namespace Pixeye.Framework
 		{
 			source = new T[size];
 		}
+
+		public ref T Get()
+		{
+			if (length == source.Length)
+				Array.Resize(ref source, length << 1);
+
+			return ref source[length++];
+		}
 		
 		
 		public void Add(in T obj)
