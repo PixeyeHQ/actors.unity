@@ -206,21 +206,37 @@ namespace Pixeye.Framework
 						ref var components = ref Entity.components[entityID];
 						components.Remove(operation.arg);
 
-						// if (components.amount == 0)
-						// {
-						// 	if (Entity.transforms.Length > entityID && Entity.transforms[entityID] != null)
-						// 	{
-						// 		Entity.transforms[entityID].gameObject.Release(Entity.cache[entityID].isPooled ? Pool.Entities : 0);
-						// 		Entity.transforms[entityID] = null;
-						// 	}
-						//
-						// 	Entity.tags[entityID].Clear();
-						// 	EntityOperations.Set(operation.entity, 0, EntityOperations.Action.KillFinalize);
-						// }
+						if (components.amount == 0)
+						{
+							EntityOperations.Set(operation.entity, 0, EntityOperations.Action.Empty);
+						}
 						
 						break;
 					}
 
+					case EntityOperations.Action.Empty:
+					{
+						
+						if (!operation.entity.Exist) continue;
+						
+						ref var components = ref Entity.components[entityID];
+						
+						if (Entity.transforms.Length > entityID && Entity.transforms[entityID] != null)
+						{
+							Entity.transforms[entityID].gameObject.Release(Entity.cache[entityID].isPooled ? Pool.Entities : 0);
+							Entity.transforms[entityID] = null;
+						}
+ 
+						Entity.tags[entityID].Clear();
+						Entity.cache[entityID].isAlive = false;
+						Entity.Count--;
+						
+						EntityOperations.Set(operation.entity, 0, EntityOperations.Action.KillFinalize);
+						
+						
+						break;
+					}
+					
 					case EntityOperations.Action.ChangeTag:
 					{
 						if (!Entity.cache[entityID].isAlive) continue;

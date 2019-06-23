@@ -30,6 +30,7 @@ namespace Pixeye.Framework
 			Remove,
 			Kill,
 			KillFinalize,
+			Empty,
 			Activate,
 			Deactivate,
 			Unbind,
