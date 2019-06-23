@@ -34,7 +34,10 @@ namespace Pixeye.Framework
 			return hash;
 		}
 
-		  
+		public static T Load<T>(string id) where T : Object
+		{
+			return Resources.Load<T>(id);
+		} 
 		
 		public static T Get<T>(string id) where T : Object
 		{
