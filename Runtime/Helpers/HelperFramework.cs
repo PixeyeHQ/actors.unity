@@ -15,7 +15,10 @@ namespace Pixeye.Framework
 
 		#region MATH
 
+
 	 
+		
+		
 		public static bool Every(this float step, float time)
 		{
 			if (step % time == 0)

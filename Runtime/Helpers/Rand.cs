@@ -9,6 +9,10 @@ namespace Pixeye.Framework
 	{
 
 		public static Random Source = new Random(DateTime.Today.Second);
-
+		
+		public static float Get(float minimum, float maximum)
+		{
+			return (float) Source.NextDouble() * (maximum - minimum) + minimum;
+		}
 	}
 }
