@@ -21,16 +21,12 @@ namespace Pixeye.Framework
 			BufferObj<T>.Creator = Creator;
 		}
 
-		public T Get()
+			public T Add()
 		{
 			if (length == source.Length)
 				Array.Resize(ref source, length << 1);
-
-			ref var next = ref source[length++];
-			if (next == null)
-				next = Creator();
-
-			return next;
+ 
+			return source[length++] = Creator();
 		}
 
 
