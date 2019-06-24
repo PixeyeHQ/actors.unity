@@ -7,7 +7,7 @@ using System;
 namespace Pixeye.Framework
 {
 	[Serializable]
-	public class BufferStruct<T> where T : struct
+	public class BufferStruct<T> where T: struct
 	{
 		public static BufferStruct<T> Default = new BufferStruct<T>(500);
 
@@ -29,6 +29,7 @@ namespace Pixeye.Framework
 
 			return ref source[length++];
 		}
+	
 		
 		
 		public void Add(in T obj)
@@ -43,12 +44,9 @@ namespace Pixeye.Framework
 		{
 			--length;
 			for (int i = index; i < length; ++i)
-				SetElement(i, ref source[i + 1]);
+				source[i] = source[i + 1];
+		 
 		}
-
-		public void SetElement(int index, ref T arg)
-		{
-			source[index] = arg;
-		}
+		
 	}
 }
