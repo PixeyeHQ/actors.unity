@@ -44,9 +44,7 @@ namespace Pixeye.Framework
 
 		public void RemoveAt(int index)
 		{
-			--length;
-			for (int i = index; i < length; ++i)
-				source[i] = source[i + 1];
+				Array.Copy(source, index + 1, source, index, length-- - index);
 		}
 	}
 }
