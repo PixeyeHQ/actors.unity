@@ -5,11 +5,11 @@ using System;
 using System.Runtime.CompilerServices;
 using Pixeye.Framework;
 using Unity.IL2CPP.CompilerServices;
-
+ 
 namespace Pixeye.Source
 {
 	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
-	sealed class ProcessorTimer : Processor, ITick, IKernel
+	sealed class ProcessorTimer : ITick, IKernel
 	{
 
 		internal static ProcessorTimer Default = new ProcessorTimer();
@@ -79,7 +79,7 @@ namespace Pixeye.Source
 			return index;
 		}
 	 
-		protected override void OnDispose()
+		public void Dispose()
 		{
 			for (int i = 0; i < length; i++)
 			{

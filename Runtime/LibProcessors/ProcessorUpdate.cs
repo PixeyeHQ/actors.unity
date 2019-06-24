@@ -155,7 +155,7 @@ namespace Pixeye.Framework
 			countTicksLate = 0;
 
 			ticks.RemoveAll(t => t is IKernel == false);
-
+			
 			ticksFixed.Clear();
 			ticksLate.Clear();
 

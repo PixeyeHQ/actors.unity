@@ -13,11 +13,11 @@ namespace Pixeye.Framework
 	public class StarterKernel : MonoBehaviour
 	{
 
-		[FoldoutGroup("SetupData")]
-		public DataSession gameSession;
-
-		[FoldoutGroup("SetupData")]
-		public DataSession gameSettings;
+		// [FoldoutGroup("SetupData")]
+		// public DataSession gameSession;
+		//
+		// [FoldoutGroup("SetupData")]
+		// public DataSession gameSettings;
 
 		[FoldoutGroup("SetupData")]
 		public List<Pluggable> pluggables = new List<Pluggable>();
@@ -34,14 +34,14 @@ namespace Pixeye.Framework
 				pluggables[i].Plug();
 			}
 
-			if (gameSession != null)
-			{
-				Toolbox.Add(gameSession);
-			}
-			if (gameSettings != null)
-			{
-				Toolbox.Add(gameSettings);
-			}
+			// if (gameSession != null)
+			// {
+			// 	Toolbox.Add(gameSession);
+			// }
+			// if (gameSettings != null)
+			// {
+			// 	Toolbox.Add(gameSettings);
+			// }
 		}
 
 		IEnumerator OnApplicationFocus(bool hasFocus)

@@ -63,6 +63,7 @@ namespace Pixeye.Framework
 			this.scenesToKeep.Clear();
 			this.sceneDependsOn.Clear();
 
+	 
 			for (var i = 0; i < scenesToKeep.Count; i++)
 			{
 				this.scenesToKeep.Add(scenesToKeep[i].Path);
@@ -103,6 +104,11 @@ namespace Pixeye.Framework
 				scenes.Add(name, SceneManager.GetSceneByName(name));
 			}
 
+			if (sceneDependsOn.Count == 0)
+			{
+				yield return 0;
+			}
+		 
 			sceneLoaded();
 
 			starter.BindScene();
@@ -114,6 +120,15 @@ namespace Pixeye.Framework
 			Toolbox.changingScene = true;
 			Toolbox.Instance.ClearSessionData();
 
+			if (scenes.Keys.Count == 1)
+			{
+				scenes.Clear();
+				SceneManager.LoadScene(name);
+				SceneManager.SetActiveScene(SceneManager.GetSceneByName(name));
+				Toolbox.changingScene = false;
+				yield break;
+			}
+			
 			var s = SceneManager.GetActiveScene();
 			var sName = s.name;
 
@@ -162,34 +177,48 @@ namespace Pixeye.Framework
 			Toolbox.changingScene = true;
 			Toolbox.Instance.ClearSessionData();
 
-			var s = SceneManager.GetActiveScene();
-			var sName = s.name;
-
-			var job = SceneManager.UnloadSceneAsync(s);
-
-			while (!job.isDone)
+			if (scenes.Keys.Count == 1)
 			{
-				yield return 0;
+				scenes.Clear();
+				SceneManager.LoadScene(id);
+				SceneManager.SetActiveScene(SceneManager.GetSceneByBuildIndex(id));
+				Toolbox.changingScene    = false;
+				yield break;
 			}
 
-			scenes.Remove(sName);
-			foreach (var key in scenes.Keys)
-			{
-				if (scenesToKeep.Contains(key)) continue;
+			var s     = SceneManager.GetActiveScene();
+				var sName = s.name;
 
-				job = SceneManager.UnloadSceneAsync(scenes[key]);
+				var job = SceneManager.UnloadSceneAsync(s);
 
 				while (!job.isDone)
 				{
 					yield return 0;
 				}
-			}
 
-			job = Resources.UnloadUnusedAssets();
-			while (!job.isDone)
-			{
-				yield return 0;
-			}
+				scenes.Remove(sName);
+
+				if (scenes.Keys.Count != 1)
+				{
+					foreach (var key in scenes.Keys)
+					{
+						if (scenesToKeep.Contains(key)) continue;
+
+						job = SceneManager.UnloadSceneAsync(scenes[key]);
+
+						while (!job.isDone)
+						{
+							yield return 0;
+						}
+					}
+
+					job = Resources.UnloadUnusedAssets();
+					while (!job.isDone)
+					{
+						yield return 0;
+					}
+				}
+		 
 
 			scenes.Clear();
 

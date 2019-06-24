@@ -105,17 +105,19 @@ namespace Pixeye.Framework
 			foreach (var pair in data)
 			{
 				var isKernel = pair.Value as IKernel;
-				if (isKernel == null) toWipe.Add(pair.Key);
+				if (isKernel == null)
+					toWipe.Add(pair.Key);
+				 
 
 				var needToBeCleaned = pair.Value as IDisposable;
 				if (needToBeCleaned == null) continue;
-
+				 
 				needToBeCleaned.Dispose();
 			}
 
 			HandlePool.Dispose();
 			ProcessorGroups.Dispose();
-			ProcessorTimer.Default.Dispose();
+	  	ProcessorTimer.Default.Dispose();
 			ProcessorScene.Default.Dispose();
 			ProcessorUpdate.Default.Dispose();
 			Box.Default.Dispose();
