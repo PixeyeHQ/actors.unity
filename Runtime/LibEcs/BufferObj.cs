@@ -3,7 +3,7 @@
 
 using System;
 
-namespace Pixeye.Source
+namespace Pixeye.Framework
 {
 	sealed class BufferObj<T> where T : class
 	{
