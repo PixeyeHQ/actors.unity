@@ -5,7 +5,7 @@ using System;
 
 namespace Pixeye.Framework
 {
-	sealed class BufferObj<T> where T : class
+	public sealed class BufferObj<T> where T : class
 	{
 		public static BufferObj<T> Default = null;
 		public static Func<T> Creator;
