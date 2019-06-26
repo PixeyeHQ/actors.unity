@@ -58,7 +58,6 @@ namespace Pixeye.Framework
 			}
 		}
 
-	 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal bool Check(int entityID)
 		{

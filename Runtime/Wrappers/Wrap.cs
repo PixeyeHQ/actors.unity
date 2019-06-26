@@ -68,7 +68,7 @@ namespace Pixeye.Framework
 
 		public static void ValueChange<TSource, TProp>(this TSource source, Func<TSource, TProp> propertySelector, Action<TProp> callback, ent e)
 		{
-			Wrap<TSource, TProp> w = new Wrap<TSource, TProp>();
+			var w = new Wrap<TSource, TProp>();
 			w.source = source;
 			w.prop = propertySelector;
 			w.callback = callback;
@@ -96,7 +96,7 @@ namespace Pixeye.Framework
 
 		public static ent ValueChange<TSource, TProp>(this TSource source, Func<TSource, TProp> propertySelector, Action<TProp> callback)
 		{
-			Wrap<TSource, TProp> w = new Wrap<TSource, TProp>();
+			var w = new Wrap<TSource, TProp>();
 			w.source = source;
 			w.prop = propertySelector;
 			w.callback = callback;
@@ -127,7 +127,7 @@ namespace Pixeye.Framework
 
 		public static void ReleaseObservers(in this ent entity)
 		{
-			Components.DisposeComponentObserver(Storage<ComponentObserver>.Instance.components[entity.id]);
+			Components.DisposeComponentObserver(entity.id);
 		}
 
 	}

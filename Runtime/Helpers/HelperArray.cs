@@ -72,10 +72,26 @@ namespace Pixeye.Framework
 			return -1;
 		}
 
+
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public unsafe static int BinarySearch(ent* entries, int value, int left, int right)
+		{
+			while (left <= right)
+			{
+				var m = (left + right) / 2;
+				if (entries[m].id == value) return m;
+				if (entries[m].id < value) left = m + 1;
+				else right                      = m - 1;
+			}
+
+			return -1;
+		}
+		
+		
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static int BinarySearch(ref ent[] entries, int value, int left, int right)
 		{
-			//if (right == 0) return -1;
 			while (left <= right)
 			{
 				var m = (left + right) / 2;

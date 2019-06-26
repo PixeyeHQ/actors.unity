@@ -1,12 +1,12 @@
- 
+
 using UnityEngine;
 using Pixeye.Framework;
 using System.Runtime.CompilerServices;
 
 ##NAMESPACE##
 {
-    
-    sealed class ##NAME## 
+ 
+    struct ##NAME## 
   	{
      	 
        
@@ -21,7 +21,6 @@ using System.Runtime.CompilerServices;
         	[RuntimeInitializeOnLoadMethod]
     		static void ##NAME##Init()
     		{
-    			Storage<##NAME##>.Instance.Creator = () => { return new ##NAME##(); };
     			Storage<##NAME##>.Instance.DisposeAction = Dispose##NAME##;
     		}
     

@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using Unity.Collections.LowLevel.Unsafe;
 using Unity.IL2CPP.CompilerServices;
 
 
@@ -32,9 +33,12 @@ namespace Pixeye.Framework
 	{
 		static int idCounter;
 
-		public ent[] entities = new ent[SettingsEngine.SizeEntities];
-		public int length;
+	 //	public ent* entities;
+	 //	int lengthTotal;
 
+	  public ent[] entities = new ent[SettingsEngine.SizeEntities];
+		public int length;
+	 
 		public EntityAction onAdd;
 		public EntityAction onRemove;
 
@@ -46,7 +50,7 @@ namespace Pixeye.Framework
 		public ref ent this[int index]
 		{
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			get { return ref entities[index]; }
+			get => ref entities[index];
 		}
 
 		public void Release(int index)
@@ -57,6 +61,9 @@ namespace Pixeye.Framework
 
 		internal GroupCore Start(Composition composition)
 		{
+			//entities    = (ent*) UnmanagedMemory.Alloc(ent.size * SettingsEngine.SizeEntities);
+			//lengthTotal = SettingsEngine.SizeEntities;
+
 			this.composition = composition;
 			composition.SetupExcludeTypes(this);
 			HelperTags.Add(this);
@@ -67,23 +74,26 @@ namespace Pixeye.Framework
 		internal void Insert(in ent entity)
 		{
 			var entityID = entity.id;
+			var index    = length++;
+			var pointer  = index;
+			var last     = index - 1;
 
-			var indexLast = length++;
+			// if (length >= lengthTotal)
+			// {
+			// 	entities    = (ent*) UnmanagedMemory.ReAlloc(entities, ent.size * (length << 1));
+			// 	lengthTotal = length;
+			// }
 
 			if (length >= entities.Length)
-			{
 				Array.Resize(ref entities, length << 1);
-			}
+			
 
-			var pointer = indexLast;
-			var index   = indexLast - 1;
-
-			if (index >= 0)
+			if (last >= 0)
 			{
-				if (entityID < entities[index].id)
+				if (entityID < entities[last].id)
 				{
 					var startIndex = 0;
-					var endIndex   = indexLast;
+					var endIndex   = last;
 
 					while (endIndex > startIndex)
 					{
@@ -111,14 +121,12 @@ namespace Pixeye.Framework
 				}
 			}
 
-			for (int i = indexLast; i >= pointer; i--)
-			{
+			for (int i = index; i >= pointer; i--)
 				entities[i + 1] = entities[i];
-			}
-
 
 			entities[pointer] = entity;
-			if (onAdd != null) onAdd(entity);
+
+			if ((object) onAdd != null) onAdd(entity);
 		}
 
 
@@ -128,31 +136,22 @@ namespace Pixeye.Framework
 			if (length == 0) return;
 			var i = HelperArray.BinarySearch(ref entities, entityID, 0, length);
 			if (i == -1) return;
-			if (onRemove != null) onRemove(entities[i]);
+			if ((object) onRemove != null) onRemove(entities[i]);
 
-			Array.Copy(entities, i + 1, entities, i, length-- - i);
+		  Array.Copy(entities, i + 1, entities, i, length-- - i);
+		  // UnsafeUtility.MemMove(entities + i, entities + i + 1, (length-- - i - 1) * ent.size);
 		}
 
-		int size = sizeof(int);
-
+	 
 		internal void Remove(int i)
 		{
-			if (onRemove != null)
+			if ((object) onRemove != null)
 				onRemove(entities[i]);
+			
 			Array.Copy(entities, i + 1, entities, i, length-- - i);
+			//  UnsafeUtility.MemMove(entities + i, entities + i + 1, (length-- - i - 1) * ent.size);
 		}
-
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public int GetIndex(int id)
-		{
-			for (int i = 0; i < length; i++)
-				if (entities[i].id == id)
-					return i;
-
-
-			return -1;
-		}
-
+ 
 		public GroupCore()
 		{
 			id = idCounter++;
@@ -165,7 +164,6 @@ namespace Pixeye.Framework
 			onAdd    = null;
 			onRemove = null;
 			length   = 0;
-			entities = new ent[SettingsEngine.SizeEntities];
 		}
 
 		#region EQUALS

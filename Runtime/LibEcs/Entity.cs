@@ -44,6 +44,7 @@ namespace Pixeye.Framework
 	{
 		public static int Count;
 
+
 		public static Transform[] transforms = new Transform[SettingsEngine.SizeEntities];
 
 		static readonly int sizeBufferComponents = UnsafeUtility.SizeOf<BufferComponents>();
@@ -149,10 +150,10 @@ namespace Pixeye.Framework
 		/// <typeparam name="T"></typeparam>
 		/// <returns></returns>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static T Set<T>(in this ent entity)
+		public static ref T Set<T>(in this ent entity)
 		{
 			components[entity.id].Add(Storage<T>.componentID);
-			return Storage<T>.Get(entity.id);
+			return ref Storage<T>.Get(entity.id);
 		}
 		/// <summary>
 		/// Used in Models and Actors for setting up components to Storage. Doesn't send the component to systems.
@@ -164,12 +165,18 @@ namespace Pixeye.Framework
 		public static void Set<T>(in this ent entity, T component)
 		{
 			components[entity.id].Add(Storage<T>.componentID);
-
+			
+			#if !ACTORS_COMPONENTS_STRUCTS
 			ref var componentInStorage = ref Storage<T>.Instance.components[entity.id];
 			if (componentInStorage != null)
-				Storage<T>.Instance.DisposeComponent(entity.id);
-
+				Storage<T>.Instance.DisposeAction(entity);
+ 
+      componentInStorage = component;
+			#else 
+			
+			ref var componentInStorage = ref Storage<T>.Instance.components[entity.id];
 			componentInStorage = component;
+			#endif
 		}
 		/// <summary>
 		/// Deploy entity components to systems.
@@ -188,33 +195,21 @@ namespace Pixeye.Framework
 		/// <typeparam name="T"></typeparam>
 		/// <returns></returns>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static T Add<T>(in this ent entity)
+		public static ref T Add<T>(in this ent entity)
 		{
 			#if UNITY_EDITOR
 			var entityID = entity.id;
 			if (!cache[entity.id].isAlive)
 			{
 				Debug.LogError($"-> Entity with id: [{entityID}] is not active. You should not add components to inactive entity. ");
-				return default;
+				return ref Storage<T>.Get(entity.id);
 			}
 			#endif
 
 			EntityOperations.Set(entity, Storage<T>.componentID, EntityOperations.Action.Add);
-			return Storage<T>.Get(entity.id);
+			return ref Storage<T>.Get(entity.id);
 		}
-
-		/// <summary>
-		/// Attach component to an entity and systems.
-		/// </summary>
-		/// <param name="entity"></param>
-		/// <typeparam name="T"></typeparam>
-		/// <returns></returns>
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static void Add<T>(in this ent entity, T component)
-		{
-			EntityOperations.Set(entity, Storage<T>.componentID, EntityOperations.Action.Add);
-			Storage<T>.Get(entity.id);
-		}
+ 
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static void Remove<T>(in this ent entity)
@@ -319,8 +314,8 @@ namespace Pixeye.Framework
 		static void Dispose()
 		{
 			for (int i = 0; i < counter; i++)
-				Marshal.FreeHGlobal((IntPtr)components[i].ids);
-			
+				Marshal.FreeHGlobal((IntPtr) components[i].ids);
+
 			UnmanagedMemory.Cleanup();
 		}
 	}

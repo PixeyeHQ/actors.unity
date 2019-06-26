@@ -27,9 +27,7 @@ namespace Pixeye.Framework
 		public void Tick(float delta)
 		{
 			if (!Starter.initialized) return;
-
 			if (EntityOperations.len == 0) return;
-
 
 			for (int i = 0; i < EntityOperations.len; i++)
 			{
@@ -60,9 +58,9 @@ namespace Pixeye.Framework
 						}
 
 
-						for (int l = 0; l < storage.lenOfGroupsToRemove; l++)
+						for (int l = 0; l < storage.lenOfGroupsToCheck; l++)
 						{
-							var group = storage.groupsToRemove[l];
+							var group = storage.groupsToCheck[l];
 							if (!group.composition.CanProceed(entityID)) continue;
 							group.TryRemove(entityID);
 						}
@@ -107,7 +105,7 @@ namespace Pixeye.Framework
 						for (int j = 0; j < components.amount; j++)
 						{
 							var cID = (int) components.ids[j];
-							Storage.all[cID].DisposeComponent(entityID);
+							Storage.all[cID].DisposeAction(entityID);
 						}
 
 						components.amount = 0;
@@ -167,7 +165,7 @@ namespace Pixeye.Framework
 						for (int j = 0; j < components.amount; j++)
 						{
 							var cID = (int) components.ids[j];
-							Storage.all[cID].DisposeComponent(entityID);
+							Storage.all[cID].DisposeAction(entityID);
 						}
 
 						components.amount = 0;
@@ -186,14 +184,12 @@ namespace Pixeye.Framework
 						Entity.generations[entityID, generation] &= ~mask;
 
 						for (int l = 0; l < storage.lenOfGroups; l++)
-						{
-							var group = storage.groups[l];
-							group.TryRemove(entityID);
-						}
+							storage.groups[l].TryRemove(entityID);
 
-						for (int l = 0; l < storage.lenOfGroupsToRemove; l++)
+
+						for (int l = 0; l < storage.lenOfGroupsToCheck; l++)
 						{
-							var group = storage.groupsToRemove[l];
+							var group = storage.groupsToCheck[l];
 
 							var composition = group.composition;
 							if (composition.Check(entityID)) continue;
@@ -207,36 +203,32 @@ namespace Pixeye.Framework
 						components.Remove(operation.arg);
 
 						if (components.amount == 0)
-						{
 							EntityOperations.Set(operation.entity, 0, EntityOperations.Action.Empty);
-						}
-						
+
+
 						break;
 					}
 
 					case EntityOperations.Action.Empty:
 					{
-						
 						if (!operation.entity.Exist) continue;
-						
-						ref var components = ref Entity.components[entityID];
-						
+
 						if (Entity.transforms.Length > entityID && Entity.transforms[entityID] != null)
 						{
 							Entity.transforms[entityID].gameObject.Release(Entity.cache[entityID].isPooled ? Pool.Entities : 0);
 							Entity.transforms[entityID] = null;
 						}
- 
+
 						Entity.tags[entityID].Clear();
 						Entity.cache[entityID].isAlive = false;
 						Entity.Count--;
-						
+
 						EntityOperations.Set(operation.entity, 0, EntityOperations.Action.KillFinalize);
-						
-						
+
+
 						break;
 					}
-					
+
 					case EntityOperations.Action.ChangeTag:
 					{
 						if (!Entity.cache[entityID].isAlive) continue;

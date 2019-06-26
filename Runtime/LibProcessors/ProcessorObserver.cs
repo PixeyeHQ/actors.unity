@@ -29,11 +29,11 @@ namespace Pixeye.Framework
 
 		}
 		
-		public void Tick(float delta)
+		public unsafe void Tick(float delta)
 		{
 			for (int i = 0; i < groupObservers.length; i++)
 			{
-				var cObserver = groupObservers.entities[i].ComponentObserver();
+				ref var cObserver = ref groupObservers.entities[i].ComponentObserver();
 				for (int j = 0; j < cObserver.length; j++)
 					cObserver.wrappers[j].Check();
 			}

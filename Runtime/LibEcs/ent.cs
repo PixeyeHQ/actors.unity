@@ -13,6 +13,7 @@ namespace Pixeye.Framework
 	[StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Unicode)]
 	public unsafe struct ent
 	{
+		internal static int size = sizeof(ent);
 		internal static Queue<ent> entityStack = new Queue<ent>(SettingsEngine.SizeEntities);
 		internal static int entityStackLength;
 		internal static int lastID;
@@ -97,13 +98,6 @@ namespace Pixeye.Framework
 			return id.CompareTo(other.id);
 		}
 
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public bool Has<T>()
-		{
-			var mask = Storage<T>.componentMask;
-
-			return (Entity.generations[id, Storage<T>.generation] & mask) == mask;
-		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void Unbind()
@@ -149,16 +143,74 @@ namespace Pixeye.Framework
 
 		#endregion
 
-		#region GET
+ 
+		[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public bool Has<T>()
+		{
+			var mask = Storage<T>.componentMask;
+			return (Entity.generations[id, Storage<T>.generation] & mask) == mask;
+		}
 
 		[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public T Get<T>()
+		public bool Has<T, Y>()
 		{
-			return Storage<T>.Instance.components[id];
-			//(arg0 = (Entity.generations[id, Storage<T>.generation] & Storage<T>.componentMask) == Storage<T>.componentMask ? Storage<T>.Instance.components[id] : default) != null;
+			var mask  = Storage<T>.componentMask;
+			var mask2 = Storage<Y>.componentMask;
+
+			return (Entity.generations[id, Storage<T>.generation] & mask) == mask &&
+			       (Entity.generations[id, Storage<Y>.generation] & mask2) == mask2;
 		}
 
+		[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public bool Has<T, Y, U>()
+		{
+			var mask  = Storage<T>.componentMask;
+			var mask2 = Storage<Y>.componentMask;
+			var mask3 = Storage<U>.componentMask;
+
+			return (Entity.generations[id, Storage<T>.generation] & mask) == mask &&
+			       (Entity.generations[id, Storage<Y>.generation] & mask2) == mask2 &&
+			       (Entity.generations[id, Storage<U>.generation] & mask3) == mask3;
+		}
+
+
+		[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public bool Has<T, Y, U, I>()
+		{
+			var mask  = Storage<T>.componentMask;
+			var mask2 = Storage<Y>.componentMask;
+			var mask3 = Storage<U>.componentMask;
+			var mask4 = Storage<I>.componentMask;
+
+			return (Entity.generations[id, Storage<T>.generation] & mask) == mask &&
+			       (Entity.generations[id, Storage<Y>.generation] & mask2) == mask2 &&
+			       (Entity.generations[id, Storage<U>.generation] & mask3) == mask3 &&
+			       (Entity.generations[id, Storage<I>.generation] & mask4) == mask4;
+		}
+
+
+		[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public bool Has<T, Y, U, I, O>()
+		{
+			var mask  = Storage<T>.componentMask;
+			var mask2 = Storage<Y>.componentMask;
+			var mask3 = Storage<U>.componentMask;
+			var mask4 = Storage<I>.componentMask;
+			var mask5 = Storage<O>.componentMask;
+
+			return (Entity.generations[id, Storage<T>.generation] & mask) == mask &&
+			       (Entity.generations[id, Storage<Y>.generation] & mask2) == mask2 &&
+			       (Entity.generations[id, Storage<U>.generation] & mask3) == mask3 &&
+			       (Entity.generations[id, Storage<I>.generation] & mask4) == mask4 &&
+			       (Entity.generations[id, Storage<O>.generation] & mask5) == mask5;
+		}
+		#if !ACTORS_COMPONENTS_STRUCTS
+    
 		/// <summary>
 		/// <para>Safely gets the component by type from the entity.</para>
 		/// </summary>
@@ -268,7 +320,9 @@ namespace Pixeye.Framework
 			if ((arg3 = Storage<I>.Instance.TryGet(id)) == null) return false;
 			return (arg4 = Storage<O>.Instance.TryGet(id)) != null;
 		}
-
-		#endregion
+   
+   
+   #endif
+		
 	}
 }

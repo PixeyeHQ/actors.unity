@@ -22,7 +22,7 @@ namespace Pixeye.Framework
 
 		public BufferComponents(int size)
 		{
-			ids    = (ushort*) Marshal.AllocHGlobal(size * sizeof(ushort)); //UnmanagedMemory.Alloc(size * sizeof(ushort));
+			ids    = (ushort*) Marshal.AllocHGlobal(size * sizeof(ushort)); 
 			length = (byte) size;
 			amount = 0;
 		}
@@ -38,7 +38,6 @@ namespace Pixeye.Framework
 			{
 				length = (byte) (amount << 1); // not safe
 				ids = (ushort*) Marshal.ReAllocHGlobal((IntPtr) ids, (IntPtr)(length * sizeof(ushort)));
-				//UnmanagedMemory.ReAlloc(ids, length * sizeof(ushort));
 			}
 
 			ids[amount++] = (ushort) type;

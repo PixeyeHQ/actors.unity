@@ -8,7 +8,6 @@ namespace Pixeye.Framework
 {
 	public class GroupExcludeAttribute : Attribute
 	{
-
 		public int[] filter = new int[0];
 		public int[] filterType = new int[0];
 
@@ -19,20 +18,20 @@ namespace Pixeye.Framework
 
 		public GroupExcludeAttribute(params object[] args)
 		{
-			List<int> f = new List<int>();
-			List<int> fType = new List<int>();
+			var f     = new List<int>();
+			var fType = new List<int>();
 			for (int i = 0; i < args.Length; i++)
 			{
 				var o = args[i];
 				if (o is string)
 				{
-					fType.Add(Storage.allDict[ByName(o.ToString()).GetHashCode()].GetComponentID());
+					fType.Add(Storage.typeNames[ByName(o.ToString()).GetHashCode()]);
 				}
 				else f.Add((int) o);
 			}
 
 			filterType = fType.ToArray();
-			filter = f.ToArray();
+			filter     = f.ToArray();
 		}
 
 		public static Type ByName(string name)
@@ -45,8 +44,8 @@ namespace Pixeye.Framework
 					return tt;
 				}
 			}
+
 			return null;
 		}
-
 	}
 }

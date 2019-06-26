@@ -33,7 +33,7 @@ namespace Pixeye.Framework
 		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
 		static void Initialize()
 		{
-			SettingsEngine.SizeEntities = 200000;
+ 
 		}
 		
 	}

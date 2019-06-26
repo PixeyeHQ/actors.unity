@@ -129,10 +129,12 @@ namespace Pixeye.Framework
 			for (int i = 0; i < lenOnCreate; i++)
 			{
 				var component = onCreate[i];
-
-				var storage = Storage.allDict[hashesOnCreate[i]];
+				
+			 
+				var componentID = Storage.typeNames[hashesOnCreate[i]];
+		 
 				component.Copy(id);
-				Entity.components[id].Add(storage.GetComponentID());
+				Entity.components[id].Add(componentID);
 			}
 
 			for (int i = 0; i < lenAddLater; i++)
@@ -154,9 +156,9 @@ namespace Pixeye.Framework
 			{
 				var component = onCreate[i];
 
-				var storage = Storage.allDict[hashesOnCreate[i]];
+				var componentID = Storage.typeNames[hashesOnCreate[i]];
 				component.Copy(id);
-				Entity.components[id].Add(storage.GetComponentID());
+				Entity.components[id].Add(componentID);
 			}
 
 			for (int i = 0; i < lenAddLater; i++)
