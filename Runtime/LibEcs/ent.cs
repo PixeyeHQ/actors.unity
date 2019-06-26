@@ -144,6 +144,7 @@ namespace Pixeye.Framework
 		#endregion
 
  
+		
 		[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public bool Has<T>()

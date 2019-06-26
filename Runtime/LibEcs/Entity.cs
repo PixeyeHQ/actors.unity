@@ -209,7 +209,29 @@ namespace Pixeye.Framework
 			EntityOperations.Set(entity, Storage<T>.componentID, EntityOperations.Action.Add);
 			return ref Storage<T>.Get(entity.id);
 		}
+
+		/// <summary>
+		/// Attach component to an entity and systems.
+		/// </summary>
+		/// <param name="entity"></param>
+		/// <typeparam name="T"></typeparam>
+		/// <returns></returns>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static void Add<T>(in this ent entity, T component)
+		{
+			EntityOperations.Set(entity, Storage<T>.componentID, EntityOperations.Action.Add);
+			#if !ACTORS_COMPONENTS_STRUCTS
+			ref var componentInStorage = ref Storage<T>.Instance.components[entity.id];
+			if (componentInStorage != null)
+				Storage<T>.Instance.DisposeAction(entity);
  
+      componentInStorage = component;
+			#else
+
+			ref var componentInStorage = ref Storage<T>.Instance.components[entity.id];
+			componentInStorage = component;
+			#endif
+		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static void Remove<T>(in this ent entity)
