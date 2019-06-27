@@ -33,8 +33,9 @@ namespace Pixeye.Framework
  
 		void OnDestroy()
 		{
-			if (Toolbox.applicationIsQuitting) return;
-			if (entity.Exist) entity.Unbind();
+			if (!Toolbox.applicationIsQuitting && entity.Exist)
+				entity.Unbind();
+			 
 		}
 	}
 }
