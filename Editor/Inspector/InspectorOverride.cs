@@ -251,9 +251,19 @@ namespace Pixeye.Framework
 
 		IEnumerable<MemberInfo> GetButtonMembers(object target)
 		{
-			return target.GetType()
-					.GetMembers(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.NonPublic)
+
+			var vals = 
+					target.GetType()
+					.GetMembers(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
+					.Where(CheckButtonAttribute).ToList();
+
+			var vals2 = target.GetType().BaseType.GetMembers(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
 					.Where(CheckButtonAttribute);
+
+			vals.AddRange(vals2);
+	 
+			return vals;
+	 
 		}
 
 		bool CheckButtonAttribute(MemberInfo memberInfo)

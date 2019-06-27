@@ -15,11 +15,8 @@ using UnityEditor;
 
 namespace Pixeye.Framework
 {
-	#if !ODIN_INSPECTOR
 	public class ScriptableBuild : ScriptableObject
-			#else
-  public class ScriptableBuild : SerializedScriptableObject
-			#endif
+
 	{
 		public Dictionary<int, ModelComposer> helpers = new Dictionary<int, ModelComposer>();
 

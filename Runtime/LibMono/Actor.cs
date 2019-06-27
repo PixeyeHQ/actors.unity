@@ -17,11 +17,8 @@ namespace Pixeye.Framework
 		public ent entity;
 
 		#if UNITY_EDITOR
-
 		[FoldoutGroup("Main"), SerializeField, ReadOnly]
 		internal int _entity = -1;
-	 
-
 		#endif
 
 		[FoldoutGroup("Main")]
@@ -30,12 +27,6 @@ namespace Pixeye.Framework
 		[FoldoutGroup("Main")]
 		public ScriptableBuild buildFrom;
 
- 
-		void OnDestroy()
-		{
-			if (!Toolbox.applicationIsQuitting && entity.Exist)
-				entity.Unbind();
-			 
-		}
+	 
 	}
 }

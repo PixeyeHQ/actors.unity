@@ -3,11 +3,12 @@
 
 
 using System.Runtime.CompilerServices;
+using Pixeye.Source;
 using UnityEngine;
 
 namespace Pixeye.Framework
 {
-	public partial class Actor
+	public partial class  Actor
 	{
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public ref ent GetEntity()
@@ -47,11 +48,18 @@ namespace Pixeye.Framework
 			else
 				id = ent.lastID++;
 
+			entity = new ent(id, age);
+
 			#if UNITY_EDITOR
 			_entity = id;
+			#if ACTORS_DEBUG
+	  	var utils                = GetComponent<ActorUtil>();
+		 	if (utils == null) utils = gameObject.AddComponent<ActorUtil>();
+	   	utils.Setup(entity);
+			#endif
 			#endif
 
-			entity = new ent(id, age);
+
 			Entity.Initialize(id, age, isPooled);
 			Entity.transforms[id] = transform;
 
@@ -89,11 +97,17 @@ namespace Pixeye.Framework
 			else
 				id = ent.lastID++;
 
+			entity = new ent(id, age);
+
 			#if UNITY_EDITOR
 			_entity = id;
+			#if ACTORS_DEBUG
+			var utils                = GetComponent<ActorUtil>();
+			if (utils == null) utils = gameObject.AddComponent<ActorUtil>();
+			utils.Setup(entity);
 			#endif
-
-			entity = new ent(id, age);
+			#endif
+ 
 			Entity.Initialize(id, age, isPooled);
 			Entity.transforms[id] = transform;
 			model(entity);
@@ -186,8 +200,6 @@ namespace Pixeye.Framework
 			actor.Launch(model);
 			return actor;
 		}
-
- 
 	}
 
 	public static class HelperActor
