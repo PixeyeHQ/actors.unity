@@ -20,7 +20,7 @@ namespace Pixeye.Framework
 
 		[FoldoutGroup("Main"), SerializeField, ReadOnly]
 		internal int _entity = -1;
-
+	 
 
 		#endif
 
@@ -30,42 +30,11 @@ namespace Pixeye.Framework
 		[FoldoutGroup("Main")]
 		public ScriptableBuild buildFrom;
 
-
-		//===============================//
-		// Methods
-		//===============================//
-
-		#if UNITY_EDITOR
-
-		protected bool manualRemoved;
-
-		void Awake() => manualRemoved = !enabled;
-
-		protected virtual void OnEnable()
+ 
+		void OnDestroy()
 		{
-			unsafe
-			{
-				if (!manualRemoved) return;
-				manualRemoved                   = false;
-				Entity.cache[entity.id].isAlive = true;
-				EntityOperations.Set(entity, 0, EntityOperations.Action.Activate);
-			}
+			if (Toolbox.applicationIsQuitting) return;
+			if (entity.Exist) entity.Unbind();
 		}
-
-		protected virtual void OnDisable()
-		{
-			unsafe
-			{
-				if (Toolbox.applicationIsQuitting || !Entity.cache[entity.id].isAlive) return;
-				manualRemoved                   = true;
-				Entity.cache[entity.id].isAlive = false;
-				EntityOperations.Set(entity, 0, EntityOperations.Action.Deactivate);
-			}
-		}
-
-		#else
-				protected virtual void OnEnable(){}
-				protected virtual void OnDisable(){}
-		#endif
 	}
 }
