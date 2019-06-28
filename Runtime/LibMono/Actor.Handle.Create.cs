@@ -158,6 +158,7 @@ namespace Pixeye.Framework
 		}
 
 
+
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static Actor Create(GameObject prefab, Vector3 position = default, bool pooled = false)
 		{
@@ -169,6 +170,21 @@ namespace Pixeye.Framework
 
 			return actor;
 		}
+
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static Actor Create(GameObject prefab, Transform parent, Vector3 position = default, bool pooled = false)
+		{
+			var tr    = pooled ? Obj.Spawn(Pool.Entities, prefab, parent, position) : Obj.Spawn(prefab, parent, position);
+			var actor = tr.AddGetActor();
+
+			actor.isPooled = pooled;
+			actor.Launch();
+
+			return actor;
+		}
+		
+		
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static Actor Create(GameObject prefab, ModelComposer model, Vector3 position = default, bool pooled = false)
 		{
