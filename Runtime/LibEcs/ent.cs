@@ -51,19 +51,7 @@ namespace Pixeye.Framework
 		{
 			return new ent(value);
 		}
-
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static ent operator +(ent a, int b)
-		{
-			return new ent(a.id + b, a.age);
-		}
-
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static ent operator -(ent a, int b)
-		{
-			return new ent(a.id - b, a.age);
-		}
-
+ 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public int CompareTo(int value)
 		{

@@ -7,7 +7,7 @@ using UnityEditor;
 
 namespace Pixeye.Framework
 {
-	internal static class DataFramework
+  static class DataFramework
 	{
 
 		public static int sizeTags

@@ -26,8 +26,8 @@ namespace Pixeye.Framework
 		/// <param name="action"></param>
 		public Timer(float finishTime, Action a)
 		{
-			this.t = finishTime;
-			this.action = a;
+		  t = finishTime;
+			action = a;
 			pointer = -1;
 		}
 

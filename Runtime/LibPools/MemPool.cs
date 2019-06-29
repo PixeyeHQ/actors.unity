@@ -16,10 +16,7 @@ namespace Pixeye.Framework
 			ElementSize = elementSize;
 		}
 
-		public void* this[int index]
-		{
-			get { return (byte*) Memory + ElementSize * index; }
-		}
+		public void* this[int index] => (byte*) Memory + ElementSize * index;
 
 		public void Destroy()
 		{

@@ -76,7 +76,6 @@ namespace Pixeye.Framework
 				var mask = ids[ll];
 				if ((Entity.generations[entityID, generations[ll]] & mask) != mask) return false;
 			}
-
 			return true;
 		}
 

@@ -8,30 +8,26 @@ namespace Pixeye.Framework
 	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
 	public class PoolContainer
 	{
-
 		public bool globalPool = false;
-		private List<GameObject> activeObjs = new List<GameObject>(600);
+		private List<GameObject> activeObjs = new List<GameObject>(500);
 
-		//	private Transform parent;
-		private Dictionary<int, Stack<GameObject>> cachedObjects = new Dictionary<int, Stack<GameObject>>(600, new FastComparable());
-
-		//	private Dictionary<int, IPoolable> cachedPoolables = new Dictionary<int, IPoolable>(600, new FastComparable());
-		private Dictionary<int, int> cachedIds = new Dictionary<int, int>(600, new FastComparable());
+		private Dictionary<int, Stack<GameObject>> cachedObjects = new Dictionary<int, Stack<GameObject>>(500, new FastComparable());
+		private Dictionary<int, int> cachedIds = new Dictionary<int, int>(500, new FastComparable());
 
 		public void RegisterObject(GameObject prefab)
 		{
-			var key = prefab.GetInstanceID();
+			var               key = prefab.GetInstanceID();
 			Stack<GameObject> stack;
-			var hasValue = cachedObjects.TryGetValue(key, out stack);
+			var               hasValue = cachedObjects.TryGetValue(key, out stack);
 
 			if (!hasValue) cachedObjects.Add(key, new Stack<GameObject>());
 		}
 
 		public void Prepopulate(GameObject prefab, GameObject obj)
 		{
-			var key = prefab.GetInstanceID();
+			var               key = prefab.GetInstanceID();
 			Stack<GameObject> stack;
-			var hasValue = cachedObjects.TryGetValue(key, out stack);
+			var               hasValue = cachedObjects.TryGetValue(key, out stack);
 			if (!hasValue) cachedObjects.Add(key, new Stack<GameObject>());
 			else
 			{
@@ -41,16 +37,14 @@ namespace Pixeye.Framework
 
 		public void AddToPool(GameObject go, GameObject prefab)
 		{
-			//Debug.Log(go);
 			cachedIds.Add(go.GetInstanceID(), prefab.GetInstanceID());
-			//var stack = cachedObjects[prefab.GetInstanceID()]
 		}
 
 		public PoolContainer PopulateWith(GameObject prefab, int amount, int amountPerTick = 10, int timeRate = 1)
 		{
-			var key = prefab.GetInstanceID();
+			var               key = prefab.GetInstanceID();
 			Stack<GameObject> stack;
-			var hasValue = cachedObjects.TryGetValue(key, out stack);
+			var               hasValue = cachedObjects.TryGetValue(key, out stack);
 			if (!hasValue) cachedObjects.Add(key, new Stack<GameObject>(amount));
 
 			Timer.Add(Time.delta * timeRate, Pop);
@@ -78,7 +72,7 @@ namespace Pixeye.Framework
 			var key = prefab.GetInstanceID();
 
 			Stack<GameObject> objs;
-			var stacked = cachedObjects.TryGetValue(key, out objs);
+			var               stacked = cachedObjects.TryGetValue(key, out objs);
 
 			if (stacked && objs.Count > 0)
 			{
@@ -87,12 +81,6 @@ namespace Pixeye.Framework
 				if (transform.parent != parent)
 					transform.SetParent(parent);
 
-				IPoolable poolable = transform.GetComponent<IPoolable>();
-				if (poolable != null)
-				{
-					poolable.Spawn();
-				}
-
 				transform.gameObject.SetActive(true);
 
 				return true;
@@ -100,7 +88,7 @@ namespace Pixeye.Framework
 
 			if (!stacked)
 			{
-				cachedObjects.Add(key, new Stack<GameObject>(600));
+				cachedObjects.Add(key, new Stack<GameObject>(500));
 			}
 
 			var createdPrefab = Object.Instantiate(prefab, parent);
@@ -117,11 +105,11 @@ namespace Pixeye.Framework
 			var key = prefab.GetInstanceID();
 
 			Stack<GameObject> objs;
-			var stacked = cachedObjects.TryGetValue(key, out objs);
+			var               stacked = cachedObjects.TryGetValue(key, out objs);
 
 			if (stacked && objs.Count > 0)
 			{
-				var obj = objs.Pop();
+				var obj       = objs.Pop();
 				var transform = obj.transform;
 				if (transform.parent != parent)
 					transform.SetParent(parent);
@@ -176,6 +164,5 @@ namespace Pixeye.Framework
 			cachedIds.Add(go.GetInstanceID(), key);
 			cachedObjects[key].Push(go);
 		}
-
 	}
 }

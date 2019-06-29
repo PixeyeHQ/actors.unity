@@ -4,7 +4,7 @@
 
 namespace Pixeye.Framework
 {
-	public interface ITag { }
-
-	public interface ITagData { }
+	public interface ITag
+	{
+	}
 }

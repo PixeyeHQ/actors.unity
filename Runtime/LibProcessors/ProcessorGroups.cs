@@ -25,21 +25,7 @@ namespace Pixeye.Framework
 			{
 				var myFieldInfo = objectFields[i];
 
-				var bindAttribute = Attribute.GetCustomAttribute(myFieldInfo, typeof(BindAttribute)) as BindAttribute;
-				if (bindAttribute != null)
-				{
-					var fType = myFieldInfo.FieldType;
-					var hash  = fType.GetHashCode();
-
-					if (!DataSession.binds.TryGetValue(hash, out object o))
-					{
-						o = Activator.CreateInstance(fType);
-						DataSession.binds.Add(hash, o);
-					}
-
-					myFieldInfo.SetValue(b, o);
-				}
-				else if (myFieldInfo.FieldType.IsSubclassOf(groupType))
+			 if (myFieldInfo.FieldType.IsSubclassOf(groupType))
 				{
 					var groupByAttribute      = Attribute.GetCustomAttribute(myFieldInfo, typeof(GroupByAttribute)) as GroupByAttribute;
 					var groupExcludeAttribute = Attribute.GetCustomAttribute(myFieldInfo, typeof(GroupExcludeAttribute)) as GroupExcludeAttribute;

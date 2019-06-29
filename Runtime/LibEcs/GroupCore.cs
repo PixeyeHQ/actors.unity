@@ -5,7 +5,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using Unity.Collections.LowLevel.Unsafe;
 using Unity.IL2CPP.CompilerServices;
 
 
@@ -33,12 +32,9 @@ namespace Pixeye.Framework
 	{
 		static int idCounter;
 
-	 //	public ent* entities;
-	 //	int lengthTotal;
-
-	  public ent[] entities = new ent[SettingsEngine.SizeEntities];
+		public ent[] entities = new ent[SettingsEngine.SizeEntities];
 		public int length;
-	 
+
 		public EntityAction onAdd;
 		public EntityAction onRemove;
 
@@ -61,9 +57,6 @@ namespace Pixeye.Framework
 
 		internal GroupCore Start(Composition composition)
 		{
-			//entities    = (ent*) UnmanagedMemory.Alloc(ent.size * SettingsEngine.SizeEntities);
-			//lengthTotal = SettingsEngine.SizeEntities;
-
 			this.composition = composition;
 			composition.SetupExcludeTypes(this);
 			HelperTags.Add(this);
@@ -86,7 +79,7 @@ namespace Pixeye.Framework
 
 			if (length >= entities.Length)
 				Array.Resize(ref entities, length << 1);
-			
+
 
 			if (last >= 0)
 			{
@@ -138,20 +131,20 @@ namespace Pixeye.Framework
 			if (i == -1) return;
 			if ((object) onRemove != null) onRemove(entities[i]);
 
-		  Array.Copy(entities, i + 1, entities, i, length-- - i);
-		  // UnsafeUtility.MemMove(entities + i, entities + i + 1, (length-- - i - 1) * ent.size);
+			Array.Copy(entities, i + 1, entities, i, length-- - i);
+			// UnsafeUtility.MemMove(entities + i, entities + i + 1, (length-- - i - 1) * ent.size);
 		}
 
-	 
+
 		internal void Remove(int i)
 		{
 			if ((object) onRemove != null)
 				onRemove(entities[i]);
-			
+
 			Array.Copy(entities, i + 1, entities, i, length-- - i);
 			//  UnsafeUtility.MemMove(entities + i, entities + i + 1, (length-- - i - 1) * ent.size);
 		}
- 
+
 		public GroupCore()
 		{
 			id = idCounter++;

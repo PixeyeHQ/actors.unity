@@ -14,7 +14,7 @@ namespace Pixeye.Framework
 			DontDestroyOnLoad(_instance);
 		}
 
-		static System.Object _lock = new System.Object();
+		static object _lock = new object();
 
 		public static T Instance
 		{

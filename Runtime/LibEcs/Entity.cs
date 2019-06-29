@@ -43,15 +43,14 @@ namespace Pixeye.Framework
 	public static unsafe partial class Entity
 	{
 		public static int Count;
-
-
+ 
 		public static Transform[] transforms = new Transform[SettingsEngine.SizeEntities];
 
 		static readonly int sizeBufferComponents = UnsafeUtility.SizeOf<BufferComponents>();
 		static readonly int sizeBufferTags = UnsafeUtility.SizeOf<BufferTags>();
 		static readonly int sizeUtils = UnsafeUtility.SizeOf<Utils>();
 
-		internal static int counter = SettingsEngine.SizeEntities;
+		internal static int lengthTotal = SettingsEngine.SizeEntities;
 		internal static int[,] generations = new int[SettingsEngine.SizeEntities, SettingsEngine.SizeGenerations];
 
 		internal static BufferComponents* components;
@@ -84,7 +83,7 @@ namespace Pixeye.Framework
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal static void Initialize(int id, byte age, bool pooled = false)
 		{
-			if (id >= counter)
+			if (id >= lengthTotal)
 			{
 				var l = id << 1;
 				HelperArray.ResizeInt(ref generations, l, SettingsEngine.SizeGenerations);
@@ -94,14 +93,14 @@ namespace Pixeye.Framework
 				tags       = (BufferTags*) UnmanagedMemory.ReAlloc(tags, sizeBufferTags * l);
 				cache      = (Utils*) UnmanagedMemory.ReAlloc(cache, sizeUtils * l);
 
-				for (int i = counter; i < l; i++)
+				for (int i = lengthTotal; i < l; i++)
 				{
 					tags[i]       = new BufferTags();
 					cache[i]      = new Utils();
 					components[i] = new BufferComponents(6);
 				}
 
-				counter = l;
+				lengthTotal = l;
 			}
 
 			components[id].amount = 0;
@@ -273,26 +272,7 @@ namespace Pixeye.Framework
 		{
 			return transforms[entity].GetChild(index1).GetChild(index2).GetComponent<T>();
 		}
-		/// <summary>
-		/// Returns the transform linked to the entity.
-		/// </summary>
-		/// <param name="entity"></param>
-		/// <returns>Returns the transform linked to the entity.</returns>
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static T GetMono<T>(in this ent entity, int index1, int index2, int index3) where T : Component
-		{
-			return transforms[entity].GetChild(index1).GetChild(index2).GetChild(index3).GetComponent<T>();
-		}
-		/// <summary>
-		/// Returns the transform linked to the entity.
-		/// </summary>
-		/// <param name="entity"></param>
-		/// <returns>Returns the transform linked to the entity.</returns>
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static T GetMono<T>(in this ent entity, int index1, int index2, int index3, int index4) where T : Component
-		{
-			return transforms[entity].GetChild(index1).GetChild(index2).GetChild(index3).GetChild(index4).GetComponent<T>();
-		}
+	 
 		/// <summary>
 		/// Returns the transform linked to the entity.
 		/// </summary>
@@ -309,7 +289,7 @@ namespace Pixeye.Framework
 		/// <param name="entity"></param>
 		/// <returns>Returns the transform linked to the entity.</returns>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static T GetMono<T>(in this ent entity, in int[] path) where T : Component
+		public static T GetMono<T>(in this ent entity, params int[] path) where T : Component
 		{
 			var transform = transforms[entity];
 			foreach (var sibling in path)
@@ -323,7 +303,7 @@ namespace Pixeye.Framework
 		/// <param name="entity"></param>
 		/// <returns>Returns the transform linked to the entity.</returns>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		internal static Component GetMono(in this ent entity, in int[] path, Type t)
+		internal static Component GetMono(in this ent entity, Type t, params int[] path)
 		{
 			var transform = transforms[entity];
 			foreach (var sibling in path)
@@ -335,7 +315,7 @@ namespace Pixeye.Framework
 
 		static void Dispose()
 		{
-			for (int i = 0; i < counter; i++)
+			for (int i = 0; i < lengthTotal; i++)
 				Marshal.FreeHGlobal((IntPtr) components[i].ids);
 
 			UnmanagedMemory.Cleanup();
