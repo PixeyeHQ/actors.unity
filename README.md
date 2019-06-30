@@ -11,20 +11,20 @@
 ACTORS is a complete game framework with multiscene editing, game object pooling, ECS and data-driven approach for game logic explicitly built for Unity3d. It is used to ease the pain of decoupling data from behaviors without tons of boilerplate code and unnecessary overhead. 
 
  
-## Requirements
+### Requirements
 - Unity 2018 and higher 
 
-## How to Install
-### From packages ( Preferable )
+### How to Install
+#### From packages ( Preferable )
 
 - Create a new Unity Project
 - Open the manifest.json file in the Packages folder inside of the Project
 - Add ```"com.pixeye.ecs": "https://github.com/dimmpixeye/ecs.git",```
 
-### From Unity
+#### From Unity
 - Download from https://github.com/dimmpixeye/ecs/releases 
 
-### How To Update
+#### How To Update
 If you use packages you can automatically get fresh updates inside Unity editor!  
 Press Tools->Actors->Update Framework[GIT] to get new update when needed.
 
