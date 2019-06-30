@@ -30,6 +30,6 @@ Press Tools->Actors->Update Framework[GIT] to get new update when needed.
 
 ## Documentation 
 
-* [Examples](https://github.com/dimmpixeye/ecs-Examples)
+* [Examples](https://github.com/dimmpixeye/CryoshockMini)
 * [Wiki](https://github.com/dimmpixeye/ecs/wiki)
  
