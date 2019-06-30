@@ -56,8 +56,6 @@ Project->Create->Actors->Generate->Component
 #### Struct Components
 To use struct components you need to add ```ACTORS_COMPONENTS_STRUCTS``` to Scripting Define Symbols in the Project Player Settings.  
 
-![IMG](https://i.gyazo.com/3f8a03a9636bcb5ebbe594d0a9b453b7.png)
-
 ```csharp
 	struct ComponentHealth
 	{
