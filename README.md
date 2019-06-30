@@ -30,12 +30,10 @@ Press Tools->Actors->Update Framework[GIT] to get new update when needed.
 
 ## Documentation 
 
-* [Examples](https://github.com/dimmpixeye/CryoshockMini)
-* [Wiki](https://github.com/dimmpixeye/ecs/wiki)
+* [Examples](https://github.com/dimmpixeye/CryoshockMini) ( In progress ) 
+* [Wiki](https://github.com/dimmpixeye/ecs/wiki) ( In progress ) 
  
 ## Introduction
-
-For more information please visit the [Wiki](https://github.com/dimmpixeye/ecs/wiki).
 
 ### Components
 Components are data containers without logic. In ACTORS Framework components can be either classes or structs. You should decide carefully from the start of the project what kind of layout ( class or structure ) you want to use as the workflow slightly differs.
