@@ -40,8 +40,8 @@ For more information please visit the [Wiki](https://github.com/dimmpixeye/ecs/w
 ### Components
 Components are data containers without logic. In ACTORS Framework components can be either classes or structs. You should decide carefully from the start of the project what kind of layout ( class or structure ) you want to use as the workflow slightly differs.
 
-You can automatically create a component class/struct from a special template in Unity.  
-Project->Create->Actors->Generate->Component
+> You can automatically create a component class/struct from a special template in Unity.  
+> Project->Create->Actors->Generate->Component
 
 #### Class Components
 
@@ -54,7 +54,7 @@ Project->Create->Actors->Generate->Component
 ```
 
 #### Struct Components
-To use struct components you need to add ```ACTORS_COMPONENTS_STRUCTS``` to Scripting Define Symbols in the Project Player Settings.  
+> To use struct components you need to add ```ACTORS_COMPONENTS_STRUCTS``` to Scripting Define Symbols in the Project Player Settings.  
 
 ```csharp
 	struct ComponentHealth
