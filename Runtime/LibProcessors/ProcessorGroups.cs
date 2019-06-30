@@ -60,7 +60,7 @@ namespace Pixeye.Framework
 			if (fieldObj != null)
 			{
 				group = fieldObj as GroupCore;
-				return group.Start(filter);
+				return container.Add((Activator.CreateInstance(groupType, true) as GroupCore).Start(filter));
 			}
 
 			return container.Add((Activator.CreateInstance(groupType, true) as GroupCore).Start(filter));

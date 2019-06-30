@@ -156,29 +156,7 @@ namespace Pixeye.Framework
 			{
 				ProcessorGroups.container.storage[i].AddCallbacks();
 			}
-			
 		 
-
-			// if ((object) onAdd != null)
-			// {
-			// 	actionInsert = Insert;
-			// 	Debug.Log("HA");
-			// }
-			// else
-			// 	actionInsert = InsertNoCallback;
-			//
-			// if ((object) onRemove != null)
-			// {
-			// 	actionTryRemove = TryRemove;
-			// 	actionRemove    = Remove;
-			// }
-			// else
-			// {
-			// 	actionTryRemove = TryRemoveNoCallback;
-			// 	actionRemove    = RemoveNoCallBack;
-			// }
-			
-			
 			
 			
 			initialized = true;
