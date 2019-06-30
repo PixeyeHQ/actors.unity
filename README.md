@@ -7,7 +7,7 @@
 [![Twitter Follow](https://img.shields.io/badge/twitter-%40dimmPixeye-blue.svg?style=flat-square&label=Follow)](https://twitter.com/dimmPixeye)
 [![license](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](https://github.com/dimmpixeye/Actors-Unity3d-Framework/blob/master/LICENSE)
 
-# ACTORS - Lightning fast ECS (Entity Component System) Framework for Unity 
+# ACTORS - Fast ECS (Entity Component System) Framework for Unity 
 ACTORS is a complete game framework with multiscene editing, game object pooling, ECS and data-driven approach for game logic explicitly built for Unity3d. It is used to ease the pain of decoupling data from behaviors without tons of boilerplate code and unnecessary overhead. 
 
  
