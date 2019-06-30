@@ -7,41 +7,26 @@
 [![Twitter Follow](https://img.shields.io/badge/twitter-%40dimmPixeye-blue.svg?style=flat-square&label=Follow)](https://twitter.com/dimmPixeye)
 [![license](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](https://github.com/dimmpixeye/Actors-Unity3d-Framework/blob/master/LICENSE)
 
-# ACTORS - Lightning fast (ECS) Entity Component System Framework for Unity 
-ACTORS is a complete game framework with multiscene editing, game object pooling and ECS ( entity-component-system ) data-driven approach for game logic explicitly built for Unity3d. It is used to ease the pain of decoupling data from behaviors without tons of boilerplate code and without unnecessary overhead. 
-
-## Features
+# ACTORS - Lightning fast ECS (Entity Component System) Framework for Unity 
+ACTORS is a complete game framework with multiscene editing, game object pooling and ECS ( entity-component-system ) data-driven approach for game logic explicitly built for Unity3d. It is used to ease the pain of decoupling data from behaviors without tons of boilerplate code and unnecessary overhead. 
 
  
-- ECS events and value observers
-- Very lightweight ECS syntax
-- Components on structs or classes
-- Actors ( visual entity composer in the Unity Inspector window )
-- Built-in support for pooling
-- Built-in support for Unity multiscene editing 
-- Built-in support for updates through ITick, ITickFixed, ITickLate - ( faster than Unity Update methods )
-- Signals ( in-memory publish/subscribe system and effectively replace Unity3d SendMessage )
-- Tags ( add simple tags to entities to define states )
-- Editor extensions ( foldout group in the inspector and tags editing )
-- Game console plugin for commands and cheats
-
-
 ## Requirements
-
 - Unity 2018 and higher 
 
 ## How to Install
-
-### From packages
+### From packages ( Preferable )
 
 - Create a new Unity Project
 - Open the manifest.json file in the Packages folder inside of the Project
 - Add ```"com.pixeye.ecs": "https://github.com/dimmpixeye/ecs.git",```
-- Press Tools->Actors->Update Framework[GIT] in Unity to get new update when needed
 
 ### From Unity
-
 - Download from https://github.com/dimmpixeye/ecs/releases 
+
+### How To Update
+If you use packages you can automatically get fresh updates inside Unity editor!  
+Press Tools->Actors->Update Framework[GIT] to get new update when needed.
 
 ## Documentation 
 
