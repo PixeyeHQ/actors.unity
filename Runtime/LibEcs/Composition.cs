@@ -21,8 +21,8 @@ namespace Pixeye.Framework
 		internal int[] includeTags = new int[0];
 		internal int[] excludeTags = new int[0];
 
-		public bool[] includeComponents = new bool[SettingsEngine.SizeComponents];
-		internal bool[] excludeComponents = new bool[SettingsEngine.SizeComponents];
+		public bool[] includeComponents = new bool[Entity.settings.SizeComponents];
+		internal bool[] excludeComponents = new bool[Entity.settings.SizeComponents];
 
 		internal HashCode hash;
 

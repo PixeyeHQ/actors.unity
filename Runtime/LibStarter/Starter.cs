@@ -148,10 +148,39 @@ namespace Pixeye.Framework
 
 			Add<ProcessorEntities>();
 			Add<ProcessorObserver>();
-
-		 
+			
 			Setup();
 
+
+			for (int i = 0; i < ProcessorGroups.container.len; i++)
+			{
+				ProcessorGroups.container.storage[i].AddCallbacks();
+			}
+			
+		 
+
+			// if ((object) onAdd != null)
+			// {
+			// 	actionInsert = Insert;
+			// 	Debug.Log("HA");
+			// }
+			// else
+			// 	actionInsert = InsertNoCallback;
+			//
+			// if ((object) onRemove != null)
+			// {
+			// 	actionTryRemove = TryRemove;
+			// 	actionRemove    = Remove;
+			// }
+			// else
+			// {
+			// 	actionTryRemove = TryRemoveNoCallback;
+			// 	actionRemove    = RemoveNoCallBack;
+			// }
+			
+			
+			
+			
 			initialized = true;
 
 			var objs = FindObjectsOfType<MonoBehaviour>().OfType<IRequireStarter>();

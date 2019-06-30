@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Unity.IL2CPP.CompilerServices;
 
-
 namespace Pixeye.Framework
 {
 	delegate void CallBackDelete(int i);
@@ -27,16 +26,24 @@ namespace Pixeye.Framework
 		}
 	}
 
+
 	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
 	public abstract class GroupCore : IEnumerable, IEquatable<GroupCore>, IDisposable
 	{
+		internal delegate void DelRemove(int id);
+
 		static int idCounter;
 
-		public ent[] entities = new ent[SettingsEngine.SizeEntities];
+		public ent[] entities = new ent[Entity.settings.SizeEntities];
 		public int length;
+
 
 		public EntityAction onAdd;
 		public EntityAction onRemove;
+
+		internal EntityAction actionInsert;
+		internal DelRemove actionTryRemove;
+		internal DelRemove actionRemove;
 
 		protected internal Composition composition;
 		internal int id;
@@ -64,18 +71,92 @@ namespace Pixeye.Framework
 			return this;
 		}
 
-		internal void Insert(in ent entity)
+		internal void AddCallbacks()
+		{
+			if ((object) onAdd != null)
+			{
+				actionInsert = Insert;
+			}
+			else
+				actionInsert = InsertNoCallback;
+
+			if ((object) onRemove != null)
+			{
+				actionTryRemove = TryRemove;
+				actionRemove    = Remove;
+			}
+			else
+			{
+				actionTryRemove = TryRemoveNoCallback;
+				actionRemove    = RemoveNoCallBack;
+			}
+		}
+
+		//===============================//
+		// Insert
+		//===============================//
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		void Insert(in ent entity)
 		{
 			var entityID = entity.id;
 			var index    = length++;
 			var pointer  = index;
 			var last     = index - 1;
 
-			// if (length >= lengthTotal)
-			// {
-			// 	entities    = (ent*) UnmanagedMemory.ReAlloc(entities, ent.size * (length << 1));
-			// 	lengthTotal = length;
-			// }
+
+			if (length >= entities.Length)
+				Array.Resize(ref entities, length << 1);
+
+
+			if (last >= 0)
+			{
+				if (entityID < entities[last].id)
+				{
+					var startIndex = 0;
+					var endIndex   = last;
+
+					while (endIndex > startIndex)
+					{
+						var middleIndex = (endIndex + startIndex) / 2;
+						var middleValue = entities[middleIndex].id;
+
+						if (middleValue == entityID)
+						{
+							pointer = middleIndex;
+
+							break;
+						}
+
+						if (middleValue < entityID)
+						{
+							startIndex = middleIndex + 1;
+							pointer    = startIndex;
+						}
+						else
+						{
+							endIndex = middleIndex;
+							pointer  = endIndex;
+						}
+					}
+				}
+			}
+
+			for (int i = index; i >= pointer; i--)
+				entities[i + 1] = entities[i];
+
+
+			entities[pointer] = entity;
+
+			onAdd(entity);
+		}
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		void InsertNoCallback(in ent entity)
+		{
+			var entityID = entity.id;
+			var index    = length++;
+			var pointer  = index;
+			var last     = index - 1;
+
 
 			if (length >= entities.Length)
 				Array.Resize(ref entities, length << 1);
@@ -118,10 +199,11 @@ namespace Pixeye.Framework
 				entities[i + 1] = entities[i];
 
 			entities[pointer] = entity;
-
-			if ((object) onAdd != null) onAdd(entity);
 		}
 
+		//===============================//
+		// Try Remove
+		//===============================//
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal void TryRemove(int entityID)
@@ -129,20 +211,31 @@ namespace Pixeye.Framework
 			if (length == 0) return;
 			var i = HelperArray.BinarySearch(ref entities, entityID, 0, length);
 			if (i == -1) return;
-			if ((object) onRemove != null) onRemove(entities[i]);
-
+			onRemove(entities[i]);
 			Array.Copy(entities, i + 1, entities, i, length-- - i);
-			// UnsafeUtility.MemMove(entities + i, entities + i + 1, (length-- - i - 1) * ent.size);
+		}
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		internal void TryRemoveNoCallback(int entityID)
+		{
+			if (length == 0) return;
+			var i = HelperArray.BinarySearch(ref entities, entityID, 0, length);
+			if (i == -1) return;
+			Array.Copy(entities, i + 1, entities, i, length-- - i);
 		}
 
-
+		//===============================//
+		// Remove
+		//===============================//
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal void Remove(int i)
 		{
-			if ((object) onRemove != null)
-				onRemove(entities[i]);
-
+			onRemove(entities[i]);
 			Array.Copy(entities, i + 1, entities, i, length-- - i);
-			//  UnsafeUtility.MemMove(entities + i, entities + i + 1, (length-- - i - 1) * ent.size);
+		}
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		internal void RemoveNoCallBack(int i)
+		{
+			Array.Copy(entities, i + 1, entities, i, length-- - i);
 		}
 
 		public GroupCore()

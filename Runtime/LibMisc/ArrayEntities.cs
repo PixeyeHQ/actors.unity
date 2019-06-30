@@ -10,7 +10,7 @@ namespace Pixeye.Framework
 	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
 	class ArrayEntities
 	{
-		internal ent[] storage = new ent[SettingsEngine.SizeEntities];
+		internal ent[] storage = new ent[Entity.settings.SizeEntities];
 		internal int len;
 
 		internal void TryAdd(in ent entity)

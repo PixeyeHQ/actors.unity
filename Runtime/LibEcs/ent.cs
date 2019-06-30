@@ -14,7 +14,7 @@ namespace Pixeye.Framework
 	public unsafe struct ent
 	{
 		internal static int size = sizeof(ent);
-		internal static Queue<ent> entityStack = new Queue<ent>(SettingsEngine.SizeEntities);
+		internal static Queue<ent> entityStack = new Queue<ent>(Entity.settings.SizeEntities);
 		internal static int entityStackLength;
 		internal static int lastID;
 

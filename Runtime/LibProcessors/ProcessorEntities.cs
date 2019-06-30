@@ -54,7 +54,7 @@ namespace Pixeye.Framework
 						{
 							var group = storage.groups[l];
 							if (!group.composition.Check(entityID)) continue;
-							group.Insert(operation.entity);
+							group.actionInsert(operation.entity);
 						}
 
 
@@ -62,7 +62,7 @@ namespace Pixeye.Framework
 						{
 							var group = storage.groupsToCheck[l];
 							if (!group.composition.CanProceed(entityID)) continue;
-							group.TryRemove(entityID);
+							group.actionTryRemove(entityID);
 						}
 
 						break;
@@ -90,7 +90,7 @@ namespace Pixeye.Framework
 								if (!AlreadyChecked(group))
 								{
 									if (group.composition.OverlapComponents(components))
-										group.TryRemove(entityID);
+										group.actionTryRemove(entityID);
 
 									if (groupsCheckedLen == groupsChecked.Length)
 										Array.Resize(ref groupsChecked, groupsCheckedLen << 1);
@@ -150,7 +150,7 @@ namespace Pixeye.Framework
 								if (!AlreadyChecked(group))
 								{
 									if (group.composition.OverlapComponents(components))
-										group.TryRemove(entityID);
+										group.actionTryRemove(entityID);
 
 									if (groupsCheckedLen == groupsChecked.Length)
 										Array.Resize(ref groupsChecked, groupsCheckedLen << 1);
@@ -184,7 +184,7 @@ namespace Pixeye.Framework
 						Entity.generations[entityID, generation] &= ~mask;
 
 						for (int l = 0; l < storage.lenOfGroups; l++)
-							storage.groups[l].TryRemove(entityID);
+							storage.groups[l].actionTryRemove(entityID);
 
 
 						for (int l = 0; l < storage.lenOfGroupsToCheck; l++)
@@ -194,9 +194,9 @@ namespace Pixeye.Framework
 							var composition = group.composition;
 							if (composition.Check(entityID)) continue;
 
-							var inGroup = group.length == 0 ? -1 : HelperArray.BinarySearch(ref group.entities, entityID, 0, group.length);
+							var inGroup = group.length == 0 ? -1 : HelperArray.BinarySearch( ref  group.entities, entityID, 0, group.length);
 							if (inGroup == -1)
-								group.Insert(operation.entity);
+								group.actionInsert(operation.entity);
 						}
 
 						ref var components = ref Entity.components[entityID];
@@ -243,16 +243,16 @@ namespace Pixeye.Framework
 							var composition = group.composition;
 							var canBeAdded  = composition.Check(entityID);
 
-							var inGroup = group.length == 0 ? -1 : HelperArray.BinarySearch(ref group.entities, entityID, 0, group.length);
+							var inGroup = group.length == 0 ? -1 : HelperArray.BinarySearch( ref  group.entities, entityID, 0, group.length);
 
 							if (inGroup == -1)
 							{
 								if (!canBeAdded) continue;
-								group.Insert(operation.entity);
+								group.actionInsert(operation.entity);
 							}
 							else if (inGroup > -1 && !canBeAdded)
 							{
-								group.Remove(inGroup);
+								group.actionRemove(inGroup);
 							}
 						}
 
@@ -278,7 +278,7 @@ namespace Pixeye.Framework
 								var group       = storage.groups[l];
 								var composition = group.composition;
 								if (!composition.Check(entityID)) continue;
-								group.Insert(operation.entity);
+								group.actionInsert(operation.entity);
 							}
 						}
 
@@ -304,7 +304,7 @@ namespace Pixeye.Framework
 							for (int l = 0; l < storage.lenOfGroups; l++)
 							{
 								var group = storage.groups[l];
-								group.TryRemove(entityID);
+								group.actionTryRemove(entityID);
 							}
 						}
 

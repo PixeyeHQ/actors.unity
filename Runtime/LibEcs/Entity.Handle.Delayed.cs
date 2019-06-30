@@ -36,7 +36,7 @@ namespace Pixeye.Framework
 			Unbind,
 		}
 
-		public static EntityOperation[] operations = new EntityOperation[SettingsEngine.SizeEntities];
+		public static EntityOperation[] operations = new EntityOperation[Entity.settings.SizeEntities];
 		public static int len;
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]

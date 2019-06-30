@@ -42,16 +42,17 @@ namespace Pixeye.Framework
 	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
 	public static unsafe partial class Entity
 	{
+		public static SettingsEngine settings = new SettingsEngine();
 		public static int Count;
- 
-		public static Transform[] transforms = new Transform[SettingsEngine.SizeEntities];
+
+		public static Transform[] transforms;
 
 		static readonly int sizeBufferComponents = UnsafeUtility.SizeOf<BufferComponents>();
 		static readonly int sizeBufferTags = UnsafeUtility.SizeOf<BufferTags>();
 		static readonly int sizeUtils = UnsafeUtility.SizeOf<Utils>();
 
-		internal static int lengthTotal = SettingsEngine.SizeEntities;
-		internal static int[,] generations = new int[SettingsEngine.SizeEntities, SettingsEngine.SizeGenerations];
+		internal static int lengthTotal;
+		internal static int[,] generations;
 
 		internal static BufferComponents* components;
 		internal static BufferTags* tags;
@@ -61,14 +62,27 @@ namespace Pixeye.Framework
 		// Initialize 
 		//===============================//
 
+		#if UNITY_EDITOR
 		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+		#else
+		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSplashScreen)]
+		#endif
 		internal static void Start()
 		{
-			components = (BufferComponents*) UnmanagedMemory.Alloc(sizeBufferComponents * SettingsEngine.SizeEntities);
-			tags       = (BufferTags*) UnmanagedMemory.Alloc(sizeBufferTags * SettingsEngine.SizeEntities);
-			cache      = (Utils*) UnmanagedMemory.Alloc(sizeUtils * SettingsEngine.SizeEntities);
+			var t = Resources.Load<TextAsset>("SettingsFramework");
+			if (t != null)
+				JsonUtility.FromJsonOverwrite(t.text, settings);
 
-			for (int i = 0; i < SettingsEngine.SizeEntities; i++)
+
+			lengthTotal = settings.SizeEntities;
+			generations = new int[settings.SizeEntities, settings.SizeGenerations];
+			transforms  = new Transform[settings.SizeEntities];
+
+			components = (BufferComponents*) UnmanagedMemory.Alloc(sizeBufferComponents * settings.SizeEntities);
+			tags       = (BufferTags*) UnmanagedMemory.Alloc(sizeBufferTags * settings.SizeEntities);
+			cache      = (Utils*) UnmanagedMemory.Alloc(sizeUtils * settings.SizeEntities);
+
+			for (int i = 0; i < settings.SizeEntities; i++)
 			{
 				tags[i]       = new BufferTags();
 				cache[i]      = new Utils();
@@ -86,7 +100,7 @@ namespace Pixeye.Framework
 			if (id >= lengthTotal)
 			{
 				var l = id << 1;
-				HelperArray.ResizeInt(ref generations, l, SettingsEngine.SizeGenerations);
+				HelperArray.ResizeInt(ref generations, l, settings.SizeGenerations);
 				Array.Resize(ref transforms, l);
 
 				components = (BufferComponents*) UnmanagedMemory.ReAlloc(components, sizeBufferComponents * l);
@@ -97,7 +111,7 @@ namespace Pixeye.Framework
 				{
 					tags[i]       = new BufferTags();
 					cache[i]      = new Utils();
-					components[i] = new BufferComponents(6);
+					components[i] = new BufferComponents(5);
 				}
 
 				lengthTotal = l;
@@ -164,15 +178,15 @@ namespace Pixeye.Framework
 		public static void Set<T>(in this ent entity, T component)
 		{
 			components[entity.id].Add(Storage<T>.componentID);
-			
+
 			#if !ACTORS_COMPONENTS_STRUCTS
 			ref var componentInStorage = ref Storage<T>.Instance.components[entity.id];
 			if (componentInStorage != null)
 				Storage<T>.Instance.DisposeAction(entity);
  
       componentInStorage = component;
-			#else 
-			
+			#else
+
 			ref var componentInStorage = ref Storage<T>.Instance.components[entity.id];
 			componentInStorage = component;
 			#endif
@@ -272,7 +286,7 @@ namespace Pixeye.Framework
 		{
 			return transforms[entity].GetChild(index1).GetChild(index2).GetComponent<T>();
 		}
-	 
+
 		/// <summary>
 		/// Returns the transform linked to the entity.
 		/// </summary>
