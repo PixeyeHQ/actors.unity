@@ -95,3 +95,122 @@ If you don't use Unity for generating components, you can easily make a template
 		}
 	}
 ```
+
+### Entity
+Entity is an incremental ID that help accessing components. Entity is represented by ```ent``` structure.
+
+
+#### How to create entity ?
+
+```csharp
+public void SomeMethod()
+{
+    // Bare entity
+    ent e = Entity.Create();
+}
+```
+___
+
+Entities can hold information about unity objects as well!
+
+```csharp
+public void SomeMethod()
+{    
+     // New entity with a new GO ( GameObject ).
+     // The GO prefab will be taken from the Resources folder by string ID.
+     ent e = Entity.Create("Obj Fluffy Unicorn");
+     // Access to the transform of Obj Fluffy Unicorn gameobject.
+     e.transform.position = new Vector3(0,0,0) ;
+}
+```
+___
+
+```csharp
+public GameObject prefabFluffyUnicorn;
+public void SomeMethod()
+{    
+     // New entity with a new GO ( GameObject ).
+     // The GO will be created from the provided prefab.
+     ent e = Entity.Create(prefabFluffyUnicorn);
+     // Access to the transform of Obj Fluffy Unicorn gameobject.
+     e.transform.position = new Vector3(0,0,0) ;
+}
+```
+___
+
+You can pool gameobject by adding ```true``` variable in the end of the method.
+```csharp
+public void SomeMethod()
+{    
+     // New entity with a new GO ( GameObject ).
+     // The GO prefab will be taken from the Resources folder by string ID.
+     ent e = Entity.Create("Obj Fluffy Unicorn", true);
+     // Access to the transform of Obj Fluffy Unicorn gameobject.
+     e.transform.position = new Vector3(0,0,0) ;
+}
+```
+___
+
+#### How to add Components ?
+There are several ways to add components depending on the context of your code.
+The simpliest way is to use ```Add``` method.
+```csharp
+public void Some Method()
+{    
+     ent e = Entity.Create("Obj Bunny");
+     // Add components
+     var cCute       = e.Add<ComponentCute>();
+     var cJumping    = e.Add<ComponentJumping>();
+     var cConsumable = e.Add<ComponentConsumable>();
+     var cPoo        = e.Add<ComponentCanPoo>();
+
+     // Component Cute
+     cCute.attractivness = float.PositiveInfinity;
+     // Component Jumping
+     cJumping.power = 100;
+
+}
+```
+In case you want to setup your new entity it's better to use ```Set``` Method. Use ```Set``` method only with newly created entities.
+At the end of your setup call ```Deploy``` method. 
+
+```csharp
+public void Some Method()
+{    
+     ent e = Entity.Create("Obj Bunny");
+     // Add components
+     var cCute       = e.Set<ComponentCute>();
+     var cJumping    = e.Set<ComponentJumping>();
+     var cConsumable = e.Set<ComponentConsumable>();
+     var cPoo        = e.Set<ComponentCanPoo>();
+
+     // Component Cute
+     cCute.attractivness = float.PositiveInfinity;
+     // Component Jumping
+     cJumping.power = 100;
+
+     // Send entity to the game.
+     e.Deploy();
+}
+```
+
+The difference between Add and Set are in the operations that Framework must do to create this object. In the example above, the Framework needs to make 4 ```ADD``` operations, but in the case of the ```SET``` method, it will make only 1 operation.
+
+#### How to kill Entities?
+
+```csharp
+// Create new entity with Obj Bunny prefab
+ent e = Entity.Create("Obj Bunny");
+// Somewhere in the code
+e.Release();
+```
+
+> If you create an entity with a GameObject, it will be destroyed as well. If the GameObject was marked as poolable, it will be deactivated and reused in the future.
+
+#### How to kill Entity without touching a GameObject?
+```csharp
+// Create new entity with Obj Bunny prefab
+ent e = Entity.Create("Obj Bunny");
+// Somewhere in the code
+e.Unbind();
+```
