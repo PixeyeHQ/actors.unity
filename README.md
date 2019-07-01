@@ -155,7 +155,7 @@ ___
 There are several ways to add components depending on the context of your code.
 The simpliest way is to use ```Add``` method.
 ```csharp
-public void Some Method()
+public void SomeMethod()
 {    
      ent e = Entity.Create("Obj Bunny");
      // Add components
@@ -175,7 +175,7 @@ In case you want to setup your new entity it's better to use ```Set``` Method. U
 At the end of your setup call ```Deploy``` method. 
 
 ```csharp
-public void Some Method()
+public void SomeMethod()
 {    
      ent e = Entity.Create("Obj Bunny");
      // Add components
