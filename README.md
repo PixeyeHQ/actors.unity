@@ -287,3 +287,20 @@ sealed class ProcessorMove : Processor, ITick
         }
 
 ```
+
+## Starters
+The Starter class is the entry point of a game scene. You define all your Processors and Scene dependecies there. How you define your processors matters for execution order.
+```csharp
+        // Inherit from Starter class
+	sealed class StarterGame : Starter
+	{
+                // override Setup method. It's like Awake in Unity.
+		protected override void Setup()
+		{
+			Add<ProcessorMotion>();
+			Add<ProcessorInput>();
+			Add<ProcessorPlayer>();
+                  }
+         }
+```
+
