@@ -217,7 +217,7 @@ e.Unbind();
 Processors are systems in ACTORS framework. You execute game logic through systems.
 Custom processors must be inherited from a Processor class.
 
-### Groups
+### Group
 Processors execute game logic through iterating groups. Groups are entities that are filtered by specific components. The same entity may lay in many groups.
 
 ```csharp
@@ -226,6 +226,49 @@ sealed class ProcessorMove : Processor, ITick
           // Define a group. The group is defined via Processor parent class
           Group<ComponentMove,ComponentPosition> groupMovables;
 	  
+	        // ITick interface Adds Tick method. It's an update with delta time.
+	  	public void Tick(float delta)
+		{
+		        // iteration through group
+			for (int i = 0; i < groupMovables.length; i++)
+			{
+				ref var entity = ref groupMovables.entities[i];
+
+				var cMove     = entity.ComponentMove();
+				var cPosition = entity.ComponentPosition();
+
+				// do some logic
+			}
+		}
+	  
+        }
+
+```
+
+### Group events
+You can use ```OnAdd``` or ```OnRemove``` events on the group. It's "similar" to Unity OnEnable and OnDisable logic. 
+
+```csharp
+sealed class ProcessorMove : Processor, ITick
+	{
+          // Define a group. The group is defined via Processor parent class
+          Group<ComponentMove,ComponentPosition> groupMovables;
+	  
+          public ProcessorMove(){
+	  
+	  groupMovables.OnAdd += ToGroupMovables;
+          groupMovables.OnRemove += FromGroupMovables;
+	  
+	  }
+
+          void ToGroupMovables(in ent entity){
+            Debug.Log($({entity} Added!));
+          }
+
+         void FromGroupMovables(in ent entity){
+            Debug.Log($({entity} Removed!));
+          }
+
 	        // ITick interface Adds Tick method. It's an update with delta time.
 	  	public void Tick(float delta)
 		{
