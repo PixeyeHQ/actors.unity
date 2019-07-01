@@ -141,7 +141,8 @@ You can pool gameobject by adding ```true``` variable in the end of the method.
 public void SomeMethod()
 {    
      // New entity with a new GO ( GameObject ).
-     // The GO prefab will be taken from the Resources folder by string ID.
+     // The GO prefab will be taken from the Resources folder by string ID. 
+     // The GO will be pooled.
      ent e = Entity.Create("Obj Fluffy Unicorn", true);
      // Access to the transform of Obj Fluffy Unicorn gameobject.
      e.transform.position = new Vector3(0,0,0) ;
