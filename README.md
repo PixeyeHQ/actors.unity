@@ -212,3 +212,11 @@ ent e = Entity.Create("Obj Bunny");
 // Somewhere in the code
 e.Unbind();
 ```
+
+### Processors
+Processors are systems in ACTORS framework. You execute game logic through systems.
+
+### Groups
+Processors execute game logic through iterating groups. Groups are entities that are filtered by specific components. The same entity may lay in many groups.
+
+
