@@ -129,7 +129,8 @@ public void SomeMethod()
 {    
      // New entity with a new GO ( GameObject ).
      // The GO will be created from the provided prefab.
-     ent e = Entity.Create(prefabFluffyUnicorn);
+     // The GO will be pooled.
+     ent e = Entity.Create(prefabFluffyUnicorn, true);
      // Access to the transform of Obj Fluffy Unicorn gameobject.
      e.transform.position = new Vector3(0,0,0) ;
 }
