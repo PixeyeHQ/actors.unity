@@ -26,9 +26,12 @@ namespace Pixeye.Framework
 			else
 				id = ent.lastID++;
 
-
+			ent entity;
+			entity.id  = id;
+			entity.age = age;
 			Initialize(id, age);
-			return new ent(id, age);
+			EntityOperations.Set(entity, -1, EntityOperations.Action.Activate);
+			return entity;
 		}
 		public static ent Create(ModelComposer model)
 		{
@@ -50,15 +53,18 @@ namespace Pixeye.Framework
 			else
 				id = ent.lastID++;
 
-			var entity = new ent(id, age);
+			ent entity;
+			entity.id  = id;
+			entity.age = age;
+
 			Initialize(id, age);
 
 			model(entity);
-			EntityOperations.Set(entity, 0, EntityOperations.Action.Activate);
 
+			EntityOperations.Set(entity, -1, EntityOperations.Action.Activate);
 			return entity;
 		}
-		
+
 		public static ent Create(string prefabID, Vector3 position = default, bool pooled = false)
 		{
 			int  id;
@@ -79,9 +85,15 @@ namespace Pixeye.Framework
 			else
 				id = ent.lastID++;
 
+			ent entity;
+			entity.id  = id;
+			entity.age = age;
+
 			Initialize(id, age, pooled);
 			transforms[id] = pooled ? Obj.Spawn(Pool.Entities, prefabID, position) : Obj.Spawn(prefabID, position);
-			return new ent(id, age);
+
+			EntityOperations.Set(entity, -1, EntityOperations.Action.Activate);
+			return entity;
 		}
 		public static ent Create(string prefabID, ModelComposer model, Vector3 position = default, bool pooled = false)
 		{
@@ -103,11 +115,15 @@ namespace Pixeye.Framework
 			else
 				id = ent.lastID++;
 
-			var entity = new ent(id, age);
+			ent entity;
+			entity.id  = id;
+			entity.age = age;
+
 			Initialize(id, age, pooled);
 			transforms[id] = pooled ? Obj.Spawn(Pool.Entities, prefabID, position) : Obj.Spawn(prefabID, position);
 			model(entity);
-			EntityOperations.Set(entity, 0, EntityOperations.Action.Activate);
+
+			EntityOperations.Set(entity, -1, EntityOperations.Action.Activate);
 
 			return entity;
 		}
@@ -133,10 +149,16 @@ namespace Pixeye.Framework
 				id = ent.lastID++;
 
 
+			ent entity;
+			entity.id  = id;
+			entity.age = age;
+
+
 			Initialize(id, age, pooled);
 			transforms[id] = pooled ? Obj.Spawn(Pool.Entities, prefab, position) : Obj.Spawn(prefab, position);
 
-			return new ent(id, age);
+			EntityOperations.Set(entity, -1, EntityOperations.Action.Activate);
+			return entity;
 		}
 		public static ent Create(GameObject prefab, ModelComposer model, Vector3 position = default, bool pooled = false)
 		{
@@ -158,12 +180,15 @@ namespace Pixeye.Framework
 			else
 				id = ent.lastID++;
 
-			var entity = new ent(id, age);
+
+			ent entity;
+			entity.id  = id;
+			entity.age = age;
+
 			Initialize(id, age, pooled);
 			transforms[id] = pooled ? Obj.Spawn(Pool.Entities, prefab, position) : Obj.Spawn(prefab, position);
 			model(entity);
-			EntityOperations.Set(entity, 0, EntityOperations.Action.Activate);
-
+			EntityOperations.Set(entity, -1, EntityOperations.Action.Activate);
 			return entity;
 		}
 
@@ -187,11 +212,14 @@ namespace Pixeye.Framework
 			else
 				id = ent.lastID++;
 
-			var entity = new ent(id, age);
+			ent entity;
+			entity.id  = id;
+			entity.age = age;
+
 			Initialize(id, age, pooled);
 			transforms[id] = prefab.transform;
 			model(entity);
-			EntityOperations.Set(entity, 0, EntityOperations.Action.Activate);
+			EntityOperations.Set(entity, -1, EntityOperations.Action.Activate);
 			return entity;
 		}
 		public static ent CreateFor(GameObject obj, bool pooled = false)
@@ -214,11 +242,14 @@ namespace Pixeye.Framework
 			else
 				id = ent.lastID++;
 
+			ent entity;
+			entity.id  = id;
+			entity.age = age;
+
 			Initialize(id, age, pooled);
 			transforms[id] = obj.transform;
-			return new ent(id, age);
+			EntityOperations.Set(entity, -1, EntityOperations.Action.Activate);
+			return entity;
 		}
-
-		 
 	}
 }

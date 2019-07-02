@@ -7,12 +7,20 @@ using System.Runtime.CompilerServices;
 
 namespace Pixeye.Framework
 {
-	[Serializable]
-	public sealed class ComponentObserver
+	#if ACTORS_COMPONENTS_STRUCTS
+	struct ComponentObserver
+	{
+		public IWrap[] wrappers;
+		public int length;
+	}
+	#else
+	sealed class ComponentObserver
 	{
 		public IWrap[] wrappers = new IWrap[1];
 		public int length;
 	}
+	#endif
+
 
 	#region HELPERS
 
@@ -28,7 +36,7 @@ namespace Pixeye.Framework
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static void DisposeComponentObserver(in ent entity)
+		internal static void DisposeComponentObserver(in ent entity)
 		{
 			ref var component = ref Storage<ComponentObserver>.Instance.components[entity.id];
 
@@ -43,7 +51,7 @@ namespace Pixeye.Framework
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static ref ComponentObserver ComponentObserver(in this ent entity)
+		internal static ref ComponentObserver ComponentObserver(in this ent entity)
 		{
 			return ref Storage<ComponentObserver>.Instance.components[entity.id];
 		}

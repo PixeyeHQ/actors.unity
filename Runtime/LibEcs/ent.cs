@@ -51,7 +51,7 @@ namespace Pixeye.Framework
 		{
 			return new ent(value);
 		}
- 
+
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public int CompareTo(int value)
 		{
@@ -90,7 +90,6 @@ namespace Pixeye.Framework
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void Unbind()
 		{
-			Entity.cache[id].isAlive = false;
 			EntityOperations.Set(this, 0, EntityOperations.Action.Unbind);
 			Entity.Count--;
 		}
@@ -99,14 +98,14 @@ namespace Pixeye.Framework
 		public void Release()
 		{
 			#if UNITY_EDITOR
-			if (!Entity.cache[id].isAlive)
+			if (!Exist)
 			{
 				Debug.LogError($"Entity with id [{id}]  already destroyed.");
 				return;
 			}
 			#endif
 
-			Entity.cache[id].isAlive = false;
+
 			EntityOperations.Set(this, 0, EntityOperations.Action.Kill);
 			Entity.Count--;
 		}
@@ -114,7 +113,7 @@ namespace Pixeye.Framework
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public bool EqualsAndExist(ent other)
 		{
-			return id > -1 && Entity.cache[id].isAlive && id == other.id && age == other.age;
+			return id > -1 && Entity.components[id].length > 0 && id == other.id && age == other.age;
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -126,13 +125,12 @@ namespace Pixeye.Framework
 		public bool Exist
 		{
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			get { return id > -1 && Entity.cache[id].isAlive && Entity.cache[id].age == age; }
+			get { return id > -1 && Entity.components[id].length > 0 && Entity.cache[id].age == age; }
 		}
 
 		#endregion
 
- 
-		
+
 		[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public bool Has<T>()
@@ -199,7 +197,6 @@ namespace Pixeye.Framework
 			       (Entity.generations[id, Storage<O>.generation] & mask5) == mask5;
 		}
 		#if !ACTORS_COMPONENTS_STRUCTS
-    
 		/// <summary>
 		/// <para>Safely gets the component by type from the entity.</para>
 		/// </summary>
@@ -309,9 +306,8 @@ namespace Pixeye.Framework
 			if ((arg3 = Storage<I>.Instance.TryGet(id)) == null) return false;
 			return (arg4 = Storage<O>.Instance.TryGet(id)) != null;
 		}
-   
-   
-   #endif
-		
+
+
+		#endif
 	}
 }

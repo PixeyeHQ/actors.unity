@@ -8,7 +8,7 @@ namespace Pixeye.Framework
 	public struct HashCode
 	{
 
-		readonly int value;
+		internal readonly int value;
 
 		HashCode(int value) => this.value = value;
 

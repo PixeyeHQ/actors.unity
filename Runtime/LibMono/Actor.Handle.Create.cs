@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace Pixeye.Framework
 {
-	public partial class  Actor
+	public partial class Actor
 	{
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public ref ent GetEntity()
@@ -48,12 +48,14 @@ namespace Pixeye.Framework
 			else
 				id = ent.lastID++;
 
-			entity = new ent(id, age);
+			entity.id  = id;
+			entity.age = age;
+
 
 			#if UNITY_EDITOR
 			_entity = id;
 			#if ACTORS_DEBUG
-	  	var utils                = GetComponent<ActorUtil>();
+	  	var utils = GetComponent<ActorUtil>();
 		 	if (utils == null) utils = gameObject.AddComponent<ActorUtil>();
 	   	utils.Setup(entity);
 			#endif
@@ -63,16 +65,18 @@ namespace Pixeye.Framework
 			Entity.Initialize(id, age, isPooled);
 			Entity.transforms[id] = transform;
 
-
-			if (buildFrom != null)
+			if (isActiveAndEnabled)
 			{
-				buildFrom.ExecuteOnStart(entity, this);
-				Setup();
-			}
-			else if (isActiveAndEnabled)
-			{
-				Setup();
-				EntityOperations.Set(entity, 0, EntityOperations.Action.Activate);
+				if (buildFrom != null)
+				{
+					buildFrom.ExecuteOnStart(entity, this);
+					Setup();
+				}
+				else
+				{
+					Setup();
+					EntityOperations.Set(entity, -1, EntityOperations.Action.Activate);
+				}
 			}
 		}
 
@@ -97,22 +101,23 @@ namespace Pixeye.Framework
 			else
 				id = ent.lastID++;
 
-			entity = new ent(id, age);
+			entity.id  = id;
+			entity.age = age;
 
 			#if UNITY_EDITOR
 			_entity = id;
 			#if ACTORS_DEBUG
-			var utils                = GetComponent<ActorUtil>();
+			var utils = GetComponent<ActorUtil>();
 			if (utils == null) utils = gameObject.AddComponent<ActorUtil>();
 			utils.Setup(entity);
 			#endif
 			#endif
- 
+
 			Entity.Initialize(id, age, isPooled);
 			Entity.transforms[id] = transform;
 			model(entity);
 			Setup();
-			EntityOperations.Set(entity, 0, EntityOperations.Action.Activate);
+			EntityOperations.Set(entity, -1, EntityOperations.Action.Activate);
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -158,7 +163,6 @@ namespace Pixeye.Framework
 		}
 
 
-
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static Actor Create(GameObject prefab, Vector3 position = default, bool pooled = false)
 		{
@@ -183,8 +187,8 @@ namespace Pixeye.Framework
 
 			return actor;
 		}
-		
-		
+
+
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static Actor Create(GameObject prefab, ModelComposer model, Vector3 position = default, bool pooled = false)
 		{
@@ -228,7 +232,7 @@ namespace Pixeye.Framework
 		{
 			entity.transform.GetComponent<Actor>().enabled = true;
 			#if !UNITY_EDITOR
-			EntityOperations.Set(entity, 0, EntityOperations.Action.Activate);
+			EntityOperations.Set(entity, -1, EntityOperations.Action.Activate);
 			#endif
 		}
 	}

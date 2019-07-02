@@ -20,14 +20,14 @@ namespace Pixeye.Framework
 		internal virtual void Execute(in ent entity, Actor a = null)
 		{
 			helpers[GetInstanceID()](entity);
-			EntityOperations.Set(entity, 0, EntityOperations.Action.Activate);
+			EntityOperations.Set(entity, -1, EntityOperations.Action.Activate);
 		}
 
 		internal virtual void ExecuteOnStart(in ent entity, Actor a)
 		{
 			helpers[GetInstanceID()](entity);
 			if (!a.isActiveAndEnabled) return;
-			EntityOperations.Set(entity, 0, EntityOperations.Action.Activate);
+			EntityOperations.Set(entity, -1, EntityOperations.Action.Activate);
 		}
 
 		protected virtual void OnEnable()

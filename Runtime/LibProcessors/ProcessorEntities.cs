@@ -2,7 +2,7 @@
 // Contacts : Pix - info@pixeye.games
 //     Date : 3/7/2019 
 
-using System;
+ 
 using Unity.IL2CPP.CompilerServices;
 using UnityEngine;
 
@@ -12,16 +12,14 @@ namespace Pixeye.Framework
 	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
 	sealed unsafe class ProcessorEntities : Processor, ITick
 	{
-		GroupCore[] groupsChecked = new GroupCore[256];
+		GroupCore[] groupsChecked = new GroupCore[Entity.settings.SizeProcessors];
 		int groupsCheckedLen;
 
 		bool AlreadyChecked(GroupCore group)
 		{
 			for (int i = 0; i < groupsCheckedLen; i++)
-			{
 				if (groupsChecked[i].id == group.id) return true;
-			}
-
+			
 			return false;
 		}
 
@@ -45,8 +43,13 @@ namespace Pixeye.Framework
 						var mask        = Storage.masks[componentID];
 
 
-						if ((Entity.generations[entityID, generation] & mask) == mask) continue;
-
+						#if UNITY_EDITOR
+						if ((Entity.generations[entityID, generation] & mask) == mask)
+						{
+							Debug.LogError($"-> Entity [{entityID}] already have this component {storage}!");
+							continue;
+						}
+						#endif
 
 						Entity.components[entityID].Add(componentID);
 						Entity.generations[entityID, generation] |= mask;
@@ -54,17 +57,12 @@ namespace Pixeye.Framework
 						for (int l = 0; l < storage.lenOfGroups; l++)
 						{
 							var group = storage.groups[l];
-							if (!group.composition.Check(entityID)) continue;
-							group.actionInsert(operation.entity);
+							if (!group.composition.Check(entityID))
+								group.actionTryRemove(entityID);
+							else
+								group.actionInsert(operation.entity);
 						}
 
-
-						for (int l = 0; l < storage.lenOfGroupsToCheck; l++)
-						{
-							var group = storage.groupsToCheck[l];
-							if (!group.composition.CanProceed(entityID)) continue;
-							group.actionTryRemove(entityID);
-						}
 
 						break;
 					}
@@ -93,9 +91,7 @@ namespace Pixeye.Framework
 									if (group.composition.OverlapComponents(components))
 										group.actionTryRemove(entityID);
 
-									if (groupsCheckedLen == groupsChecked.Length)
-										Array.Resize(ref groupsChecked, groupsCheckedLen << 1);
-
+					 
 									groupsChecked[groupsCheckedLen++] = group;
 								}
 							}
@@ -119,16 +115,13 @@ namespace Pixeye.Framework
 
 						Entity.tags[entityID].Clear();
 
-						EntityOperations.Set(operation.entity, 0, EntityOperations.Action.KillFinalize);
+
+						ent.entityStack.Enqueue(operation.entity);
+						ent.entityStackLength++;
+
 						break;
 					}
 
-					case EntityOperations.Action.KillFinalize:
-					{
-						ent.entityStack.Enqueue(operation.entity);
-						ent.entityStackLength++;
-						break;
-					}
 
 					case EntityOperations.Action.Unbind:
 					{
@@ -152,10 +145,7 @@ namespace Pixeye.Framework
 								{
 									if (group.composition.OverlapComponents(components))
 										group.actionTryRemove(entityID);
-
-									if (groupsCheckedLen == groupsChecked.Length)
-										Array.Resize(ref groupsChecked, groupsCheckedLen << 1);
-
+ 
 									groupsChecked[groupsCheckedLen++] = group;
 								}
 							}
@@ -172,7 +162,10 @@ namespace Pixeye.Framework
 						components.amount = 0;
 						Entity.tags[entityID].Clear();
 
-						EntityOperations.Set(operation.entity, 0, EntityOperations.Action.KillFinalize);
+						ent.entityStack.Enqueue(operation.entity);
+						ent.entityStackLength++;
+
+
 						break;
 					}
 
@@ -182,29 +175,39 @@ namespace Pixeye.Framework
 						var mask       = Storage.masks[operation.arg];
 						var storage    = Storage.all[operation.arg];
 
-						Entity.generations[entityID, generation] &= ~mask;
-
-						for (int l = 0; l < storage.lenOfGroups; l++)
-							storage.groups[l].actionTryRemove(entityID);
-
-
-						for (int l = 0; l < storage.lenOfGroupsToCheck; l++)
+						#if UNITY_EDITOR
+						if (Entity.components[entityID].amount == 0)
 						{
-							var group = storage.groupsToCheck[l];
-
-							var composition = group.composition;
-							if (composition.Check(entityID)) continue;
-
-							var inGroup = group.length == 0 ? -1 : HelperArray.BinarySearch( ref  group.entities, entityID, 0, group.length);
-							if (inGroup == -1)
-								group.actionInsert(operation.entity);
+							Debug.LogError($"-> You are trying remove a component from already deleted entity: [{entityID}]");
+							continue;
 						}
+						#endif
+
+						//	if ((Entity.generations[entityID, generation] & mask) != mask) continue;
+
+						Entity.generations[entityID, generation] &= ~mask;
 
 						ref var components = ref Entity.components[entityID];
 						components.Remove(operation.arg);
 
+
+						for (int l = 0; l < storage.lenOfGroups; l++)
+						{
+							var group = storage.groups[l];
+
+							if (!group.composition.Check(entityID))
+								group.actionTryRemove(entityID);
+							else
+							{
+								var inGroup = group.length == 0 ? -1 : HelperArray.BinarySearch(ref group.entities, entityID, 0, group.length);
+								if (inGroup == -1)
+									group.actionInsert(operation.entity);
+							}
+						}
+
+
 						if (components.amount == 0)
-							EntityOperations.Set(operation.entity, 0, EntityOperations.Action.Empty);
+							EntityOperations.Delayed(operation.entity, 0, EntityOperations.Action.Empty);
 
 
 						break;
@@ -221,31 +224,29 @@ namespace Pixeye.Framework
 						}
 
 						Entity.tags[entityID].Clear();
-						Entity.cache[entityID].isAlive = false;
 						Entity.Count--;
 
-						EntityOperations.Set(operation.entity, 0, EntityOperations.Action.KillFinalize);
 
+						ent.entityStack.Enqueue(operation.entity);
+						ent.entityStackLength++;
 
 						break;
 					}
 
 					case EntityOperations.Action.ChangeTag:
 					{
-						if (!Entity.cache[entityID].isAlive) continue;
+						if (Entity.components[entityID].amount == 0) continue;
 
-						var index  = operation.arg;
-						var groups = HelperTags.inUseGroups.groupStorage[index];
+						var groups = HelperTags.inUseGroups.groupStorage[operation.arg]; // op.arg = index
 
 						for (int l = 0; l < groups.len; l++)
 						{
 							var group = groups.storage[l];
 
-							var composition = group.composition;
-							var canBeAdded  = composition.Check(entityID);
 
-							var inGroup = group.length == 0 ? -1 : HelperArray.BinarySearch( ref  group.entities, entityID, 0, group.length);
+							var canBeAdded = group.composition.Check(entityID);
 
+							var inGroup = group.length == 0 ? -1 : HelperArray.BinarySearch(ref group.entities, entityID, 0, group.length);
 							if (inGroup == -1)
 							{
 								if (!canBeAdded) continue;
@@ -270,9 +271,10 @@ namespace Pixeye.Framework
 							var componentID = components.Get(j);
 							var generation  = Storage.generations[componentID];
 							var mask        = Storage.masks[componentID];
-							var storage     = Storage.all[operation.arg];
+							var storage     = Storage.all[componentID];
+
 							Entity.generations[entityID, generation] |= mask;
-							storage                                  =  Storage.all[componentID];
+
 
 							for (int l = 0; l < storage.lenOfGroups; l++)
 							{
@@ -314,8 +316,8 @@ namespace Pixeye.Framework
 				}
 			}
 
-
 			EntityOperations.len = 0;
+			EntityOperations.SetDelayed();
 		}
 
 		protected override void OnDispose()

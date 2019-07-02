@@ -6,6 +6,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Unity.IL2CPP.CompilerServices;
+ 
+
 
 namespace Pixeye.Framework
 {
@@ -22,7 +24,7 @@ namespace Pixeye.Framework
 
 		public int GetHashCode(GroupCore obj)
 		{
-			return obj.id;
+			return obj.composition.hash;
 		}
 	}
 
@@ -98,107 +100,67 @@ namespace Pixeye.Framework
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		void Insert(in ent entity)
 		{
-			var entityID = entity.id;
-			var index    = length++;
-			var pointer  = index;
-			var last     = index - 1;
-
+			var left  = 0;
+			var index = 0;
+			var right = length++;
 
 			if (length >= entities.Length)
 				Array.Resize(ref entities, length << 1);
 
 
-			if (last >= 0)
+			while (right > left)
 			{
-				if (entityID < entities[last].id)
+				var midIndex = (right + left) / 2;
+
+				if (entities[midIndex].id == entity.id)
 				{
-					var startIndex = 0;
-					var endIndex   = last;
-
-					while (endIndex > startIndex)
-					{
-						var middleIndex = (endIndex + startIndex) / 2;
-						var middleValue = entities[middleIndex].id;
-
-						if (middleValue == entityID)
-						{
-							pointer = middleIndex;
-
-							break;
-						}
-
-						if (middleValue < entityID)
-						{
-							startIndex = middleIndex + 1;
-							pointer    = startIndex;
-						}
-						else
-						{
-							endIndex = middleIndex;
-							pointer  = endIndex;
-						}
-					}
+					index = midIndex;
+					break;
 				}
+
+				if (entities[midIndex].id < entity.id)
+					left = midIndex + 1;
+				else
+					right = midIndex;
+
+				index = left;
 			}
 
-			for (int i = index; i >= pointer; i--)
-				entities[i + 1] = entities[i];
-
-
-			entities[pointer] = entity;
-
+			Array.Copy(entities, index, entities, index + 1, length - index);
+			entities[index] = entity;
 			onAdd(entity);
 		}
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		void InsertNoCallback(in ent entity)
 		{
-			var entityID = entity.id;
-			var index    = length++;
-			var pointer  = index;
-			var last     = index - 1;
-
+			var left  = 0;
+			var index = 0;
+			var right = length++;
 
 			if (length >= entities.Length)
 				Array.Resize(ref entities, length << 1);
 
 
-			if (last >= 0)
+			while (right > left)
 			{
-				if (entityID < entities[last].id)
+				var midIndex = (right + left) / 2;
+
+				if (entities[midIndex].id == entity.id)
 				{
-					var startIndex = 0;
-					var endIndex   = last;
-
-					while (endIndex > startIndex)
-					{
-						var middleIndex = (endIndex + startIndex) / 2;
-						var middleValue = entities[middleIndex].id;
-
-						if (middleValue == entityID)
-						{
-							pointer = middleIndex;
-
-							break;
-						}
-
-						if (middleValue < entityID)
-						{
-							startIndex = middleIndex + 1;
-							pointer    = startIndex;
-						}
-						else
-						{
-							endIndex = middleIndex;
-							pointer  = endIndex;
-						}
-					}
+					index = midIndex;
+					break;
 				}
+
+				if (entities[midIndex].id < entity.id)
+					left = midIndex + 1;
+				else
+					right = midIndex;
+
+				index = left;
 			}
 
-			for (int i = index; i >= pointer; i--)
-				entities[i + 1] = entities[i];
-
-			entities[pointer] = entity;
+			Array.Copy(entities, index, entities, index + 1, length - index);
+			entities[index] = entity;
 		}
 
 		//===============================//

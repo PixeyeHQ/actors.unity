@@ -64,7 +64,7 @@ namespace Pixeye.Framework
 			#if ACTORS_NO_TAGS
 			return CanProceed(entityID) && !ExcludeTypes(entityID);
 			#else
-			return CanProceed(entityID) && (includeTags.Length == 0 || IncludeTags(entityID)) & (excludeTags.Length == 0 || ExcludeTags(entityID)) & !ExcludeTypes(entityID);
+			return CanProceed(entityID) && (includeTags.Length == 0 || IncludeTags(entityID)) & (excludeTags.Length == 0 || ExcludeTags(entityID)) && !ExcludeTypes(entityID);
 			#endif
 		}
 
@@ -72,10 +72,9 @@ namespace Pixeye.Framework
 		internal bool CanProceed(int entityID)
 		{
 			for (int ll = 0; ll < ids.Length; ll++)
-			{
-				var mask = ids[ll];
-				if ((Entity.generations[entityID, generations[ll]] & mask) != mask) return false;
-			}
+				if ((Entity.generations[entityID, generations[ll]] & ids[ll]) != ids[ll])
+					return false;
+
 			return true;
 		}
 

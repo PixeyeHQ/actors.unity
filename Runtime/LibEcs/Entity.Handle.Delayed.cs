@@ -2,15 +2,15 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Unity.IL2CPP.CompilerServices;
-
+ 
 namespace Pixeye.Framework
 {
 	[StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Unicode)]
-	readonly struct EntityOperation
+	struct EntityOperation
 	{
-		public readonly ent entity;
-		public readonly int arg;
-		public readonly EntityOperations.Action action;
+		public ent entity;
+		public int arg;
+		public EntityOperations.Action action;
 
 		public EntityOperation(in ent entity, int arg, EntityOperations.Action action)
 		{
@@ -29,28 +29,56 @@ namespace Pixeye.Framework
 			ChangeTag,
 			Remove,
 			Kill,
-			KillFinalize,
 			Empty,
 			Activate,
 			Deactivate,
 			Unbind,
 		}
 
-		public static EntityOperation[] operations = new EntityOperation[Entity.settings.SizeEntities];
-		public static int len;
+		internal static EntityOperation[] operationsDelayed = new EntityOperation[Entity.settings.SizeEntities];
+		internal static EntityOperation[] operations = new EntityOperation[Entity.settings.SizeEntities];
+		internal static int len;
+		internal static int lenDelayed;
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal static void Set(in ent entity, int arg, Action action)
 		{
-			if (len >= operations.Length)
-			{
-				var l = len << 1;
-				Array.Resize(ref operations, l);
-			}
+			if (len == operations.Length)
+				Array.Resize(ref operations, len << 1);
+ 
+			ref var operation = ref operations[len++];
+			operation.entity = entity;
+			operation.arg    = arg;
+			operation.action = action;
+		}
 
-			var     pointer   = len++;
-			ref var operation = ref operations[pointer];
-			operation = new EntityOperation(entity, arg, action);
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		internal static void Delayed(in ent entity, int arg, Action action)
+		{
+			if (lenDelayed == operationsDelayed.Length)
+				Array.Resize(ref operationsDelayed, lenDelayed << 1);
+			
+			ref var operation = ref operationsDelayed[lenDelayed++];
+			operation.entity = entity;
+			operation.arg    = arg;
+			operation.action = action;
+	 
+		}
+
+		internal static void SetDelayed()
+		{
+			for (int i = 0; i < lenDelayed; i++)
+			{
+				if (len == operations.Length)
+					Array.Resize(ref operations, len << 1);
+
+				ref var opDelayed = ref operationsDelayed[i];
+				ref var operation = ref operations[len++];
+				operation.entity = opDelayed.entity;
+				operation.arg    = opDelayed.arg;
+				operation.action = opDelayed.action;
+			}
+			lenDelayed = 0;
 		}
 	}
 }

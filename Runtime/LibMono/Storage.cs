@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Unity.IL2CPP.CompilerServices;
+using UnityEngine;
 
 namespace Pixeye.Framework
 {
@@ -23,9 +24,8 @@ namespace Pixeye.Framework
 		internal static int lastID;
 
 		internal GroupCore[] groups = new GroupCore[8];
-		internal GroupCore[] groupsToCheck = new GroupCore[8];
 		internal int lenOfGroups;
-		internal int lenOfGroupsToCheck;
+
 
 		public EntityAction DisposeAction = delegate { };
 
@@ -45,7 +45,7 @@ namespace Pixeye.Framework
 		public static int generation;
 
 		public int len = 0;
-   
+
 		public Func<T> Creator;
 		public T[] components = new T[Entity.settings.SizeEntities];
 
@@ -69,6 +69,8 @@ namespace Pixeye.Framework
 
 			var type = typeof(T);
 			typeNames.Add(type.GetHashCode(), componentID);
+
+ 
 		}
 
 
@@ -102,9 +104,10 @@ namespace Pixeye.Framework
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal override void AddGroupExclude(GroupCore groupCore)
 		{
-			if (lenOfGroupsToCheck == groupsToCheck.Length)
-				Array.Resize(ref groupsToCheck, lenOfGroupsToCheck << 1);
-			groupsToCheck[lenOfGroupsToCheck++] = groupCore;
+			if (lenOfGroups == groups.Length)
+				Array.Resize(ref groups, lenOfGroups << 1);
+
+			groups[lenOfGroups++] = groupCore;
 		}
 
 
@@ -115,7 +118,5 @@ namespace Pixeye.Framework
 			return (Entity.generations[entityID, generation] & componentMask) == componentMask ? components[entityID] : default;
 		}
 		#endif
-		
-		
 	}
 }

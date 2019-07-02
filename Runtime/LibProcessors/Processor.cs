@@ -8,7 +8,6 @@ namespace Pixeye.Framework
 {
 	public abstract class Processor : IDisposable
 	{
-
 		protected Processor()
 		{
 			ProcessorGroups.Setup(this);
@@ -25,7 +24,6 @@ namespace Pixeye.Framework
 		}
 
 
-		
 		protected virtual void OnDispose()
 		{
 		}
@@ -33,8 +31,6 @@ namespace Pixeye.Framework
 		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
 		static void Initialize()
 		{
- 
 		}
-		
 	}
 }

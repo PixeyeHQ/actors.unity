@@ -3,16 +3,15 @@
 
 using System;
 using Unity.IL2CPP.CompilerServices;
+using UnityEngine;
 
 namespace Pixeye.Framework
 {
 	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
 	sealed class DictionaryGroup
 	{
-
 		internal GroupCore[] storage = new GroupCore[10];
 		internal int len;
-
 	}
 
 	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
@@ -108,11 +107,10 @@ namespace Pixeye.Framework
 			tagsID[pointer]       = tagID;
 		}
 	}
-	
+
 	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
 	static class HelperDictionary
 	{
-
 		public static bool Contain(this DictionaryGroup container, GroupCore groupCore)
 		{
 			var len = container.len;
@@ -121,6 +119,7 @@ namespace Pixeye.Framework
 				var groupAdded = container.storage[i];
 				if (groupAdded.Equals(groupCore)) return true;
 			}
+
 			return false;
 		}
 
@@ -130,13 +129,11 @@ namespace Pixeye.Framework
 			for (int i = 0; i < len; i++)
 			{
 				var instance = container.storage[i];
-				var instanceType = instance.GetType();
-				var instanceComposition = instance.composition;
-
-				if (t != instanceType) continue;
-				if (!instanceComposition.Equals(composition)) continue;
-				group = instance;
-				return true;
+				if (instance.composition.hash.value == composition.hash.value)
+				{
+					group = instance;
+					return true;
+				}
 			}
 
 			group = default;
@@ -145,7 +142,7 @@ namespace Pixeye.Framework
 
 		public static GroupCore Add(this DictionaryGroup container, GroupCore group)
 		{
-			ref var len = ref container.len;
+			ref var len     = ref container.len;
 			ref var storage = ref container.storage;
 			if (len == storage.Length)
 			{
@@ -166,6 +163,5 @@ namespace Pixeye.Framework
 
 			container.len = 0;
 		}
-
 	}
 }

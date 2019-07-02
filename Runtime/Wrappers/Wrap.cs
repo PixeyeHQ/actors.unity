@@ -8,10 +8,8 @@ using UnityEngine;
 
 namespace Pixeye.Framework
 {
-
 	public class Wrap<TSource, TProp> : IWrap<TProp>
 	{
-
 		public TSource source;
 		public Func<TSource, TProp> prop;
 		public Action<TProp> callback;
@@ -33,7 +31,7 @@ namespace Pixeye.Framework
 			val = arg;
 			callback(val);
 		}
-		
+
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void Check()
 		{
@@ -49,10 +47,10 @@ namespace Pixeye.Framework
 		public void Dispose()
 		{
 			callback = null;
-			prop = null;
+			prop     = null;
 			comparer = null;
-			source = default;
-			val = default;
+			source   = default;
+			val      = default;
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -60,17 +58,15 @@ namespace Pixeye.Framework
 		{
 			return Equals(val, other);
 		}
-
 	}
 
 	public static class HelperWrapper
 	{
-
 		public static void ValueChange<TSource, TProp>(this TSource source, Func<TSource, TProp> propertySelector, Action<TProp> callback, ent e)
 		{
 			var w = new Wrap<TSource, TProp>();
-			w.source = source;
-			w.prop = propertySelector;
+			w.source   = source;
+			w.prop     = propertySelector;
 			w.callback = callback;
 
 			#if UNITY_EDITOR
@@ -86,9 +82,15 @@ namespace Pixeye.Framework
 			w.comparer = Comparers.storage[typeof(TProp).GetHashCode()]  as IEqualityComparer<TProp>;
 			#endif
 
-			var cObserver = e.Add<ComponentObserver>();
-
-			if (cObserver.length == cObserver.wrappers.Length)
+			ref var cObserver = ref e.Add<ComponentObserver>();
+			
+			#if ACTORS_COMPONENTS_STRUCTS
+			if (cObserver.wrappers == null)
+				cObserver.wrappers = new IWrap[2];
+			Debug.Log(cObserver.wrappers.Length);
+			#endif
+			
+			if (cObserver.length >= cObserver.wrappers.Length)
 				Array.Resize(ref cObserver.wrappers, cObserver.length << 1);
 
 			cObserver.wrappers[cObserver.length++] = w;
@@ -97,8 +99,8 @@ namespace Pixeye.Framework
 		public static ent ValueChange<TSource, TProp>(this TSource source, Func<TSource, TProp> propertySelector, Action<TProp> callback)
 		{
 			var w = new Wrap<TSource, TProp>();
-			w.source = source;
-			w.prop = propertySelector;
+			w.source   = source;
+			w.prop     = propertySelector;
 			w.callback = callback;
 
 			#if UNITY_EDITOR
@@ -114,8 +116,13 @@ namespace Pixeye.Framework
 			w.comparer = Comparers.storage[typeof(TProp).GetHashCode()]  as IEqualityComparer<TProp>;
 			#endif
 
-			var e = Entity.Create();
-			var cObserver = e.Add<ComponentObserver>();
+			var     e         = Entity.Create();
+			ref var cObserver = ref e.Set<ComponentObserver>();
+
+			#if ACTORS_COMPONENTS_STRUCTS
+			if (cObserver.wrappers == null)
+				cObserver.wrappers = new IWrap[2];
+			#endif
 
 			if (cObserver.length == cObserver.wrappers.Length)
 				Array.Resize(ref cObserver.wrappers, cObserver.length << 1);
@@ -129,7 +136,5 @@ namespace Pixeye.Framework
 		{
 			Components.DisposeComponentObserver(entity.id);
 		}
-
 	}
-
 }

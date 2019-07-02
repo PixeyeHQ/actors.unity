@@ -1,6 +1,7 @@
 //  Project : ecs.unity
 // Contacts : Pix - ask@pixeye.games
 
+#if UNITY_EDITOR
 using Pixeye.Framework;
 using UnityEngine;
 
@@ -12,10 +13,9 @@ namespace Pixeye.Source
 	sealed class ActorUtil : MonoBehaviour
 	{
 		ent entity;
-		public void Setup(ent entity)
-		{
-			this.entity = entity;
-		}
+		bool isAlive;
+		public void Setup(ent entity) => this.entity = entity;
+
 
 		#if ODIN_INSPECTOR
  	  [Sirenix.OdinInspector.Button]
@@ -24,14 +24,11 @@ namespace Pixeye.Source
 		#endif
 		void Activate()
 		{
-			unsafe
-			{
-				if (Entity.cache[entity.id].isAlive) return;
+			if (isAlive) return;
 
-				Entity.cache[entity.id].isAlive = true;
-				EntityOperations.Set(entity, 0, EntityOperations.Action.Activate);
-				gameObject.SetActive(true);
-			}
+			isAlive = true;
+			EntityOperations.Set(entity, -1, EntityOperations.Action.Activate);
+			gameObject.SetActive(true);
 		}
 
 		#if ODIN_INSPECTOR
@@ -41,15 +38,12 @@ namespace Pixeye.Source
 		#endif
 		void Deactivate()
 		{
-			unsafe
-			{
-				if (!Entity.cache[entity.id].isAlive) return;
+			if (!isAlive) return;
 
-				Entity.cache[entity.id].isAlive = false;
-				EntityOperations.Set(entity, 0, EntityOperations.Action.Deactivate);
-				gameObject.SetActive(false);
-			}
+			isAlive = false;
+			EntityOperations.Set(entity, 0, EntityOperations.Action.Deactivate);
+			gameObject.SetActive(false);
 		}
-		
 	}
 }
+#endif

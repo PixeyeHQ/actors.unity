@@ -4,13 +4,13 @@
 using System;
 using System.Reflection;
 using Unity.IL2CPP.CompilerServices;
+using UnityEngine;
 
 namespace Pixeye.Framework
 {
 	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
 	public sealed class ProcessorGroups
 	{
-
 		internal static DictionaryGroup container = new DictionaryGroup();
 
 		public static void Setup(object b)
@@ -25,7 +25,7 @@ namespace Pixeye.Framework
 			{
 				var myFieldInfo = objectFields[i];
 
-			 if (myFieldInfo.FieldType.IsSubclassOf(groupType))
+				if (myFieldInfo.FieldType.IsSubclassOf(groupType))
 				{
 					var groupByAttribute      = Attribute.GetCustomAttribute(myFieldInfo, typeof(GroupByAttribute)) as GroupByAttribute;
 					var groupExcludeAttribute = Attribute.GetCustomAttribute(myFieldInfo, typeof(GroupExcludeAttribute)) as GroupExcludeAttribute;
@@ -44,7 +44,8 @@ namespace Pixeye.Framework
 					composition.includeTags = includeTagsFilter;
 					composition.AddTypesExclude(excludeCompFilter);
 
-					composition.hash = HashCode.OfEach(composition.includeTags).And(17).AndEach(composition.excludeTags).And(31).AndEach(excludeCompFilter);
+
+					composition.hash = HashCode.OfEach(myFieldInfo.FieldType.GetGenericArguments()).AndEach(composition.includeTags).And(17).AndEach(composition.excludeTags).And(31).AndEach(excludeCompFilter);
 					myFieldInfo.SetValue(b, SetupGroup(myFieldInfo.FieldType, composition, myFieldInfo.GetValue(b)));
 				}
 			}
@@ -70,6 +71,5 @@ namespace Pixeye.Framework
 		{
 			container.Dispose();
 		}
-
 	}
 }

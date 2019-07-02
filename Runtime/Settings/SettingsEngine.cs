@@ -11,5 +11,6 @@ namespace Pixeye.Framework
 		public int SizeEntities = 1024;
 		public int SizeComponents = 256;
 		public int SizeGenerations = 4;
+		public int SizeProcessors = 256;
 	}
 }

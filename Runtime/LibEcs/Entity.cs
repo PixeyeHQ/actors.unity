@@ -14,7 +14,6 @@ namespace Pixeye.Framework
 	public struct Utils
 	{
 		public int id;
-		public bool isAlive;
 		public bool isPooled;
 		public byte age; // caching age of entity for retrivieng it in future. ( ParseBy method )
 	}
@@ -120,9 +119,9 @@ namespace Pixeye.Framework
 			components[id].amount = 0;
 
 			var ptrCache = &cache[id];
-			ptrCache->id       = id;
-			ptrCache->age      = age;
-			ptrCache->isAlive  = true;
+			ptrCache->id  = id;
+			ptrCache->age = age;
+
 			ptrCache->isPooled = pooled;
 
 			Count++;
@@ -197,10 +196,30 @@ namespace Pixeye.Framework
 		/// </summary>
 		/// <param name="entity"></param>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static void Deploy(in this ent entity)
+		internal static void Deploy(in this ent entity)
 		{
-			EntityOperations.Set(entity, 0, EntityOperations.Action.Activate);
+			EntityOperations.Set(entity, -1, EntityOperations.Action.Activate);
 		}
+
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static ref T AddGet<T>(in this ent entity)
+		{
+			#if UNITY_EDITOR
+			if (!entity.Exist)
+			{
+				Debug.LogError($"-> Entity [{entity.id}] is not active. You should not add components to inactive entity. ");
+				return ref Storage<T>.Get(entity.id);
+			}
+			#endif
+
+			if ((generations[entity.id, Storage<T>.generation] & Storage<T>.componentMask) != Storage<T>.componentMask)
+				EntityOperations.Set(entity, Storage<T>.componentID, EntityOperations.Action.Add);
+
+			return ref Storage<T>.Get(entity.id);
+		}
+
+
 		/// <summary>
 		/// Attach component to an entity and systems.
 		/// </summary>
@@ -211,10 +230,9 @@ namespace Pixeye.Framework
 		public static ref T Add<T>(in this ent entity)
 		{
 			#if UNITY_EDITOR
-			var entityID = entity.id;
-			if (!cache[entity.id].isAlive)
+			if (!entity.Exist)
 			{
-				Debug.LogError($"-> Entity with id: [{entityID}] is not active. You should not add components to inactive entity. ");
+				Debug.LogError($"-> Entity [{entity.id}] is not active. You should not add components to inactive entity. ");
 				return ref Storage<T>.Get(entity.id);
 			}
 			#endif
@@ -233,6 +251,7 @@ namespace Pixeye.Framework
 		public static void Add<T>(in this ent entity, T component)
 		{
 			EntityOperations.Set(entity, Storage<T>.componentID, EntityOperations.Action.Add);
+
 			#if !ACTORS_COMPONENTS_STRUCTS
 			ref var componentInStorage = ref Storage<T>.Instance.components[entity.id];
 			if (componentInStorage != null)
@@ -240,7 +259,6 @@ namespace Pixeye.Framework
  
       componentInStorage = component;
 			#else
-
 			ref var componentInStorage = ref Storage<T>.Instance.components[entity.id];
 			componentInStorage = component;
 			#endif
@@ -249,6 +267,16 @@ namespace Pixeye.Framework
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static void Remove<T>(in this ent entity)
 		{
+			#if UNITY_EDITOR
+
+			if (!entity.Exist)
+			{
+				Debug.LogError($"-> You are trying remove a component from already deleted entity: [{entity}]");
+				return;
+			}
+
+			#endif
+
 			EntityOperations.Set(entity, Storage<T>.componentID, EntityOperations.Action.Remove);
 		}
 

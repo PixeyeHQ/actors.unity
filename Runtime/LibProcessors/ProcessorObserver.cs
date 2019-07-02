@@ -4,11 +4,9 @@
 
 namespace Pixeye.Framework
 {
-
 	sealed class ProcessorObserver : Processor, ITick
 	{
-
-		public Group<ComponentObserver> groupObservers = new Group<ComponentObserver>();
+		Group<ComponentObserver> groupObservers = null;
 
 		public ProcessorObserver()
 		{
@@ -18,18 +16,16 @@ namespace Pixeye.Framework
 				for (int j = 0; j < cObserver.length; j++)
 					cObserver.wrappers[j].FirstTime();
 			};
-	
-			groupObservers.onRemove +=(in ent entity) => 
+
+			groupObservers.onRemove += (in ent entity) =>
 			{
-     		var cObserver = entity.ComponentObserver();
+				var cObserver = entity.ComponentObserver();
 				for (int j = 0; j < cObserver.length; j++)
 					cObserver.wrappers[j].Check();
-			} ;
-
-
+			};
 		}
-		
-		public unsafe void Tick(float delta)
+
+		public void Tick(float delta)
 		{
 			for (int i = 0; i < groupObservers.length; i++)
 			{
@@ -38,9 +34,5 @@ namespace Pixeye.Framework
 					cObserver.wrappers[j].Check();
 			}
 		}
-
 	}
-
- 
-
 }
