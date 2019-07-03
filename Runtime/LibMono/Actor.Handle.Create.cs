@@ -57,7 +57,7 @@ namespace Pixeye.Framework
 			#if ACTORS_DEBUG
 	  	var utils = GetComponent<ActorUtil>();
 		 	if (utils == null) utils = gameObject.AddComponent<ActorUtil>();
-	   	utils.Setup(entity);
+	   	utils.Setup(entity,isActiveAndEnabled);
 			#endif
 			#endif
 
@@ -109,7 +109,7 @@ namespace Pixeye.Framework
 			#if ACTORS_DEBUG
 			var utils = GetComponent<ActorUtil>();
 			if (utils == null) utils = gameObject.AddComponent<ActorUtil>();
-			utils.Setup(entity);
+			utils.Setup(entity, isActiveAndEnabled);
 			#endif
 			#endif
 
@@ -123,7 +123,11 @@ namespace Pixeye.Framework
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		void IRequireStarter.Launch()
 		{
-			Launch();
+ 
+			if (!entity.Exist)
+			{
+				Launch();
+			}
 		}
 
 

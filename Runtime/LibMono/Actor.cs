@@ -14,7 +14,7 @@ namespace Pixeye.Framework
 	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
 	public partial class Actor : MonoBehaviour, IRequireStarter, IActor
 	{
-		public ent entity;
+		public ent entity = -1;
 
 		#if UNITY_EDITOR
 		[FoldoutGroup("Main"), SerializeField, ReadOnly]
