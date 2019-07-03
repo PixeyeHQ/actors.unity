@@ -298,7 +298,7 @@ namespace Pixeye.Framework
 			#if !ACTORS_COMPONENTS_STRUCTS
 			ref var componentInStorage = ref Storage<T>.Instance.components[id];
 			if (componentInStorage != null)
-				storage.DisposeAction(entity);
+				Storage<T>.Instance.DisposeAction(entity);
 
 			componentInStorage = component;
 			#else
