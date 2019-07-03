@@ -33,7 +33,7 @@ Press Tools->Actors->Update Framework[GIT] to get new update when needed.
 * [Examples](https://github.com/dimmpixeye/CryoshockMini) ( In progress ) 
 * [Wiki](https://github.com/dimmpixeye/ecs/wiki) ( In progress ) 
  
-## Introduction
+## Basic
 
 ### Components
 Components are data containers without logic. In ACTORS Framework components can be either classes or structs. You should decide carefully from the start of the project what kind of layout ( class or structure ) you want to use as the workflow slightly differs.
@@ -301,4 +301,11 @@ The Starter class is the entry point of a game scene. You define all your Proces
                   }
          }
 ```
+
+## Actors
+The Actor is a monobehavior class that allows communicating between unity game objects and framework. Most of the time you will inherit from Actors when defining new objects.
+
+The Actor class is for defining what is your Entity. You use Actors only to add some components to the Entity, to have a connection between Framework and Unity out of the box and for initial setup of the object. You can use it as _view_ class if you like MVC patterns.
+
+####How to create
 
