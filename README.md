@@ -307,5 +307,30 @@ The Actor is a monobehavior class that allows communicating between unity game o
 
 The Actor class is for defining what is your Entity. You use Actors only to add some components to the Entity, to have a connection between Framework and Unity out of the box and for initial setup of the object. You can use it as _view_ class if you like MVC patterns.
 
-####How to create
+### How to create an Actor
 
+```csharp
+public class ActorModuleReactor : Actor
+    {
+       // use the FoldoutGroup attribute to decorate components nicely 
+       // in groups in the Unity Inspector
+       [FoldoutGroup("Setup")]
+        public ComponentStateMachine componentStateMachine;
+
+        [FoldoutGroup("Setup")]
+        public ComponentRecycle componentRecycle;
+
+        // Use setup method to define Actor.
+        protected override void Setup()
+        {
+             // add your components to the Entity of the Actor
+             entity.Set(componentStateMachine);
+             entity.Set(componentRecycle);
+             
+             // add a component by its type. 
+             entity.Set<ComponentDescription>;
+        }
+    }
+```
+
+[![Actor in the Inspector](https://i.gyazo.com/2bdd01853f4df82d3ddf6e8f06241b1f.gif)](https://gyazo.com/2bdd01853f4df82d3ddf6e8f06241b1f)
