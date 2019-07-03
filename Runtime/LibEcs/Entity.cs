@@ -174,10 +174,9 @@ namespace Pixeye.Framework
 			return ref Storage<T>.Instance.components[id];
 			#else
 			ref var val = ref Storage<T>.Instance.components[id];
-			if (val == null)
+			if ( val == null)
 				val = Storage<T>.Instance.Creator();
-
-
+ 
 			return ref Storage<T>.Instance.components[id];
 			#endif
 		}

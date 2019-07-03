@@ -86,8 +86,7 @@ namespace Pixeye.Framework
 			if (val == null)
 				val = Instance.Creator();
 			#endif
-
-
+			
 			return ref Instance.components[entityID];
 		}
 

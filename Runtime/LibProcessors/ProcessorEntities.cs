@@ -2,7 +2,7 @@
 // Contacts : Pix - info@pixeye.games
 //     Date : 3/7/2019 
 
- 
+
 using Unity.IL2CPP.CompilerServices;
 using UnityEngine;
 
@@ -18,8 +18,9 @@ namespace Pixeye.Framework
 		bool AlreadyChecked(GroupCore group)
 		{
 			for (int i = 0; i < groupsCheckedLen; i++)
-				if (groupsChecked[i].id == group.id) return true;
-			
+				if (groupsChecked[i].id == group.id)
+					return true;
+
 			return false;
 		}
 
@@ -37,7 +38,6 @@ namespace Pixeye.Framework
 				{
 					case EntityOperations.Action.Add:
 					{
-				 
 						var componentID = operation.arg;
 						var storage     = Storage.all[componentID];
 						var generation  = Storage.generations[componentID];
@@ -64,13 +64,12 @@ namespace Pixeye.Framework
 								group.actionInsert(operation.entity);
 						}
 
- 
+
 						break;
 					}
 
 					case EntityOperations.Action.Kill:
 					{
-	 
 						ref var components = ref Entity.components[entityID];
 						var     length     = components.amount;
 
@@ -93,7 +92,7 @@ namespace Pixeye.Framework
 									if (group.composition.OverlapComponents(components))
 										group.actionTryRemove(entityID);
 
-					 
+
 									groupsChecked[groupsCheckedLen++] = group;
 								}
 							}
@@ -120,7 +119,7 @@ namespace Pixeye.Framework
 
 						ent.entityStack.Enqueue(operation.entity);
 						ent.entityStackLength++;
- 
+
 						break;
 					}
 
@@ -147,7 +146,7 @@ namespace Pixeye.Framework
 								{
 									if (group.composition.OverlapComponents(components))
 										group.actionTryRemove(entityID);
- 
+
 									groupsChecked[groupsCheckedLen++] = group;
 								}
 							}
@@ -173,7 +172,6 @@ namespace Pixeye.Framework
 
 					case EntityOperations.Action.Remove:
 					{
-			 
 						var generation = Storage.generations[operation.arg];
 						var mask       = Storage.masks[operation.arg];
 						var storage    = Storage.all[operation.arg];
@@ -210,9 +208,9 @@ namespace Pixeye.Framework
 
 
 						if (components.amount == 0)
-							EntityOperations.Delayed(operation.entity, 0, EntityOperations.Action.Empty);
+							EntityOperations.Set(operation.entity, 0, EntityOperations.Action.Empty);
 
-		 
+
 						break;
 					}
 
@@ -266,7 +264,6 @@ namespace Pixeye.Framework
 
 					case EntityOperations.Action.Activate:
 					{
-			 
 						ref var components = ref Entity.components[entityID];
 						var     length     = components.amount;
 
@@ -289,7 +286,7 @@ namespace Pixeye.Framework
 							}
 						}
 
- 
+
 						break;
 					}
 
@@ -321,7 +318,6 @@ namespace Pixeye.Framework
 			}
 
 			EntityOperations.len = 0;
-			EntityOperations.SetDelayed();
 		}
 
 		protected override void OnDispose()

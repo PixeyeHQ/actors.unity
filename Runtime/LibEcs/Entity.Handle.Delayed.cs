@@ -35,7 +35,7 @@ namespace Pixeye.Framework
 			Unbind,
 		}
 
-		internal static EntityOperation[] operationsDelayed = new EntityOperation[Entity.settings.SizeEntities];
+		//internal static EntityOperation[] operationsDelayed = new EntityOperation[Entity.settings.SizeEntities];
 		internal static EntityOperation[] operations = new EntityOperation[Entity.settings.SizeEntities];
 		internal static int len;
 		internal static int lenDelayed;
@@ -52,33 +52,33 @@ namespace Pixeye.Framework
 			operation.action = action;
 		}
 
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		internal static void Delayed(in ent entity, int arg, Action action)
-		{
-			if (lenDelayed == operationsDelayed.Length)
-				Array.Resize(ref operationsDelayed, lenDelayed << 1);
-			
-			ref var operation = ref operationsDelayed[lenDelayed++];
-			operation.entity = entity;
-			operation.arg    = arg;
-			operation.action = action;
-	 
-		}
+		// [MethodImpl(MethodImplOptions.AggressiveInlining)]
+		// internal static void Delayed(in ent entity, int arg, Action action)
+		// {
+		// 	if (lenDelayed == operationsDelayed.Length)
+		// 		Array.Resize(ref operationsDelayed, lenDelayed << 1);
+		// 	
+		// 	ref var operation = ref operationsDelayed[lenDelayed++];
+		// 	operation.entity = entity;
+		// 	operation.arg    = arg;
+		// 	operation.action = action;
+	 //
+		// }
 
-		internal static void SetDelayed()
-		{
-			for (int i = 0; i < lenDelayed; i++)
-			{
-				if (len == operations.Length)
-					Array.Resize(ref operations, len << 1);
-
-				ref var opDelayed = ref operationsDelayed[i];
-				ref var operation = ref operations[len++];
-				operation.entity = opDelayed.entity;
-				operation.arg    = opDelayed.arg;
-				operation.action = opDelayed.action;
-			}
-			lenDelayed = 0;
-		}
+		// internal static void SetDelayed()
+		// {
+		// 	for (int i = 0; i < lenDelayed; i++)
+		// 	{
+		// 		if (len == operations.Length)
+		// 			Array.Resize(ref operations, len << 1);
+		//
+		// 		ref var opDelayed = ref operationsDelayed[i];
+		// 		ref var operation = ref operations[len++];
+		// 		operation.entity = opDelayed.entity;
+		// 		operation.arg    = opDelayed.arg;
+		// 		operation.action = opDelayed.action;
+		// 	}
+		// 	lenDelayed = 0;
+		// }
 	}
 }

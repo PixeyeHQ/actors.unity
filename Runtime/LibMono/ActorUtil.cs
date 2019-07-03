@@ -13,12 +13,12 @@ namespace Pixeye.Source
 	sealed class ActorUtil : MonoBehaviour
 	{
 		ent entity;
-		bool isAlive; 
-		public void Setup(ent entity, bool isAlive) {
-this.entity = entity;
-this.isAlive = isAlive;
- 
-        }  
+		bool isAlive;
+		public void Setup(ent entity, bool isAlive)
+		{
+			this.entity  = entity;
+			this.isAlive = isAlive;
+		}
 
 
 		#if ODIN_INSPECTOR
@@ -48,16 +48,12 @@ this.isAlive = isAlive;
 			EntityOperations.Set(entity, 0, EntityOperations.Action.Deactivate);
 			gameObject.SetActive(false);
 		}
-	
-
-        void OnDestroy(){
-          
-			  if (entity.Exist) entity.Release();
-}
 
 
-
-
-}
+		void OnDestroy()
+		{
+			if (entity.Exist) entity.Release();
+		}
+	}
 }
 #endif

@@ -53,6 +53,14 @@ namespace Pixeye.Framework
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		static public void Populate(int size,out ent[] arr)
+		{
+			arr = new ent[size];
+			for (int i = 0; i < size; i++)
+				arr[i] = new ent(-1);
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public int CompareTo(int value)
 		{
 			if (id < value)
@@ -104,8 +112,7 @@ namespace Pixeye.Framework
 				return;
 			}
 			#endif
-
-
+     
 			EntityOperations.Set(this, 0, EntityOperations.Action.Kill);
 			Entity.Count--;
 		}
