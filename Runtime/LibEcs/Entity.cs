@@ -164,8 +164,22 @@ namespace Pixeye.Framework
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static ref T Set<T>(in this ent entity)
 		{
-			components[entity.id].Add(Storage<T>.componentID);
-			return ref Storage<T>.Get(entity.id);
+			var id = entity.id;
+			components[id].Add(Storage<T>.componentID);
+
+			if (id >= Storage<T>.Instance.components.Length)
+				Array.Resize(ref Storage<T>.Instance.components, id << 1);
+
+			#if ACTORS_COMPONENTS_STRUCTS
+			return ref Storage<T>.Instance.components[id];
+			#else
+			ref var val = ref Storage<T>.Instance.components[id];
+			if (val == null)
+				val = Storage<T>.Instance.Creator();
+
+
+			return ref Storage<T>.Instance.components[id];
+			#endif
 		}
 		/// <summary>
 		/// Used in Models and Actors for setting up components to Storage. Doesn't send the component to systems.
@@ -176,17 +190,17 @@ namespace Pixeye.Framework
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static void Set<T>(in this ent entity, T component)
 		{
-			components[entity.id].Add(Storage<T>.componentID);
+			var id = entity.id;
+			components[id].Add(Storage<T>.componentID);
 
 			#if !ACTORS_COMPONENTS_STRUCTS
-			ref var componentInStorage = ref Storage<T>.Instance.components[entity.id];
+			ref var componentInStorage = ref Storage<T>.Instance.components[id];
 			if (componentInStorage != null)
 				Storage<T>.Instance.DisposeAction(entity);
- 
-      componentInStorage = component;
-			#else
 
-			ref var componentInStorage = ref Storage<T>.Instance.components[entity.id];
+			componentInStorage = component;
+			#else
+			ref var componentInStorage = ref Storage<T>.Instance.components[id];
 			componentInStorage = component;
 			#endif
 		}
@@ -205,18 +219,31 @@ namespace Pixeye.Framework
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static ref T AddGet<T>(in this ent entity)
 		{
+			var id = entity.id;
 			#if UNITY_EDITOR
 			if (!entity.Exist)
 			{
-				Debug.LogError($"-> Entity [{entity.id}] is not active. You should not add components to inactive entity. ");
-				return ref Storage<T>.Get(entity.id);
+				Debug.LogError($"-> Entity [{id}] is not active. You should not add components to inactive entity. ");
+				return ref Storage<T>.Get(id);
 			}
 			#endif
 
-			if ((generations[entity.id, Storage<T>.generation] & Storage<T>.componentMask) != Storage<T>.componentMask)
+			if ((generations[id, Storage<T>.generation] & Storage<T>.componentMask) != Storage<T>.componentMask)
 				EntityOperations.Set(entity, Storage<T>.componentID, EntityOperations.Action.Add);
 
-			return ref Storage<T>.Get(entity.id);
+			if (id >= Storage<T>.Instance.components.Length)
+				Array.Resize(ref Storage<T>.Instance.components, id << 1);
+
+			#if ACTORS_COMPONENTS_STRUCTS
+			return ref Storage<T>.Instance.components[id];
+			#else
+			ref var val = ref Storage<T>.Instance.components[id];
+			if (val == null)
+				val = Storage<T>.Instance.Creator();
+
+
+			return ref Storage<T>.Instance.components[id];
+			#endif
 		}
 
 
@@ -229,16 +256,30 @@ namespace Pixeye.Framework
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static ref T Add<T>(in this ent entity)
 		{
+			var id = entity.id;
+
 			#if UNITY_EDITOR
 			if (!entity.Exist)
 			{
-				Debug.LogError($"-> Entity [{entity.id}] is not active. You should not add components to inactive entity. ");
-				return ref Storage<T>.Get(entity.id);
+				Debug.LogError($"-> Entity [{id}] is not active. You should not add components to inactive entity. ");
+				return ref Storage<T>.Get(id);
 			}
 			#endif
 
 			EntityOperations.Set(entity, Storage<T>.componentID, EntityOperations.Action.Add);
-			return ref Storage<T>.Get(entity.id);
+			if (id >= Storage<T>.Instance.components.Length)
+				Array.Resize(ref Storage<T>.Instance.components, id << 1);
+
+			#if ACTORS_COMPONENTS_STRUCTS
+			return ref Storage<T>.Instance.components[id];
+			#else
+			ref var val = ref Storage<T>.Instance.components[id];
+			if (val == null)
+				val = Storage<T>.Instance.Creator();
+
+
+			return ref Storage<T>.Instance.components[id];
+			#endif
 		}
 
 		/// <summary>
@@ -250,16 +291,18 @@ namespace Pixeye.Framework
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static void Add<T>(in this ent entity, T component)
 		{
+			var id = entity.id;
+
 			EntityOperations.Set(entity, Storage<T>.componentID, EntityOperations.Action.Add);
 
 			#if !ACTORS_COMPONENTS_STRUCTS
-			ref var componentInStorage = ref Storage<T>.Instance.components[entity.id];
+			ref var componentInStorage = ref Storage<T>.Instance.components[id];
 			if (componentInStorage != null)
-				Storage<T>.Instance.DisposeAction(entity);
- 
-      componentInStorage = component;
+				storage.DisposeAction(entity);
+
+			componentInStorage = component;
 			#else
-			ref var componentInStorage = ref Storage<T>.Instance.components[entity.id];
+			ref var componentInStorage = ref Storage<T>.Instance.components[id];
 			componentInStorage = component;
 			#endif
 		}

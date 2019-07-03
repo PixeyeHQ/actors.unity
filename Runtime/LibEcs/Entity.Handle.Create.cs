@@ -8,6 +8,7 @@ namespace Pixeye.Framework
 	{
 		public static ent Create()
 		{
+	 
 			int  id;
 			byte age = 0;
 
@@ -30,7 +31,7 @@ namespace Pixeye.Framework
 			entity.id  = id;
 			entity.age = age;
 			Initialize(id, age);
-			EntityOperations.Set(entity, -1, EntityOperations.Action.Activate);
+		 	EntityOperations.Set(entity, -1, EntityOperations.Action.Activate);
 			return entity;
 		}
 		public static ent Create(ModelComposer model)

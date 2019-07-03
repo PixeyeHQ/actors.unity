@@ -37,6 +37,7 @@ namespace Pixeye.Framework
 				{
 					case EntityOperations.Action.Add:
 					{
+				 
 						var componentID = operation.arg;
 						var storage     = Storage.all[componentID];
 						var generation  = Storage.generations[componentID];
@@ -63,12 +64,13 @@ namespace Pixeye.Framework
 								group.actionInsert(operation.entity);
 						}
 
-
+ 
 						break;
 					}
 
 					case EntityOperations.Action.Kill:
 					{
+	 
 						ref var components = ref Entity.components[entityID];
 						var     length     = components.amount;
 
@@ -118,7 +120,7 @@ namespace Pixeye.Framework
 
 						ent.entityStack.Enqueue(operation.entity);
 						ent.entityStackLength++;
-
+ 
 						break;
 					}
 
@@ -171,6 +173,7 @@ namespace Pixeye.Framework
 
 					case EntityOperations.Action.Remove:
 					{
+			 
 						var generation = Storage.generations[operation.arg];
 						var mask       = Storage.masks[operation.arg];
 						var storage    = Storage.all[operation.arg];
@@ -209,7 +212,7 @@ namespace Pixeye.Framework
 						if (components.amount == 0)
 							EntityOperations.Delayed(operation.entity, 0, EntityOperations.Action.Empty);
 
-
+		 
 						break;
 					}
 
@@ -263,6 +266,7 @@ namespace Pixeye.Framework
 
 					case EntityOperations.Action.Activate:
 					{
+			 
 						ref var components = ref Entity.components[entityID];
 						var     length     = components.amount;
 
@@ -285,7 +289,7 @@ namespace Pixeye.Framework
 							}
 						}
 
-
+ 
 						break;
 					}
 
