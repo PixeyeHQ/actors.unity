@@ -51,7 +51,7 @@ this.isAlive = isAlive;
 	
 
         void OnDestroy(){
-               Debug.Log(entity);
+          
 			  if (entity.Exist) entity.Release();
 }
 
