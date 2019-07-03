@@ -172,7 +172,6 @@ public void SomeMethod()
 }
 ```
 In case you want to setup your new entity it's better to use ```Set``` Method. Use ```Set``` method only with newly created entities.
-At the end of your setup call ```Deploy``` method. 
 
 ```csharp
 public void SomeMethod()
@@ -188,9 +187,6 @@ public void SomeMethod()
      cCute.attractivness = float.PositiveInfinity;
      // Component Jumping
      cJumping.power = 100;
-
-     // Send entity to the game.
-     e.Deploy();
 }
 ```
 
