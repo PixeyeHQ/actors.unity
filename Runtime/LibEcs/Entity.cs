@@ -260,7 +260,7 @@ namespace Pixeye.Framework
 			#if UNITY_EDITOR
 			if (!entity.Exist)
 			{
-				Debug.LogError($"-> Entity [{id}] is not active. You should not add components to inactive entity. ");
+				Debug.LogError($"-> Entity [{id}] is not active. You should not add components to inactive entity, [{Storage<T>.Instance.componentType}] ");
 				return ref Storage<T>.Get(id);
 			}
 			#endif

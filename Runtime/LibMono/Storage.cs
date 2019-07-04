@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Unity.IL2CPP.CompilerServices;
-using UnityEngine;
 
 namespace Pixeye.Framework
 {
@@ -28,7 +27,7 @@ namespace Pixeye.Framework
 
 
 		public EntityAction DisposeAction = delegate { };
-
+		public Type componentType;
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal abstract void AddGroupExclude(GroupCore groupCore);
@@ -49,7 +48,7 @@ namespace Pixeye.Framework
 		public Func<T> Creator;
 		public T[] components = new T[Entity.settings.SizeEntities];
 
-		public T this[int index] => components[index];
+		public ref T this[int index] => ref components[index];
 
 		public Storage()
 		{
@@ -69,8 +68,8 @@ namespace Pixeye.Framework
 
 			var type = typeof(T);
 			typeNames.Add(type.GetHashCode(), componentID);
+			componentType = type;
 
- 
 		}
 
 

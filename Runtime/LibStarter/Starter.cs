@@ -19,7 +19,7 @@ namespace Pixeye.Framework
 	public class Starter : MonoBehaviour
 	{
 		public static bool initialized;
-		
+
 		#if ODIN_INSPECTOR
 		[FoldoutGroup("Setup")]
 		#else
@@ -40,15 +40,12 @@ namespace Pixeye.Framework
 		void Awake()
 		{
 			if (ProcessorUpdate.Default == null)
-			{
 				ProcessorUpdate.Create();
-			}
 
 			ProcessorScene.Default.Setup(ScenesToKeep, SceneDependsOn, this);
 		}
 
 		#if UNITY_EDITOR
-
 		public void ClearNodes()
 		{
 			for (int i = 0; i < nodes.Count; i++)
@@ -60,7 +57,6 @@ namespace Pixeye.Framework
 
 			nodes.Clear();
 		}
-
 		public void AddToNode(GameObject prefab, GameObject instance, int pool)
 		{
 			var id                  = prefab.GetInstanceID();
@@ -111,7 +107,6 @@ namespace Pixeye.Framework
 				nodes.Add(node);
 			}
 		}
-
 		public void RemoveFromNode(GameObject instance, int pool)
 		{
 			GameObject prefab;
@@ -136,37 +131,28 @@ namespace Pixeye.Framework
 				}
 			}
 		}
-
 		#endif
 
 		public void BindScene()
 		{
 			for (int i = 0; i < nodes.Count; i++)
-			{
 				nodes[i].Populate();
-			}
 
 			Add<ProcessorEntities>();
 			Add<ProcessorObserver>();
-			
+
 			Setup();
 
-
 			for (int i = 0; i < ProcessorGroups.container.len; i++)
-			{
 				ProcessorGroups.container.storage[i].AddCallbacks();
-			}
-		 
-			
-			
+
+
 			initialized = true;
 
 			var objs = FindObjectsOfType<MonoBehaviour>().OfType<IRequireStarter>();
-
 			foreach (var obj in objs)
-			{
 				obj.Launch();
-			}
+
 
 			Timer.Add(Time.deltaFixed, PostSetup);
 		}
@@ -193,5 +179,20 @@ namespace Pixeye.Framework
 		{
 			initialized = false;
 		}
+	}
+
+
+	//===============================//
+	// FEATURES
+	//===============================//
+
+	public abstract class Feature : IAwake
+	{
+		public void Add<T>() where T : new()
+		{
+			Toolbox.Add<T>();
+		}
+
+		public abstract void OnAwake();
 	}
 }

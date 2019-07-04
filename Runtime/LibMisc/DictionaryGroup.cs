@@ -129,6 +129,8 @@ namespace Pixeye.Framework
 			for (int i = 0; i < len; i++)
 			{
 				var instance = container.storage[i];
+				if (t != instance.GetType()) continue;
+
 				if (instance.composition.hash.value == composition.hash.value)
 				{
 					group = instance;

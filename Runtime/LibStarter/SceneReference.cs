@@ -12,7 +12,6 @@ namespace Pixeye.Framework
 
 		[SerializeField]
 		private Object sceneAsset;
-
 		[SerializeField]
 		private string sceneName = "";
 

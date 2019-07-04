@@ -179,7 +179,7 @@ namespace Pixeye.Framework
 						#if UNITY_EDITOR
 						if (Entity.components[entityID].amount == 0)
 						{
-							Debug.LogError($"-> You are trying remove a component from already deleted entity: [{entityID}]");
+							Debug.LogError($"-> You are trying remove a component from already deleted entity: [{entityID}],   [{storage.componentType}]");
 							continue;
 						}
 						#endif

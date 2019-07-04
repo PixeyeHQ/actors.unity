@@ -4,10 +4,10 @@
 using System;
 using System.Reflection;
 using Unity.IL2CPP.CompilerServices;
-using UnityEngine;
 
 namespace Pixeye.Framework
 {
+	// TODO: refactor.
 	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
 	public sealed class ProcessorGroups
 	{
@@ -57,6 +57,7 @@ namespace Pixeye.Framework
 			{
 				return group;
 			}
+
 
 			if (fieldObj != null)
 			{

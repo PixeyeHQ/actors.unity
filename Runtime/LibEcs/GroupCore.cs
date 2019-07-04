@@ -5,8 +5,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using Unity.IL2CPP.CompilerServices;
- 
 
 
 namespace Pixeye.Framework
@@ -38,8 +38,6 @@ namespace Pixeye.Framework
 
 		public ent[] entities = new ent[Entity.settings.SizeEntities];
 		public int length;
-
-
 		public EntityAction onAdd;
 		public EntityAction onRemove;
 
@@ -48,9 +46,11 @@ namespace Pixeye.Framework
 		internal DelRemove actionRemove;
 
 		protected internal Composition composition;
+
 		internal int id;
 
 		int position;
+
 
 		public ref ent this[int index]
 		{
@@ -64,11 +64,14 @@ namespace Pixeye.Framework
 			entities[index].Release();
 		}
 
+
 		internal GroupCore Start(Composition composition)
 		{
 			this.composition = composition;
 			composition.SetupExcludeTypes(this);
 			HelperTags.Add(this);
+
+
 			Initialize();
 			return this;
 		}
@@ -200,6 +203,7 @@ namespace Pixeye.Framework
 			Array.Copy(entities, i + 1, entities, i, length-- - i);
 		}
 
+
 		public GroupCore()
 		{
 			id = idCounter++;
@@ -209,10 +213,166 @@ namespace Pixeye.Framework
 
 		public void Dispose()
 		{
+			// base
 			onAdd    = null;
 			onRemove = null;
 			length   = 0;
+
+			//parallel
+			for (int i = 0; i < segmentGroups.Length; i++)
+			{
+				var d = segmentGroups[i];
+				d.thread.Interrupt();
+				d.thread.Join(5);
+				syncs[i].Close();
+				segmentGroups[i] = null;
+			}
+
+			segmentGroupLocal = null;
 		}
+
+		//===============================//
+		// Concurrent
+		//===============================//
+
+		SegmentGroup segmentGroupLocal;
+		SegmentGroup[] segmentGroups;
+		ManualResetEvent[] syncs;
+
+
+		int threadsAmount = Environment.ProcessorCount - 1;
+		int entitiesPerThreadMin = 5000;
+		int entitiesPerThread;
+
+		HandleSegmentGroup jobAction;
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public void MakeConcurrent(int minEntities, int threads, HandleSegmentGroup jobAction)
+		{
+			this.jobAction = jobAction;
+
+			segmentGroupLocal        = new SegmentGroup();
+			segmentGroupLocal.source = this;
+
+
+			segmentGroups = new SegmentGroup[threadsAmount];
+			syncs         = new ManualResetEvent[threadsAmount];
+
+			for (int i = 0; i < threadsAmount; i++)
+			{
+				ref var nextSegment = ref segmentGroups[i];
+				nextSegment                     = new SegmentGroup();
+				nextSegment.thread              = new Thread(HandleThread);
+				nextSegment.thread.IsBackground = true;
+				nextSegment.HasWork             = new ManualResetEvent(false);
+				nextSegment.WorkDone            = new ManualResetEvent(true);
+				nextSegment.source              = this;
+
+				syncs[i] = nextSegment.WorkDone;
+
+				nextSegment.thread.Start(nextSegment);
+			}
+		}
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public void Execute(float delta)
+		{
+			if (length > 0)
+			{
+				var entitiesNext      = 0;
+				var threadsInWork     = 0;
+				var entitiesPerThread = length / (threadsAmount + 1);
+				if (entitiesPerThread > entitiesPerThreadMin)
+				{
+					threadsInWork = threadsAmount + 1;
+				}
+				else
+				{
+					threadsInWork     = length / entitiesPerThreadMin;
+					entitiesPerThread = entitiesPerThreadMin;
+				}
+
+
+				for (var i = 0; i < threadsInWork - 1; i++)
+				{
+					var nextSegmentGroup = segmentGroups[i];
+					nextSegmentGroup.delta     = delta;
+					nextSegmentGroup.indexFrom = entitiesNext;
+					nextSegmentGroup.indexTo   = entitiesNext += entitiesPerThread;
+
+					nextSegmentGroup.WorkDone.Reset();
+					nextSegmentGroup.HasWork.Set();
+				}
+
+				segmentGroupLocal.indexFrom = entitiesNext;
+				segmentGroupLocal.indexTo   = length;
+				segmentGroupLocal.delta     = delta;
+				jobAction(segmentGroupLocal);
+
+				for (var i = 0; i < syncs.Length; i++)
+				{
+					syncs[i].WaitOne();
+				}
+			}
+		}
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public void Execute()
+		{
+			if (length > 0)
+			{
+				var entitiesNext      = 0;
+				var threadsInWork     = 0;
+				var entitiesPerThread = length / (threadsAmount + 1);
+				if (entitiesPerThread > entitiesPerThreadMin)
+				{
+					threadsInWork = threadsAmount + 1;
+				}
+				else
+				{
+					threadsInWork     = length / entitiesPerThreadMin;
+					entitiesPerThread = entitiesPerThreadMin;
+				}
+
+
+				for (var i = 0; i < threadsInWork - 1; i++)
+				{
+					var nextSegmentGroup = segmentGroups[i];
+					nextSegmentGroup.indexFrom = entitiesNext;
+					nextSegmentGroup.indexTo   = entitiesNext += entitiesPerThread;
+
+					nextSegmentGroup.WorkDone.Reset();
+					nextSegmentGroup.HasWork.Set();
+				}
+
+				segmentGroupLocal.indexFrom = entitiesNext;
+				segmentGroupLocal.indexTo   = length;
+				jobAction(segmentGroupLocal);
+
+				for (var i = 0; i < syncs.Length; i++)
+				{
+					syncs[i].WaitOne();
+				}
+			}
+		}
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		protected void HandleThread(object objSegmentGroup)
+		{
+			var segmentGroup = (SegmentGroup) objSegmentGroup;
+			try
+			{
+				while (Thread.CurrentThread.IsAlive)
+				{
+					segmentGroup.HasWork.WaitOne();
+					segmentGroup.HasWork.Reset();
+
+					jobAction(segmentGroup);
+					segmentGroup.WorkDone.Set();
+				}
+			}
+			catch
+			{
+			}
+		}
+
 
 		#region EQUALS
 
@@ -244,7 +404,7 @@ namespace Pixeye.Framework
 
 		public Enumerator GetEnumerator()
 		{
-			return new Enumerator(this, length);
+			return new Enumerator(this);
 		}
 
 		IEnumerator IEnumerable.GetEnumerator()
@@ -256,20 +416,19 @@ namespace Pixeye.Framework
 		{
 			GroupCore g;
 			int position;
-			int length;
+
 
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			internal Enumerator(GroupCore g, int length)
+			internal Enumerator(GroupCore g)
 			{
-				position    = -1;
-				this.g      = g;
-				this.length = length;
+				position = -1;
+				this.g   = g;
 			}
 
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			public bool MoveNext()
 			{
-				return ++position < length;
+				return ++position < g.length;
 			}
 
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -289,11 +448,13 @@ namespace Pixeye.Framework
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			public void Dispose()
 			{
+				g = null;
 			}
 		}
 
 		#endregion
 	}
+
 
 	public class Group<T> : GroupCore
 	{
