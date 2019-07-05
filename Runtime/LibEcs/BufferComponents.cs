@@ -51,18 +51,26 @@ namespace Pixeye.Framework
 			{
 				if (ids[i] == typeConverted)
 				{
-					RemoveAt(i);
+
+
+					for (int j = i; j < amount - 1; ++j)
+						ids[j] = ids[j + 1];
+
+					amount--;
+					
+					
+					//RemoveAt(i);
 					break;
 				}
 			}
 		}
 
-		public void RemoveAt(int index)
-		{
-			for (int i = index; i < amount - 1; ++i)
-				ids[i] = ids[i + 1];
-
-			amount--;
-		}
+		// public void RemoveAt(int index)
+		// {
+		// 	for (int i = index; i < amount - 1; ++i)
+		// 		ids[i] = ids[i + 1];
+		//
+		// 	amount--;
+		// }
 	}
 }

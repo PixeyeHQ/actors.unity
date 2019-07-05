@@ -15,32 +15,16 @@ namespace Pixeye.Framework
 	[InitializeOnLoad]
 	public class PostHandleSymbols : Editor
 	{
-
-//		/// <summary>
-//		/// Symbols that will be added to the editor
-//		/// </summary>
-//		public static readonly string[] Symbols =
-//		{
-////			"ACTORS_TAGS_24"
-//		};
-
 		/// <summary>
 		/// Add define symbols as soon as Unity gets done compiling.
 		/// </summary>
 		static PostHandleSymbols()
 		{
-//		  string       definesString = PlayerSettings.GetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup);
-//			List<string> allDefines    = definesString.Split(';').ToList();
-//			allDefines.AddRange(Symbols.Except(allDefines));
-//			PlayerSettings.SetScriptingDefineSymbolsForGroup(
-//					EditorUserBuildSettings.selectedBuildTargetGroup,
-//					string.Join(";", allDefines.ToArray()));
-
 			string definesString = PlayerSettings.GetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup);
-			List<string> allDefines = definesString.Split(';').ToList();
+			var    allDefines    = definesString.Split(';').ToList();
 
 			var index = allDefines.FindIndex(d => d.Contains("ACTORS_TAGS"));
-			var str = string.Empty;
+			var str   = string.Empty;
 
 			if (DataFramework.sizeTags == 24)
 			{
@@ -55,14 +39,40 @@ namespace Pixeye.Framework
 				str = "ACTORS_TAGS_6";
 			}
 
+
 			if (index > -1)
 			{
 				allDefines[index] = str;
 			}
 			else allDefines.Add(str);
 
+
+			index = allDefines.FindIndex(d => d.Contains("ACTORS_TAGS_CHECKS"));
+ 
+			str   = DataFramework.tagsCheck ? "ACTORS_TAGS_CHECKS" : string.Empty;
+			if (index > -1)
+			{
+				allDefines[index] = str;
+			}
+			else
+			{
+				allDefines.Add(str);
+			}
+
+			index = allDefines.FindIndex(d => d.Contains("ACTORS_COMPONENTS_STRUCTS"));
+ 
+			str   = DataFramework.onStructs ? "ACTORS_COMPONENTS_STRUCTS" : string.Empty;
+			if (index > -1)
+			{
+				allDefines[index] = str;
+			}
+			else
+			{
+				allDefines.Add(str);
+			}
+			
+
 			PlayerSettings.SetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup, string.Join(";", allDefines.ToArray()));
 		}
-
 	}
 }

@@ -1,10 +1,6 @@
 //  Project  : ACTORS
 //  Contacts : Pixeye - ask@pixeye.games
 
-// #define ACTORS_TAGS_FILTER_DEFAULT
-// #if ACTORS_NO_TAGS
-// #undef ACTORS_TAGS_FILTER_DEFAULT
-// #endif
 
 using System;
 using System.Runtime.CompilerServices;
@@ -61,10 +57,25 @@ namespace Pixeye.Framework
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal bool Check(int entityID)
 		{
-			#if ACTORS_NO_TAGS
-			return CanProceed(entityID) && !ExcludeTypes(entityID);
+			#if ACTORS_TAGS_CHECKS
+			return CanProceed(entityID) && !ExcludeTypes(entityID) && (includeTags.Length == 0 || IncludeTags(entityID)) & (excludeTags.Length == 0 || ExcludeTags(entityID));
 			#else
-			return CanProceed(entityID) && (includeTags.Length == 0 || IncludeTags(entityID)) & (excludeTags.Length == 0 || ExcludeTags(entityID)) && !ExcludeTypes(entityID);
+			for (int ll = 0; ll < ids.Length; ll++)
+				if ((Entity.generations[entityID, generations[ll]] & ids[ll]) != ids[ll])
+				{
+					return false;
+				}
+
+			ref var components = ref Entity.components[entityID];
+
+			for (int i = 0; i < components.amount; i++)
+			{
+				if (excludeComponents[components.ids[i]])
+				{
+					return false;
+				}
+			}
+			return true;
 			#endif
 		}
 
@@ -77,7 +88,7 @@ namespace Pixeye.Framework
 
 			return true;
 		}
-
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal bool IncludeTags(int entityID)
 		{
 			ref var tags = ref Entity.tags[entityID];
@@ -98,7 +109,7 @@ namespace Pixeye.Framework
 
 			return match == includeTags.Length;
 		}
-
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal bool ExcludeTags(int entityID)
 		{
 			ref var tags = ref Entity.tags[entityID];
@@ -117,7 +128,7 @@ namespace Pixeye.Framework
 
 			return true;
 		}
-
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal bool ExcludeTypes(int entityID)
 		{
 			ref var components = ref Entity.components[entityID];

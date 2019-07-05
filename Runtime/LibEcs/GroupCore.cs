@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using Unity.IL2CPP.CompilerServices;
-
+ 
 
 namespace Pixeye.Framework
 {
@@ -67,6 +67,7 @@ namespace Pixeye.Framework
 
 		internal GroupCore Start(Composition composition)
 		{
+			//	ent.Populate(Entity.settings.SizeEntities, out entities);
 			this.composition = composition;
 			composition.SetupExcludeTypes(this);
 			HelperTags.Add(this);
@@ -110,28 +111,37 @@ namespace Pixeye.Framework
 			if (length >= entities.Length)
 				Array.Resize(ref entities, length << 1);
 
-
-			while (right > left)
+			var consitionSort = right - 1;
+			if (consitionSort > -1 && entity.id < entities[consitionSort].id)
 			{
-				var midIndex = (right + left) / 2;
-
-				if (entities[midIndex].id == entity.id)
+				while (right > left)
 				{
-					index = midIndex;
-					break;
+					var midIndex = (right + left) / 2;
+
+					if (entities[midIndex].id == entity.id)
+					{
+						index = midIndex;
+						break;
+					}
+
+					if (entities[midIndex].id < entity.id)
+						left = midIndex + 1;
+					else
+						right = midIndex;
+
+					index = left;
 				}
 
-				if (entities[midIndex].id < entity.id)
-					left = midIndex + 1;
-				else
-					right = midIndex;
 
-				index = left;
+				Array.Copy(entities, index, entities, index + 1, length - index);
+				entities[index] = entity;
+				onAdd(entity);
 			}
-
-			Array.Copy(entities, index, entities, index + 1, length - index);
-			entities[index] = entity;
-			onAdd(entity);
+			else
+			{
+				entities[right] = entity;
+				onAdd(entity);
+			}
 		}
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		void InsertNoCallback(in ent entity)
@@ -144,32 +154,37 @@ namespace Pixeye.Framework
 				Array.Resize(ref entities, length << 1);
 
 
-			while (right > left)
+			var consitionSort = right - 1;
+			if (consitionSort > -1 && entity.id < entities[consitionSort].id)
 			{
-				var midIndex = (right + left) / 2;
-
-				if (entities[midIndex].id == entity.id)
+				while (right > left)
 				{
-					index = midIndex;
-					break;
+					var midIndex = (right + left) / 2;
+
+					if (entities[midIndex].id == entity.id)
+					{
+						index = midIndex;
+						break;
+					}
+
+					if (entities[midIndex].id < entity.id)
+						left = midIndex + 1;
+					else
+						right = midIndex;
+
+					index = left;
 				}
 
-				if (entities[midIndex].id < entity.id)
-					left = midIndex + 1;
-				else
-					right = midIndex;
 
-				index = left;
+				Array.Copy(entities, index, entities, index + 1, length - index);
+				entities[index] = entity;
 			}
-
-			Array.Copy(entities, index, entities, index + 1, length - index);
-			entities[index] = entity;
+			else entities[right] = entity;
 		}
 
 		//===============================//
 		// Try Remove
 		//===============================//
-
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal void TryRemove(int entityID)
 		{
@@ -177,27 +192,32 @@ namespace Pixeye.Framework
 			var i = HelperArray.BinarySearch(ref entities, entityID, 0, length);
 			if (i == -1) return;
 			onRemove(entities[i]);
+
 			Array.Copy(entities, i + 1, entities, i, length-- - i);
 		}
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		[
+				MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal void TryRemoveNoCallback(int entityID)
 		{
 			if (length == 0) return;
 			var i = HelperArray.BinarySearch(ref entities, entityID, 0, length);
 			if (i == -1) return;
+
 			Array.Copy(entities, i + 1, entities, i, length-- - i);
 		}
 
 		//===============================//
 		// Remove
 		//===============================//
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		[
+				MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal void Remove(int i)
 		{
 			onRemove(entities[i]);
 			Array.Copy(entities, i + 1, entities, i, length-- - i);
 		}
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		[
+				MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal void RemoveNoCallBack(int i)
 		{
 			Array.Copy(entities, i + 1, entities, i, length-- - i);
