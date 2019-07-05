@@ -6,7 +6,7 @@
 using Unity.IL2CPP.CompilerServices;
 using UnityEngine;
 
-
+//todo; refactor ops
 namespace Pixeye.Framework
 {
 	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
@@ -184,12 +184,28 @@ namespace Pixeye.Framework
 						}
 						#endif
 
-						//	if ((Entity.generations[entityID, generation] & mask) != mask) continue;
 
 						Entity.generations[entityID, generation] &= ~mask;
 
 						ref var components = ref Entity.components[entityID];
-						components.Remove(operation.arg);
+
+						//===============================//
+						// Remove Component
+						//===============================//
+						var typeConverted = (ushort) operation.arg;
+
+						for (int tRemoveIndex = 0; tRemoveIndex < components.amount; tRemoveIndex++)
+						{
+							if (components.ids[tRemoveIndex] == typeConverted)
+							{
+								for (int j = tRemoveIndex; j < components.amount - 1; ++j)
+									components.ids[j] = components.ids[j + 1];
+
+								components.amount--;
+
+								break;
+							}
+						}
 
 
 						for (int l = 0; l < storage.lenOfGroups; l++)
@@ -265,23 +281,19 @@ namespace Pixeye.Framework
 					case EntityOperations.Action.Activate:
 					{
 						ref var components = ref Entity.components[entityID];
-						var     length     = components.amount;
 
-						for (int j = 0; j < length; j++)
+						for (int j = 0; j < components.amount; j++)
 						{
 							var componentID = components.Get(j);
-							var generation  = Storage.generations[componentID];
-							var mask        = Storage.masks[componentID];
-							var storage     = Storage.all[componentID];
 
-							Entity.generations[entityID, generation] |= mask;
+							var storage = Storage.all[componentID];
 
+							Entity.generations[entityID, Storage.generations[componentID]] |= Storage.masks[componentID];
 
 							for (int l = 0; l < storage.lenOfGroups; l++)
 							{
 								var group       = storage.groups[l];
-								var composition = group.composition;
-								if (!composition.Check(entityID)) continue;
+								if (!group.composition.Check(entityID)) continue;
 								group.actionInsert(operation.entity);
 							}
 						}
