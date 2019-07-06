@@ -174,10 +174,10 @@ namespace Pixeye.Framework
 			return ref Storage<T>.Instance.components[id];
 			#else
 			ref var val = ref Storage<T>.Instance.components[id];
-			if ( val == null)
+			if (val == null)
 				val = Storage<T>.Instance.Creator();
- 
-			return ref Storage<T>.Instance.components[id];
+
+			return ref val;
 			#endif
 		}
 		/// <summary>
@@ -228,7 +228,10 @@ namespace Pixeye.Framework
 			#endif
 
 			if ((generations[id, Storage<T>.generation] & Storage<T>.componentMask) != Storage<T>.componentMask)
+			{
+				generations[id, Storage<T>.generation] |= Storage<T>.componentMask;
 				EntityOperations.Set(entity, Storage<T>.componentID, EntityOperations.Action.Add);
+			}
 
 			if (id >= Storage<T>.Instance.components.Length)
 				Array.Resize(ref Storage<T>.Instance.components, id << 1);
@@ -241,7 +244,7 @@ namespace Pixeye.Framework
 				val = Storage<T>.Instance.Creator();
 
 
-			return ref Storage<T>.Instance.components[id];
+			return ref val;
 			#endif
 		}
 
@@ -263,9 +266,17 @@ namespace Pixeye.Framework
 				Debug.LogError($"-> Entity [{id}] is not active. You should not add components to inactive entity, [{Storage<T>.Instance.componentType}] ");
 				return ref Storage<T>.Get(id);
 			}
+
+			if ((generations[id, Storage<T>.generation] & Storage<T>.componentMask) == Storage<T>.componentMask)
+			{
+				Debug.LogError($"-> Entity [{id}] already have this component {Storage<T>.Instance.componentType}!");
+				return ref Storage<T>.Get(id);
+			}
 			#endif
 
 			EntityOperations.Set(entity, Storage<T>.componentID, EntityOperations.Action.Add);
+			generations[id, Storage<T>.generation] |= Storage<T>.componentMask;
+
 			if (id >= Storage<T>.Instance.components.Length)
 				Array.Resize(ref Storage<T>.Instance.components, id << 1);
 
@@ -277,7 +288,7 @@ namespace Pixeye.Framework
 				val = Storage<T>.Instance.Creator();
 
 
-			return ref Storage<T>.Instance.components[id];
+			return ref val;
 			#endif
 		}
 
@@ -292,7 +303,22 @@ namespace Pixeye.Framework
 		{
 			var id = entity.id;
 
+			#if UNITY_EDITOR
+			if (!entity.Exist)
+			{
+				Debug.LogError($"-> Entity [{id}] is not active. You should not add components to inactive entity, [{Storage<T>.Instance.componentType}] ");
+				return;
+			}
+
+			if ((generations[id, Storage<T>.generation] & Storage<T>.componentMask) == Storage<T>.componentMask)
+			{
+				Debug.LogError($"-> Entity [{id}] already have this component {Storage<T>.Instance.componentType}!");
+				return;
+			}
+			#endif
+
 			EntityOperations.Set(entity, Storage<T>.componentID, EntityOperations.Action.Add);
+			generations[id, Storage<T>.generation] |= Storage<T>.componentMask;
 
 			#if !ACTORS_COMPONENTS_STRUCTS
 			ref var componentInStorage = ref Storage<T>.Instance.components[id];

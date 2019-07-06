@@ -44,16 +44,8 @@ namespace Pixeye.Framework
 						var mask        = Storage.masks[componentID];
 
 
-						#if UNITY_EDITOR
-						if ((Entity.generations[entityID, generation] & mask) == mask)
-						{
-							Debug.LogError($"-> Entity [{entityID}] already have this component {storage}!");
-							continue;
-						}
-						#endif
-
 						Entity.components[entityID].Add(componentID);
-						Entity.generations[entityID, generation] |= mask;
+
 
 						for (int l = 0; l < storage.lenOfGroups; l++)
 						{
@@ -292,7 +284,7 @@ namespace Pixeye.Framework
 
 							for (int l = 0; l < storage.lenOfGroups; l++)
 							{
-								var group       = storage.groups[l];
+								var group = storage.groups[l];
 								if (!group.composition.Check(entityID)) continue;
 								group.actionInsert(operation.entity);
 							}
