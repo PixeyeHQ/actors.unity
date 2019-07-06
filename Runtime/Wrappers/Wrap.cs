@@ -82,14 +82,14 @@ namespace Pixeye.Framework
 			w.comparer = Comparers.storage[typeof(TProp).GetHashCode()]  as IEqualityComparer<TProp>;
 			#endif
 
-			ref var cObserver = ref e.Add<ComponentObserver>();
-			
+			ref var cObserver = ref e.AddGet<ComponentObserver>();
+
 			#if ACTORS_COMPONENTS_STRUCTS
 			if (cObserver.wrappers == null)
 				cObserver.wrappers = new IWrap[2];
 			Debug.Log(cObserver.wrappers.Length);
 			#endif
-			
+
 			if (cObserver.length >= cObserver.wrappers.Length)
 				Array.Resize(ref cObserver.wrappers, cObserver.length << 1);
 
