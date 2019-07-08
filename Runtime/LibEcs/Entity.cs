@@ -358,7 +358,7 @@ namespace Pixeye.Framework
 		/// <param name="entity"></param>
 		/// <returns>Returns the transform linked to the entity.</returns>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static T GetMono<T>(in this ent entity) where T : Component
+		public static T GetMono<T>(in this ent entity)
 		{
 			return transforms[entity].GetComponentInChildren<T>();
 		}
@@ -389,7 +389,7 @@ namespace Pixeye.Framework
 		/// <param name="entity"></param>
 		/// <returns>Returns the transform linked to the entity.</returns>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static T GetMono<T>(in this ent entity, string path) where T : Component
+		public static T GetMono<T>(in this ent entity, string path)
 		{
 			return transforms[entity].Find(path).GetComponent<T>();
 		}
