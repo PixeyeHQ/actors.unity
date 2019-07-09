@@ -30,7 +30,7 @@ namespace Pixeye.Framework
 		public static Transform Spawn(GameObject prefab, Transform parent , Vector3 startPosition = default, Quaternion startRotation = default)
 		{
 			var tr = Object.Instantiate(prefab, parent).transform;
-			tr.position = startPosition;
+			tr.localPosition = startPosition;
 			tr.localRotation = startRotation;
 			return tr;
 		}
@@ -48,7 +48,7 @@ namespace Pixeye.Framework
 		public static Transform Spawn(int poolID, GameObject prefab, Transform parent , Vector3 startPosition = default, Quaternion startRotation = default)
 		{
 			var tr = Pool.pools[poolID].Spawn(prefab, parent).transform;
-			tr.position = startPosition;
+			tr.localPosition = startPosition;
 			tr.localRotation = startRotation;
 			return tr;
 		}
@@ -86,8 +86,8 @@ namespace Pixeye.Framework
 		public static Transform Spawn(string prefabID, Transform parent , Vector3 startPosition = default, Quaternion startRotation = default)
 		{
 			var tr = Object.Instantiate(Box.Get<GameObject>(prefabID), parent).transform;
-			tr.position = startPosition;
-			tr.localRotation = startRotation;
+		 	tr.localPosition = startPosition;
+	  	tr.localRotation = startRotation;
 			return tr;
 		}
 		public static T Spawn<T>(string prefabID, Transform parent , Vector3 startPosition = default, Quaternion startRotation = default)
@@ -112,7 +112,7 @@ namespace Pixeye.Framework
 		public static Transform Spawn(int poolID, string prefabID, Transform parent , Vector3 startPosition = default, Quaternion startRotation = default)
 		{
 			var tr = Pool.pools[poolID].Spawn(Box.Get<GameObject>(prefabID), parent).transform;
-			tr.position = startPosition;
+			tr.localPosition = startPosition;
 			tr.localRotation = startRotation;
 			return tr;
 		}
