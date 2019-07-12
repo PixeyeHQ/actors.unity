@@ -16,11 +16,7 @@ namespace Pixeye.Framework
 			return ref entity;
 		}
 
-		void Awake()
-		{
-			if (!Starter.initialized)return;
-			Launch();
-		}
+		 
 
 		/// <summary>
 		/// Initialize entity here.
