@@ -31,6 +31,15 @@ namespace Pixeye.Framework
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal abstract void AddGroupExclude(GroupCore groupCore);
+
+
+		internal static void Dispose()
+		{
+			for (int i = 0; i < lastID; i++)
+			{
+				all[i].lenOfGroups = 0;
+			}
+		}
 	}
 
 
@@ -69,9 +78,13 @@ namespace Pixeye.Framework
 			var type = typeof(T);
 			typeNames.Add(type.GetHashCode(), componentID);
 			componentType = type;
-
 		}
 
+
+		public void Dispose()
+		{
+			lenOfGroups = 0;
+		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static ref T Get(int entityID)
@@ -85,7 +98,7 @@ namespace Pixeye.Framework
 			if (val == null)
 				val = Instance.Creator();
 			#endif
-			
+
 			return ref Instance.components[entityID];
 		}
 

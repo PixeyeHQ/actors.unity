@@ -239,6 +239,7 @@ namespace Pixeye.Framework
 			length   = 0;
 
 			//parallel
+			if (segmentGroups!=null)
 			for (int i = 0; i < segmentGroups.Length; i++)
 			{
 				var d = segmentGroups[i];
