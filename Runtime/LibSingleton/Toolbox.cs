@@ -92,7 +92,7 @@ namespace Pixeye.Framework
 		{
 			object resolve;
 			var    hasValue = Instance.data.TryGetValue(typeof(T).GetHashCode(), out resolve);
-			return hasValue ? (T) resolve : default(T);
+			return hasValue ? (T) resolve : default(T); 
 		}
 
 		internal void ClearSessionData()

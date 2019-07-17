@@ -40,8 +40,6 @@ namespace Pixeye.Framework
 					{
 						var componentID = operation.arg;
 						var storage     = Storage.all[componentID];
-						var generation  = Storage.generations[componentID];
-						var mask        = Storage.masks[componentID];
 
 
 						Entity.components[entityID].Add(componentID);
@@ -107,8 +105,8 @@ namespace Pixeye.Framework
 						}
 
 						Entity.tags[entityID].Clear();
-
-
+						Entity.cache[entityID].isAlive = false;
+					  
 						ent.entityStack.Enqueue(operation.entity);
 						ent.entityStackLength++;
 
@@ -154,7 +152,7 @@ namespace Pixeye.Framework
 
 						components.amount = 0;
 						Entity.tags[entityID].Clear();
-
+						Entity.cache[entityID].isAlive = false;
 						ent.entityStack.Enqueue(operation.entity);
 						ent.entityStackLength++;
 
@@ -233,6 +231,7 @@ namespace Pixeye.Framework
 						}
 
 						Entity.tags[entityID].Clear();
+						Entity.cache[entityID].isAlive = false;
 						Entity.Count--;
 
 

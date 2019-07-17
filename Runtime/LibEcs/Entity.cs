@@ -15,6 +15,7 @@ namespace Pixeye.Framework
 	{
 		public int id;
 		public bool isPooled;
+		public bool isAlive;
 		public byte age; // caching age of entity for retrivieng it in future. ( ParseBy method )
 	}
 
@@ -121,7 +122,7 @@ namespace Pixeye.Framework
 			var ptrCache = &cache[id];
 			ptrCache->id  = id;
 			ptrCache->age = age;
-
+			ptrCache->isAlive = true;
 			ptrCache->isPooled = pooled;
 
 			Count++;

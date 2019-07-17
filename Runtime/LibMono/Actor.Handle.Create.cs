@@ -3,7 +3,6 @@
 
 
 using System.Runtime.CompilerServices;
-using Pixeye.Source;
 using UnityEngine;
 
 namespace Pixeye.Framework
@@ -16,7 +15,7 @@ namespace Pixeye.Framework
 			return ref entity;
 		}
 
-		 
+	 
 
 		/// <summary>
 		/// Initialize entity here.

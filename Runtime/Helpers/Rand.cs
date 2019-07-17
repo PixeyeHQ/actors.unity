@@ -18,5 +18,11 @@ namespace Pixeye.Framework
 		{
 			return (int) Source.NextDouble() * (maximum - minimum) + minimum;
 		}
+		
+		public static bool NextBool(int truePercentage = 50)
+		{
+			return Source.NextDouble() < truePercentage / 100.0;
+		}
+		
 	}
 }

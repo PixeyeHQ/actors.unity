@@ -53,7 +53,7 @@ namespace Pixeye.Framework
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		static public void Populate(int size,out ent[] arr)
+		static public void Populate(int size, out ent[] arr)
 		{
 			arr = new ent[size];
 			for (int i = 0; i < size; i++)
@@ -112,7 +112,7 @@ namespace Pixeye.Framework
 				return;
 			}
 			#endif
-     
+
 			EntityOperations.Set(this, 0, EntityOperations.Action.Kill);
 			Entity.Count--;
 		}
@@ -120,7 +120,8 @@ namespace Pixeye.Framework
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public bool EqualsAndExist(ent other)
 		{
-			return id > -1 && Entity.components[id].length > 0 && id == other.id && age == other.age;
+			return id > -1 && Entity.components[id].length > 0 && id == other.id && age == other.age && Entity.cache[id].isAlive;
+			;
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -132,7 +133,7 @@ namespace Pixeye.Framework
 		public bool Exist
 		{
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			get { return id > -1 && Entity.components[id].length > 0 && Entity.cache[id].age == age; }
+			get { return id > -1 && Entity.components[id].length > 0 && age == Entity.cache[id].age && Entity.cache[id].isAlive; }
 		}
 
 		#endregion
