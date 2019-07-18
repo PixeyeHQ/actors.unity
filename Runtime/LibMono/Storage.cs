@@ -81,10 +81,10 @@ namespace Pixeye.Framework
 		}
 
 
-		public void Dispose()
-		{
-			lenOfGroups = 0;
-		}
+		// public void Dispose()
+		// {
+		// 	lenOfGroups = 0;
+		// }
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static ref T Get(int entityID)
