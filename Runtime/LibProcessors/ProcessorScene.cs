@@ -236,13 +236,34 @@ namespace Pixeye.Framework
 		{
 			Toolbox.Instance.StartCoroutine(_Add(id));
 		}
-
+		public static void Add(string id)
+		{
+			Toolbox.Instance.StartCoroutine(_Add(id));
+		}
+		
 		public static void Remove(int id)
 		{
 			Toolbox.Instance.StartCoroutine(_Remove(id));
 		}
-
+		public static void Remove(string id)
+		{
+			Toolbox.Instance.StartCoroutine(_Remove(id));
+		}
 		static IEnumerator _Add(int id)
+		{
+			Toolbox.changingScene    =  true;
+			SceneManager.sceneLoaded += OnAdditiveLoaded;
+			var job = SceneManager.LoadSceneAsync(id, LoadSceneMode.Additive);
+			while (!job.isDone)
+			{
+				yield return 0;
+			}
+
+
+			Toolbox.changingScene = false;
+		}
+
+		static IEnumerator _Add(string id)
 		{
 			Toolbox.changingScene    =  true;
 			SceneManager.sceneLoaded += OnAdditiveLoaded;
@@ -297,6 +318,18 @@ namespace Pixeye.Framework
 			Toolbox.changingScene = false;
 		}
 
+		static IEnumerator _Remove(string id)
+		{
+			Toolbox.changingScene = true;
+			var job = SceneManager.UnloadSceneAsync(id);
+			while (!job.isDone)
+			{
+				yield return 0;
+			}
+
+			Toolbox.changingScene = false;
+		}
+		
 		public static void To(int id)
 		{
 			var processing = Default;
