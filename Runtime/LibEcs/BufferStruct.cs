@@ -50,7 +50,7 @@ namespace Pixeye.Framework
 			return ref source[pointers[index]];
 		}
 
-		public int Add()
+		public int AddIndex()
 		{
 			var index = length++;
 			if (lengthQueue > 0)
@@ -61,7 +61,7 @@ namespace Pixeye.Framework
 				lengthQueue--;
 			}
 			else pointers[index] = length;
-
+ 
 			return index;
 		}
 
