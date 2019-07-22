@@ -13,7 +13,7 @@ namespace Pixeye.Framework
 		
 		public int length;
 
-		T[] source;
+		public T[] source;
 		int[] pointers;
 		int[] queue;
 		int lengthQueue;
@@ -48,6 +48,21 @@ namespace Pixeye.Framework
 			}
 			else pointers[index] = length;
 			return ref source[pointers[index]];
+		}
+
+		public int Add()
+		{
+			var index = length++;
+			if (lengthQueue > 0)
+			{
+				pointers[index] = queue[head];
+				queue[head]     = 0;
+				head            = (head + 1) % queue.Length;
+				lengthQueue--;
+			}
+			else pointers[index] = length;
+
+			return index;
 		}
 
 
