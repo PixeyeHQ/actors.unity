@@ -162,6 +162,10 @@ namespace Pixeye.Framework
 
 			Add<ProcessorObserver>();
 			Add<ProcessorEntities>();
+			
+#if DEBUG
+			HelperTag.CheckDuplicateID();
+#endif
 
 			Setup();
 
