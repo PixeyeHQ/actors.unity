@@ -85,7 +85,7 @@ namespace Pixeye.Framework
 				}
 			}
 
-			return "Таг не найден";
+			return default;
 		}
 
 
@@ -117,7 +117,7 @@ namespace Pixeye.Framework
 
 				foreach (var v in listDuplicateName)
 				{
-					Debug.LogError($"TAG дубликат: {v} = {(int) GetFieldId(v, typeTag)}");
+					Debug.LogError($"TAG duplicate: {v} = {(int) GetFieldId(v, typeTag)}");
 				}
 
 			}
