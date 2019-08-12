@@ -46,4 +46,12 @@ namespace Pixeye.Framework
 			helpers.Clear();
 		}
 	}
+	
+	public static class HelperScriptableBuild
+	{
+		public static ModelComposer GetModelComposer(this ScriptableBuild sb)
+		{
+			return sb.helpers[sb.GetHashCode()];
+		}
+	}
 }
