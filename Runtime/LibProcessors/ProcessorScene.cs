@@ -240,7 +240,7 @@ namespace Pixeye.Framework
 		{
 			Toolbox.Instance.StartCoroutine(_Add(id));
 		}
-		
+
 		public static void Remove(int id)
 		{
 			Toolbox.Instance.StartCoroutine(_Remove(id));
@@ -309,6 +309,7 @@ namespace Pixeye.Framework
 		static IEnumerator _Remove(int id)
 		{
 			Toolbox.changingScene = true;
+			KillActors(SceneManager.GetSceneByBuildIndex(id));
 			var job = SceneManager.UnloadSceneAsync(id);
 			while (!job.isDone)
 			{
@@ -321,6 +322,7 @@ namespace Pixeye.Framework
 		static IEnumerator _Remove(string id)
 		{
 			Toolbox.changingScene = true;
+			KillActors(SceneManager.GetSceneByName(id));
 			var job = SceneManager.UnloadSceneAsync(id);
 			while (!job.isDone)
 			{
@@ -329,7 +331,23 @@ namespace Pixeye.Framework
 
 			Toolbox.changingScene = false;
 		}
-		
+
+		static void KillActors(Scene s)
+		{
+			var root = s.GetRootGameObjects();
+
+			foreach (var go in root)
+			{
+				var actors = go.GetComponentsInChildren<Actor>();
+
+				for (int i = 0; i < actors.Length; i++)
+				{
+					actors[i].entity.Release();
+				}
+			}
+
+		}
+
 		public static void To(int id)
 		{
 			var processing = Default;
