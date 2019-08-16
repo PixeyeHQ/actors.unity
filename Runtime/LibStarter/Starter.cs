@@ -139,7 +139,14 @@ namespace Pixeye.Framework
 				nodes[i].Populate();
 
 			Add<ProcessorEntities>();
+
+			
+#if DEBUG
+			HelperTag.CheckDuplicateID();
+#endif
+
 			Add<ProcessorObserver>();
+
 
 			Setup();
 
