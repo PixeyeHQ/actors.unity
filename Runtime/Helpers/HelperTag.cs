@@ -1,6 +1,6 @@
 ﻿//  Project : ecs
 // Contacts : Pix - ask@pixeye.games
-
+// Author : Geobrain
 using System;
 using System.Collections.Generic;
 using System.Linq;
