@@ -9,7 +9,6 @@ using Sirenix.OdinInspector;
 #endif
 using System.Collections.Generic;
 using System.Linq;
-using Pixeye.Source;
 using UnityEngine;
 
 namespace Pixeye.Framework
@@ -19,15 +18,7 @@ namespace Pixeye.Framework
 	/// </summary>
 	public class Starter : MonoBehaviour
 	{
-
 		public static bool initialized;
-
-		#if ODIN_INSPECTOR
-		[FoldoutGroup("Setup")]
-		#else
-		[FoldoutGroup("Setup"), Reorderable]
-		#endif
-		public List<Factory> factories;
 
 		#if ODIN_INSPECTOR
 		[FoldoutGroup("Setup")]
@@ -49,15 +40,12 @@ namespace Pixeye.Framework
 		void Awake()
 		{
 			if (ProcessorUpdate.Default == null)
-			{
 				ProcessorUpdate.Create();
-			}
 
 			ProcessorScene.Default.Setup(ScenesToKeep, SceneDependsOn, this);
 		}
 
 		#if UNITY_EDITOR
-
 		public void ClearNodes()
 		{
 			for (int i = 0; i < nodes.Count; i++)
@@ -69,13 +57,12 @@ namespace Pixeye.Framework
 
 			nodes.Clear();
 		}
-
 		public void AddToNode(GameObject prefab, GameObject instance, int pool)
 		{
-			var id = prefab.GetInstanceID();
-			var nodesValid = nodes.FindValidNodes(id);
+			var id                  = prefab.GetInstanceID();
+			var nodesValid          = nodes.FindValidNodes(id);
 			var conditionNodeCreate = true;
-			List<int> nodesToKill = new List<int>();
+			var nodesToKill         = new List<int>();
 
 			for (int i = 0; i < nodesValid.Count; i++)
 			{
@@ -112,15 +99,14 @@ namespace Pixeye.Framework
 			if (conditionNodeCreate)
 			{
 				var node = new PoolNode();
-				node.id = id;
-				node.prefab = prefab;
-				node.pool = pool;
+				node.id          = id;
+				node.prefab      = prefab;
+				node.pool        = pool;
 				node.createdObjs = new List<GameObject>();
 				node.createdObjs.Add(instance);
 				nodes.Add(node);
 			}
 		}
-
 		public void RemoveFromNode(GameObject instance, int pool)
 		{
 			GameObject prefab;
@@ -131,7 +117,7 @@ namespace Pixeye.Framework
 			#endif
 
 			if (prefab == null) return;
-			var id = prefab.GetInstanceID();
+			var id    = prefab.GetInstanceID();
 			var index = nodes.FindValidNode(id, pool);
 			if (index != -1)
 			{
@@ -145,38 +131,35 @@ namespace Pixeye.Framework
 				}
 			}
 		}
-
 		#endif
 
 		public void BindScene()
 		{
 			for (int i = 0; i < nodes.Count; i++)
-			{
 				nodes[i].Populate();
-			}
 
-			foreach (var factory in factories)
-			{
-				Toolbox.Add(factory);
-			}
-
-			Add<ProcessorObserver>();
 			Add<ProcessorEntities>();
+
 			
 #if DEBUG
 			HelperTag.CheckDuplicateID();
 #endif
 
+			Add<ProcessorObserver>();
+
+
 			Setup();
+
+			for (int i = 0; i < ProcessorGroups.container.len; i++)
+				ProcessorGroups.container.storage[i].AddCallbacks();
+
 
 			initialized = true;
 
 			var objs = FindObjectsOfType<MonoBehaviour>().OfType<IRequireStarter>();
-
 			foreach (var obj in objs)
-			{
-				obj.LaunchOnStart();
-			}
+				obj.Launch();
+
 
 			Timer.Add(Time.deltaFixed, PostSetup);
 		}
@@ -191,14 +174,32 @@ namespace Pixeye.Framework
 			return Toolbox.Add<T>();
 		}
 
-		protected virtual void Setup() { }
+		protected virtual void Setup()
+		{
+		}
 
-		protected virtual void PostSetup() { }
+		protected virtual void PostSetup()
+		{
+		}
 
 		protected virtual void OnDestroy()
 		{
 			initialized = false;
 		}
+	}
 
+
+	//===============================//
+	// FEATURES
+	//===============================//
+
+	public abstract class Feature : IAwake
+	{
+		public void Add<T>() where T : new()
+		{
+			Toolbox.Add<T>();
+		}
+
+		public abstract void OnAwake();
 	}
 }

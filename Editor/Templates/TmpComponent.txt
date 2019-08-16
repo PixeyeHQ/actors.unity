@@ -1,13 +1,12 @@
-
-using System;
+ 
 using UnityEngine;
 using Pixeye.Framework;
 using System.Runtime.CompilerServices;
 
 ##NAMESPACE##
 {
-   [Serializable]
-    public sealed class ##NAME## 
+    
+    sealed class ##NAME## 
   	{
      	 
        
@@ -28,10 +27,11 @@ using System.Runtime.CompilerServices;
     
             /// Use this method to clean variables
         	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-    		internal static void Dispose##NAME##(##NAME## component)
+    		internal static void Dispose##NAME##(in ent entity)
     		{
+    	      ref var component = ref Storage<##NAME##>.Instance.components[entity.id];
     		}
-    
+                
     		 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             internal static ref ##NAME## ##NAME##(in this ent entity)

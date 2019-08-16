@@ -8,24 +8,22 @@ namespace Pixeye.Framework
 {
 	public abstract class Processor : IDisposable
 	{
-
 		protected Processor()
 		{
 			ProcessorGroups.Setup(this);
-			ProcessorSignals.Default.Add(this);
+			ProcessorSignals.Add(this);
 			Toolbox.disposables.Add(this);
 		}
 
 		public void Dispose()
 		{
-			ProcessorSignals.Default.Remove(this);
-			ProcessorUpdate.Default.Remove(this);
+			ProcessorSignals.Remove(this);
+			ProcessorUpdate.Remove(this);
 
 			OnDispose();
 		}
 
 
-		
 		protected virtual void OnDispose()
 		{
 		}
@@ -33,8 +31,6 @@ namespace Pixeye.Framework
 		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
 		static void Initialize()
 		{
-			SettingsEngine.SizeEntities = 200000;
 		}
-		
 	}
 }

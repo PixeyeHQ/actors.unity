@@ -7,12 +7,24 @@ using UnityEditor;
 
 namespace Pixeye.Framework
 {
-	internal static class DataFramework
+	static class DataFramework
 	{
+
+		public static bool onStructs
+		{
+			get { return EditorPrefs.GetBool("hba.data.onStructs", false); }
+			set { EditorPrefs.SetBool("hba.data.onStructs", value); }
+		}
+		
+		public static bool tagsCheck
+		{
+			get { return EditorPrefs.GetBool("hba.data.tagsCheck", false); }
+			set { EditorPrefs.SetBool("hba.data.tagsCheck", value); }
+		}
 
 		public static int sizeTags
 		{
-			get { return EditorPrefs.GetInt("hba.data.tags", 24); }
+			get { return EditorPrefs.GetInt("hba.data.tags", 6); }
 			set { EditorPrefs.SetInt("hba.data.tags", value); }
 		}
 
@@ -35,7 +47,6 @@ namespace Pixeye.Framework
 		}
 
 		public static string pathTags => Directory.GetCurrentDirectory() + EditorPrefs.GetString("hba.path.tags", @"\Assets\Runtime\Tags");
-
 	}
 }
 #endif

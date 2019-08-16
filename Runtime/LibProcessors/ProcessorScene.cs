@@ -11,7 +11,6 @@ namespace Pixeye.Framework
 {
 	public sealed class ProcessorScene : IKernel
 	{
-
 		public static ProcessorScene Default = new ProcessorScene();
 
 		public Action sceneLoaded = delegate { };
@@ -31,7 +30,7 @@ namespace Pixeye.Framework
 		public static Transform Get(string id)
 		{
 			Transform obj;
-			var haveFound = Default.sceneObjs.TryGetValue(id, out obj);
+			var       haveFound = Default.sceneObjs.TryGetValue(id, out obj);
 			if (!haveFound)
 			{
 				var o = GameObject.Find(id);
@@ -46,7 +45,7 @@ namespace Pixeye.Framework
 		public static Transform Get(ref string id)
 		{
 			Transform obj;
-			var haveFound = Default.sceneObjs.TryGetValue(id, out obj);
+			var       haveFound = Default.sceneObjs.TryGetValue(id, out obj);
 			if (!haveFound)
 			{
 				var o = GameObject.Find(id);
@@ -62,6 +61,7 @@ namespace Pixeye.Framework
 		{
 			this.scenesToKeep.Clear();
 			this.sceneDependsOn.Clear();
+
 
 			for (var i = 0; i < scenesToKeep.Count; i++)
 			{
@@ -103,6 +103,11 @@ namespace Pixeye.Framework
 				scenes.Add(name, SceneManager.GetSceneByName(name));
 			}
 
+			if (sceneDependsOn.Count == 0)
+			{
+				yield return 0;
+			}
+
 			sceneLoaded();
 
 			starter.BindScene();
@@ -114,7 +119,16 @@ namespace Pixeye.Framework
 			Toolbox.changingScene = true;
 			Toolbox.Instance.ClearSessionData();
 
-			var s = SceneManager.GetActiveScene();
+			if (scenes.Keys.Count == 1)
+			{
+				scenes.Clear();
+				SceneManager.LoadScene(name);
+				SceneManager.SetActiveScene(SceneManager.GetSceneByName(name));
+				Toolbox.changingScene = false;
+				yield break;
+			}
+
+			var s     = SceneManager.GetActiveScene();
 			var sName = s.name;
 
 			var job = SceneManager.UnloadSceneAsync(s);
@@ -153,7 +167,7 @@ namespace Pixeye.Framework
 
 			SceneManager.SetActiveScene(SceneManager.GetSceneByName(name));
 			job.allowSceneActivation = true;
-			Toolbox.changingScene = false;
+			Toolbox.changingScene    = false;
 		}
 
 		IEnumerator _Load(int id)
@@ -162,7 +176,16 @@ namespace Pixeye.Framework
 			Toolbox.changingScene = true;
 			Toolbox.Instance.ClearSessionData();
 
-			var s = SceneManager.GetActiveScene();
+			if (scenes.Keys.Count == 1)
+			{
+				scenes.Clear();
+				SceneManager.LoadScene(id);
+				SceneManager.SetActiveScene(SceneManager.GetSceneByBuildIndex(id));
+				Toolbox.changingScene = false;
+				yield break;
+			}
+
+			var s     = SceneManager.GetActiveScene();
 			var sName = s.name;
 
 			var job = SceneManager.UnloadSceneAsync(s);
@@ -173,23 +196,28 @@ namespace Pixeye.Framework
 			}
 
 			scenes.Remove(sName);
-			foreach (var key in scenes.Keys)
+
+			if (scenes.Keys.Count != 1)
 			{
-				if (scenesToKeep.Contains(key)) continue;
+				foreach (var key in scenes.Keys)
+				{
+					if (scenesToKeep.Contains(key)) continue;
 
-				job = SceneManager.UnloadSceneAsync(scenes[key]);
+					job = SceneManager.UnloadSceneAsync(scenes[key]);
 
+					while (!job.isDone)
+					{
+						yield return 0;
+					}
+				}
+
+				job = Resources.UnloadUnusedAssets();
 				while (!job.isDone)
 				{
 					yield return 0;
 				}
 			}
 
-			job = Resources.UnloadUnusedAssets();
-			while (!job.isDone)
-			{
-				yield return 0;
-			}
 
 			scenes.Clear();
 
@@ -201,10 +229,14 @@ namespace Pixeye.Framework
 
 			SceneManager.SetActiveScene(SceneManager.GetSceneByBuildIndex(id));
 			job.allowSceneActivation = true;
-			Toolbox.changingScene = false;
+			Toolbox.changingScene    = false;
 		}
 
 		public static void Add(int id)
+		{
+			Toolbox.Instance.StartCoroutine(_Add(id));
+		}
+		public static void Add(string id)
 		{
 			Toolbox.Instance.StartCoroutine(_Add(id));
 		}
@@ -213,16 +245,34 @@ namespace Pixeye.Framework
 		{
 			Toolbox.Instance.StartCoroutine(_Remove(id));
 		}
-
+		public static void Remove(string id)
+		{
+			Toolbox.Instance.StartCoroutine(_Remove(id));
+		}
 		static IEnumerator _Add(int id)
 		{
-			Toolbox.changingScene = true;
+			Toolbox.changingScene    =  true;
 			SceneManager.sceneLoaded += OnAdditiveLoaded;
 			var job = SceneManager.LoadSceneAsync(id, LoadSceneMode.Additive);
 			while (!job.isDone)
 			{
 				yield return 0;
 			}
+
+
+			Toolbox.changingScene = false;
+		}
+
+		static IEnumerator _Add(string id)
+		{
+			Toolbox.changingScene    =  true;
+			SceneManager.sceneLoaded += OnAdditiveLoaded;
+			var job = SceneManager.LoadSceneAsync(id, LoadSceneMode.Additive);
+			while (!job.isDone)
+			{
+				yield return 0;
+			}
+
 
 			Toolbox.changingScene = false;
 		}
@@ -231,12 +281,35 @@ namespace Pixeye.Framework
 		{
 			if (arg1 != LoadSceneMode.Additive) return;
 
+
+			var objs = arg0.GetRootGameObjects();
+
+
+			foreach (var obj in objs)
+			{
+				var transforms = obj.GetComponentsInChildren<Transform>();
+
+				foreach (var tr in transforms)
+				{
+					var o = tr.GetComponent("MonoBehaviour");
+
+					if (o != null)
+					{
+						var req = o as IRequireStarter;
+						if (req != null)
+							req.Launch();
+					}
+				}
+			}
+
+
 			SceneManager.sceneLoaded -= OnAdditiveLoaded;
 		}
 
 		static IEnumerator _Remove(int id)
 		{
 			Toolbox.changingScene = true;
+			KillActors(SceneManager.GetSceneByBuildIndex(id));
 			var job = SceneManager.UnloadSceneAsync(id);
 			while (!job.isDone)
 			{
@@ -244,6 +317,35 @@ namespace Pixeye.Framework
 			}
 
 			Toolbox.changingScene = false;
+		}
+
+		static IEnumerator _Remove(string id)
+		{
+			Toolbox.changingScene = true;
+			KillActors(SceneManager.GetSceneByName(id));
+			var job = SceneManager.UnloadSceneAsync(id);
+			while (!job.isDone)
+			{
+				yield return 0;
+			}
+
+			Toolbox.changingScene = false;
+		}
+
+		static void KillActors(Scene s)
+		{
+			var root = s.GetRootGameObjects();
+
+			foreach (var go in root)
+			{
+				var actors = go.GetComponentsInChildren<Actor>();
+
+				for (int i = 0; i < actors.Length; i++)
+				{
+					actors[i].entity.Release();
+				}
+			}
+
 		}
 
 		public static void To(int id)
@@ -258,6 +360,5 @@ namespace Pixeye.Framework
 			var processing = Default;
 			Toolbox.Instance.StartCoroutine(processing._Load(name));
 		}
-
 	}
 }

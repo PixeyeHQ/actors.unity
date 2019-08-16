@@ -12,7 +12,6 @@ namespace Pixeye.Framework
 	[InitializeOnLoad]
 	public class PostHandleTags
 	{
-
 		static int lastIndex;
 		static List<int> idTags = new List<int>(50);
 		static List<int> freeIdTags = new List<int>(50);
@@ -25,7 +24,7 @@ namespace Pixeye.Framework
 		//	static string pathWithMeta => DataFramework.pathTags + DataFramework.pathTagsMeta;
 		static string path => DataFramework.pathTags;
 
-		 
+
 		internal static List<Type> tagTypes = new List<Type>();
 
 		static PostHandleTags()
@@ -39,7 +38,7 @@ namespace Pixeye.Framework
 		{
 			tagTypes.Clear();
 			var assemblies = AppDomain.CurrentDomain.GetAssemblies();
-			var executing = Assembly.GetExecutingAssembly();
+			var executing  = Assembly.GetExecutingAssembly();
 			for (int i = 0; i < assemblies.Length; i++)
 			{
 				var a = assemblies[i];
@@ -55,29 +54,99 @@ namespace Pixeye.Framework
 			}
 		}
 
+		[MenuItem("Tools/Actors/Set Struct Components", false, 2)]
+		static public void SetStructsChecks()
+		{
+			DataFramework.onStructs = true;
+			string definesString = PlayerSettings.GetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup);
+			var    allDefines    = definesString.Split(';').ToList();
+
+			var index = allDefines.FindIndex(d => d.Contains("ACTORS_COMPONENTS_STRUCTS"));
+			if (index == -1)
+			{
+				allDefines.Add("ACTORS_COMPONENTS_STRUCTS");
+			}
+
+
+			PlayerSettings.SetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup, string.Join(";", allDefines.ToArray()));
+		}
+
+
+		[MenuItem("Tools/Actors/Remove Struct Components", false, 2)]
+		static public void SetNoStructsChecks()
+		{
+			DataFramework.onStructs = false;
+			string definesString = PlayerSettings.GetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup);
+			var    allDefines    = definesString.Split(';').ToList();
+
+			var index = allDefines.FindIndex(d => d.Contains("ACTORS_COMPONENTS_STRUCTS"));
+			if (index != -1)
+			{
+				allDefines[index] = string.Empty;
+			}
+
+
+			PlayerSettings.SetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup, string.Join(";", allDefines.ToArray()));
+		}
+
+		[MenuItem("Tools/Actors/Tags/Remove Tag Checks", false, 1)]
+		static public void SetNoChecks()
+		{
+			DataFramework.tagsCheck = false;
+			string definesString = PlayerSettings.GetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup);
+			var    allDefines    = definesString.Split(';').ToList();
+
+			var index = allDefines.FindIndex(d => d.Contains("ACTORS_TAGS_CHECKS"));
+			if (index != -1)
+			{
+				allDefines[index] = string.Empty;
+			}
+
+
+			PlayerSettings.SetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup, string.Join(";", allDefines.ToArray()));
+		}
+
+		[MenuItem("Tools/Actors/Tags/Set Tag Checks", false, 1)]
+		static public void SetChecks()
+		{
+			DataFramework.tagsCheck = true;
+			string definesString = PlayerSettings.GetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup);
+			var    allDefines    = definesString.Split(';').ToList();
+
+			var index = allDefines.FindIndex(d => d.Contains("ACTORS_TAGS_CHECKS"));
+			if (index == -1)
+			{
+				allDefines.Add("ACTORS_TAGS_CHECKS");
+			}
+
+
+			PlayerSettings.SetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup, string.Join(";", allDefines.ToArray()));
+		}
+
+
 		[MenuItem("Tools/Actors/Tags/Size/24 Tags", false, 0)]
 		static public void Set24()
 		{
 			DataFramework.sizeTags = 24;
 			string definesString = PlayerSettings.GetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup);
-			List<string> allDefines = definesString.Split(';').ToList();
+			var    allDefines    = definesString.Split(';').ToList();
 
 			var index = allDefines.FindIndex(d => d.Contains("ACTORS_TAGS"));
 			allDefines[index] = "ACTORS_TAGS_24";
 			PlayerSettings.SetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup, string.Join(";", allDefines.ToArray()));
 
-//			allDefines.AddRange(Symbols.Except(allDefines));
-//			PlayerSettings.SetScriptingDefineSymbolsForGroup(
-//					EditorUserBuildSettings.selectedBuildTargetGroup,
-//					string.Join(";", allDefines.ToArray()));
+			//			allDefines.AddRange(Symbols.Except(allDefines));
+			//			PlayerSettings.SetScriptingDefineSymbolsForGroup(
+			//					EditorUserBuildSettings.selectedBuildTargetGroup,
+			//					string.Join(";", allDefines.ToArray()));
 		}
 
 		[MenuItem("Tools/Actors/Tags/Size/12 Tags", false, 0)]
 		static public void Set12()
 		{
 			DataFramework.sizeTags = 12;
-			string definesString = PlayerSettings.GetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup);
-			List<string> allDefines = definesString.Split(';').ToList();
+			string       definesString = PlayerSettings.GetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup);
+			List<string> allDefines    = definesString.Split(';').ToList();
 
 			var index = allDefines.FindIndex(d => d.Contains("ACTORS_TAGS"));
 			allDefines[index] = "ACTORS_TAGS_12";
@@ -88,33 +157,33 @@ namespace Pixeye.Framework
 		static public void Set6()
 		{
 			DataFramework.sizeTags = 6;
-			string definesString = PlayerSettings.GetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup);
-			List<string> allDefines = definesString.Split(';').ToList();
+			string       definesString = PlayerSettings.GetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup);
+			List<string> allDefines    = definesString.Split(';').ToList();
 
 			var index = allDefines.FindIndex(d => d.Contains("ACTORS_TAGS"));
 			allDefines[index] = "ACTORS_TAGS_6";
 			PlayerSettings.SetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup, string.Join(";", allDefines.ToArray()));
 		}
 
-	//	[MenuItem("Tools/Actors/Tags/Register", false, 1)]
+		//	[MenuItem("Tools/Actors/Tags/Register", false, 1)]
 		static public void Execute()
 		{
 			Init();
 			TagRegist();
 		}
 
-	//	[MenuItem("Tools/Actors/Tags/Reset/Reset And Register", false, 1)]
+		//	[MenuItem("Tools/Actors/Tags/Reset/Reset And Register", false, 1)]
 		static public void ExecuteResetAndRegistration()
 		{
-			isReset = true;
+			isReset   = true;
 			lastIndex = 0;
 			TagRegist();
 		}
 
-	//	[MenuItem("Tools/Actors/Tags/Reset/Reset", false, 1)]
+		//	[MenuItem("Tools/Actors/Tags/Reset/Reset", false, 1)]
 		static public void ExecuteReset()
 		{
-			isReset = true;
+			isReset   = true;
 			lastIndex = 0;
 		}
 
@@ -130,7 +199,7 @@ namespace Pixeye.Framework
 						while (!sr.EndOfStream)
 						{
 							var str = sr.ReadLine();
-							var e = int.Parse(str);
+							var e   = int.Parse(str);
 							freeIdTags.Add(e);
 						}
 					}
@@ -142,36 +211,36 @@ namespace Pixeye.Framework
 			}
 		}
 
-//		static void Save()
-//		{
-//			StreamWriter sr;
-//			if (!File.Exists(pathWithMeta))
-//			{
-//				sr = File.CreateText(pathWithMeta);
-//			}
-//			else
-//			{
-//				sr = new StreamWriter(pathWithMeta, false, System.Text.Encoding.Default);
-//			}
-//
-//			using (sr)
-//			{
-//				sr.WriteLine(lastIndex);
-//				for (int i = 0; i < freeIdTags.Count; i++)
-//				{
-//					sr.WriteLine(freeIdTags[i]);
-//				}
-//			}
-//		}
+		//		static void Save()
+		//		{
+		//			StreamWriter sr;
+		//			if (!File.Exists(pathWithMeta))
+		//			{
+		//				sr = File.CreateText(pathWithMeta);
+		//			}
+		//			else
+		//			{
+		//				sr = new StreamWriter(pathWithMeta, false, System.Text.Encoding.Default);
+		//			}
+		//
+		//			using (sr)
+		//			{
+		//				sr.WriteLine(lastIndex);
+		//				for (int i = 0; i < freeIdTags.Count; i++)
+		//				{
+		//					sr.WriteLine(freeIdTags[i]);
+		//				}
+		//			}
+		//		}
 
 		static void TagRegist()
 		{
 			string[] Files = Directory.GetFiles(path, "*.cs");
-			int count = 0;
+			int      count = 0;
 			for (int f = 0; f < Files.Length; f++)
 			{
-				var readPath = Files[f];
-				string text = String.Empty;
+				var    readPath = Files[f];
+				string text     = String.Empty;
 				try
 				{
 					using (StreamReader sr = new StreamReader(readPath, System.Text.Encoding.Default))
@@ -192,7 +261,7 @@ namespace Pixeye.Framework
 						if (lines[i][ind] == '0' | isReset)
 						{
 							count++;
-// free id required
+							// free id required
 							int l_int = 0;
 							if (freeIdTags.Count == 0)
 							{
@@ -250,6 +319,5 @@ namespace Pixeye.Framework
 			idTags.Clear();
 			freeIdTags.Clear();
 		}
-
 	}
 }

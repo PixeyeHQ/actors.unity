@@ -9,6 +9,7 @@ namespace Pixeye.Framework
 	public interface IWrap<TProp> : IWrap
 	{
 
+		
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		IWrap<TProp> Subscribe(Action<TProp> callback);
 
@@ -17,6 +18,8 @@ namespace Pixeye.Framework
 	public interface IWrap
 	{
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		void FirstTime();
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		void Check();
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]

@@ -8,83 +8,71 @@ namespace Pixeye.Framework
 {
 	public sealed class ProcessorSignals : IDisposable, IKernel
 	{
-
 		public static ProcessorSignals Default = new ProcessorSignals();
-		readonly Dictionary<int, List<IReceive>> signals = new Dictionary<int, List<IReceive>>(new FastComparable());
-
-		#region LOGIC
+		private readonly Dictionary<int, List<IReceive>> signals = new Dictionary<int, List<IReceive>>((IEqualityComparer<int>) new FastComparable());
 
 		public static void Send<T>(in T val)
 		{
 			Default.Dispatch(in val);
 		}
 
-		void Dispatch<T>(in T val)
+		private void Dispatch<T>(in T val)
 		{
-			List<IReceive> cachedSignals;
-
-			if (!signals.TryGetValue(typeof(T).GetHashCode(), out cachedSignals)) return;
-
-			var len = cachedSignals.Count;
-
-			for ( var i = 0; i < len; i++ )
-			{
-				(cachedSignals[i] as IReceive<T>).HandleSignal(in val);
-			}
-		}
-
-		void Add(IReceive receive, Type type)
-		{
-			List<IReceive> cachedSignals;
-			var            key = type.GetHashCode();
-
-			if (signals.TryGetValue(key, out cachedSignals))
-			{
-				cachedSignals.Add(receive);
+			List<IReceive> receiveList;
+			if (!signals.TryGetValue(typeof(T).GetHashCode(), out receiveList))
 				return;
-			}
-
-			signals.Add(key, new List<IReceive> {receive});
+			int count = receiveList.Count;
+			for (int index = 0; index < count; ++index)
+				(receiveList[index] as IReceive<T>).HandleSignal(in val);
 		}
 
-		void Remove(IReceive receive, Type type)
+		private void Add(IReceive receive, Type type)
 		{
-			List<IReceive> cachedSignals;
-			if (signals.TryGetValue(type.GetHashCode(), out cachedSignals))
-			{
-				cachedSignals.Remove(receive);
-			}
+			int            hashCode = type.GetHashCode();
+			List<IReceive> receiveList;
+			if (signals.TryGetValue(hashCode, out receiveList))
+				receiveList.Add(receive);
+			else
+				signals.Add(hashCode, new List<IReceive>()
+				{
+						receive
+				});
+		}
+
+		private void Remove(IReceive receive, Type type)
+		{
+			List<IReceive> receiveList;
+			if (!signals.TryGetValue(type.GetHashCode(), out receiveList))
+				return;
+			receiveList.Remove(receive);
 		}
 
 		public static bool Check(object obj)
 		{
-			var reciever = obj as IReceive;
-			return reciever != null;
+			return obj is IReceive;
 		}
 
-		public void Add(object obj)
+		public static void Add(object obj)
 		{
-			var all      = obj.GetType().GetInterfaces();
-			var reciever = obj as IReceive;
-			foreach ( var intType in all )
+			var      processor  = Default;
+			var      interfaces = obj.GetType().GetInterfaces();
+			IReceive receive    = obj as IReceive;
+			foreach (Type type in interfaces)
 			{
-				if (intType.IsGenericType && intType.GetGenericTypeDefinition() == typeof(IReceive<>))
-				{
-					Add(reciever, intType.GetGenericArguments()[0]);
-				}
+				if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IReceive<>))
+					processor.Add(receive, type.GetGenericArguments()[0]);
 			}
 		}
 
-		public void Remove(object obj)
+		public static void Remove(object obj)
 		{
-			var all      = obj.GetType().GetInterfaces();
-			var reciever = obj as IReceive;
-			foreach ( var intType in all )
+			var      processor  = Default;
+			var      interfaces = obj.GetType().GetInterfaces();
+			IReceive receive    = obj as IReceive;
+			foreach (Type type in interfaces)
 			{
-				if (intType.IsGenericType && intType.GetGenericTypeDefinition() == typeof(IReceive<>))
-				{
-					Remove(reciever, intType.GetGenericArguments()[0]);
-				}
+				if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IReceive<>))
+					processor.Remove(receive, type.GetGenericArguments()[0]);
 			}
 		}
 
@@ -92,8 +80,5 @@ namespace Pixeye.Framework
 		{
 			signals.Clear();
 		}
-
-		#endregion
-
 	}
 }

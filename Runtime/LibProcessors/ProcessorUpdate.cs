@@ -9,7 +9,6 @@ namespace Pixeye.Framework
 {
 	public sealed class ProcessorUpdate : MonoBehaviour, IDisposable, IKernel
 	{
-
 		public static ProcessorUpdate Default;
 
 		internal static List<Time> times = new List<Time>();
@@ -33,46 +32,85 @@ namespace Pixeye.Framework
 			return countTicks;
 		}
 
-		public void Add(object updateble)
+		public static void AddTick(object updateble)
+		{
+			Default.ticks.Add(updateble as ITick);
+			Default.countTicks++;
+		}
+
+		public static void RemoveTick(object updateble)
+		{
+			Default.ticks.Remove(updateble as ITick);
+			Default.countTicks--;
+		}
+
+
+		public static void AddTickFixed(object updateble)
+		{
+			Default.ticksFixed.Add(updateble as ITickFixed);
+			Default.countTicksFixed++;
+		}
+
+		public static void RemoveTickFixed(object updateble)
+		{
+			Default.ticksFixed.Remove(updateble as ITickFixed);
+			Default.countTicksFixed--;
+		}
+
+
+		public static void AddTickLate(object updateble)
+		{
+			Default.ticksLate.Add(updateble as ITickLate);
+			Default.countTicksLate++;
+		}
+
+		public static void RemoveTickLate(object updateble)
+		{
+			Default.ticksLate.Remove(updateble as ITickLate);
+			Default.countTicksLate--;
+		}
+
+
+		public static void Add(object updateble)
 		{
 			var tickable = updateble as ITick;
 			if (tickable != null)
 			{
-				ticks.Add(tickable);
+				Default.ticks.Add(tickable);
 
-				countTicks++;
+				Default.countTicks++;
 			}
 
 			var tickableFixed = updateble as ITickFixed;
 			if (tickableFixed != null)
 			{
-				ticksFixed.Add(tickableFixed);
-				countTicksFixed++;
+				Default.ticksFixed.Add(tickableFixed);
+				Default.countTicksFixed++;
 			}
 
 			var tickableLate = updateble as ITickLate;
 			if (tickableLate != null)
 			{
-				ticksLate.Add(tickableLate);
-				countTicksLate++;
+				Default.ticksLate.Add(tickableLate);
+				Default.countTicksLate++;
 			}
 		}
 
-		public void Remove(object updateble)
+		public static void Remove(object updateble)
 		{
-			if (ticks.Remove(updateble as ITick))
+			if (Default.ticks.Remove(updateble as ITick))
 			{
-				countTicks--;
+				Default.countTicks--;
 			}
 
-			if (ticksFixed.Remove(updateble as ITickFixed))
+			if (Default.ticksFixed.Remove(updateble as ITickFixed))
 			{
-				countTicksFixed--;
+				Default.countTicksFixed--;
 			}
 
-			if (ticksLate.Remove(updateble as ITickLate))
+			if (Default.ticksLate.Remove(updateble as ITickLate))
 			{
-				countTicksLate--;
+				Default.countTicksLate--;
 			}
 		}
 
@@ -80,7 +118,8 @@ namespace Pixeye.Framework
 		{
 			if (Toolbox.changingScene) return;
 
-			var delta = Time.delta;
+ 
+			var delta = Time.delta * Time.Default.timeScale;
 
 			for (int i = 0; i < timesLen; i++)
 			{
@@ -109,7 +148,7 @@ namespace Pixeye.Framework
 				ticksLate[i].TickLate(delta);
 		}
 
- 
+
 		public void Dispose()
 		{
 			countTicks = 0;
@@ -117,7 +156,7 @@ namespace Pixeye.Framework
 			countTicksLate = 0;
 
 			ticks.RemoveAll(t => t is IKernel == false);
-
+			
 			ticksFixed.Clear();
 			ticksLate.Clear();
 
@@ -130,6 +169,5 @@ namespace Pixeye.Framework
 			DontDestroyOnLoad(obj);
 			Default = obj.AddComponent<ProcessorUpdate>();
 		}
-
 	}
 }

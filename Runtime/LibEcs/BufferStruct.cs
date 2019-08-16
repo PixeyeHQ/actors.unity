@@ -2,48 +2,81 @@
 // Contacts : Pix - ask@pixeye.games
 
 using System;
- 
+using System.Runtime.CompilerServices;
 
 namespace Pixeye.Framework
 {
 	[Serializable]
 	public class BufferStruct<T> where T : struct
 	{
-
-		public static BufferStruct<T> Default = new BufferStruct<T>();
-
-		public T[] source = new T[12];
+		public static BufferStruct<T> Default = new BufferStruct<T>(500);
+		
 		public int length;
 
-		public ref T this[int index] => ref source[index];
+		public T[] source;
+		int[] pointers;
+		int[] queue;
+		int lengthQueue;
+		int tail;
+		int head;
 
-		public void Add(in T obj)
+
+		public ref T this[int index]
 		{
-			if (length == source.Length)
-				Array.Resize(ref source, length << 1);
-
-			source[length++] = obj;
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			get => ref source[pointers[index]];
 		}
 
-		public void RemoveAt(int index)
+
+		public BufferStruct(int size)
 		{
-			--length;
-			for (int i = index; i < length; ++i)
-				SetElement(i, ref source[i + 1]);
+			source   = new T[size];
+			pointers = new int[size];
+			queue    = new int[size];
 		}
 
-		public void SetElement(int index, ref T arg)
-		{
-			source[index] = arg;
-		}
 
 		public ref T Add()
 		{
-			if (length == source.Length)
-				Array.Resize(ref source, length << 1);
-
-			return ref source[length++];
+			var index = length++;
+			if (lengthQueue> 0)
+			{
+				pointers[index] = queue[head];
+				queue[head]     = 0;
+				head            = (head + 1) % queue.Length;
+				lengthQueue--;
+			}
+			else pointers[index] = length;
+			return ref source[pointers[index]];
 		}
 
+		public int AddIndex()
+		{
+			var index = length++;
+			if (lengthQueue > 0)
+			{
+				pointers[index] = queue[head];
+				queue[head]     = 0;
+				head            = (head + 1) % queue.Length;
+				lengthQueue--;
+			}
+			else pointers[index] = length;
+ 
+			return index;
+		}
+
+
+		public void RemoveAt(int index)
+		{
+			queue[tail] = pointers[index];
+			tail        = (tail + 1) % queue.Length;
+			lengthQueue++;
+
+			--length;
+			for (int i = index; i < length; i++)
+			{
+				pointers[i] = pointers[i + 1];
+			}
+		}
 	}
 }

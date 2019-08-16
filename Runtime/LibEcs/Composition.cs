@@ -1,25 +1,24 @@
 //  Project  : ACTORS
 //  Contacts : Pixeye - ask@pixeye.games
 
+
 using System;
 using System.Runtime.CompilerServices;
 using Unity.IL2CPP.CompilerServices;
-using UnityEngine;
 
 namespace Pixeye.Framework
 {
 	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
 	public unsafe class Composition : IEquatable<Composition>
 	{
-
 		public int[] generations = new int[0];
 		public int[] ids = new int[0];
 
 		internal int[] includeTags = new int[0];
 		internal int[] excludeTags = new int[0];
 
-		public bool[] includeComponents = new bool[SettingsEngine.SizeComponents];
-		internal bool[] excludeComponents = new bool[SettingsEngine.SizeComponents];
+		public bool[] includeComponents = new bool[Entity.settings.SizeComponents];
+		internal bool[] excludeComponents = new bool[Entity.settings.SizeComponents];
 
 		internal HashCode hash;
 
@@ -27,11 +26,12 @@ namespace Pixeye.Framework
 		internal bool OverlapComponents(in BufferComponents entityComponents)
 		{
 			int match = 0;
-			for (int i = 0; i < entityComponents.length; i++)
+			for (int i = 0; i < entityComponents.amount; i++)
 			{
 				if (includeComponents[entityComponents.ids[i]])
 					match++;
 			}
+
 			return ids.Length == match;
 		}
 
@@ -55,32 +55,44 @@ namespace Pixeye.Framework
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		internal bool CheckTags(int entityID)
-		{
-			return CanProceed(entityID) && (includeTags.Length == 0 || IncludeTags(entityID)) & (excludeTags.Length == 0 || ExcludeTags(entityID));
-		}
-
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal bool Check(int entityID)
 		{
-			return CanProceed(entityID) && (includeTags.Length == 0 || IncludeTags(entityID)) & (excludeTags.Length == 0 || ExcludeTags(entityID)) & !ExcludeTypes(entityID);
+			#if ACTORS_TAGS_CHECKS
+			return CanProceed(entityID) && !ExcludeTypes(entityID) && (includeTags.Length == 0 || IncludeTags(entityID)) & (excludeTags.Length == 0 || ExcludeTags(entityID));
+			#else
+			for (int ll = 0; ll < ids.Length; ll++)
+				if ((Entity.generations[entityID, generations[ll]] & ids[ll]) != ids[ll])
+				{
+					return false;
+				}
+
+			ref var components = ref Entity.components[entityID];
+
+			for (int i = 0; i < components.amount; i++)
+			{
+				if (excludeComponents[components.ids[i]])
+				{
+					return false;
+				}
+			}
+			return true;
+			#endif
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal bool CanProceed(int entityID)
 		{
 			for (int ll = 0; ll < ids.Length; ll++)
-			{
-				var mask = ids[ll];
-				if ((Entity.generations[entityID, generations[ll]] & mask) != mask) return false;
-			}
+				if ((Entity.generations[entityID, generations[ll]] & ids[ll]) != ids[ll])
+					return false;
+
 			return true;
 		}
-
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal bool IncludeTags(int entityID)
 		{
 			ref var tags = ref Entity.tags[entityID];
-			var len = tags.Length;
+			var     len  = tags.Length;
 
 			if (len == 0) return false;
 			var match = 0;
@@ -97,11 +109,11 @@ namespace Pixeye.Framework
 
 			return match == includeTags.Length;
 		}
-
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal bool ExcludeTags(int entityID)
 		{
 			ref var tags = ref Entity.tags[entityID];
-			var len = tags.Length;
+			var     len  = tags.Length;
 			if (len == 0) return true;
 
 			for (int l = 0; l < excludeTags.Length; l++)
@@ -116,18 +128,19 @@ namespace Pixeye.Framework
 
 			return true;
 		}
-
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal bool ExcludeTypes(int entityID)
 		{
 			ref var components = ref Entity.components[entityID];
 
-			for (int i = 0; i < components.length; i++)
+			for (int i = 0; i < components.amount; i++)
 			{
 				if (excludeComponents[components.ids[i]])
 				{
 					return true;
 				}
 			}
+
 			return false;
 		}
 
@@ -146,6 +159,5 @@ namespace Pixeye.Framework
 			var other = obj as Composition;
 			return other != null && Equals(other);
 		}
-
 	}
 }

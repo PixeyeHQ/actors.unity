@@ -16,64 +16,44 @@ namespace Pixeye.Framework
 {
 	public abstract class MonoCached : MonoBehaviour, IRequireStarter
 	{
-		#region FIELDS
-
-		[HideInInspector] public Transform selfTransform;
-		bool conditionSignals;
-
-		#endregion
-
+		 
 
 		void Awake()
 		{
-			selfTransform = transform;
-			conditionSignals = ProcessorSignals.Check(this);
 			if (Starter.initialized == false) return;
 			Setup();
-			
 		}
 
 
 		void OnEnable()
 		{
 			if (Starter.initialized == false) return;
-
-
 			HandleEnable();
-
-			if (conditionSignals)
-				ProcessorSignals.Default.Add(this);
-
-			ProcessorUpdate.Default.Add(this);
 		}
 
 		void OnDisable()
 		{
-			if (conditionSignals)
-				ProcessorSignals.Default.Remove(this);
-			ProcessorUpdate.Default.Remove(this);
-
 			HandleDisable();
 		}
 
 
-		public virtual void Launch()
+		public void Launch()
 		{
 			Setup();
 			OnEnable();
 		}
 
 
-		protected virtual void HandleEnable() { }
-
-		protected virtual void HandleDisable() { }
-
-		protected virtual void Setup() { }
-		public void LaunchOnStart()
+		protected virtual void HandleEnable()
 		{
-			Setup();
-			OnEnable();
 		}
 
+		protected virtual void HandleDisable()
+		{
+		}
+
+		protected virtual void Setup()
+		{
+		}
 	}
 }

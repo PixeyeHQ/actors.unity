@@ -15,7 +15,10 @@ namespace Pixeye.Framework
 
 		#region MATH
 
+
 	 
+		
+		
 		public static bool Every(this float step, float time)
 		{
 			if (step % time == 0)
@@ -180,14 +183,14 @@ namespace Pixeye.Framework
 			GameObject.Destroy(tr.gameObject);
 		}
 
-		/// <summary>
-		/// Must have actor component.
-		/// </summary>
-		/// <param name="e"></param>
-		public static void ForceDeploy(this in ent e)
-		{
-			Entity.Delayed.Set(e, 0, Entity.Delayed.Action.Activate);
-		}
+		// /// <summary>
+		// /// Must have actor component.
+		// /// </summary>
+		// /// <param name="e"></param>
+		// public static void ForceDeploy(this in ent e)
+		// {
+		// 	Entity.Delayed.Set(e, 0, EntityOperations.Action.Activate);
+		// }
 
 		#endregion
 
@@ -537,6 +540,9 @@ namespace Pixeye.Framework
 		{
 			return Rand.Source.NextDouble() > chance ? arg0 : arg1;
 		}
+
+
+	 
 
 		public static int Between(this object o, int a, int b, float chance = 0.5f)
 		{

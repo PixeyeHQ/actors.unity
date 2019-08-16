@@ -1,15 +1,16 @@
 //  Project  : ACTORS
 //  Contacts : Pixeye - ask@pixeye.games
 
+using System;
+
 namespace Pixeye.Framework
 {
-	public static class SettingsEngine
+	[Serializable]
+	public class SettingsEngine
 	{
-		
-		public static int SizeEntities = 1024;
-		public static int SizeComponents = 256;
-		public static int SizeBlueprinths = 24;
-		public static int SizeGenerations = 4;
-
+		public int SizeEntities = 1024;
+		public int SizeComponents = 256;
+		public int SizeGenerations = 4;
+		public int SizeProcessors = 256;
 	}
 }

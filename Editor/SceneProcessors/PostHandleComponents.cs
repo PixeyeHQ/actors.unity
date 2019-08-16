@@ -16,8 +16,11 @@ namespace Pixeye.Framework
 {
 	public class PostHandleComponents : EndNameEditAction
 	{
-
+		#if !ACTORS_COMPONENTS_STRUCTS
 		public const string PATH_TO_TEMPLATE = @"Assets\Framework\Editor\Templates\TmpComponent.txt";
+		#else
+	  public const string PATH_TO_TEMPLATE = @"Assets\Framework\Editor\Templates\TmpComponentStruct.txt";
+		#endif
 		const int MENU_ITEM_PRIORITY = 0;
 		static Texture2D scriptIcon;
 
@@ -32,8 +35,11 @@ namespace Pixeye.Framework
 			var path = HelperFramework.GetPathLibrary();
 			if (path == string.Empty)
 				path = PATH_TO_TEMPLATE;
+			#if !ACTORS_COMPONENTS_STRUCTS
 			else path = string.Format($"{path}/Editor/Templates/TmpComponent.txt");
-
+			#else
+		 	else path = string.Format($"{path}/Editor/Templates/TmpComponentStruct.txt");
+			#endif
 			CreateFromTemplate("ComponentDefault.cs", path);
 		}
 
@@ -64,10 +70,10 @@ namespace Pixeye.Framework
 
 			templateContents = templateContents.Replace("##NAMESPACE##", string.Format($"{Environment.NewLine}namespace {DataFramework.nameSpace}"));
 			templateContents = templateContents.Replace("##NAME##", className);
-			
-			
+
+
 			templateContents = templateContents.Replace("##NAMESPACE2##", string.Format($"{DataFramework.nameSpace}"));
-			templateContents = templateContents.Replace("##NAME2##", string.Format($"{className.Replace("Component","")}"));
+			templateContents = templateContents.Replace("##NAME2##", string.Format($"{className.Replace("Component", "")}"));
 			var encoding = new UTF8Encoding(true, false);
 
 			using (var tc = new StreamWriter(filePath, false, encoding))
@@ -88,6 +94,5 @@ namespace Pixeye.Framework
 			ProjectWindowUtil.ShowCreatedAsset(o);
 			AssetDatabase.Refresh();
 		}
-
 	}
 }

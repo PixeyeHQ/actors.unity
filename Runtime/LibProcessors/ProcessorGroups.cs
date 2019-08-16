@@ -4,21 +4,20 @@
 using System;
 using System.Reflection;
 using Unity.IL2CPP.CompilerServices;
-using UnityEngine;
 
 namespace Pixeye.Framework
 {
+	// TODO: refactor.
 	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
 	public sealed class ProcessorGroups
 	{
-
 		internal static DictionaryGroup container = new DictionaryGroup();
 
 		public static void Setup(object b)
 		{
-			var type = b.GetType();
+			var type         = b.GetType();
 			var objectFields = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
-			int length = objectFields.Length;
+			int length       = objectFields.Length;
 
 			var groupType = typeof(GroupCore);
 
@@ -26,23 +25,9 @@ namespace Pixeye.Framework
 			{
 				var myFieldInfo = objectFields[i];
 
-				var bindAttribute = Attribute.GetCustomAttribute(myFieldInfo, typeof(BindAttribute)) as BindAttribute;
-				if (bindAttribute != null)
+				if (myFieldInfo.FieldType.IsSubclassOf(groupType))
 				{
-					var fType = myFieldInfo.FieldType;
-					var hash = fType.GetHashCode();
-
-					if (!DataSession.binds.TryGetValue(hash, out object o))
-					{
-						o = Activator.CreateInstance(fType);
-						DataSession.binds.Add(hash, o);
-					}
-
-					myFieldInfo.SetValue(b, o);
-				}
-				else if (myFieldInfo.FieldType.IsSubclassOf(groupType))
-				{
-					var groupByAttribute = Attribute.GetCustomAttribute(myFieldInfo, typeof(GroupByAttribute)) as GroupByAttribute;
+					var groupByAttribute      = Attribute.GetCustomAttribute(myFieldInfo, typeof(GroupByAttribute)) as GroupByAttribute;
 					var groupExcludeAttribute = Attribute.GetCustomAttribute(myFieldInfo, typeof(GroupExcludeAttribute)) as GroupExcludeAttribute;
 
 					var includeTagsFilter = groupByAttribute != null ? groupByAttribute.filter : new int[0];
@@ -59,17 +44,25 @@ namespace Pixeye.Framework
 					composition.includeTags = includeTagsFilter;
 					composition.AddTypesExclude(excludeCompFilter);
 
-					composition.hash = HashCode.OfEach(composition.includeTags).And(17).AndEach(composition.excludeTags).And(31).AndEach(excludeCompFilter);
-					myFieldInfo.SetValue(b, SetupGroup(myFieldInfo.FieldType, composition));
+
+					composition.hash = HashCode.OfEach(myFieldInfo.FieldType.GetGenericArguments()).AndEach(composition.includeTags).And(17).AndEach(composition.excludeTags).And(31).AndEach(excludeCompFilter);
+					myFieldInfo.SetValue(b, SetupGroup(myFieldInfo.FieldType, composition, myFieldInfo.GetValue(b)));
 				}
 			}
 		}
 
-		internal static GroupCore SetupGroup(Type groupType, Composition filter)
+		internal static GroupCore SetupGroup(Type groupType, Composition filter, object fieldObj)
 		{
 			if (container.TryGetValue(groupType, filter, out GroupCore group))
 			{
 				return group;
+			}
+
+
+			if (fieldObj != null)
+			{
+				group = fieldObj as GroupCore;
+				return container.Add((Activator.CreateInstance(groupType, true) as GroupCore).Start(filter));
 			}
 
 			return container.Add((Activator.CreateInstance(groupType, true) as GroupCore).Start(filter));
@@ -79,6 +72,5 @@ namespace Pixeye.Framework
 		{
 			container.Dispose();
 		}
-
 	}
 }

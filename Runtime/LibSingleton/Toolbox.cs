@@ -13,7 +13,6 @@ namespace Pixeye.Framework
 	/// </summary>
 	public class Toolbox : Singleton<Toolbox>
 	{
-
 		[SerializeField]
 		Dictionary<int, object> data = new Dictionary<int, object>(5, new FastComparable());
 
@@ -32,7 +31,7 @@ namespace Pixeye.Framework
 		public static T Add<T>(Type type = null) where T : new()
 		{
 			object o;
-			var hash = type == null ? typeof(T).GetHashCode() : type.GetHashCode();
+			var    hash = type == null ? typeof(T).GetHashCode() : type.GetHashCode();
 			if (Instance.data.TryGetValue(hash, out o))
 			{
 				InitializeObject(o);
@@ -65,8 +64,8 @@ namespace Pixeye.Framework
 				InitializeObject(possibleObj);
 			}
 
-			var add = obj;
-			var scriptable = obj as ScriptableObject;
+			var add             = obj;
+			var scriptable      = obj as ScriptableObject;
 			if (scriptable) add = Instantiate(scriptable);
 			InitializeObject(obj);
 
@@ -83,7 +82,7 @@ namespace Pixeye.Framework
 		{
 			var awakeble = obj as IAwake;
 			if (awakeble != null) awakeble.OnAwake();
-			ProcessorUpdate.Default.Add(obj);
+			ProcessorUpdate.Add(obj);
 		}
 
 		/// <summary>
@@ -92,8 +91,8 @@ namespace Pixeye.Framework
 		public static T Get<T>()
 		{
 			object resolve;
-			var hasValue = Instance.data.TryGetValue(typeof(T).GetHashCode(), out resolve);
-			return hasValue ? (T) resolve : default(T);
+			var    hasValue = Instance.data.TryGetValue(typeof(T).GetHashCode(), out resolve);
+			return hasValue ? (T) resolve : default(T); 
 		}
 
 		internal void ClearSessionData()
@@ -104,16 +103,16 @@ namespace Pixeye.Framework
 
 			foreach (var pair in data)
 			{
-				var isKernel = pair.Value as IKernel;
-				if (isKernel == null) toWipe.Add(pair.Key);
+				if (!(pair.Value is IKernel))
+					toWipe.Add(pair.Key);
 
-				var needToBeCleaned = pair.Value as IDisposable;
-				if (needToBeCleaned == null) continue;
+				if (!(pair.Value is IDisposable needToBeCleaned)) continue;
 
 				needToBeCleaned.Dispose();
 			}
 
-			HandlePool.Dispose();
+			Pool.Dispose();
+			Storage.Dispose();
 			ProcessorGroups.Dispose();
 			ProcessorTimer.Default.Dispose();
 			ProcessorScene.Default.Dispose();
@@ -143,8 +142,6 @@ namespace Pixeye.Framework
 			{
 				disposables[i].Dispose();
 			}
-
-	 
 		}
 
 		protected override void OnApplicationQuit()
@@ -152,6 +149,5 @@ namespace Pixeye.Framework
 			base.OnApplicationQuit();
 			OnDestroyAction();
 		}
-
 	}
 }

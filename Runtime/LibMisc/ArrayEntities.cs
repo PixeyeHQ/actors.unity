@@ -2,17 +2,15 @@
 // Contacts : Pix - ask@pixeye.games
 
 using System;
-using System.Collections.Generic;
 using Unity.IL2CPP.CompilerServices;
-using UnityEngine;
+
 
 namespace Pixeye.Framework
 {
 	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
-	internal class ArrayEntities
+	class ArrayEntities
 	{
-
-		internal ent[] storage = new ent[SettingsEngine.SizeEntities];
+		internal ent[] storage = new ent[Entity.settings.SizeEntities];
 		internal int len;
 
 		internal void TryAdd(in ent entity)
@@ -32,6 +30,7 @@ namespace Pixeye.Framework
 
 			storage[len++] = entity;
 		}
+
 		internal void Add(in ent entity)
 		{
 			if (len == storage.Length)
@@ -39,16 +38,8 @@ namespace Pixeye.Framework
 				var l = len << 1;
 				Array.Resize(ref storage, l);
 			}
-    //  Debug.Log($"ADDED {entity.id} {len}");
+
 			storage[len++] = entity;
 		}
-
-		
-		
-	 
-		
-		
-		
-		
 	}
 }
