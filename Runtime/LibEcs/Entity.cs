@@ -193,16 +193,16 @@ namespace Pixeye.Framework
 			var id = entity.id;
 			components[id].Add(Storage<T>.componentID);
 
-			#if !ACTORS_COMPONENTS_STRUCTS
+			// #if !ACTORS_COMPONENTS_STRUCTS
+			// ref var componentInStorage = ref Storage<T>.Instance.components[id];
+			// if (componentInStorage != null)
+			// 	Storage<T>.Instance.DisposeAction(entity);
+			//
+			// componentInStorage = component;
+			// #else
 			ref var componentInStorage = ref Storage<T>.Instance.components[id];
-			if (componentInStorage != null)
-				Storage<T>.Instance.DisposeAction(entity);
-
 			componentInStorage = component;
-			#else
-			ref var componentInStorage = ref Storage<T>.Instance.components[id];
-			componentInStorage = component;
-			#endif
+			//#endif
 		}
 		/// <summary>
 		/// Deploy entity components to systems.
@@ -321,16 +321,16 @@ namespace Pixeye.Framework
 			EntityOperations.Set(entity, Storage<T>.componentID, EntityOperations.Action.Add);
 			generations[id, Storage<T>.generation] |= Storage<T>.componentMask;
 
-			#if !ACTORS_COMPONENTS_STRUCTS
+			// #if !ACTORS_COMPONENTS_STRUCTS
+			// ref var componentInStorage = ref Storage<T>.Instance.components[id];
+			// if (componentInStorage != null)
+			// 	Storage<T>.Instance.DisposeAction(entity);
+			//
+			// componentInStorage = component;
+			// #else
 			ref var componentInStorage = ref Storage<T>.Instance.components[id];
-			if (componentInStorage != null)
-				Storage<T>.Instance.DisposeAction(entity);
-
 			componentInStorage = component;
-			#else
-			ref var componentInStorage = ref Storage<T>.Instance.components[id];
-			componentInStorage = component;
-			#endif
+		//	#endif
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]

@@ -106,7 +106,7 @@ namespace Pixeye.Framework
 
 						Entity.tags[entityID].Clear();
 						Entity.cache[entityID].isAlive = false;
-					  
+
 						ent.entityStack.Enqueue(operation.entity);
 						ent.entityStackLength++;
 
@@ -188,6 +188,8 @@ namespace Pixeye.Framework
 						{
 							if (components.ids[tRemoveIndex] == typeConverted)
 							{
+								Storage.all[typeConverted].DisposeAction(entityID);
+
 								for (int j = tRemoveIndex; j < components.amount - 1; ++j)
 									components.ids[j] = components.ids[j + 1];
 
