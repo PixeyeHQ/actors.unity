@@ -150,6 +150,18 @@ namespace Pixeye.Framework
 			return false;
 		}
 
+
+		public int GetAmount(int tagID)
+		{
+			for (int i = 0; i < length; i++)
+			{
+				if (tags[i] == tagID)
+					return size[i];
+			}
+
+			return -1;
+		}
+		
 	}
 
 	public unsafe static class HelperTags
@@ -163,6 +175,11 @@ namespace Pixeye.Framework
 			Entity.tags[entity.id].Clear();
 		}
 
+		public static int TagsAmount(in this ent entity, int tagID)
+		{
+			return Entity.tags[entity.id].GetAmount(tagID);
+		}
+		
 		public static void Add(in this ent entity, int tagID)
 		{
 			ref var buffer = ref Entity.tags[entity.id];
@@ -351,6 +368,8 @@ namespace Pixeye.Framework
 			}
 		}
 
+
+		 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static bool Has(in this ent entity, int tagID)
 		{
