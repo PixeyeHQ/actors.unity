@@ -7,7 +7,7 @@ using Unity.IL2CPP.CompilerServices;
 
 namespace Pixeye.Framework
 {
-	[Serializable]
+		[Serializable]
 	public struct ArrayEntity
 	{
 		public int length;
@@ -26,6 +26,9 @@ namespace Pixeye.Framework
 
 		public void Add(in ent entity)
 		{
+			if (length>=source.Length)
+				Array.Resize(ref source, length << 1);
+		
 			source[length++] = entity;
 		}
 
