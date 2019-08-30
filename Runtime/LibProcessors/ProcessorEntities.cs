@@ -367,7 +367,6 @@ namespace Pixeye.Framework
 				st.toDisposeLen = 0;
 			}
 
-		 // if (EntityOperations.len != 0)
 			EntityOperations.len = 0;
 		}
 

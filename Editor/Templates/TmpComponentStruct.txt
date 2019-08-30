@@ -15,31 +15,29 @@ using System.Runtime.CompilerServices;
     #region HELPERS
     static partial class Components
     {
-    
-                    public const string ##NAME2## = "##NAMESPACE2##.##NAME##";
-                      
-                    [RuntimeInitializeOnLoadMethod]
-                    static void ##NAME##Init() => new S##NAME##();
-                      
-                      
-                    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-                    internal static ref ##NAME## ##NAME##(in this ent entity) =>
-                    ref Storage<##NAME##>.Instance.components[entity.id];
-                      
-                      
-                    internal class S##NAME2## : Storage<##NAME2##>.Setup
-                      {
-                      			public override ##NAME2## Create() => new ##NAME2##();
-                      
-                                 // Use for cleaning components that were removed at the current frame.
-                      			public override void Dispose(int[] id, int len)
-                      			{
-                      				for (int i = 0; i < len; i++)
-                      				{
-                      					ref var component = ref components[id[i]];
-                      				}
-                      			}
-                      }
+           public const string ##NAME2## = "##NAMESPACE2##.##NAME##";
+              
+            static S##NAME## s##NAME## = new S##NAME##();
+              
+              
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            internal static ref ##NAME## ##NAME##(in this ent entity) =>
+            ref Storage<##NAME##>.Instance.components[entity.id];
+              
+              
+            internal class S##NAME## : Storage<##NAME##>.Setup
+              {
+              	public override ##NAME## Create() => new ##NAME##();
+              
+                 // Use for cleaning components that were removed at the current frame.
+              	public override void Dispose(int[] id, int len)
+              	{
+              	  for (int i = 0; i < len; i++)
+              	  {
+              		ref var component = ref components[id[i]];
+              	  }
+              	}
+              }
     }
     #endregion
  
