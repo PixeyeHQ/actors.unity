@@ -29,7 +29,8 @@ namespace Pixeye.Framework
 		public const string Observer = "Pixeye.Source.ComponentObserver";
 
 
-		static SComponentObserver sComponentObserver = new SComponentObserver();
+		[RuntimeInitializeOnLoadMethod]
+		static void ComponentObserverInit()=> new SComponentObserver();
 		
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal static ref ComponentObserver ComponentObserver(in this ent entity) =>
