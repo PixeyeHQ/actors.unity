@@ -2,12 +2,13 @@
 // Contacts : Pix - ask@pixeye.games
 
 using System;
+using System.Runtime.CompilerServices;
 using Unity.IL2CPP.CompilerServices;
 
 
 namespace Pixeye.Framework
 {
-		[Serializable]
+	[Serializable]
 	public struct ArrayEntity
 	{
 		public int length;
@@ -15,6 +16,7 @@ namespace Pixeye.Framework
 
 		public ref ent this[int index]
 		{
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			get => ref source[index];
 		}
 
@@ -23,15 +25,17 @@ namespace Pixeye.Framework
 			source = new ent[size];
 			length = 0;
 		}
-
+		[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void Add(in ent entity)
 		{
-			if (length>=source.Length)
+			if (length >= source.Length)
 				Array.Resize(ref source, length << 1);
-		
+
 			source[length++] = entity;
 		}
-
+		[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void Remove(in ent entity)
 		{
 			for (int i = 0; i < length; i++)
@@ -44,7 +48,8 @@ namespace Pixeye.Framework
 				}
 			}
 		}
-		
+		[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public bool Removed(in ent entity)
 		{
 			for (int i = 0; i < length; i++)
@@ -58,10 +63,6 @@ namespace Pixeye.Framework
 			}
 
 			return false;
-		}		 
-
-		
-		
-		
+		}
 	}
 }

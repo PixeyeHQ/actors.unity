@@ -140,19 +140,17 @@ namespace Pixeye.Framework
 
 			Add<ProcessorEntities>();
 
-			
-#if DEBUG
+
+			#if DEBUG
 			HelperTag.CheckDuplicateID();
-#endif
+			#endif
 
 			Add<ProcessorObserver>();
 
 
 			Setup();
 
-			for (int i = 0; i < ProcessorGroups.container.len; i++)
-				ProcessorGroups.container.storage[i].AddCallbacks();
-
+	 
 
 			initialized = true;
 

@@ -7,12 +7,10 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using Unity.IL2CPP.CompilerServices;
- 
+
 
 namespace Pixeye.Framework
 {
-	delegate void CallBackDelete(int i);
-
 	class GroupCoreComparer : IEqualityComparer<GroupCore>
 	{
 		public static GroupCoreComparer Default = new GroupCoreComparer();
@@ -30,20 +28,33 @@ namespace Pixeye.Framework
 
 
 	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
-	public abstract class GroupCore : IEnumerable, IEquatable<GroupCore>, IDisposable
+	public abstract class GroupCore : GroupEvents, IEnumerable, IEquatable<GroupCore>, IDisposable
 	{
-		internal delegate void DelRemove(int id);
+		internal static GroupCore[] all = new GroupCore[10];
+		internal static int allLen;
 
 		static int idCounter;
 
 		public ent[] entities = new ent[Entity.settings.SizeEntities];
 		public int length;
-		public EntityAction onAdd;
-		public EntityAction onRemove;
 
-		internal EntityAction actionInsert;
-		internal DelRemove actionTryRemove;
-		internal DelRemove actionRemove;
+
+		internal GroupEvents[] onAdd = new GroupEvents[1];
+		internal int onAddLen = 0;
+		internal GroupEvents[] onRemove = new GroupEvents[1];
+		internal int onRemoveLen = 0;
+
+
+		//public EntityActionArray onAdd;
+		//	public EntityActionArray onRemove;
+
+
+		internal ent[] entitiesToAdd = new ent[Entity.settings.SizeEntities];
+		internal ent[] entitiesToRemove = new ent[Entity.settings.SizeEntities];
+
+		internal int entitiesToAddLen;
+		internal int entitiesToRemoveLen;
+
 
 		protected internal Composition composition;
 
@@ -65,9 +76,65 @@ namespace Pixeye.Framework
 		}
 
 
+		internal void SetSelf(Op op)
+		{
+			if ((op & Op.Add) == Op.Add)
+			{
+				if (onAdd.Length == onAddLen)
+					Array.Resize(ref onAdd, onAddLen << 1);
+
+				onAdd[onAddLen++] = this;
+			}
+
+
+			if ((op & Op.Remove) == Op.Remove)
+			{
+				if (onRemove.Length == onRemoveLen)
+					Array.Resize(ref onRemove, onRemoveLen << 1);
+
+				onRemove[onRemoveLen++] = this;
+			}
+		}
+
+
+		public T Set<T>(Op op, Processor proc = null) where T : GroupEvents, new()
+		{
+			var evs = new T();
+			evs.AddProcessor(proc);
+
+			if ((op & Op.Add) == Op.Add)
+			{
+				if (onAdd.Length == onAddLen)
+					Array.Resize(ref onAdd, onAddLen << 1);
+
+				onAdd[onAddLen++] = evs;
+			}
+
+			if ((op & Op.Remove) == Op.Remove)
+			{
+				if (onRemove.Length == onRemoveLen)
+					Array.Resize(ref onRemove, onRemoveLen << 1);
+
+				onRemove[onRemoveLen++] = evs;
+			}
+
+			return evs;
+		}
+
+
+		public GroupCore()
+		{
+			id = idCounter++;
+
+			if (allLen == all.Length)
+				Array.Resize(ref all, allLen << 1);
+
+			all[allLen++] = this;
+		}
+
+
 		internal GroupCore Start(Composition composition)
 		{
-			//	ent.Populate(Entity.settings.SizeEntities, out entities);
 			this.composition = composition;
 			composition.SetupExcludeTypes(this);
 			HelperTags.Add(this);
@@ -77,39 +144,23 @@ namespace Pixeye.Framework
 			return this;
 		}
 
-		internal void AddCallbacks()
-		{
-			if ((object) onAdd != null)
-			{
-				actionInsert = Insert;
-			}
-			else
-				actionInsert = InsertNoCallback;
-
-			if ((object) onRemove != null)
-			{
-				actionTryRemove = TryRemove;
-				actionRemove    = Remove;
-			}
-			else
-			{
-				actionTryRemove = TryRemoveNoCallback;
-				actionRemove    = RemoveNoCallBack;
-			}
-		}
 
 		//===============================//
 		// Insert
 		//===============================//
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		void Insert(in ent entity)
+		internal void Insert(in ent entity)
 		{
 			var left  = 0;
 			var index = 0;
 			var right = length++;
 
 			if (length >= entities.Length)
+			{
 				Array.Resize(ref entities, length << 1);
+				Array.Resize(ref entitiesToAdd, length << 1);
+				Array.Resize(ref entitiesToRemove, length << 1);
+			}
 
 			var consitionSort = right - 1;
 			if (consitionSort > -1 && entity.id < entities[consitionSort].id)
@@ -135,52 +186,19 @@ namespace Pixeye.Framework
 
 				Array.Copy(entities, index, entities, index + 1, length - index);
 				entities[index] = entity;
-				onAdd(entity);
+
+
+				if (onAddLen > 0)
+					entitiesToAdd[entitiesToAddLen++] = entity;
 			}
 			else
 			{
 				entities[right] = entity;
-				onAdd(entity);
+				if (onAddLen > 0)
+					entitiesToAdd[entitiesToAddLen++] = entity;
 			}
 		}
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		void InsertNoCallback(in ent entity)
-		{
-			var left  = 0;
-			var index = 0;
-			var right = length++;
 
-			if (length >= entities.Length)
-				Array.Resize(ref entities, length << 1);
-
-
-			var consitionSort = right - 1;
-			if (consitionSort > -1 && entity.id < entities[consitionSort].id)
-			{
-				while (right > left)
-				{
-					var midIndex = (right + left) / 2;
-
-					if (entities[midIndex].id == entity.id)
-					{
-						index = midIndex;
-						break;
-					}
-
-					if (entities[midIndex].id < entity.id)
-						left = midIndex + 1;
-					else
-						right = midIndex;
-
-					index = left;
-				}
-
-
-				Array.Copy(entities, index, entities, index + 1, length - index);
-				entities[index] = entity;
-			}
-			else entities[right] = entity;
-		}
 
 		//===============================//
 		// Try Remove
@@ -191,63 +209,65 @@ namespace Pixeye.Framework
 			if (length == 0) return;
 			var i = HelperArray.BinarySearch(ref entities, entityID, 0, length);
 			if (i == -1) return;
-			onRemove(entities[i]);
+
+
+			if (onRemoveLen > 0)
+				entitiesToRemove[entitiesToRemoveLen++] = entities[i];
+
 
 			Array.Copy(entities, i + 1, entities, i, length-- - i);
 		}
-		[
-				MethodImpl(MethodImplOptions.AggressiveInlining)]
-		internal void TryRemoveNoCallback(int entityID)
-		{
-			if (length == 0) return;
-			var i = HelperArray.BinarySearch(ref entities, entityID, 0, length);
-			if (i == -1) return;
 
-			Array.Copy(entities, i + 1, entities, i, length-- - i);
-		}
 
 		//===============================//
 		// Remove
 		//===============================//
-		[
-				MethodImpl(MethodImplOptions.AggressiveInlining)]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal void Remove(int i)
 		{
-			onRemove(entities[i]);
-			Array.Copy(entities, i + 1, entities, i, length-- - i);
-		}
-		[
-				MethodImpl(MethodImplOptions.AggressiveInlining)]
-		internal void RemoveNoCallBack(int i)
-		{
+			//	onRemove(entities[i]);
+
+			// if ((object) onRemove != null)
+			// 	entsToRemove.Add(entities[i]);
+
+			if (onRemoveLen > 0)
+				entitiesToRemove[entitiesToRemoveLen++] = entities[i];
+
+
 			Array.Copy(entities, i + 1, entities, i, length-- - i);
 		}
 
-
-		public GroupCore()
-		{
-			id = idCounter++;
-		}
 
 		public abstract void Initialize();
 
-		public void Dispose()
+		public virtual void Dispose()
 		{
 			// base
-			onAdd    = null;
-			onRemove = null;
+			onAdd    = new GroupEvents[1];
+			onRemove = new GroupEvents[1];
 			length   = 0;
 
+
+			onAddLen    = 0;
+			onRemoveLen = 0;
+
+			entitiesToAdd    = new ent[Entity.settings.SizeEntities];
+			entitiesToRemove = new ent[Entity.settings.SizeEntities];
+
+			entitiesToAddLen    = 0;
+			entitiesToRemoveLen = 0;
+
+
 			//parallel
-			if (segmentGroups!=null)
-			for (int i = 0; i < segmentGroups.Length; i++)
-			{
-				var d = segmentGroups[i];
-				d.thread.Interrupt();
-				d.thread.Join(5);
-				syncs[i].Close();
-				segmentGroups[i] = null;
-			}
+			if (segmentGroups != null)
+				for (int i = 0; i < segmentGroups.Length; i++)
+				{
+					var d = segmentGroups[i];
+					d.thread.Interrupt();
+					d.thread.Join(5);
+					syncs[i].Close();
+					segmentGroups[i] = null;
+				}
 
 			segmentGroupLocal = null;
 		}
@@ -517,7 +537,7 @@ namespace Pixeye.Framework
 		}
 	}
 
-	public sealed class Group<T, Y, U> : GroupCore
+	public class Group<T, Y, U> : GroupCore
 	{
 		public override void Initialize()
 		{
@@ -544,7 +564,7 @@ namespace Pixeye.Framework
 		}
 	}
 
-	public sealed class Group<T, Y, U, I> : GroupCore
+	public class Group<T, Y, U, I> : GroupCore
 	{
 		public override void Initialize()
 		{
@@ -576,7 +596,7 @@ namespace Pixeye.Framework
 		}
 	}
 
-	public sealed class Group<T, Y, U, I, O> : GroupCore
+	public class Group<T, Y, U, I, O> : GroupCore
 	{
 		public override void Initialize()
 		{
@@ -607,7 +627,7 @@ namespace Pixeye.Framework
 		}
 	}
 
-	public sealed class Group<T, Y, U, I, O, P> : GroupCore
+	public class Group<T, Y, U, I, O, P> : GroupCore
 
 	{
 		public override void Initialize()
@@ -650,7 +670,7 @@ namespace Pixeye.Framework
 		}
 	}
 
-	public sealed class Group<T, Y, U, I, O, P, A> : GroupCore
+	public class Group<T, Y, U, I, O, P, A> : GroupCore
 	{
 		public override void Initialize()
 		{
@@ -697,7 +717,7 @@ namespace Pixeye.Framework
 		}
 	}
 
-	public sealed class Group<T, Y, U, I, O, P, A, S> : GroupCore
+	public class Group<T, Y, U, I, O, P, A, S> : GroupCore
 	{
 		public override void Initialize()
 		{
@@ -749,7 +769,7 @@ namespace Pixeye.Framework
 		}
 	}
 
-	public sealed class Group<T, Y, U, I, O, P, A, S, D> : GroupCore
+	public class Group<T, Y, U, I, O, P, A, S, D> : GroupCore
 	{
 		public override void Initialize()
 		{
@@ -805,7 +825,7 @@ namespace Pixeye.Framework
 		}
 	}
 
-	public sealed class Group<T, Y, U, I, O, P, A, S, D, F> : GroupCore
+	public class Group<T, Y, U, I, O, P, A, S, D, F> : GroupCore
 	{
 		public override void Initialize()
 		{

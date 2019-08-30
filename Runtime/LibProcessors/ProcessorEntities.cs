@@ -3,6 +3,7 @@
 //     Date : 3/7/2019 
 
 
+using System;
 using Unity.IL2CPP.CompilerServices;
 using UnityEngine;
 
@@ -27,7 +28,7 @@ namespace Pixeye.Framework
 		public void Tick(float delta)
 		{
 			if (!Starter.initialized) return;
-			if (EntityOperations.len == 0) return;
+
 
 			for (int i = 0; i < EntityOperations.len; i++)
 			{
@@ -49,9 +50,9 @@ namespace Pixeye.Framework
 						{
 							var group = storage.groups[l];
 							if (!group.composition.Check(entityID))
-								group.actionTryRemove(entityID);
+								group.TryRemove(entityID);
 							else
-								group.actionInsert(operation.entity);
+								group.Insert(operation.entity);
 						}
 
 
@@ -80,7 +81,7 @@ namespace Pixeye.Framework
 								if (!AlreadyChecked(group))
 								{
 									if (group.composition.OverlapComponents(components))
-										group.actionTryRemove(entityID);
+										group.TryRemove(entityID);
 
 
 									groupsChecked[groupsCheckedLen++] = group;
@@ -93,7 +94,13 @@ namespace Pixeye.Framework
 						for (int j = 0; j < components.amount; j++)
 						{
 							var cID = (int) components.ids[j];
-							Storage.all[cID].DisposeAction(entityID);
+
+							if (Storage.all[cID].toDisposeLen == Storage.all[cID].toDispose.Length)
+								Array.Resize(ref Storage.all[cID].toDispose, Storage.all[cID].toDisposeLen << 1);
+
+							Storage.all[cID].toDispose[Storage.all[cID].toDisposeLen++] = entityID;
+
+							//	Storage.all[cID].DisposeAction(entityID);
 						}
 
 						components.amount = 0;
@@ -107,8 +114,10 @@ namespace Pixeye.Framework
 						Entity.tags[entityID].Clear();
 						Entity.cache[entityID].isAlive = false;
 
-						ent.entityStack.Enqueue(operation.entity);
-						ent.entityStackLength++;
+
+						if (ent.entityStack.length == ent.entityStack.source.Length)
+							Array.Resize(ref ent.entityStack.source, ent.entityStack.length << 1);
+						ent.entityStack.source[ent.entityStack.length++] = operation.entity;
 
 						break;
 					}
@@ -135,7 +144,7 @@ namespace Pixeye.Framework
 								if (!AlreadyChecked(group))
 								{
 									if (group.composition.OverlapComponents(components))
-										group.actionTryRemove(entityID);
+										group.TryRemove(entityID);
 
 									groupsChecked[groupsCheckedLen++] = group;
 								}
@@ -147,14 +156,19 @@ namespace Pixeye.Framework
 						for (int j = 0; j < components.amount; j++)
 						{
 							var cID = (int) components.ids[j];
-							Storage.all[cID].DisposeAction(entityID);
+							//	Storage.all[cID].DisposeAction(entityID);
+							if (Storage.all[cID].toDisposeLen == Storage.all[cID].toDispose.Length)
+								Array.Resize(ref Storage.all[cID].toDispose, Storage.all[cID].toDisposeLen << 1);
+
+							Storage.all[cID].toDispose[Storage.all[cID].toDisposeLen++] = entityID;
 						}
 
 						components.amount = 0;
 						Entity.tags[entityID].Clear();
 						Entity.cache[entityID].isAlive = false;
-						ent.entityStack.Enqueue(operation.entity);
-						ent.entityStackLength++;
+						if (ent.entityStack.length == ent.entityStack.source.Length)
+							Array.Resize(ref ent.entityStack.source, ent.entityStack.length << 1);
+						ent.entityStack.source[ent.entityStack.length++] = operation.entity;
 
 
 						break;
@@ -188,7 +202,11 @@ namespace Pixeye.Framework
 						{
 							if (components.ids[tRemoveIndex] == typeConverted)
 							{
-								Storage.all[typeConverted].DisposeAction(entityID);
+								if (Storage.all[typeConverted].toDisposeLen == Storage.all[typeConverted].toDispose.Length)
+									Array.Resize(ref Storage.all[typeConverted].toDispose, Storage.all[typeConverted].toDisposeLen << 1);
+
+								Storage.all[typeConverted].toDispose[Storage.all[typeConverted].toDisposeLen++] = entityID;
+								//Storage.all[typeConverted].DisposeAction(entityID);
 
 								for (int j = tRemoveIndex; j < components.amount - 1; ++j)
 									components.ids[j] = components.ids[j + 1];
@@ -205,12 +223,12 @@ namespace Pixeye.Framework
 							var group = storage.groups[l];
 
 							if (!group.composition.Check(entityID))
-								group.actionTryRemove(entityID);
+								group.TryRemove(entityID);
 							else
 							{
 								var inGroup = group.length == 0 ? -1 : HelperArray.BinarySearch(ref group.entities, entityID, 0, group.length);
 								if (inGroup == -1)
-									group.actionInsert(operation.entity);
+									group.Insert(operation.entity);
 							}
 						}
 
@@ -237,8 +255,9 @@ namespace Pixeye.Framework
 						Entity.Count--;
 
 
-						ent.entityStack.Enqueue(operation.entity);
-						ent.entityStackLength++;
+						if (ent.entityStack.length == ent.entityStack.source.Length)
+							Array.Resize(ref ent.entityStack.source, ent.entityStack.length << 1);
+						ent.entityStack.source[ent.entityStack.length++] = operation.entity;
 
 						break;
 					}
@@ -260,11 +279,11 @@ namespace Pixeye.Framework
 							if (inGroup == -1)
 							{
 								if (!canBeAdded) continue;
-								group.actionInsert(operation.entity);
+								group.Insert(operation.entity);
 							}
 							else if (inGroup > -1 && !canBeAdded)
 							{
-								group.actionRemove(inGroup);
+								group.Remove(inGroup);
 							}
 						}
 
@@ -274,6 +293,7 @@ namespace Pixeye.Framework
 					case EntityOperations.Action.Activate:
 					{
 						ref var components = ref Entity.components[entityID];
+
 
 						for (int j = 0; j < components.amount; j++)
 						{
@@ -287,7 +307,7 @@ namespace Pixeye.Framework
 							{
 								var group = storage.groups[l];
 								if (!group.composition.Check(entityID)) continue;
-								group.actionInsert(operation.entity);
+								group.Insert(operation.entity);
 							}
 						}
 
@@ -313,7 +333,7 @@ namespace Pixeye.Framework
 							for (int l = 0; l < storage.lenOfGroups; l++)
 							{
 								var group = storage.groups[l];
-								group.actionTryRemove(entityID);
+								group.TryRemove(entityID);
 							}
 						}
 
@@ -322,8 +342,36 @@ namespace Pixeye.Framework
 				}
 			}
 
+			for (int i = 0; i < GroupCore.allLen; i++)
+			{
+				var gr = GroupCore.all[i];
+				Debug.Log(gr);
+				for (int j = gr.onRemoveLen - 1; j > -1; j--)
+				{
+					gr.onRemove[j].OnRemove(gr.entitiesToRemove, gr.entitiesToRemoveLen);
+				}
+
+				gr.entitiesToRemoveLen = 0;
+
+				for (int j = gr.onAddLen - 1; j > -1; j--)
+				{
+					gr.onAdd[j].OnAdd(gr.entitiesToAdd, gr.entitiesToAddLen);
+				}
+
+				gr.entitiesToAddLen = 0;
+			}
+
+			for (int i = 0; i < Storage.lastID; i++)
+			{
+				var st = Storage.all[i];
+				st.setupBase.Dispose(st.toDispose, st.toDisposeLen);
+				st.toDisposeLen = 0;
+			}
+
+			//if (EntityOperations.len != 0)
 			EntityOperations.len = 0;
 		}
+
 
 		protected override void OnDispose()
 		{

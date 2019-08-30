@@ -26,7 +26,6 @@ namespace Pixeye.Framework
 		internal int lenOfGroups;
 
 
-		public EntityAction DisposeAction = delegate { };
 		public Type componentType;
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -38,6 +37,21 @@ namespace Pixeye.Framework
 			for (int i = 0; i < lastID; i++)
 			{
 				all[i].lenOfGroups = 0;
+			}
+		}
+
+
+		internal int[] toDispose = new int[Entity.settings.SizeEntities];
+		internal int toDisposeLen;
+
+		internal SetupBase setupBase;
+
+		[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
+		public abstract class SetupBase
+		{
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			public virtual void Dispose(int[] id, int len)
+			{
 			}
 		}
 	}
@@ -54,10 +68,11 @@ namespace Pixeye.Framework
 
 		public int len = 0;
 
-		public Func<T> Creator;
 		public T[] components = new T[Entity.settings.SizeEntities];
 
 		public ref T this[int index] => ref components[index];
+
+		internal static Setup setup;
 
 		public Storage()
 		{
@@ -96,7 +111,7 @@ namespace Pixeye.Framework
 			#if !ACTORS_COMPONENTS_STRUCTS
 			ref var val = ref Instance.components[entityID];
 			if (val == null)
-				val = Instance.Creator();
+				val = setup.Create();
 			#endif
 
 			return ref Instance.components[entityID];
@@ -129,5 +144,22 @@ namespace Pixeye.Framework
 			return (Entity.generations[entityID, generation] & componentMask) == componentMask ? components[entityID] : default;
 		}
 		#endif
+
+
+		[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
+		public abstract class Setup : SetupBase
+		{
+			protected T[] components;
+
+			public Setup()
+			{
+				Instance.setupBase = this;
+				setup              = this;
+				components         = Instance.components;
+			}
+
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			public abstract T Create();
+		}
 	}
 }

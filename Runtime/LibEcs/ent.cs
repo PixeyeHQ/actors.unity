@@ -2,7 +2,7 @@
 // Contacts : Pix - info@pixeye.games
 //     Date : 3/16/2019 
 
-using System.Collections.Generic;
+ 
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Unity.IL2CPP.CompilerServices;
@@ -13,9 +13,10 @@ namespace Pixeye.Framework
 	[StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Unicode)]
 	public unsafe struct ent
 	{
+		internal static ArrayEntity entityStack = new ArrayEntity(Entity.settings.SizeEntities); 
 		internal static int size = sizeof(ent);
-		internal static Queue<ent> entityStack = new Queue<ent>(Entity.settings.SizeEntities);
-		internal static int entityStackLength;
+	//	internal static Queue<ent> entityStack = new Queue<ent>(Entity.settings.SizeEntities);
+	//	internal static int entityStackLength;
 		internal static int lastID;
 
 		public int id;
@@ -114,6 +115,9 @@ namespace Pixeye.Framework
 			#endif
 
 			EntityOperations.Set(this, 0, EntityOperations.Action.Kill);
+			
+			
+			
 			Entity.Count--;
 		}
 

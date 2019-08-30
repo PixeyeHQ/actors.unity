@@ -131,10 +131,5 @@ namespace Pixeye.Framework
 
 			return e;
 		}
-
-		public static void ReleaseObservers(in this ent entity)
-		{
-			Components.DisposeComponentObserver(entity.id);
-		}
 	}
 }

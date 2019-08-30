@@ -15,7 +15,6 @@ namespace Pixeye.Framework
 			return ref entity;
 		}
 
-	 
 
 		/// <summary>
 		/// Initialize entity here.
@@ -33,17 +32,14 @@ namespace Pixeye.Framework
 			int  id;
 			byte age = 0;
 
-			if (ent.entityStackLength > 0)
+			if (ent.entityStack.length > 0)
 			{
-				var  pop    = ent.entityStack.Dequeue();
-				byte ageOld = pop.age;
+				var pop = ent.entityStack.source[--ent.entityStack.length];
 				id = pop.id;
 				unchecked
 				{
-					age = (byte) (ageOld + 1);
+					age = (byte) (pop.age + 1);
 				}
-
-				ent.entityStackLength--;
 			}
 			else
 				id = ent.lastID++;
@@ -86,17 +82,14 @@ namespace Pixeye.Framework
 			int  id;
 			byte age = 0;
 
-			if (ent.entityStackLength > 0)
+			if (ent.entityStack.length > 0)
 			{
-				var  pop    = ent.entityStack.Dequeue();
-				byte ageOld = pop.age;
+				var pop = ent.entityStack.source[--ent.entityStack.length];
 				id = pop.id;
 				unchecked
 				{
-					age = (byte) (ageOld + 1);
+					age = (byte) (pop.age + 1);
 				}
-
-				ent.entityStackLength--;
 			}
 			else
 				id = ent.lastID++;
@@ -123,7 +116,6 @@ namespace Pixeye.Framework
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		void IRequireStarter.Launch()
 		{
- 
 			if (!entity.Exist)
 			{
 				Launch();

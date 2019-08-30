@@ -1,7 +1,7 @@
 //  Project : ecs
 // Contacts : Pix - ask@pixeye.games
 
- 
+
 using UnityEngine;
 using System.Runtime.CompilerServices;
 
@@ -29,31 +29,32 @@ namespace Pixeye.Framework
 		public const string Observer = "Pixeye.Source.ComponentObserver";
 
 		[RuntimeInitializeOnLoadMethod]
-		static void ComponentObserverInit()
-		{
-			Storage<ComponentObserver>.Instance.Creator       = () => new ComponentObserver();
-			Storage<ComponentObserver>.Instance.DisposeAction = DisposeComponentObserver;
-		}
+		static void ComponentObserverInit() => new SComponentObserver();
+
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		internal static void DisposeComponentObserver(in ent entity)
+		internal static ref ComponentObserver ComponentObserver(in this ent entity) =>
+			ref Storage<ComponentObserver>.Instance.components[entity.id];
+
+
+		internal class SComponentObserver : Storage<ComponentObserver>.Setup
 		{
-			ref var component = ref Storage<ComponentObserver>.Instance.components[entity.id];
+			public override ComponentObserver Create() => new ComponentObserver();
 
-
-			for (int i = 0; i < component.length; i++)
+			public override void Dispose(int[] id, int len)
 			{
-				component.wrappers[i].Dispose();
-				component.wrappers[i] = null;
+				for (int i = 0; i < len; i++)
+				{
+					ref var component = ref components[id[i]];
+					for (int ii = 0; ii < component.length; ii++)
+					{
+						component.wrappers[ii].Dispose();
+						component.wrappers[ii] = null;
+					}
+
+					component.length = 0;
+				}
 			}
-
-			component.length = 0;
-		}
-
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		internal static ref ComponentObserver ComponentObserver(in this ent entity)
-		{
-			return ref Storage<ComponentObserver>.Instance.components[entity.id];
 		}
 	}
 

@@ -7,6 +7,7 @@ using System.Runtime.InteropServices;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.IL2CPP.CompilerServices;
 using UnityEngine;
+ 
 
 namespace Pixeye.Framework
 {
@@ -176,7 +177,7 @@ namespace Pixeye.Framework
 			#else
 			ref var val = ref Storage<T>.Instance.components[id];
 			if (val == null)
-				val = Storage<T>.Instance.Creator();
+				val = Storage<T>.setup.Create();
 
 			return ref val;
 			#endif
@@ -242,7 +243,7 @@ namespace Pixeye.Framework
 			#else
 			ref var val = ref Storage<T>.Instance.components[id];
 			if (val == null)
-				val = Storage<T>.Instance.Creator();
+				val = Storage<T>.setup.Create();
 
 
 			return ref val;
@@ -286,7 +287,7 @@ namespace Pixeye.Framework
 			#else
 			ref var val = ref Storage<T>.Instance.components[id];
 			if (val == null)
-				val = Storage<T>.Instance.Creator();
+				val = Storage<T>.setup.Create();
 
 
 			return ref val;
