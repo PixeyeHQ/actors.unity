@@ -345,7 +345,6 @@ namespace Pixeye.Framework
 			for (int i = 0; i < GroupCore.allLen; i++)
 			{
 				var gr = GroupCore.all[i];
-				Debug.Log(gr);
 				for (int j = gr.onRemoveLen - 1; j > -1; j--)
 				{
 					gr.onRemove[j].OnRemove(gr.entitiesToRemove, gr.entitiesToRemoveLen);
@@ -368,7 +367,7 @@ namespace Pixeye.Framework
 				st.toDisposeLen = 0;
 			}
 
-			//if (EntityOperations.len != 0)
+		 // if (EntityOperations.len != 0)
 			EntityOperations.len = 0;
 		}
 
