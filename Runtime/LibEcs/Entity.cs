@@ -169,13 +169,13 @@ namespace Pixeye.Framework
 			var id = entity.id;
 			components[id].Add(Storage<T>.componentID);
 
-			if (id >= Storage<T>.Instance.components.Length)
-				Array.Resize(ref Storage<T>.Instance.components, id << 1);
+			if (id >= Storage<T>.components.Length)
+				Array.Resize(ref Storage<T>.components, id << 1);
 
 			#if ACTORS_COMPONENTS_STRUCTS
-			return ref Storage<T>.Instance.components[id];
+			return ref Storage<T>.components[id];
 			#else
-			ref var val = ref Storage<T>.Instance.components[id];
+			ref var val = ref Storage<T>.components[id];
 			if (val == null)
 				val = Storage<T>.setup.Create();
 
@@ -195,13 +195,13 @@ namespace Pixeye.Framework
 			components[id].Add(Storage<T>.componentID);
 
 			// #if !ACTORS_COMPONENTS_STRUCTS
-			// ref var componentInStorage = ref Storage<T>.Instance.components[id];
+			// ref var componentInStorage = ref Storage<T>.components[id];
 			// if (componentInStorage != null)
 			// 	Storage<T>.Instance.DisposeAction(entity);
 			//
 			// componentInStorage = component;
 			// #else
-			ref var componentInStorage = ref Storage<T>.Instance.components[id];
+			ref var componentInStorage = ref Storage<T>.components[id];
 			componentInStorage = component;
 			//#endif
 		}
@@ -235,13 +235,13 @@ namespace Pixeye.Framework
 				EntityOperations.Set(entity, Storage<T>.componentID, EntityOperations.Action.Add);
 			}
 
-			if (id >= Storage<T>.Instance.components.Length)
-				Array.Resize(ref Storage<T>.Instance.components, id << 1);
+			if (id >= Storage<T>.components.Length)
+				Array.Resize(ref Storage<T>.components, id << 1);
 
 			#if ACTORS_COMPONENTS_STRUCTS
-			return ref Storage<T>.Instance.components[id];
+			return ref Storage<T>.components[id];
 			#else
-			ref var val = ref Storage<T>.Instance.components[id];
+			ref var val = ref Storage<T>.components[id];
 			if (val == null)
 				val = Storage<T>.setup.Create();
 
@@ -279,13 +279,13 @@ namespace Pixeye.Framework
 			EntityOperations.Set(entity, Storage<T>.componentID, EntityOperations.Action.Add);
 			generations[id, Storage<T>.generation] |= Storage<T>.componentMask;
 
-			if (id >= Storage<T>.Instance.components.Length)
-				Array.Resize(ref Storage<T>.Instance.components, id << 1);
+			if (id >= Storage<T>.components.Length)
+				Array.Resize(ref Storage<T>.components, id << 1);
 
 			#if ACTORS_COMPONENTS_STRUCTS
-			return ref Storage<T>.Instance.components[id];
+			return ref Storage<T>.components[id];
 			#else
-			ref var val = ref Storage<T>.Instance.components[id];
+			ref var val = ref Storage<T>.components[id];
 			if (val == null)
 				val = Storage<T>.setup.Create();
 
@@ -323,13 +323,13 @@ namespace Pixeye.Framework
 			generations[id, Storage<T>.generation] |= Storage<T>.componentMask;
 
 			// #if !ACTORS_COMPONENTS_STRUCTS
-			// ref var componentInStorage = ref Storage<T>.Instance.components[id];
+			// ref var componentInStorage = ref Storage<T>.components[id];
 			// if (componentInStorage != null)
 			// 	Storage<T>.Instance.DisposeAction(entity);
 			//
 			// componentInStorage = component;
 			// #else
-			ref var componentInStorage = ref Storage<T>.Instance.components[id];
+			ref var componentInStorage = ref Storage<T>.components[id];
 			componentInStorage = component;
 		//	#endif
 		}

@@ -23,7 +23,7 @@ using System.Runtime.CompilerServices;
              
            [MethodImpl(MethodImplOptions.AggressiveInlining)]
            internal static ref ##NAME## ##NAME##(in this ent entity) =>
-           ref Storage<##NAME##>.Instance.components[entity.id];
+           ref Storage<##NAME##>.components[entity.id];
              
              
            internal class S##NAME## : Storage<##NAME##>.Setup

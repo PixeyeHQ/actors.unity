@@ -68,9 +68,9 @@ namespace Pixeye.Framework
 
 		public int len = 0;
 
-		public T[] components = new T[Entity.settings.SizeEntities];
+		public static T[] components = new T[Entity.settings.SizeEntities];
 
-		public ref T this[int index] => ref components[index];
+		//public ref T this[int index] => ref components[index];
 
 		internal static Setup setup;
 
@@ -93,6 +93,9 @@ namespace Pixeye.Framework
 			var type = typeof(T);
 			typeNames.Add(type.GetHashCode(), componentID);
 			componentType = type;
+
+
+			//	var t = components[0];
 		}
 
 
@@ -104,17 +107,17 @@ namespace Pixeye.Framework
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static ref T Get(int entityID)
 		{
-			if (entityID >= Instance.components.Length)
-				Array.Resize(ref Instance.components, entityID << 1);
+			if (entityID >= components.Length)
+				Array.Resize(ref components, entityID << 1);
 
 
 			#if !ACTORS_COMPONENTS_STRUCTS
-			ref var val = ref Instance.components[entityID];
+			ref var val = ref components[entityID];
 			if (val == null)
 				val = setup.Create();
 			#endif
 
-			return ref Instance.components[entityID];
+			return ref components[entityID];
 		}
 
 
@@ -155,7 +158,7 @@ namespace Pixeye.Framework
 			{
 				Instance.setupBase = this;
 				setup              = this;
-				components         = Instance.components;
+				components         = Storage<T>.components;
 			}
 
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]

@@ -34,7 +34,7 @@ namespace Pixeye.Framework
 		
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal static ref ComponentObserver ComponentObserver(in this ent entity) =>
-			ref Storage<ComponentObserver>.Instance.components[entity.id];
+			ref Storage<ComponentObserver>.components[entity.id];
 
 
 		internal class SComponentObserver : Storage<ComponentObserver>.Setup

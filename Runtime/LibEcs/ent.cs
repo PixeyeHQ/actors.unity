@@ -2,7 +2,7 @@
 // Contacts : Pix - info@pixeye.games
 //     Date : 3/16/2019 
 
- 
+
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Unity.IL2CPP.CompilerServices;
@@ -13,14 +13,13 @@ namespace Pixeye.Framework
 	[StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Unicode)]
 	public unsafe struct ent
 	{
-		internal static ArrayEntity entityStack = new ArrayEntity(Entity.settings.SizeEntities); 
+		internal static ArrayEntity entityStack = new ArrayEntity(Entity.settings.SizeEntities);
 		internal static int size = sizeof(ent);
-	//	internal static Queue<ent> entityStack = new Queue<ent>(Entity.settings.SizeEntities);
-	//	internal static int entityStackLength;
 		internal static int lastID;
 
 		public int id;
 		internal byte age;
+
 
 		public ref readonly Transform transform
 		{
@@ -115,9 +114,8 @@ namespace Pixeye.Framework
 			#endif
 
 			EntityOperations.Set(this, 0, EntityOperations.Action.Kill);
-			
-			
-			
+
+
 			Entity.Count--;
 		}
 
@@ -220,7 +218,7 @@ namespace Pixeye.Framework
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public bool Get<T>(out T arg0)
 		{
-			return (arg0 = (Entity.generations[id, Storage<T>.generation] & Storage<T>.componentMask) == Storage<T>.componentMask ? Storage<T>.Instance.components[id] : default) != null;
+			return (arg0 = (Entity.generations[id, Storage<T>.generation] & Storage<T>.componentMask) == Storage<T>.componentMask ? Storage<T>.components[id] : default) != null;
 		}
 
 		/// <summary>
