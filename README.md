@@ -84,7 +84,7 @@ If you don't use Unity for generating components, you can easily make a template
                      for (int i = 0; i < len; i++)
                      {
                         ref var component = ref components[id[i]];
-                        component.val       = 0;
+                        component.val    = 0;
                         component.valMax = 0;
                      }
                   }
@@ -156,7 +156,7 @@ The simpliest way is to use ```Add``` method.
 ```csharp
 public void SomeMethod()
 {    
-     ent e = Entity.Create("Obj Bunny");
+     // where e is some entity.
      // Add components
      var cCute       = e.Add<ComponentCute>();
      var cJumping    = e.Add<ComponentJumping>();
@@ -170,7 +170,7 @@ public void SomeMethod()
 
 }
 ```
-In case you want to setup your new entity it's better to use ```Set``` Method. Use ```Set``` method only with newly created entities.
+In case you want to setup your new entity use ```Set``` Method. Use ```Set``` method only with newly created entities.
 
 ```csharp
 public void SomeMethod()
@@ -243,7 +243,7 @@ sealed class ProcessorMove : Processor, ITick
 ```
 
 ### Group events
-You can use ```OnAdd``` or ```OnRemove``` events on the group. It's "similar" to Unity OnEnable and OnDisable logic. 
+You can make events for entities that were added or removed from the group. It's "similar" to Unity OnEnable and OnDisable logic. 
 
 ```csharp
 sealed class ProcessorMove : Processor, ITick
@@ -251,21 +251,13 @@ sealed class ProcessorMove : Processor, ITick
           // Define a group. The group is defined via Processor parent class
           Group<ComponentMove,ComponentPosition> groupMovables;
 	  
-          public ProcessorMove(){
-	  
-	  groupMovables.OnAdd += ToGroupMovables;
-          groupMovables.OnRemove += FromGroupMovables;
-	  
+          public ProcessorMove()
+	  {
+	  // register EventsForMovables for group. Choose events to work with.
+	  // sending this processor as param allows to use it from events class
+	  groupMovables.Set<EventsForMovables>(Op.Add | Op.Remove, this);
 	  }
-
-          void ToGroupMovables(in ent entity){
-            Debug.Log($({entity} Added!));
-          }
-
-         void FromGroupMovables(in ent entity){
-            Debug.Log($({entity} Removed!));
-          }
-
+ 
 	        // ITick interface Adds Tick method. It's an update with delta time.
 	  	public void Tick(float delta)
 		{
@@ -280,6 +272,29 @@ sealed class ProcessorMove : Processor, ITick
 				// do some logic
 			}
 		}
+		
+		class EventsForMovables : GroupEvents<ProcessorMove>
+		{
+                        public override void OnAdd(ent[] entities, int length)
+			{
+			   // work with all entities that were added to the group on the current frame
+			   for (int i = 0; i < length; i++)
+			   {
+			        ref var entity = ref entities[i];
+			   }
+			   // if you need a link to the Processor from the events  class use variable proc
+                           proc.DoStuff();
+			}
+			public override void OnRemove(ent[] entities, int length)
+                        {
+			   for (int i = 0; i < length; i++)
+			   {
+			        ref var entity = ref entities[i];
+			   }
+			}
+			
+                }
+		
 	  
         }
 
