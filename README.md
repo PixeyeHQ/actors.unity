@@ -68,29 +68,29 @@ If you don't use Unity for generating components, you can easily make a template
 ```csharp
 	static partial class Components
 	{
-		public const string Health = "Pixeye.Source.ComponentHealth";
-
-		[RuntimeInitializeOnLoadMethod]
-		static void ComponentHealthInit()
-		{
-			Storage<ComponentHealth>.Instance.Creator       = () => { return new ComponentHealth(); };
-			Storage<ComponentHealth>.Instance.DisposeAction = DisposeComponentHealth;
-		}
-
-		/// Use this method to clean variables
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		internal static void DisposeComponentHealth(in ent entity)
-		{
-			ref var component = ref Storage<ComponentHealth>.Instance.components[entity.id];
-		}
-
-
+	        public const string Health = "Pixeye.Source.ComponentHealth";
+		
+                static SComponentHealth sComponentHealth = new SComponentHealth();
+		
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal static ref ComponentHealth ComponentHealth(in this ent entity)
+		=> ref Storage<ComponentHealth>.Instance.components[entity.id];
+		
+		internal class SComponentHealth : Storage<ComponentHealth>.Setup
 		{
-			return ref Storage<ComponentHealth>.Instance.components[entity.id];
+		  public override ComponentHealth Create() => new ComponentHealth();
+                  public override void Dispose(int[] id, int len)
+                  {
+                     for (int i = 0; i < len; i++)
+                     {
+                        ref var component = ref components[id[i]];
+                        component.val       = 0;
+                        component.valMax = 0;
+                     }
+                  }
 		}
-	}
+          }
+
 ```
 
 ### Entity
