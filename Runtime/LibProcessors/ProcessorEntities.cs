@@ -95,8 +95,8 @@ namespace Pixeye.Framework
 						{
 							var cID = (int) components.ids[j];
 
-							if (Storage.all[cID].toDisposeLen >= Storage.all[cID].toDispose.Length)
-								Array.Resize(ref Storage.all[cID].toDispose, Storage.all[cID].toDisposeLen << 1);
+							if (entityID >= Storage.all[cID].toDispose.Length)
+								Array.Resize(ref Storage.all[cID].toDispose, entityID << 1);
 
 							Storage.all[cID].toDispose[Storage.all[cID].toDisposeLen++] = entityID;
 
@@ -114,7 +114,7 @@ namespace Pixeye.Framework
 						Entity.tags[entityID].Clear();
 						Entity.cache[entityID].isAlive = false;
 					
-						if (ent.entityStack.length == ent.entityStack.source.Length)
+						if (ent.entityStack.length >= ent.entityStack.source.Length)
 							Array.Resize(ref ent.entityStack.source, ent.entityStack.length << 1);
 						ent.entityStack.source[ent.entityStack.length++] = operation.entity;
 
@@ -156,8 +156,8 @@ namespace Pixeye.Framework
 						{
 							var cID = (int) components.ids[j];
 							//	Storage.all[cID].DisposeAction(entityID);
-							if (Storage.all[cID].toDisposeLen >= Storage.all[cID].toDispose.Length)
-								Array.Resize(ref Storage.all[cID].toDispose, Storage.all[cID].toDisposeLen << 1);
+							if (entityID >= Storage.all[cID].toDispose.Length)
+								Array.Resize(ref Storage.all[cID].toDispose, entityID << 1);
 
 							Storage.all[cID].toDispose[Storage.all[cID].toDisposeLen++] = entityID;
 						}
@@ -172,7 +172,7 @@ namespace Pixeye.Framework
 						// ent.entityStack.source[ent.entityStack.length++] = operation.entity;
 
 
-						if (ent.entityStack.length == ent.entityStack.source.Length)
+						if (ent.entityStack.length >= ent.entityStack.source.Length)
 							Array.Resize(ref ent.entityStack.source, ent.entityStack.length << 1);
 						ent.entityStack.source[ent.entityStack.length++] = operation.entity;
 						
@@ -207,8 +207,8 @@ namespace Pixeye.Framework
 						{
 							if (components.ids[tRemoveIndex] == typeConverted)
 							{
-								if (Storage.all[typeConverted].toDisposeLen >= Storage.all[typeConverted].toDispose.Length)
-									Array.Resize(ref Storage.all[typeConverted].toDispose, Storage.all[typeConverted].toDisposeLen << 1);
+								if (entityID >= Storage.all[typeConverted].toDispose.Length)
+									Array.Resize(ref Storage.all[typeConverted].toDispose, entityID << 1);
 
 								Storage.all[typeConverted].toDispose[Storage.all[typeConverted].toDisposeLen++] = entityID;
 								//Storage.all[typeConverted].DisposeAction(entityID);
@@ -261,7 +261,7 @@ namespace Pixeye.Framework
 
 
 	 
-							if (ent.entityStack.length == ent.entityStack.source.Length)
+							if (ent.entityStack.length >= ent.entityStack.source.Length)
 								Array.Resize(ref ent.entityStack.source, ent.entityStack.length << 1);
 							ent.entityStack.source[ent.entityStack.length++] = operation.entity;
  
