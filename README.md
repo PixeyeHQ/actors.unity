@@ -74,7 +74,7 @@ If you don't use Unity for generating components, you can easily make a template
 		
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal static ref ComponentHealth ComponentHealth(in this ent entity)
-		=> ref Storage<ComponentHealth>.Instance.components[entity.id];
+		=> ref Storage<ComponentHealth>.components[entity.id];
 		
 		internal class SComponentHealth : Storage<ComponentHealth>.Setup
 		{
