@@ -13,7 +13,7 @@ namespace Pixeye.Framework
 		
 		public int length;
 
-		public T[] source;
+		T[] source;
 		int[] pointers;
 		int[] queue;
 		int lengthQueue;
