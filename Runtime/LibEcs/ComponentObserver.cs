@@ -46,6 +46,7 @@ namespace Pixeye.Framework
 				for (int i = 0; i < len; i++)
 				{
 					ref var component = ref components[id[i]];
+					
 					for (int ii = 0; ii < component.length; ii++)
 					{
 						component.wrappers[ii].Dispose();

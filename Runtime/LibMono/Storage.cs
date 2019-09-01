@@ -70,7 +70,6 @@ namespace Pixeye.Framework
 
 		public static T[] components = new T[Entity.settings.SizeEntities];
 
-		//public ref T this[int index] => ref components[index];
 
 		internal static Setup setup;
 
@@ -95,15 +94,9 @@ namespace Pixeye.Framework
 			componentType = type;
 
 
-			//	var t = components[0];
 		}
 
-
-		// public void Dispose()
-		// {
-		// 	lenOfGroups = 0;
-		// }
-
+ 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static ref T Get(int entityID)
 		{
@@ -152,13 +145,12 @@ namespace Pixeye.Framework
 		[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
 		public abstract class Setup : SetupBase
 		{
-			protected T[] components;
+			protected T[] components => Storage<T>.components;
 
 			public Setup()
 			{
 				Instance.setupBase = this;
 				setup              = this;
-				components         = Storage<T>.components;
 			}
 
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]

@@ -155,6 +155,13 @@ namespace Pixeye.Framework
 			var index = 0;
 			var right = length++;
 
+			if (entity.id >= entities.Length)
+			{
+				Array.Resize(ref entities, entity.id << 1);
+				Array.Resize(ref entitiesToAdd, entity.id << 1);
+				Array.Resize(ref entitiesToRemove, entity.id << 1);	
+			}
+			else 
 			if (length >= entities.Length)
 			{
 				Array.Resize(ref entities, length << 1);
