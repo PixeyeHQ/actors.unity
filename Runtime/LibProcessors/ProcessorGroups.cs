@@ -122,14 +122,14 @@ namespace Pixeye.Framework
 
 					composition.hash = HashCode.OfEach(myFieldInfo.FieldType.GetGenericArguments()).AndEach(composition.includeTags).And(17).AndEach(composition.excludeTags).And(31).AndEach(excludeCompFilter);
 					var group = SetupGroup(myFieldInfo.FieldType, composition, myFieldInfo.GetValue(b));
-
+					myFieldInfo.SetValue(b, group);
 
 					if (groupEv != null)
 					{
-						group.SetSelf(groupEv.ev);
+					 	 group.SetSelf(groupEv.ev,b as GroupEvents);
 					}
 
-					myFieldInfo.SetValue(b, group);
+		 
 
 
 					break;

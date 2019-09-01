@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using Unity.IL2CPP.CompilerServices;
-
+ 
 
 namespace Pixeye.Framework
 {
@@ -76,23 +76,24 @@ namespace Pixeye.Framework
 		}
 
 
-		internal void SetSelf(Op op)
+		internal void SetSelf(Op op, GroupEvents gr)
 		{
 			if ((op & Op.Add) == Op.Add)
 			{
-				if (onAdd.Length == onAddLen)
+				if (onAdd.Length <= onAddLen)
 					Array.Resize(ref onAdd, onAddLen << 1);
 
-				onAdd[onAddLen++] = this;
+				onAdd[onAddLen++] = gr;
 			}
 
 
-			if ((op & Op.Remove) == Op.Remove)
+			if ((op & Op.Remove) <= Op.Remove)
 			{
 				if (onRemove.Length == onRemoveLen)
 					Array.Resize(ref onRemove, onRemoveLen << 1);
 
-				onRemove[onRemoveLen++] = this;
+			 	
+				onRemove[onRemoveLen++] = gr;
 			}
 		}
 
@@ -221,7 +222,7 @@ namespace Pixeye.Framework
 			if (onRemoveLen > 0)
 				entitiesToRemove[entitiesToRemoveLen++] = entities[i];
 
-
+		 
 			Array.Copy(entities, i + 1, entities, i, length-- - i);
 		}
 

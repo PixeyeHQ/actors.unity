@@ -359,14 +359,19 @@ namespace Pixeye.Framework
 
 			for (int i = 0; i < GroupCore.allLen; i++)
 			{
+				
 				var gr = GroupCore.all[i];
+	 
+ 
 				for (int j = 0; j < gr.onRemoveLen; j++)
 				{
+		
 					gr.onRemove[j].OnRemove(gr.entitiesToRemove, gr.entitiesToRemoveLen);
 				}
 
 				gr.entitiesToRemoveLen = 0;
 
+				
 				for (int j = 0; j < gr.onAddLen; j++)
 				{
 					gr.onAdd[j].OnAdd(gr.entitiesToAdd, gr.entitiesToAddLen);
