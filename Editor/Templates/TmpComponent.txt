@@ -17,9 +17,9 @@ using System.Runtime.CompilerServices;
     {
       
            public const string ##NAME2## = "##NAMESPACE2##.##NAME##";
-             
-           static S##NAME## s##NAME## = new S##NAME##();
-             
+     
+           [RuntimeInitializeOnLoadMethod]
+           static void ##NAME##Init() => new S##NAME##();  
              
            [MethodImpl(MethodImplOptions.AggressiveInlining)]
            internal static ref ##NAME## ##NAME##(in this ent entity) =>
