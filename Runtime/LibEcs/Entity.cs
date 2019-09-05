@@ -56,7 +56,7 @@ namespace Pixeye.Framework
 		internal static int[,] generations;
 
 		internal static BufferComponents* components;
-		internal static BufferTags* tags;
+		public static BufferTags* tags;
 		internal static Utils* cache;
 
 		//===============================//
