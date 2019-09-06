@@ -357,6 +357,8 @@ namespace Pixeye.Framework
 				}
 			}
 
+			EntityOperations.len = 0;
+			
 			for (int i = 0; i < GroupCore.allLen; i++)
 			{
 				
@@ -387,7 +389,7 @@ namespace Pixeye.Framework
 				st.toDisposeLen = 0;
 			}
 
-			EntityOperations.len = 0;
+		 
 		}
 
 
