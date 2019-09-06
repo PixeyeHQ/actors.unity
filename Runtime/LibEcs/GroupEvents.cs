@@ -9,8 +9,8 @@ namespace Pixeye.Framework
 	[Flags]
 	public enum Op
 	{
-		Add = 0x0,
-		Remove = 0x1,
+		Add = 1,
+		Remove = 2,
 		All = Add | Remove
 	}
 
