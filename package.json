@@ -4,7 +4,7 @@
     "displayName": "Actors",
     "description": "Entity Component System framework. Ease the pain of decoupling data from behaviors.",
     "unity": "2019.2",
-    "version": "2019.9.6",
+    "version": "2019.9.7",
     "keywords": [
         "ecs",
         "pixeye",
