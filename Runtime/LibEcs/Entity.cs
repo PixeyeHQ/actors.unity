@@ -43,21 +43,24 @@ namespace Pixeye.Framework
 	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
 	public static unsafe partial class Entity
 	{
+		static readonly int sizeBufferComponents = UnsafeUtility.SizeOf<BufferComponents>();
+		static readonly int sizeBufferTags = UnsafeUtility.SizeOf<BufferTags>();
+		static readonly int sizeUtils = UnsafeUtility.SizeOf<Utils>();
+
+		
 		public static SettingsEngine settings = new SettingsEngine();
 		public static int Count;
 
 		public static Transform[] transforms;
 
-		static readonly int sizeBufferComponents = UnsafeUtility.SizeOf<BufferComponents>();
-		static readonly int sizeBufferTags = UnsafeUtility.SizeOf<BufferTags>();
-		static readonly int sizeUtils = UnsafeUtility.SizeOf<Utils>();
-
+		 
+		public static BufferTags* tags;
+		public static Utils* cache;
+		
 		internal static int lengthTotal;
 		internal static int[,] generations;
 
 		internal static BufferComponents* components;
-		public static BufferTags* tags;
-		internal static Utils* cache;
 
 		//===============================//
 		// Initialize 
