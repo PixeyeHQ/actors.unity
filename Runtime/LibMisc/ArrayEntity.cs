@@ -4,6 +4,7 @@
 using System;
 using System.Runtime.CompilerServices;
 using Unity.IL2CPP.CompilerServices;
+using UnityEngine;
 
 
 namespace Pixeye.Framework
@@ -38,12 +39,16 @@ namespace Pixeye.Framework
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void Remove(in ent entity)
 		{
-			for (int i = 0; i < length; i++)
+ 
+				for (int i = 0; i < length; i++)
 			{
-				ref var val = ref source[i];
+				  var val =   source[i];
+ 
 				if (entity.Equals(val))
 				{
-					Array.Copy(source, i + 1, source, i, --length - i);
+					source[i] = -1;
+					Array.Copy(source, i + 1, source, i,  --length - i);
+		 
 					break;
 				}
 			}
@@ -55,9 +60,10 @@ namespace Pixeye.Framework
 			for (int i = 0; i < length; i++)
 			{
 				ref var val = ref source[i];
-				if (entity.EqualsAndExist(val))
+				if (entity.Equals(val))
 				{
-					Array.Copy(source, i + 1, source, i, --length - i);
+					source[i] = -1;
+					Array.Copy(source, i + 1, source, i,  --length - i);
 					return true;
 				}
 			}
