@@ -34,6 +34,7 @@ namespace Pixeye.Framework
 			Activate,
 			Deactivate,
 			Unbind,
+			RemoveEntity,
 		}
 
 		internal static EntityOperation[] operations = new EntityOperation[Entity.settings.SizeEntities];

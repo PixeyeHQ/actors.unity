@@ -45,7 +45,7 @@ namespace Pixeye.Framework
 				if (entity.Equals(val))
 				{
 			  	source[i] = -1;
-					Array.Copy(source, i + 1, source, i,  length-- - i);
+					Array.Copy(source, i + 1, source, i,  --length - i);
 		 
 					break;
 				}
@@ -61,7 +61,7 @@ namespace Pixeye.Framework
 				if (entity.Equals(val))
 				{
 				 	source[i] = -1;
-					Array.Copy(source, i + 1, source, i, length-- - i);
+					Array.Copy(source, i + 1, source, i, --length - i);
 					return true;
 				}
 			}
