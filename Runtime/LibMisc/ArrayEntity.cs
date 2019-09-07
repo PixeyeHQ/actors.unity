@@ -38,14 +38,14 @@ namespace Pixeye.Framework
 		public void Remove(in ent entity)
 		{
  
-				for (int i = 0; i < length; i++)
+		  for (int i = 0; i < length; i++)
 			{
 				  var val =   source[i];
  
 				if (entity.Equals(val))
 				{
-					source[i] = -1;
-					Array.Copy(source, i + 1, source, i,  --length - i);
+			  	source[i] = -1;
+					Array.Copy(source, i + 1, source, i,  length-- - i);
 		 
 					break;
 				}
@@ -60,8 +60,8 @@ namespace Pixeye.Framework
 				ref var val = ref source[i];
 				if (entity.Equals(val))
 				{
-					source[i] = -1;
-					Array.Copy(source, i + 1, source, i,  --length - i);
+				 	source[i] = -1;
+					Array.Copy(source, i + 1, source, i, length-- - i);
 					return true;
 				}
 			}
