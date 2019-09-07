@@ -41,7 +41,7 @@ namespace Pixeye.Framework
 			for (int i = 0; i < length; i++)
 			{
 				ref var val = ref source[i];
-				if (entity.EqualsAndExist(val))
+				if (entity.Equals(val))
 				{
 					Array.Copy(source, i + 1, source, i, --length - i);
 					break;
