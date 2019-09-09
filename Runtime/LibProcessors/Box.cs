@@ -38,7 +38,10 @@ namespace Pixeye.Framework
 		{
 			return Resources.Load<T>(id);
 		}
-		
+		public static T[] LoadAll<T>(string id) where T : Object
+		{
+			return Resources.LoadAll<T>(id);
+		}
 		public static T Get<T>(string id) where T : Object
 		{
 			Object obj;
