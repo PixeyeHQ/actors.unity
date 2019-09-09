@@ -58,6 +58,54 @@ namespace Pixeye.Framework
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static T[] Slice<T>(this T[] source, int start, int end)
+		{
+			int len = end - start;
+
+			// Return new array.
+			var res = new T[len];
+			for (int i = 0; i < len; i++)
+			{
+				res[i] = source[i + start];
+			}
+
+			return res;
+		}
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static T[] Slice<T>(this T[] source, string from, int end) where T : UnityEngine.Object
+		{
+			Predicate<T> predicate = s => s.name == from;
+			var          start     = -1;
+
+			for (int i = 0; i < source.Length; i++)
+			{
+				ref var val = ref source[i];
+				if (predicate(val))
+				{
+					start = i;
+					break;
+				}
+			}
+
+			#if UNITY_EDITOR
+			if (start == -1)
+				throw new Exception($"Couldn't find object typeof {typeof(T)}");
+			#endif
+
+			int len = start + end - start;
+
+			// Return new array.
+			var res = new T[len];
+			for (int i = 0; i < len; i++)
+			{
+				res[i] = source[i + start];
+			}
+
+			return res;
+		}
+		
+		
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static int BinarySearch(ref int[] entries, int value, int left, int right)
 		{
 			while (left <= right)
