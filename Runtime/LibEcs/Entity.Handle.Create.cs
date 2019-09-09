@@ -117,6 +117,61 @@ namespace Pixeye.Framework
 			return entity;
 		}
 
+
+
+
+		public static ent Create(GameObject prefab, Transform parent, Vector3 position = default(Vector3), bool pooled = false)
+		{
+			byte age = 0;
+			int  id;
+			if (ent.entityStack.length > 0)
+			{
+				ent ent = ent.entityStack.source[--ent.entityStack.length];
+				id  = ent.id;
+				age = (byte) ((uint) ent.age + 1U);
+			}
+			else
+				id = ent.lastID++;
+
+			ent entity;
+			entity.id  = id;
+			entity.age = age;
+			Entity.Initialize(id, age, pooled);
+			Entity.transforms[id] = pooled ? Obj.Spawn(1, prefab, parent, position, new Quaternion()) : Obj.Spawn(prefab, parent, position, new Quaternion());
+			EntityOperations.Set(in entity, -1, EntityOperations.Action.Activate);
+			return entity;
+		}
+
+		public static ent Create(string prefabID, Transform parent, Vector3 position = default(Vector3), bool pooled = false)
+		{
+			byte age = 0;
+			int  id;
+			if (ent.entityStack.length > 0)
+			{
+				ent ent = ent.entityStack.source[--ent.entityStack.length];
+				id  = ent.id;
+				age = (byte) ((uint) ent.age + 1U);
+			}
+			else
+				id = ent.lastID++;
+
+			ent entity;
+			entity.id  = id;
+			entity.age = age;
+			Entity.Initialize(id, age, pooled);
+			Entity.transforms[id] = pooled ? Obj.Spawn(1, prefabID, parent, position, new Quaternion()) : Obj.Spawn(prefabID, parent, position, new Quaternion());
+			EntityOperations.Set(in entity, -1, EntityOperations.Action.Activate);
+			return entity;
+		}
+		
+		
+		
+		
+		
+		
+		
+		
+		
 		public static ent Create(GameObject prefab, Vector3 position = default, bool pooled = false)
 		{
 			int  id;
