@@ -156,8 +156,6 @@ namespace Pixeye.Framework
 		}
 		public static T Spawn<T>(string prefabID, Vector3 startPosition = default, Quaternion startRotation = default)
 		{
-			return Spawn(prefabID, startPosition, startRotation).GetComponentInChildren<T>();
-
 			#if UNITY_EDITOR
       var o = Spawn(prefabID, startPosition, startRotation).GetComponentInChildren<T>();
 			(o as Component).transform.SetAsLastSibling();
