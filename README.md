@@ -70,8 +70,9 @@ If you don't use Unity for generating components, you can easily make a template
 	{
 	        public const string Health = "Pixeye.Source.ComponentHealth";
 		
-                static SComponentHealth sComponentHealth = new SComponentHealth();
-		
+                [RuntimeInitializeOnLoadMethod]
+		static void ComponentHealthInit() => new SComponentHealth();
+
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal static ref ComponentHealth ComponentHealth(in this ent entity)
 		=> ref Storage<ComponentHealth>.components[entity.id];
