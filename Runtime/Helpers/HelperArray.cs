@@ -151,6 +151,8 @@ namespace Pixeye.Framework
 		}
 
 
+		
+		
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public unsafe static int BinarySearch(ent* entries, int value, int left, int right)
 		{
@@ -198,6 +200,18 @@ namespace Pixeye.Framework
 			return -1;
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static T Get<T>(this T[] array, Predicate<T> predicate)
+		{
+			for (int index = 0; index < array.Length; ++index)
+			{
+				ref T local = ref array[index];
+				if (predicate(local))
+					return local;
+			}
+
+			return default;
+		}
 
 		internal class ArrayTraverse
 		{
