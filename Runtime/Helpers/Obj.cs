@@ -45,7 +45,7 @@ namespace Pixeye.Framework
 		  
 			#if UNITY_EDITOR
       var o = Spawn(prefab, parent, startPosition, startRotation).GetComponentInChildren<T>();
-			(o as Transform).SetAsLastSibling();
+	  	(o as Component).transform.SetAsLastSibling();
 			return o;
 			#else
 			return Spawn(prefab, parent, startPosition, startRotation).GetComponentInChildren<T>();
@@ -57,7 +57,7 @@ namespace Pixeye.Framework
 		 
 			#if UNITY_EDITOR
       var o = Spawn(prefab, startPosition, startRotation).GetComponentInChildren<T>();
-			(o as Transform).SetAsLastSibling();
+			(o as Component).transform.SetAsLastSibling();
 	return o;
 			#else
 			return Spawn(prefab, startPosition, startRotation).GetComponentInChildren<T>();
@@ -80,7 +80,7 @@ namespace Pixeye.Framework
 	 
 			#if UNITY_EDITOR
       var o = Spawn(poolID, prefab, parent, startPosition, startRotation).GetComponentInChildren<T>();
-			(o as Transform).SetAsLastSibling();
+			(o as Component).transform.SetAsLastSibling();
 		return o;
 			#else
 			return Spawn(poolID, prefab, parent, startPosition, startRotation).GetComponentInChildren<T>();
@@ -92,7 +92,7 @@ namespace Pixeye.Framework
 	 
 			#if UNITY_EDITOR
       var o = Spawn(poolID , prefab, startPosition, startRotation).GetComponentInChildren<T>();
-			(o as Transform).SetAsLastSibling();
+			(o as Component).transform.SetAsLastSibling();
 		return o;
 			#else
 			return Spawn(poolID, prefab, startPosition, startRotation).GetComponentInChildren<T>();
@@ -148,7 +148,7 @@ namespace Pixeye.Framework
 			 
 			#if UNITY_EDITOR
       var o = Spawn(prefabID, parent, startPosition, startRotation).GetComponentInChildren<T>();
-			(o as Transform).SetAsLastSibling();
+	  	(o as Component).transform.SetAsLastSibling();
 		return o;
 			#else
 			return Spawn(prefabID, parent, startPosition, startRotation).GetComponentInChildren<T>();
@@ -160,7 +160,7 @@ namespace Pixeye.Framework
 
 			#if UNITY_EDITOR
       var o = Spawn(prefabID, startPosition, startRotation).GetComponentInChildren<T>();
-			(o as Transform).SetAsLastSibling();
+			(o as Component).transform.SetAsLastSibling();
 		return o;
 			#else
 			return Spawn(prefabID, startPosition, startRotation).GetComponentInChildren<T>();
@@ -199,7 +199,7 @@ namespace Pixeye.Framework
 		{
 			#if UNITY_EDITOR
       var o = Spawn(poolID, prefabID, parent, startPosition, startRotation).GetComponentInChildren<T>();
-			(o as Transform).SetAsLastSibling();
+			(o as Component).transform.SetAsLastSibling();
 		return o;
 			#else
 			return Spawn(poolID, prefabID, parent, startPosition, startRotation).GetComponentInChildren<T>();
@@ -211,7 +211,7 @@ namespace Pixeye.Framework
 		{
 			#if UNITY_EDITOR
       var o = Spawn(poolID, prefabID, startPosition, startRotation).GetComponentInChildren<T>();
-			(o as Transform).SetAsLastSibling();
+			(o as Component).transform.SetAsLastSibling();
       return o;
 			#else
 			return Spawn(poolID, prefabID, startPosition, startRotation).GetComponentInChildren<T>();
