@@ -78,25 +78,13 @@ namespace Pixeye.Framework
 		public static T Spawn<T>(int poolID, GameObject prefab, Transform parent , Vector3 startPosition = default, Quaternion startRotation = default)
 		{
 	 
-			#if UNITY_EDITOR
-      var o = Spawn(poolID, prefab, parent, startPosition, startRotation).GetComponentInChildren<T>();
-			(o as Component).transform.SetAsLastSibling();
-		return o;
-			#else
 			return Spawn(poolID, prefab, parent, startPosition, startRotation).GetComponentInChildren<T>();
-			#endif
+	
 		}
 
 		public static T Spawn<T>(int poolID, GameObject prefab, Vector3 startPosition = default, Quaternion startRotation = default)
 		{
-	 
-			#if UNITY_EDITOR
-      var o = Spawn(poolID , prefab, startPosition, startRotation).GetComponentInChildren<T>();
-			(o as Component).transform.SetAsLastSibling();
-		return o;
-			#else
 			return Spawn(poolID, prefab, startPosition, startRotation).GetComponentInChildren<T>();
-			#endif
 		}
 		
 		public static Transform Spawn(int poolID, GameObject prefab, Vector3 startPosition = default, Quaternion startRotation = default)
