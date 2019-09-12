@@ -42,6 +42,23 @@ namespace Pixeye.Framework
 		{
 			return Resources.LoadAll<T>(id);
 		}
+
+		public static T[] LoadAll<T>(string id, int amount) where T : UnityEngine.Object
+		{
+			storage = new T[amount];
+
+			for (int i = 0; i < amount; i++)
+				storage[i] = Resources.Load<T>($"{id} {amount}");
+
+			return storage;
+		}	
+		
+		
+		
+		
+		
+		
+		
 		public static T Get<T>(string id) where T : Object
 		{
 			Object obj;
@@ -56,6 +73,10 @@ namespace Pixeye.Framework
 			return obj as T;
 		}
 
+		
+		
+		
+		
 		public static T Get<T>(int id) where T : Object
 		{
 			Object obj;
