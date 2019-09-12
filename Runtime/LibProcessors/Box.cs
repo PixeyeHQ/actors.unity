@@ -45,7 +45,7 @@ namespace Pixeye.Framework
 
 		public static T[] LoadAll<T>(string id, int amount) where T : UnityEngine.Object
 		{
-			storage = new T[amount];
+			var storage = new T[amount];
 
 			for (int i = 0; i < amount; i++)
 				storage[i] = Resources.Load<T>($"{id} {amount}");
