@@ -48,7 +48,10 @@ namespace Pixeye.Framework
 			var storage = new T[amount];
 
 			for (int i = 0; i < amount; i++)
-				storage[i] = Resources.Load<T>($"{id} {amount}");
+			{
+				storage[i] = Resources.Load<T>($"{id} {i}");
+		 
+			}
 
 			return storage;
 		}	
