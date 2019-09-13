@@ -153,24 +153,6 @@ ___
 
 #### How to add Components ?
 There are several ways to add components depending on the context of your code.
-The simpliest way is to use ```Add``` method.
-```csharp
-public void SomeMethod()
-{    
-     // where e is some entity.
-     // Add components
-     var cCute       = e.Add<ComponentCute>();
-     var cJumping    = e.Add<ComponentJumping>();
-     var cConsumable = e.Add<ComponentConsumable>();
-     var cPoo        = e.Add<ComponentCanPoo>();
-
-     // Component Cute
-     cCute.attractivness = float.PositiveInfinity;
-     // Component Jumping
-     cJumping.power = 100;
-
-}
-```
 In case you want to setup your new entity use ```Set``` Method. Use ```Set``` method only with newly created entities.
 
 ```csharp
@@ -190,7 +172,48 @@ public void SomeMethod()
 }
 ```
 
+Use ```Add``` method when you want to attach new component to already existed entity.
+```csharp
+public void SomeMethod()
+{    
+     // where e is some entity.
+     // Add components
+     var cCute       = e.Add<ComponentCute>();
+     var cJumping    = e.Add<ComponentJumping>();
+     var cConsumable = e.Add<ComponentConsumable>();
+     var cPoo        = e.Add<ComponentCanPoo>();
+
+     // Component Cute
+     cCute.attractivness = float.PositiveInfinity;
+     // Component Jumping
+     cJumping.power = 100;
+
+}
+```
+ 
+
 The difference between Add and Set are in the operations that Framework must do to create this object. In the example above, the Framework needs to make 4 ```ADD``` operations, but in the case of the ```SET``` method, it will make only 1 operation.
+
+Use ```AddGet``` method when you unsure if entity has particular component. This method will check and add component if it doesn't exist.
+
+```csharp
+public void SomeMethod()
+{    
+     // where e is some entity.
+     // Add components
+     var cCute       = e.AddGet<ComponentCute>();
+     var cJumping    = e.AddGet<ComponentJumping>();
+     var cConsumable = e.AddGet<ComponentConsumable>();
+     var cPoo        = e.AddGet<ComponentCanPoo>();
+
+     // Component Cute
+     cCute.attractivness = float.PositiveInfinity;
+     // Component Jumping
+     cJumping.power = 100;
+
+}
+```
+
 
 #### How to kill Entities?
 
