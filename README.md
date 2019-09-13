@@ -358,9 +358,9 @@ sealed class ProcessorMove : Processor<ComponentMove,ComponentPosition>, ITick
 	  	public void Tick(float delta)
 		{
 		        // iteration through group
-			for (int i = 0; i < groupMovables.length; i++)
+			for (int i = 0; i < source.length; i++)
 			{
-				ref var entity = ref groupMovables.entities[i];
+				ref var entity = ref source.entities[i];
 
 				var cMove     = entity.ComponentMove();
 				var cPosition = entity.ComponentPosition();
