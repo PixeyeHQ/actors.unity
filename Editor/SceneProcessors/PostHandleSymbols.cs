@@ -34,10 +34,11 @@ namespace Pixeye.Framework
 			{
 				str = "ACTORS_TAGS_12";
 			}
-			else
+			else  if (DataFramework.sizeTags == 6)
 			{
 				str = "ACTORS_TAGS_6";
 			}
+			else str = "ACTORS_TAGS_0";
 
 
 			if (index > -1)
