@@ -83,7 +83,9 @@ namespace Pixeye.Framework
 			transforms  = new Transform[settings.SizeEntities];
 
 			components = (BufferComponents*) UnmanagedMemory.Alloc(sizeBufferComponents * settings.SizeEntities);
+			#if !ACTORS_TAGS_0
 			tags       = (BufferTags*) UnmanagedMemory.Alloc(sizeBufferTags * settings.SizeEntities);
+			#endif
 			cache      = (Utils*) UnmanagedMemory.Alloc(sizeUtils * settings.SizeEntities);
 
 			for (int i = 0; i < settings.SizeEntities; i++)
@@ -108,12 +110,16 @@ namespace Pixeye.Framework
 				Array.Resize(ref transforms, l);
 
 				components = (BufferComponents*) UnmanagedMemory.ReAlloc(components, sizeBufferComponents * l);
+				#if !ACTORS_TAGS_0
 				tags       = (BufferTags*) UnmanagedMemory.ReAlloc(tags, sizeBufferTags * l);
+				#endif
 				cache      = (Utils*) UnmanagedMemory.ReAlloc(cache, sizeUtils * l);
 
 				for (int i = lengthTotal; i < l; i++)
 				{
+					#if !ACTORS_TAGS_0
 					tags[i]       = new BufferTags();
+					#endif
 					cache[i]      = new Utils();
 					components[i] = new BufferComponents(5);
 				}

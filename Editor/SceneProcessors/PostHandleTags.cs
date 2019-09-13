@@ -54,6 +54,9 @@ namespace Pixeye.Framework
 			}
 		}
 
+
+		
+	#if !ACTORS_COMPONENTS_STRUCTS	
 		[MenuItem("Tools/Actors/Set Struct Components", false, 2)]
 		static public void SetStructsChecks()
 		{
@@ -70,8 +73,7 @@ namespace Pixeye.Framework
 
 			PlayerSettings.SetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup, string.Join(";", allDefines.ToArray()));
 		}
-
-
+	#else
 		[MenuItem("Tools/Actors/Remove Struct Components", false, 2)]
 		static public void SetNoStructsChecks()
 		{
@@ -88,7 +90,9 @@ namespace Pixeye.Framework
 
 			PlayerSettings.SetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup, string.Join(";", allDefines.ToArray()));
 		}
+ #endif
 
+		#if ACTORS_TAGS_CHECKS
 		[MenuItem("Tools/Actors/Tags/Remove Tag Checks", false, 1)]
 		static public void SetNoChecks()
 		{
@@ -105,7 +109,7 @@ namespace Pixeye.Framework
 
 			PlayerSettings.SetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup, string.Join(";", allDefines.ToArray()));
 		}
-
+	  #else	
 		[MenuItem("Tools/Actors/Tags/Set Tag Checks", false, 1)]
 		static public void SetChecks()
 		{
@@ -122,6 +126,7 @@ namespace Pixeye.Framework
 
 			PlayerSettings.SetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup, string.Join(";", allDefines.ToArray()));
 		}
+		#endif
 
 
 		[MenuItem("Tools/Actors/Tags/Size/24 Tags", false, 0)]
@@ -164,6 +169,52 @@ namespace Pixeye.Framework
 			allDefines[index] = "ACTORS_TAGS_6";
 			PlayerSettings.SetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup, string.Join(";", allDefines.ToArray()));
 		}
+
+
+		[MenuItem("Tools/Actors/Tags/Size/0 Tags", false, 0)]
+		static public void Set0()
+		{
+			DataFramework.sizeTags = 0;
+			string       definesString = PlayerSettings.GetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup);
+			List<string> allDefines    = definesString.Split(';').ToList();
+
+			var index = allDefines.FindIndex(d => d.Contains("ACTORS_TAGS"));
+			allDefines[index] = "ACTORS_TAGS_0";
+			PlayerSettings.SetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup, string.Join(";", allDefines.ToArray()));
+		}
+    #if !ACTORS_DEBUG
+		[MenuItem("Tools/Actors/Set Debug", false, 4)]
+		static public void SetDebug()
+		{
+			string definesString = PlayerSettings.GetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup);
+			var    allDefines    = definesString.Split(';').ToList();
+
+			var index = allDefines.FindIndex(d => d.Contains("ACTORS_DEBUG"));
+			if (index == -1)
+			{
+				allDefines.Add("ACTORS_DEBUG");
+			}
+
+
+			PlayerSettings.SetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup, string.Join(";", allDefines.ToArray()));
+		}
+		#else
+		[MenuItem("Tools/Actors/Set Release", false, 4)]
+		static public void SetNoDebug()
+		{
+			string definesString = PlayerSettings.GetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup);
+			var    allDefines    = definesString.Split(';').ToList();
+
+			var index = allDefines.FindIndex(d => d.Contains("ACTORS_DEBUG"));
+			if (index != -1)
+			{
+				allDefines[index] = string.Empty;
+			}
+
+
+			PlayerSettings.SetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup, string.Join(";", allDefines.ToArray()));
+		}
+		#endif
 
 		//	[MenuItem("Tools/Actors/Tags/Register", false, 1)]
 		static public void Execute()

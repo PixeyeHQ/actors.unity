@@ -50,11 +50,11 @@ namespace Pixeye.Framework
 
 			#if UNITY_EDITOR
 			_entity = id;
-			#if ACTORS_DEBUG
-	  	var utils = GetComponent<ActorUtil>();
-		 	if (utils == null) utils = gameObject.AddComponent<ActorUtil>();
-	   	utils.Setup(entity,isActiveAndEnabled);
-			#endif
+			// #if ACTORS_DEBUG
+	  // 	var utils = GetComponent<ActorUtil>();
+		 // 	if (utils == null) utils = gameObject.AddComponent<ActorUtil>();
+	  //  	utils.Setup(entity,isActiveAndEnabled);
+			// #endif
 			#endif
 
 
@@ -99,11 +99,11 @@ namespace Pixeye.Framework
 
 			#if UNITY_EDITOR
 			_entity = id;
-			#if ACTORS_DEBUG
-			var utils = GetComponent<ActorUtil>();
-			if (utils == null) utils = gameObject.AddComponent<ActorUtil>();
-			utils.Setup(entity, isActiveAndEnabled);
-			#endif
+			// #if ACTORS_DEBUG
+			// var utils = GetComponent<ActorUtil>();
+			// if (utils == null) utils = gameObject.AddComponent<ActorUtil>();
+			// utils.Setup(entity, isActiveAndEnabled);
+			// #endif
 			#endif
 
 			Entity.Initialize(id, age, isPooled);

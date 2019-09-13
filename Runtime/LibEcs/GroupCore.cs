@@ -138,8 +138,9 @@ namespace Pixeye.Framework
 		{
 			this.composition = composition;
 			composition.SetupExcludeTypes(this);
+			#if !ACTORS_TAGS_0
 			HelperTags.Add(this);
-
+			#endif
 
 			Initialize();
 			return this;
