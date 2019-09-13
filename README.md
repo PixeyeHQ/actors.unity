@@ -18,7 +18,7 @@ ACTORS is a complete game framework with multiscene editing, game object pooling
 
 - Create a new Unity Project
 - Open the manifest.json file in the Packages folder inside of the Project
-- Add ```"com.pixeye.ecs": "https://github.com/dimmpixeye/ecs.git",```
+- Add ```"com.pixeye.ecs": "https://github.com/dimmpixeye/actors.git",```
 
 #### From Unity
 - Download from https://github.com/dimmpixeye/ecs/releases 
