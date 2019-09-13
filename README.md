@@ -263,7 +263,31 @@ sealed class ProcessorMove : Processor, ITick
 		}
 	  
         }
+```
 
+If you are going to use only one group in the processor you can take a slightly different approach. There is no difference except that you will type less.
+
+```csharp
+// Define a group from the processor. The group defined in this way called source.
+sealed class ProcessorMove : Processor<ComponentMove,ComponentPosition>, ITick
+	{
+  
+	        // ITick interface Adds Tick method. It's an update with delta time.
+	  	public void Tick(float delta)
+		{
+		        // iteration through group
+			for (int i = 0; i < source.length; i++)
+			{
+				ref var entity = ref source.entities[i];
+
+				var cMove     = entity.ComponentMove();
+				var cPosition = entity.ComponentPosition();
+
+				// do some logic
+			}
+		}
+	  
+        }
 ```
 
 ### Group events
