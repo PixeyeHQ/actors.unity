@@ -345,8 +345,51 @@ sealed class ProcessorMove : Processor, ITick
 		
 	  
         }
-
 ```
+The code below shows how to add events to group from the processor.
+
+```csharp
+// Define a group from the processor. The group defined in this way called source.
+ // register EventsForMovables for group. Choose events to work with.
+[GroupWantEvent(Op.Add | Op.Remove)]
+sealed class ProcessorMove : Processor<ComponentMove,ComponentPosition>, ITick
+	{
+	        // ITick interface Adds Tick method. It's an update with delta time.
+	  	public void Tick(float delta)
+		{
+		        // iteration through group
+			for (int i = 0; i < groupMovables.length; i++)
+			{
+				ref var entity = ref groupMovables.entities[i];
+
+				var cMove     = entity.ComponentMove();
+				var cPosition = entity.ComponentPosition();
+
+				// do some logic
+			}
+		}
+	
+	                 public override void OnAdd(ent[] entities, int length)
+			{
+			   // work with all entities that were added to the group on the current frame
+			   for (int i = 0; i < length; i++)
+			   {
+			        ref var entity = ref entities[i];
+			   }
+			}
+			public override void OnRemove(ent[] entities, int length)
+                        {
+			   for (int i = 0; i < length; i++)
+			   {
+			        ref var entity = ref entities[i];
+			   }
+			}
+        }
+```
+
+```Tip. You can use Op.All instead of Op.Add | Op.Remove```
+
+
 
 ## Starters
 The Starter class is the entry point of a game scene. You define all your Processors and Scene dependecies there. How you define your processors matters for execution order.
