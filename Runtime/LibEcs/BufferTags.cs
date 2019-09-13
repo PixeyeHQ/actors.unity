@@ -5,12 +5,12 @@
 #if ACTORS_TAGS_6 || ACTORS_TAGS_12
 #undef ACTORS_TAGS_DEFAULT
 #endif
-
+#if! ACTORS_TAGS_0
 using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-
+ 
 namespace Pixeye.Framework
 {
 	[StructLayout(LayoutKind.Sequential)]
@@ -29,11 +29,8 @@ namespace Pixeye.Framework
 		public const int Capacity = 6;
 		public fixed ushort tags[Capacity];
 		public fixed byte size[Capacity];
-		#elif ACTORS_TAGS_0
-    public const int Capacity = 0;
-		public fixed ushort tags[Capacity];
-		public fixed byte size[Capacity];
-		#endif
+     #endif
+ 
 
 		public byte length;
 
@@ -174,7 +171,7 @@ namespace Pixeye.Framework
 		internal static DictionaryGroupTags inUseGroups = new DictionaryGroupTags();
 		internal static DictionaryGroupTags inUseGroupsTypes = new DictionaryGroupTags();
 
-		#if !ACTORS_TAGS_0
+ 
 		public static void ClearTags(in this ent entity)
 		{
 			Entity.tags[entity.id].Clear();
@@ -448,7 +445,7 @@ namespace Pixeye.Framework
 				}
 			}
 		}
-	 #endif
+	  
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal static void HandleChange(in ent entity, int tagID)
 		{
@@ -461,3 +458,4 @@ namespace Pixeye.Framework
 	}
 
 }
+ #endif

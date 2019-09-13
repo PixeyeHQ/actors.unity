@@ -114,8 +114,9 @@ namespace Pixeye.Framework
 							Entity.transforms[entityID].gameObject.Release(Entity.cache[entityID].isPooled ? Pool.Entities : 0);
 							Entity.transforms[entityID] = null;
 						}
-
+            			#if !ACTORS_TAGS_0
 						Entity.tags[entityID].Clear();
+						#endif
 						Entity.cache[entityID].isAlive = false;
 					
 				  // if (ent.entityStack.length >= ent.entityStack.source.Length)
@@ -174,7 +175,9 @@ namespace Pixeye.Framework
 			 			}
 
 						components.amount = 0;
+						#if !ACTORS_TAGS_0
 						Entity.tags[entityID].Clear();
+						#endif
 						Entity.cache[entityID].isAlive = false;
 
 
@@ -272,8 +275,9 @@ namespace Pixeye.Framework
 							Entity.transforms[entityID].gameObject.Release(Entity.cache[entityID].isPooled ? Pool.Entities : 0);
 							Entity.transforms[entityID] = null;
 						}
-
+						#if !ACTORS_TAGS_0
 						Entity.tags[entityID].Clear();
+						#endif
 						Entity.cache[entityID].isAlive = false;
 						Entity.Count--;
 
@@ -289,6 +293,7 @@ namespace Pixeye.Framework
 
 					case EntityOperations.Action.ChangeTag:
 					{
+						#if !ACTORS_TAGS_0
 						if (Entity.components[entityID].amount == 0) continue;
 
 						var groups = HelperTags.inUseGroups.groupStorage[operation.arg]; // op.arg = index
@@ -311,8 +316,9 @@ namespace Pixeye.Framework
 								group.Remove(inGroup);
 							}
 						}
-
+						#endif
 						break;
+						
 					}
 
 					case EntityOperations.Action.Activate:

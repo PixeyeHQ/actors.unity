@@ -57,7 +57,7 @@ namespace Pixeye.Framework
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal bool Check(int entityID)
 		{
-			#if ACTORS_TAGS_CHECKS
+			#if ACTORS_TAGS_CHECKS && !ACTORS_TAGS_0
 			return CanProceed(entityID) && !ExcludeTypes(entityID) && (includeTags.Length == 0 || IncludeTags(entityID)) & (excludeTags.Length == 0 || ExcludeTags(entityID));
 			#else
 			for (int ll = 0; ll < ids.Length; ll++)
@@ -88,6 +88,7 @@ namespace Pixeye.Framework
 
 			return true;
 		}
+		#if !ACTORS_TAGS_0
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal bool IncludeTags(int entityID)
 		{
@@ -109,6 +110,7 @@ namespace Pixeye.Framework
 
 			return match == includeTags.Length;
 		}
+		
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal bool ExcludeTags(int entityID)
 		{
@@ -128,6 +130,7 @@ namespace Pixeye.Framework
 
 			return true;
 		}
+		#endif
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal bool ExcludeTypes(int entityID)
 		{

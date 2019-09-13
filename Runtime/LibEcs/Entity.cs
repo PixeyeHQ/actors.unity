@@ -44,7 +44,9 @@ namespace Pixeye.Framework
 	public static unsafe partial class Entity
 	{
 		static readonly int sizeBufferComponents = UnsafeUtility.SizeOf<BufferComponents>();
+		#if !ACTORS_TAGS_0
 		static readonly int sizeBufferTags = UnsafeUtility.SizeOf<BufferTags>();
+		#endif
 		static readonly int sizeUtils = UnsafeUtility.SizeOf<Utils>();
 
 		
@@ -53,8 +55,9 @@ namespace Pixeye.Framework
 
 		public static Transform[] transforms;
 
-		 
+		#if !ACTORS_TAGS_0 
 		public static BufferTags* tags;
+		#endif
 		public static Utils* cache;
 		
 		internal static int lengthTotal;
@@ -90,7 +93,9 @@ namespace Pixeye.Framework
 
 			for (int i = 0; i < settings.SizeEntities; i++)
 			{
+				#if !ACTORS_TAGS_0
 				tags[i]       = new BufferTags();
+				#endif
 				cache[i]      = new Utils();
 				components[i] = new BufferComponents(6);
 			}
