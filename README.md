@@ -66,31 +66,27 @@ Every component is generated with special helpers that are optional but makes yo
 If you don't use Unity for generating components, you can easily make a template in your IDE. Or type helpers manually.
 
 ```csharp
-	static partial class Components
+	static partial class component
 	{
-	        public const string Health = "Pixeye.Source.ComponentHealth";
-		
-                [RuntimeInitializeOnLoadMethod]
-		static void ComponentHealthInit() => new SComponentHealth();
+		public const string health = "Pixeye.Source.ComponentHealth";
 
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		internal static ref ComponentHealth ComponentHealth(in this ent entity)
-		=> ref Storage<ComponentHealth>.components[entity.id];
-		
-		internal class SComponentHealth : Storage<ComponentHealth>.Setup
+		public static ref ComponentHealth ComponentHealth(in this ent entity)
+			=> ref StorageComponentHealth.components[entity.id];
+	}
+
+	sealed class StorageComponentHealth : Storage<ComponentHealth>
+	{
+		public override ComponentHealth Create() => new ComponentHealth();
+		public override void Dispose()
 		{
-		  public override ComponentHealth Create() => new ComponentHealth();
-                  public override void Dispose(int[] id, int len)
-                  {
-                     for (int i = 0; i < len; i++)
-                     {
-                        ref var component = ref components[id[i]];
-                        component.val    = 0;
-                        component.valMax = 0;
-                     }
-                  }
+			for (int i = 0; i < disposedLen; i++)
+			{
+				ref var component = ref components[disposed[i]];
+				component.val = 0;
+				component.valMax = 0;
+			}
 		}
-          }
+	}
 
 ```
 
