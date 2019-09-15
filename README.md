@@ -68,22 +68,26 @@ If you don't use Unity for generating components, you can easily make a template
 ```csharp
 	static partial class component
 	{
-		public const string health = "Pixeye.Source.ComponentHealth";
-
+	       // auxiliary excluding filter for entity groups
+		public const string Health = "ComponentHealth";
+               // a shortcut to get compontent like this : entity.ComponentHealth();
 		public static ref ComponentHealth ComponentHealth(in this ent entity)
-			=> ref StorageComponentHealth.components[entity.id];
+			=> ref Storage<ComponentHealth>.components[entity.id];
 	}
-
+        
 	sealed class StorageComponentHealth : Storage<ComponentHealth>
 	{
+	        // This is for performance. Adding new Component is much faster than new T();
 		public override ComponentHealth Create() => new ComponentHealth();
+		// Every time one or more components are removed from the entity the dispose method will run.
+                // Use this method for cleanup and reverting settings of the component.
 		public override void Dispose()
 		{
 			for (int i = 0; i < disposedLen; i++)
 			{
 				ref var component = ref components[disposed[i]];
 				component.val = 0;
-				component.valMax = 0;
+				component.valMax = 100;
 			}
 		}
 	}
