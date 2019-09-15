@@ -20,7 +20,6 @@ namespace Pixeye.Framework
 	/// </summary>
 	public class Starter : MonoBehaviour
 	{
-		public static string namespacer;
 		public static bool initialized;
 		static bool typesBinded;
 
