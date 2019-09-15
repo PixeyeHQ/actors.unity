@@ -351,7 +351,7 @@ The code below shows how to add events to group from the processor.
 ```csharp
 // Define a group from the processor. The group defined in this way called source.
  // register EventsForMovables for group. Choose events to work with.
-[GroupWantEvent(Op.Add | Op.Remove)]
+[WantEvent(Op.Add | Op.Remove)]
 sealed class ProcessorMove : Processor<ComponentMove,ComponentPosition>, ITick
 	{
 	        // ITick interface Adds Tick method. It's an update with delta time.
