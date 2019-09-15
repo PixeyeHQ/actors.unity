@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.IL2CPP.CompilerServices;
 using UnityEngine;
- 
+
 
 namespace Pixeye.Framework
 {
@@ -49,17 +49,17 @@ namespace Pixeye.Framework
 		#endif
 		static readonly int sizeUtils = UnsafeUtility.SizeOf<Utils>();
 
-		
+
 		public static SettingsEngine settings = new SettingsEngine();
 		public static int Count;
 
 		public static Transform[] transforms;
 
-		#if !ACTORS_TAGS_0 
+		#if !ACTORS_TAGS_0
 		public static BufferTags* tags;
 		#endif
 		public static Utils* cache;
-		
+
 		internal static int lengthTotal;
 		internal static int[,] generations;
 
@@ -87,14 +87,14 @@ namespace Pixeye.Framework
 
 			components = (BufferComponents*) UnmanagedMemory.Alloc(sizeBufferComponents * settings.SizeEntities);
 			#if !ACTORS_TAGS_0
-			tags       = (BufferTags*) UnmanagedMemory.Alloc(sizeBufferTags * settings.SizeEntities);
+			tags = (BufferTags*) UnmanagedMemory.Alloc(sizeBufferTags * settings.SizeEntities);
 			#endif
-			cache      = (Utils*) UnmanagedMemory.Alloc(sizeUtils * settings.SizeEntities);
+			cache = (Utils*) UnmanagedMemory.Alloc(sizeUtils * settings.SizeEntities);
 
 			for (int i = 0; i < settings.SizeEntities; i++)
 			{
 				#if !ACTORS_TAGS_0
-				tags[i]       = new BufferTags();
+				tags[i] = new BufferTags();
 				#endif
 				cache[i]      = new Utils();
 				components[i] = new BufferComponents(6);
@@ -116,14 +116,14 @@ namespace Pixeye.Framework
 
 				components = (BufferComponents*) UnmanagedMemory.ReAlloc(components, sizeBufferComponents * l);
 				#if !ACTORS_TAGS_0
-				tags       = (BufferTags*) UnmanagedMemory.ReAlloc(tags, sizeBufferTags * l);
+				tags = (BufferTags*) UnmanagedMemory.ReAlloc(tags, sizeBufferTags * l);
 				#endif
-				cache      = (Utils*) UnmanagedMemory.ReAlloc(cache, sizeUtils * l);
+				cache = (Utils*) UnmanagedMemory.ReAlloc(cache, sizeUtils * l);
 
 				for (int i = lengthTotal; i < l; i++)
 				{
 					#if !ACTORS_TAGS_0
-					tags[i]       = new BufferTags();
+					tags[i] = new BufferTags();
 					#endif
 					cache[i]      = new Utils();
 					components[i] = new BufferComponents(5);
@@ -135,9 +135,9 @@ namespace Pixeye.Framework
 			components[id].amount = 0;
 
 			var ptrCache = &cache[id];
-			ptrCache->id  = id;
-			ptrCache->age = age;
-			ptrCache->isAlive = true;
+			ptrCache->id       = id;
+			ptrCache->age      = age;
+			ptrCache->isAlive  = true;
 			ptrCache->isPooled = pooled;
 
 			Count++;
@@ -191,7 +191,7 @@ namespace Pixeye.Framework
 			#else
 			ref var val = ref Storage<T>.components[id];
 			if (val == null)
-				val = Storage<T>.setup.Create();
+				val = Storage<T>.Instance.Create();
 
 			return ref val;
 			#endif
@@ -257,7 +257,7 @@ namespace Pixeye.Framework
 			#else
 			ref var val = ref Storage<T>.components[id];
 			if (val == null)
-				val = Storage<T>.setup.Create();
+				val = Storage<T>.Instance.Create();
 
 
 			return ref val;
@@ -279,13 +279,13 @@ namespace Pixeye.Framework
 			#if UNITY_EDITOR
 			if (!entity.Exist)
 			{
-				Debug.LogError($"-> Entity [{id}] is not active. You should not add components to inactive entity, [{Storage<T>.Instance.componentType}] ");
+				Debug.LogError($"-> Entity [{id}] is not active. You should not add components to inactive entity, [{typeof(T)}] ");
 				return ref Storage<T>.Get(id);
 			}
 
 			if ((generations[id, Storage<T>.generation] & Storage<T>.componentMask) == Storage<T>.componentMask)
 			{
-				Debug.LogError($"-> Entity [{id}] already have this component {Storage<T>.Instance.componentType}!");
+				Debug.LogError($"-> Entity [{id}] already have this component {typeof(T)}!");
 				return ref Storage<T>.Get(id);
 			}
 			#endif
@@ -301,7 +301,7 @@ namespace Pixeye.Framework
 			#else
 			ref var val = ref Storage<T>.components[id];
 			if (val == null)
-				val = Storage<T>.setup.Create();
+				val = Storage<T>.Instance.Create();
 
 
 			return ref val;
@@ -322,13 +322,13 @@ namespace Pixeye.Framework
 			#if UNITY_EDITOR
 			if (!entity.Exist)
 			{
-				Debug.LogError($"-> Entity [{id}] is not active. You should not add components to inactive entity, [{Storage<T>.Instance.componentType}] ");
+				Debug.LogError($"-> Entity [{id}] is not active. You should not add components to inactive entity, [{typeof(T)}] ");
 				return;
 			}
 
 			if ((generations[id, Storage<T>.generation] & Storage<T>.componentMask) == Storage<T>.componentMask)
 			{
-				Debug.LogError($"-> Entity [{id}] already have this component {Storage<T>.Instance.componentType}!");
+				Debug.LogError($"-> Entity [{id}] already have this component {typeof(T)}!");
 				return;
 			}
 			#endif
@@ -345,7 +345,7 @@ namespace Pixeye.Framework
 			// #else
 			ref var componentInStorage = ref Storage<T>.components[id];
 			componentInStorage = component;
-		//	#endif
+			//	#endif
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]

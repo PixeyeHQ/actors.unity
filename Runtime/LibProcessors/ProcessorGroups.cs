@@ -28,7 +28,7 @@ namespace Pixeye.Framework
 				if (myFieldInfo.FieldType.IsSubclassOf(groupType))
 				{
 					var groupByAttribute      = Attribute.GetCustomAttribute(myFieldInfo, typeof(GroupByAttribute)) as GroupByAttribute;
-					var groupExcludeAttribute = Attribute.GetCustomAttribute(myFieldInfo, typeof(GroupExcludeAttribute)) as GroupExcludeAttribute;
+					var groupExcludeAttribute = Attribute.GetCustomAttribute(myFieldInfo, typeof(ExcludeAttribute)) as ExcludeAttribute;
 
 					var includeTagsFilter = groupByAttribute != null ? groupByAttribute.filter : new int[0];
 					var excludeTagsFilter = new int[0];
@@ -80,12 +80,11 @@ namespace Pixeye.Framework
 	{
 		public static void Setup(object b)
 		{
-	 
 			var type = b.GetType();
 
-			var groupEv               = Attribute.GetCustomAttribute(type, typeof(GroupWantEventAttribute)) as GroupWantEventAttribute;
+			var groupEv               = Attribute.GetCustomAttribute(type, typeof(WantEventAttribute)) as WantEventAttribute;
 			var groupByAttribute      = Attribute.GetCustomAttribute(type, typeof(GroupByAttribute)) as GroupByAttribute;
-			var groupExcludeAttribute = Attribute.GetCustomAttribute(type, typeof(GroupExcludeAttribute)) as GroupExcludeAttribute;
+			var groupExcludeAttribute = Attribute.GetCustomAttribute(type, typeof(ExcludeAttribute)) as ExcludeAttribute;
 			var includeTagsFilter     = groupByAttribute != null ? groupByAttribute.filter : new int[0];
 			var excludeTagsFilter     = new int[0];
 			var excludeCompFilter     = new int[0];
@@ -126,10 +125,8 @@ namespace Pixeye.Framework
 
 					if (groupEv != null)
 					{
-					 	 group.SetSelf(groupEv.ev,b as GroupEvents);
+						group.SetSelf(groupEv.ev, b as GroupEvents);
 					}
-
-		 
 
 
 					break;

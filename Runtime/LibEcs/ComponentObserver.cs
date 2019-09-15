@@ -1,10 +1,6 @@
 //  Project : ecs
 // Contacts : Pix - ask@pixeye.games
 
-
-using UnityEngine;
-using System.Runtime.CompilerServices;
-
 namespace Pixeye.Framework
 {
 	#if ACTORS_COMPONENTS_STRUCTS
@@ -24,37 +20,29 @@ namespace Pixeye.Framework
 
 	#region HELPERS
 
-	public static partial class Components
+	static class component
 	{
-		public const string Observer = "Pixeye.Source.ComponentObserver";
-
-
-		[RuntimeInitializeOnLoadMethod]
-		static void ComponentObserverInit()=> new SComponentObserver();
-		
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal static ref ComponentObserver ComponentObserver(in this ent entity) =>
 			ref Storage<ComponentObserver>.components[entity.id];
+	}
 
+	sealed class StorageComponentObserver : Storage<ComponentObserver>
+	{
+		public override ComponentObserver Create() => new ComponentObserver();
 
-		internal class SComponentObserver : Storage<ComponentObserver>.Setup
+		public override void Dispose()
 		{
-			public override ComponentObserver Create() => new ComponentObserver();
-
-			public override void Dispose(int[] id, int len)
+			for (int i = 0; i < disposedLen; i++)
 			{
-				for (int i = 0; i < len; i++)
-				{
-					ref var component = ref components[id[i]];
-					
-					for (int ii = 0; ii < component.length; ii++)
-					{
-						component.wrappers[ii].Dispose();
-						component.wrappers[ii] = null;
-					}
+				ref var component = ref components[disposed[i]];
 
-					component.length = 0;
+				for (int ii = 0; ii < component.length; ii++)
+				{
+					component.wrappers[ii].Dispose();
+					component.wrappers[ii] = null;
 				}
+
+				component.length = 0;
 			}
 		}
 	}

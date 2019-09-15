@@ -35,6 +35,7 @@ namespace Pixeye.Framework
 		static EditorFramework()
 		{
 			EditorApplication.update += Updating;
+		 
 		}
 
 

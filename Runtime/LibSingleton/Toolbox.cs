@@ -112,7 +112,7 @@ namespace Pixeye.Framework
 			}
 
 			Pool.Dispose();
-			Storage.Dispose();
+			Storage.Wipe();
 			ProcessorGroups.Dispose();
 			ProcessorTimer.Default.Dispose();
 			ProcessorScene.Default.Dispose();

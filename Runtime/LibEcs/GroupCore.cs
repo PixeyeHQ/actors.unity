@@ -7,7 +7,8 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using Unity.IL2CPP.CompilerServices;
- 
+using UnityEngine;
+
 
 namespace Pixeye.Framework
 {
@@ -92,7 +93,7 @@ namespace Pixeye.Framework
 				if (onRemove.Length == onRemoveLen)
 					Array.Resize(ref onRemove, onRemoveLen << 1);
 
-			 	
+
 				onRemove[onRemoveLen++] = gr;
 			}
 		}
@@ -136,13 +137,19 @@ namespace Pixeye.Framework
 
 		internal GroupCore Start(Composition composition)
 		{
+ 
 			this.composition = composition;
-			composition.SetupExcludeTypes(this);
+		 
 			#if !ACTORS_TAGS_0
 			HelperTags.Add(this);
 			#endif
 
+			this.composition.SetupExcludeTypes(this);
+		
 			Initialize();
+		
+			
+		 
 			return this;
 		}
 
@@ -161,10 +168,9 @@ namespace Pixeye.Framework
 			{
 				Array.Resize(ref entities, entity.id << 1);
 				Array.Resize(ref entitiesToAdd, entity.id << 1);
-				Array.Resize(ref entitiesToRemove, entity.id << 1);	
+				Array.Resize(ref entitiesToRemove, entity.id << 1);
 			}
-			else 
-			if (length >= entities.Length)
+			else if (length >= entities.Length)
 			{
 				Array.Resize(ref entities, length << 1);
 				Array.Resize(ref entitiesToAdd, length << 1);
@@ -223,7 +229,7 @@ namespace Pixeye.Framework
 			if (onRemoveLen > 0)
 				entitiesToRemove[entitiesToRemoveLen++] = entities[i];
 
-		 
+
 			Array.Copy(entities, i + 1, entities, i, length-- - i);
 		}
 
@@ -510,6 +516,7 @@ namespace Pixeye.Framework
 	{
 		public override void Initialize()
 		{
+	 
 			Storage<T>.Instance.Add(this);
 
 			var len = 1;

@@ -27,39 +27,6 @@ namespace Pixeye.Framework
 		}
 	}
 
-	// public static class ProcessorHelpers
-	// {
-	// 	public static T Set<T>(this Processor proc, Op op) where T : GroupEvents, new()
-	// 	{
-	// 		var evs = new T();
-	//
-	//
-	// 		// if ((op & Op.Add) == Op.Add)
-	// 		// {
-	// 		//
-	// 		//
-	// 		// 	if (eventsAddLength >= eventsAdd.Length)
-	// 		// 	{
-	// 		// 		Array.Resize(ref eventsAdd, eventsAddLength + 1);
-	// 		// 	}
-	// 		//
-	// 		// 	eventsAdd[eventsAddLength++] = evs;
-	// 		// }
-	// 		//
-	// 		//
-	// 		// if ((op & Op.Remove) == Op.Remove)
-	// 		// {
-	// 		// 	if (eventsRemoveLength >= eventsRemove.Length)
-	// 		// 	{
-	// 		// 		Array.Resize(ref eventsRemove, eventsRemoveLength + 1);
-	// 		// 	}
-	// 		//
-	// 		// 	eventsRemove[eventsRemoveLength++] = evs;
-	// 		// }
-	//
-	// 		return evs;
-	// 	}
-	// }
 
 	public abstract class ProcessorGroup : GroupEvents, IDisposable
 	{

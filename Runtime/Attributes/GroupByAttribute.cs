@@ -9,16 +9,13 @@ using System;
 
 namespace Pixeye.Framework
 {
-    public class GroupByAttribute : Attribute
-    {
-        public int[] filter;
- 
-        public GroupByAttribute(params int[] filter)
-        {
-            this.filter = filter;
-        }
-        
-        
-       
-    }
+	public class GroupByAttribute : Attribute
+	{
+		public int[] filter;
+
+		public GroupByAttribute(params int[] filter)
+		{
+			this.filter = filter;
+		}
+	}
 }

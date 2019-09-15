@@ -6,10 +6,10 @@ using System;
 
 namespace Pixeye.Framework
 {
-	public sealed class GroupWantEventAttribute : Attribute
+	public sealed class WantEventAttribute : Attribute
 	{
 		public Op ev;
-		public GroupWantEventAttribute(Op ev)
+		public WantEventAttribute(Op ev)
 		{
 			this.ev = ev;
 		}

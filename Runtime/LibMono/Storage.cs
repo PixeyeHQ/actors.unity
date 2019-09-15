@@ -23,55 +23,45 @@ namespace Pixeye.Framework
 		internal static int lastID;
 
 		internal GroupCore[] groups = new GroupCore[8];
-		internal int lenOfGroups;
-
-
-		public Type componentType;
+		internal int groupsLen;
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal abstract void AddGroupExclude(GroupCore groupCore);
 
 
-		internal static void Dispose()
+		internal static void Wipe()
 		{
 			for (int i = 0; i < lastID; i++)
-			{
-				all[i].lenOfGroups = 0;
-			}
+				all[i].groupsLen = 0;
 		}
 
 
-		internal int[] toDispose = new int[Entity.settings.SizeEntities];
-		internal int toDisposeLen;
+		public int[] disposed = new int[Entity.settings.SizeEntities];
+		public int disposedLen;
 
-		internal SetupBase setupBase;
 
-		[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
-		public abstract class SetupBase
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public virtual void Dispose()
 		{
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			public virtual void Dispose(int[] id, int len)
-			{
-			}
 		}
+
+		internal abstract Type GetComponentType();
 	}
 
 
 	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
-	public sealed class Storage<T> : Storage
+	public class Storage<T> : Storage
 	{
-		public static readonly Storage<T> Instance = new Storage<T>();
+		public static Storage<T> Instance;
 
 		public static int componentID;
 		public static int componentMask;
 		public static int generation;
 
-		public int len = 0;
+		internal int componentsLen = 0;
 
 		public static T[] components = new T[Entity.settings.SizeEntities];
 
-
-		internal static Setup setup;
 
 		public Storage()
 		{
@@ -91,12 +81,21 @@ namespace Pixeye.Framework
 
 			var type = typeof(T);
 			typeNames.Add(type.GetHashCode(), componentID);
-			componentType = type;
-
-
+			Instance = this;
 		}
 
- 
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public virtual T Create()
+		{
+			return default;
+		}
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		internal override Type GetComponentType()
+		{
+			return typeof(T);
+		}
+
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static ref T Get(int entityID)
 		{
@@ -107,7 +106,7 @@ namespace Pixeye.Framework
 			#if !ACTORS_COMPONENTS_STRUCTS
 			ref var val = ref components[entityID];
 			if (val == null)
-				val = setup.Create();
+				val = Instance.Create();
 			#endif
 
 			return ref components[entityID];
@@ -117,19 +116,19 @@ namespace Pixeye.Framework
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal void Add(GroupCore groupCore)
 		{
-			if (lenOfGroups == groups.Length)
-				Array.Resize(ref groups, lenOfGroups << 1);
+			if (groupsLen == groups.Length)
+				Array.Resize(ref groups, groupsLen << 1);
 
-			groups[lenOfGroups++] = groupCore;
+			groups[groupsLen++] = groupCore;
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal override void AddGroupExclude(GroupCore groupCore)
 		{
-			if (lenOfGroups == groups.Length)
-				Array.Resize(ref groups, lenOfGroups << 1);
+			if (groupsLen == groups.Length)
+				Array.Resize(ref groups, groupsLen << 1);
 
-			groups[lenOfGroups++] = groupCore;
+			groups[groupsLen++] = groupCore;
 		}
 
 
@@ -140,21 +139,5 @@ namespace Pixeye.Framework
 			return (Entity.generations[entityID, generation] & componentMask) == componentMask ? components[entityID] : default;
 		}
 		#endif
-
-
-		[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
-		public abstract class Setup : SetupBase
-		{
-			protected T[] components => Storage<T>.components;
-
-			public Setup()
-			{
-				Instance.setupBase = this;
-				setup              = this;
-			}
-
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			public abstract T Create();
-		}
 	}
 }

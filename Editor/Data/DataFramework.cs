@@ -4,18 +4,18 @@
 #if UNITY_EDITOR
 using System.IO;
 using UnityEditor;
+using UnityEngine;
 
 namespace Pixeye.Framework
 {
 	static class DataFramework
 	{
-
 		public static bool onStructs
 		{
 			get { return EditorPrefs.GetBool("hba.data.onStructs", false); }
 			set { EditorPrefs.SetBool("hba.data.onStructs", value); }
 		}
-		
+
 		public static bool tagsCheck
 		{
 			get { return EditorPrefs.GetBool("hba.data.tagsCheck", false); }
@@ -30,8 +30,13 @@ namespace Pixeye.Framework
 
 		public static string nameSpace
 		{
-			get { return EditorPrefs.GetString("hba.data.namespace", "Pixeye.Source"); }
-			set { EditorPrefs.SetString("hba.data.namespace", value); }
+			get { return EditorPrefs.GetString("hba.data.namespace", "Game.Source"); }
+			set
+			{
+				{
+					EditorPrefs.SetString("hba.data.namespace", value);
+				}
+			}
 		}
 
 		public static string pathPrefabsEditor

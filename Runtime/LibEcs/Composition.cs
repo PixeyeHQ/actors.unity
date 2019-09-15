@@ -5,12 +5,14 @@
 using System;
 using System.Runtime.CompilerServices;
 using Unity.IL2CPP.CompilerServices;
+ 
 
 namespace Pixeye.Framework
 {
 	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
 	public unsafe class Composition : IEquatable<Composition>
 	{
+		//public int[] excludeCompFilterCache; // dirty : ( 
 		public int[] generations = new int[0];
 		public int[] ids = new int[0];
 
@@ -40,13 +42,17 @@ namespace Pixeye.Framework
 			if (types != null)
 				for (int i = 0; i < types.Length; i++)
 				{
-					var t = types[i];
+					var t = Storage.typeNames[types[i]];
+
 					excludeComponents[t] = true;
 				}
 		}
 
 		internal void SetupExcludeTypes(GroupCore g)
 		{
+			//  AddTypesExclude(excludeCompFilterCache);
+			//	AddTypesExclude(excludeCompFilterCache);
+
 			for (int i = 0; i < Storage.lastID; i++)
 			{
 				var t = excludeComponents[i];
@@ -110,7 +116,7 @@ namespace Pixeye.Framework
 
 			return match == includeTags.Length;
 		}
-		
+
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal bool ExcludeTags(int entityID)
 		{

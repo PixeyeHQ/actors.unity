@@ -7,8 +7,10 @@ using UnityEditor;
 #if ODIN_INSPECTOR
 using Sirenix.OdinInspector;
 #endif
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using UnityEngine;
 
 namespace Pixeye.Framework
@@ -18,7 +20,9 @@ namespace Pixeye.Framework
 	/// </summary>
 	public class Starter : MonoBehaviour
 	{
+		public static string namespacer;
 		public static bool initialized;
+		static bool typesBinded;
 
 		#if ODIN_INSPECTOR
 		[FoldoutGroup("Setup")]
@@ -42,7 +46,59 @@ namespace Pixeye.Framework
 			if (ProcessorUpdate.Default == null)
 				ProcessorUpdate.Create();
 
+
+			if (!typesBinded)
+			{
+				var asmFramework = Assembly.GetExecutingAssembly();
+				var asmDataRaw   = Entity.settings.DataNamespace;
+
+				var q = asmFramework.GetTypes()
+					.Where(t => t.IsSubclassOf(typeof(Storage)) && !t.ContainsGenericParameters);
+
+				foreach (var item in q)
+				{
+					Activator.CreateInstance(item);
+				}
+
+				var asmData = default(Assembly);
+				if (asmDataRaw != string.Empty)
+				{
+					asmData = Assembly.Load(asmDataRaw);
+					q = asmData.GetTypes()
+						.Where(t => t.IsSubclassOf(typeof(Storage)) && !t.ContainsGenericParameters);
+
+					foreach (var item in q)
+					{
+					  	Activator.CreateInstance(item);
+					}
+				}
+				else
+				{
+					q = AppDomain.CurrentDomain.GetAssemblies().Where(asm => asm != asmFramework)
+						.SelectMany(t => t.GetTypes())
+						.Where(t => t.IsSubclassOf(typeof(Storage)) && !t.ContainsGenericParameters);
+					foreach (var item in q)
+					{
+						Activator.CreateInstance(item);
+					}
+				}
+
+				typesBinded = true;
+			}
+
+
 			ProcessorScene.Default.Setup(ScenesToKeep, SceneDependsOn, this);
+		}
+
+		public static IEnumerable<Type> GetAllSubclassOf(Type parent)
+		{
+			foreach (var a in AppDomain.CurrentDomain.GetAssemblies())
+			foreach (var t in a.GetTypes())
+			{
+				Debug.Log(t);
+				if (t.IsSubclassOf(parent))
+					yield return t;
+			}
 		}
 
 		#if UNITY_EDITOR
@@ -150,7 +206,6 @@ namespace Pixeye.Framework
 
 			Setup();
 
-	 
 
 			initialized = true;
 
