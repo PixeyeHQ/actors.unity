@@ -12,6 +12,6 @@ namespace Pixeye.Framework
 		public int SizeComponents = 256;
 		public int SizeGenerations = 4;
 		public int SizeProcessors = 256;
-		public string DataNamespace = "Pixeye.Source";
+		public string DataNamespace = "";
 	}
 }
