@@ -1,12 +1,14 @@
 //  Project : ecs
 // Contacts : Pix - ask@pixeye.games
 
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 namespace Pixeye.Framework
 {
 	public static class Obj
 	{
+		
 		public static void Release(this GameObject o, int poolID = 0)
 		{
 			if (poolID <= 0)
@@ -14,6 +16,14 @@ namespace Pixeye.Framework
 			else Pool.Despawn(poolID, o);
 		}
 
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static T Get<T>(this Transform tr, string path)
+		{
+			return tr.Find(path).GetComponent<T>();
+		}
+		
+		
 		//===============================//
 		// By GameObject ID
 		//===============================//
