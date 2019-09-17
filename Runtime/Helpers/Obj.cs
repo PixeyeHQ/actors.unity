@@ -23,6 +23,11 @@ namespace Pixeye.Framework
 			return tr.Find(path).GetComponent<T>();
 		}
 		
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static T Get<T>(this Behaviour obj, string path)
+		{
+			return obj.transform.Find(path).GetComponent<T>();
+		}
 		
 		//===============================//
 		// By GameObject ID
