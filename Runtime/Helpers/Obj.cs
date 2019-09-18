@@ -16,6 +16,11 @@ namespace Pixeye.Framework
 			else Pool.Despawn(poolID, o);
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static T Get<T>(this GameObject obj, string path)
+		{
+			return obj.transform.Find(path).GetComponent<T>();
+		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static T Get<T>(this Transform tr, string path)
