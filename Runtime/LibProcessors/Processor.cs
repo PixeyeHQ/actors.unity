@@ -51,51 +51,51 @@ namespace Pixeye.Framework
 
 	public abstract class Processor<T> : ProcessorGroup
 	{
-		protected Group<T> source = null;
+		public Group<T> source = null;
 	}
 
 	public abstract class Processor<T, Y> : ProcessorGroup
 	{
-		protected Group<T, Y> source = null;
+		public Group<T, Y> source = null;
 	}
 
 	public abstract class Processor<T, Y, U> : ProcessorGroup
 	{
-		protected Group<T, Y, U> source = null;
+		public Group<T, Y, U> source = null;
 	}
 
 	public abstract class Processor<T, Y, U, I> : ProcessorGroup
 	{
-		protected Group<T, Y, U, I> source = null;
+		public Group<T, Y, U, I> source = null;
 	}
 
 	public abstract class Processor<T, Y, U, I, O> : ProcessorGroup
 	{
-		protected Group<T, Y, U, I, O> source = null;
+		public Group<T, Y, U, I, O> source = null;
 	}
 
 	public abstract class Processor<T, Y, U, I, O, P> : ProcessorGroup
 	{
-		protected Group<T, Y, U, I, O, P> source = null;
+		public Group<T, Y, U, I, O, P> source = null;
 	}
 
 	public abstract class Processor<T, Y, U, I, O, P, A> : ProcessorGroup
 	{
-		protected Group<T, Y, U, I, O, P, A> source = null;
+		public Group<T, Y, U, I, O, P, A> source = null;
 	}
 
 	public abstract class Processor<T, Y, U, I, O, P, A, S> : ProcessorGroup
 	{
-		protected Group<T, Y, U, I, O, P, A, S> source = null;
+		public Group<T, Y, U, I, O, P, A, S> source = null;
 	}
 
 	public abstract class Processor<T, Y, U, I, O, P, A, S, D> : ProcessorGroup
 	{
-		protected Group<T, Y, U, I, O, P, A, S, D> source = null;
+		public Group<T, Y, U, I, O, P, A, S, D> source = null;
 	}
 
 	public abstract class Processor<T, Y, U, I, O, P, A, S, D, F> : ProcessorGroup
 	{
-		protected Group<T, Y, U, I, O, P, A, S, D, F> source = null;
+		public Group<T, Y, U, I, O, P, A, S, D, F> source = null;
 	}
 }
