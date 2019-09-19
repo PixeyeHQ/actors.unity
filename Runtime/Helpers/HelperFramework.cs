@@ -120,20 +120,6 @@ namespace Pixeye.Framework
 
 		#endregion
 
-		#region SIGNALS
-
-		/// <summary>
-		/// <para>Send a signal to the Frameworks default Signal processor.</para>
-		/// </summary>
-		/// <param name="signal"></param>
-		/// <typeparam name="T"></typeparam>
-		public static void Send<T>(ref T signal) where T : struct
-		{
-			ProcessorSignals.Send(in signal);
-		}
-
-		#endregion
-
 		#region ACTORS
 
 		public static List<int> FindValidNodes(this List<PoolNode> list, int id)
