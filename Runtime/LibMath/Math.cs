@@ -1,4 +1,7 @@
-namespace Pix.Actors.Math
+using System.Runtime.CompilerServices;
+ 
+ 
+namespace Pixeye.Framework
 {
     public static partial class HelperFramework
     {
