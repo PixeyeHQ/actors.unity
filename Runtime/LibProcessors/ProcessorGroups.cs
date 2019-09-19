@@ -4,6 +4,7 @@
 using System;
 using System.Reflection;
 using Unity.IL2CPP.CompilerServices;
+using UnityEngine;
 
 namespace Pixeye.Framework
 {
@@ -53,8 +54,10 @@ namespace Pixeye.Framework
 
 		internal static GroupCore SetupGroup(Type groupType, Composition filter, object fieldObj)
 		{
+ 
 			if (container.TryGetValue(groupType, filter, out GroupCore group))
 			{
+  	 
 				return group;
 			}
 

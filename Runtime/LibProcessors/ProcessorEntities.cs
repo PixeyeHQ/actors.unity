@@ -40,21 +40,26 @@ namespace Pixeye.Framework
 				{
 					case EntityOperations.Action.Add:
 					{
-						var componentID = operation.arg;
-						var storage     = Storage.all[componentID];
-
-
-						Entity.components[entityID].Add(componentID);
-
-
-						for (int l = 0; l < storage.groupsLen; l++)
-						{
-							var group = storage.groups[l];
-							if (!group.composition.Check(entityID))
-								group.TryRemove(entityID);
-							else
-								group.Insert(operation.entity);
-						}
+						// var componentID = operation.arg;
+						// var storage     = Storage.all[componentID];
+						//
+						//
+						// Entity.components[entityID].Add(componentID);
+						//
+						//
+						// for (int l = 0; l < storage.groupsLen; l++)
+						// {
+						//  
+						// 	var group = storage.groups[l];
+						//  
+						// 	if (!group.composition.Check(entityID))
+						// 	{
+						// 	 
+						// 		group.TryRemove(entityID);
+						// 	}
+						// 	else
+						// 		group.Insert(operation.entity);
+						// }
 
 
 						break;

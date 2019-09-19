@@ -290,7 +290,7 @@ namespace Pixeye.Framework
 			}
 			#endif
 
-			EntityOperations.Set(entity, Storage<T>.componentID, EntityOperations.Action.Add);
+		//	EntityOperations.Set(entity, Storage<T>.componentID, EntityOperations.Action.Add);
 			generations[id, Storage<T>.generation] |= Storage<T>.componentMask;
 
 			if (id >= Storage<T>.components.Length)
@@ -304,6 +304,46 @@ namespace Pixeye.Framework
 				val = Storage<T>.Instance.Create();
 
 
+			Entity.components[id].Add(Storage<T>.componentID);
+
+			for (int i = 0; i < Storage<T>.Instance.groupsLen; i++)
+			{
+				var group = Storage<T>.Instance.groups[i];
+				if (!group.composition.Check(id))
+				{
+					group.TryRemove(id);
+				}
+				else
+					group.Insert(entity);
+			}
+			 
+			
+			//Storage<T>.Instance
+			//var storage = Storage.all[componentID];
+			// var componentID = operation.arg;
+			// var storage     = Storage.all[componentID];
+			//
+			//
+			// Entity.components[entityID].Add(componentID);
+			//
+			//
+			// for (int l = 0; l < storage.groupsLen; l++)
+			// {
+			//
+				// var group = storage.groups[l];
+				//
+				// if (!group.composition.Check(entityID))
+				// {
+				//
+				// 	group.TryRemove(entityID);
+				// }
+				// else
+				// 	group.Insert(operation.entity);
+			// }
+
+			
+			
+			
 			return ref val;
 			#endif
 		}
