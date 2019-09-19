@@ -1,5 +1,5 @@
 using System.Runtime.CompilerServices;
- 
+using System;
  
 namespace Pixeye.Framework
 {
