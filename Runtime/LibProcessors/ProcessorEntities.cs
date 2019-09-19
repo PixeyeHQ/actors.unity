@@ -42,10 +42,12 @@ namespace Pixeye.Framework
 					{
 						var componentID = operation.arg;
 						var storage     = Storage.all[componentID];
-						
+						var generation = Storage.generations[componentID];
+						var mask       = Storage.masks[componentID];	
 						
 						Entity.components[entityID].Add(componentID);
-						
+						Entity.generations[entityID, generation] |= mask;
+ 
 						
 						for (int l = 0; l < storage.groupsLen; l++)
 						{

@@ -245,7 +245,7 @@ namespace Pixeye.Framework
 
 			if ((generations[id, Storage<T>.generation] & Storage<T>.componentMask) != Storage<T>.componentMask)
 			{
-				generations[id, Storage<T>.generation] |= Storage<T>.componentMask;
+			//	generations[id, Storage<T>.generation] |= Storage<T>.componentMask;
 				EntityOperations.Set(entity, Storage<T>.componentID, EntityOperations.Action.Add);
 			}
 
@@ -291,7 +291,7 @@ namespace Pixeye.Framework
 			#endif
 
 			EntityOperations.Set(entity, Storage<T>.componentID, EntityOperations.Action.Add);
-			generations[id, Storage<T>.generation] |= Storage<T>.componentMask;
+		//	generations[id, Storage<T>.generation] |= Storage<T>.componentMask;
 
 			if (id >= Storage<T>.components.Length)
 				Array.Resize(ref Storage<T>.components, id << 1);
@@ -334,7 +334,7 @@ namespace Pixeye.Framework
 			#endif
 
 			EntityOperations.Set(entity, Storage<T>.componentID, EntityOperations.Action.Add);
-			generations[id, Storage<T>.generation] |= Storage<T>.componentMask;
+		//	generations[id, Storage<T>.generation] |= Storage<T>.componentMask;
 
 			// #if !ACTORS_COMPONENTS_STRUCTS
 			// ref var componentInStorage = ref Storage<T>.components[id];
