@@ -8,32 +8,6 @@ namespace Pixeye.Framework
 {
 	public static class Obj
 	{
-		
-		public static void Release(this GameObject o, int poolID = 0)
-		{
-			if (poolID <= 0)
-				GameObject.Destroy(o);
-			else Pool.Despawn(poolID, o);
-		}
-
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static T Get<T>(this GameObject obj, string path)
-		{
-			return obj.transform.Find(path).GetComponent<T>();
-		}
-
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static T Get<T>(this Transform tr, string path)
-		{
-			return tr.Find(path).GetComponent<T>();
-		}
-		
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static T Get<T>(this Behaviour obj, string path)
-		{
-			return obj.transform.Find(path).GetComponent<T>();
-		}
-		
 		//===============================//
 		// By GameObject ID
 		//===============================//
@@ -223,6 +197,34 @@ namespace Pixeye.Framework
 			return Spawn(poolID, prefabID, startPosition, startRotation).GetComponentInChildren<T>();
 			#endif
 			 
+		}
+	}
+
+	public static partial class HelperFramework
+	{
+		public static void Release(this GameObject o, int poolID = 0)
+		{
+			if (poolID <= 0)
+				GameObject.Destroy(o);
+			else Pool.Despawn(poolID, o);
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static T Get<T>(this GameObject obj, string path)
+		{
+			return obj.transform.Find(path).GetComponent<T>();
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static T Get<T>(this Transform tr, string path)
+		{
+			return tr.Find(path).GetComponent<T>();
+		}
+		
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static T Get<T>(this Behaviour obj, string path)
+		{
+			return obj.transform.Find(path).GetComponent<T>();
 		}
 	}
 }
