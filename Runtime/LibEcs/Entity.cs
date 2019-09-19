@@ -290,7 +290,7 @@ namespace Pixeye.Framework
 			}
 			#endif
 
-		//	EntityOperations.Set(entity, Storage<T>.componentID, EntityOperations.Action.Add);
+	  	EntityOperations.Set(entity, Storage<T>.componentID, EntityOperations.Action.Add);
 			generations[id, Storage<T>.generation] |= Storage<T>.componentMask;
 
 			if (id >= Storage<T>.components.Length)
@@ -313,8 +313,9 @@ namespace Pixeye.Framework
 				{
 					group.TryRemove(id);
 				}
-				else
-					group.Insert(entity);
+			
+				//else
+				//	group.Insert(entity);
 			}
 			 
 			
