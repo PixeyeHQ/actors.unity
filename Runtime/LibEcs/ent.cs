@@ -145,8 +145,7 @@ public unsafe   struct ent
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public bool Has<T>()
 	{
-		var mask = Storage<T>.componentMask;
-		return (Entity.generations[id, Storage<T>.generation] & mask) == mask;
+		return (Entity.generations[id, Storage<T>.generation] & Storage<T>.componentMask) == Storage<T>.componentMask;
 	}
 
 	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
