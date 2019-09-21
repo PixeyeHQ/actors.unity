@@ -258,14 +258,7 @@ namespace Pixeye.Framework
 				}
 				else
 				{
-					for (int l = 0; l < Storage<T>.Instance.groupsLen; l++)
-					{
-						var group = Storage<T>.Instance.groups[l];
-						if (!group.composition.Check(id))
-							group.TryRemove(id);
-						else
-							group.Insert(entity);
-					}
+					EntityOperations.Set(entity, Storage<T>.componentID, EntityOperations.Action.Add);
 				}
 				
 			}
@@ -338,14 +331,11 @@ namespace Pixeye.Framework
 			}
 			else
 			{
-				for (int l = 0; l < Storage<T>.Instance.groupsLen; l++)
-				{
-					var group = Storage<T>.Instance.groups[l];
-					if (!group.composition.Check(id))
-						group.TryRemove(id);
-					else
-						group.Insert(entity);
-				}
+
+				EntityOperations.Set(entity, Storage<T>.componentID, EntityOperations.Action.Add);
+				
+				
+			 
 			}
 
 
@@ -399,14 +389,7 @@ namespace Pixeye.Framework
 			}
 			else
 			{
-				for (int l = 0; l < Storage<T>.Instance.groupsLen; l++)
-				{
-					var group = Storage<T>.Instance.groups[l];
-					if (!group.composition.Check(id))
-						group.TryRemove(id);
-					else
-						group.Insert(entity);
-				}
+				EntityOperations.Set(entity, Storage<T>.componentID, EntityOperations.Action.Add);
 			}
 			
 			
