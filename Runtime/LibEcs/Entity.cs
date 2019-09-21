@@ -282,16 +282,10 @@ namespace Pixeye.Framework
 				Debug.LogError($"-> Entity [{id}] is not active. You should not add components to inactive entity, [{typeof(T)}] ");
 				return ref Storage<T>.Get(id);
 			}
-
-			if ((generations[id, Storage<T>.generation] & Storage<T>.componentMask) == Storage<T>.componentMask)
-			{
-				Debug.LogError($"-> Entity [{id}] already have this component {typeof(T)}!");
-				return ref Storage<T>.Get(id);
-			}
+ 
 			#endif
 
 			EntityOperations.Set(entity, Storage<T>.componentID, EntityOperations.Action.Add);
-		//	generations[id, Storage<T>.generation] |= Storage<T>.componentMask;
 
 			if (id >= Storage<T>.components.Length)
 				Array.Resize(ref Storage<T>.components, id << 1);

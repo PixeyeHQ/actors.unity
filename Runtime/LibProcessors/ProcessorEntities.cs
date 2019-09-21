@@ -40,10 +40,22 @@ namespace Pixeye.Framework
 				{
 					case EntityOperations.Action.Add:
 					{
+
 						var componentID = operation.arg;
 						var storage     = Storage.all[componentID];
-						var generation = Storage.generations[componentID];
-						var mask       = Storage.masks[componentID];	
+						var generation  = Storage.generations[componentID];
+						var mask        = Storage.masks[componentID];
+						 
+#if UNITY_EDITOR
+						if ((Entity.generations[entityID, generation] & mask) == mask)
+						{
+							Debug.LogError($"-> Entity [{entityID}] already have this component {storage.GetComponentType()}!");
+							break;
+						}
+
+#endif
+						
+				 
 						
 						Entity.components[entityID].Add(componentID);
 						Entity.generations[entityID, generation] |= mask;
@@ -296,7 +308,7 @@ namespace Pixeye.Framework
 
 					case EntityOperations.Action.ChangeTag:
 					{
-						#if !ACTORS_TAGS_0
+						#if !ACTORS_TAGS_0 
 						if (Entity.components[entityID].amount == 0) continue;
 
 						var groups = HelperTags.inUseGroups.groupStorage[operation.arg]; // op.arg = index
