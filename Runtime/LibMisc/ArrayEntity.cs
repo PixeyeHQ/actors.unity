@@ -24,9 +24,41 @@ namespace Pixeye.Framework
 			source = new ent[size];
 			length = 0;
 		}
+
+		[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
+		public bool TryAdd(in ent entity)
+		{
+			for (var i = 0; i < length; i++)
+			{
+				ref var val = ref source[i];
+				if (entity.id == val.id && entity.age == val.age)
+				{
+					return false;
+				}
+			}
+
+			Add(entity);
+			return true;
+
+		}
+
+		[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
+		public bool Has(in ent entity)
+		{
+			for (var i = 0; i < length; i++)
+			{
+				ref var val = ref source[i];
+				if (entity.id == val.id && entity.age == val.age)
+				{
+					return false;
+				}
+			}
+ 
+			return true;
+
+		}
 		
 		[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void Add(in ent entity)
 		{
 			if (length >= source.Length)
@@ -37,7 +69,6 @@ namespace Pixeye.Framework
 		}
 		
 		[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void Remove(in ent entity)
 		{
 			var i = 0;
