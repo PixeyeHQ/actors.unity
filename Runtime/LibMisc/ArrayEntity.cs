@@ -12,7 +12,7 @@ namespace Pixeye.Framework
 	{
 		public int length;
 		public ent[] source;
-
+ 
 		public ref ent this[int index]
 		{
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -24,49 +24,60 @@ namespace Pixeye.Framework
 			source = new ent[size];
 			length = 0;
 		}
+		
 		[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void Add(in ent entity)
 		{
 			if (length >= source.Length)
+			{
 				Array.Resize(ref source, length << 1);
-
+			}
 			source[length++] = entity;
 		}
+		
 		[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void Remove(in ent entity)
 		{
- 
-		  for (int i = 0; i < length; i++)
+			var i = 0;
+			for (; i < length; i++)
 			{
-				  var val =   source[i];
- 
-				if (entity.Equals(val))
+				ref var val = ref source[i];
+				if (entity.id == val.id && entity.age == val.age)
 				{
-			  	source[i] = -1;
-					Array.Copy(source, i + 1, source, i,  --length - i);
-		 
+					val.id = -1;
 					break;
 				}
 			}
+			
+			Array.Copy(source, i + 1, source, i, length-- - i);
+			
 		}
+		
 		[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public bool Removed(in ent entity)
 		{
-			for (int i = 0; i < length; i++)
+
+			var i = 0;
+			for (; i < length; i++)
 			{
 				ref var val = ref source[i];
-				if (entity.Equals(val))
+				if (entity.id == val.id && entity.age == val.age)
 				{
-				 	source[i] = -1;
-					Array.Copy(source, i + 1, source, i, --length - i);
-					return true;
+					val.id = -1;
+					break;
 				}
 			}
 
-			return false;
+			if (i != length)
+			{
+				Array.Copy(source, i + 1, source, i, length-- - i);
+				return true;
+			}
+			else return false;
+ 
 		}
 	}
 }
