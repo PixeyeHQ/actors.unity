@@ -4,13 +4,13 @@
 using System;
 using System.Reflection;
 using Unity.IL2CPP.CompilerServices;
- 
+
 
 namespace Pixeye.Framework
 {
 	// TODO: refactor.
 	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
-	public sealed class ProcessorGroups
+	sealed class ProcessorGroups
 	{
 		internal static DictionaryGroup container = new DictionaryGroup();
 
@@ -54,10 +54,8 @@ namespace Pixeye.Framework
 
 		internal static GroupCore SetupGroup(Type groupType, Composition filter, object fieldObj)
 		{
- 
 			if (container.TryGetValue(groupType, filter, out GroupCore group))
 			{
-  	 
 				return group;
 			}
 
@@ -79,7 +77,7 @@ namespace Pixeye.Framework
 
 
 	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
-	public sealed class ProcessorInitializer
+	sealed class ProcessorInitializer
 	{
 		public static void Setup(object b)
 		{

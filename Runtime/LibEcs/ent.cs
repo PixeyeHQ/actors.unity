@@ -11,7 +11,7 @@ using UnityEngine;
 
 
 [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Unicode)]
-public unsafe   struct ent
+public unsafe struct ent
 {
 	internal static ArrayEntity entityStack = new ArrayEntity(Entity.settings.SizeEntities);
 	internal static int size = sizeof(ent);
@@ -113,8 +113,8 @@ public unsafe   struct ent
 		}
 		#endif
 
-		EntityOperations.Set(this, 0, EntityOperations.Action.Kill);
 
+		EntityOperations.Set(this, 0, EntityOperations.Action.Kill);
 
 		Entity.Count--;
 	}

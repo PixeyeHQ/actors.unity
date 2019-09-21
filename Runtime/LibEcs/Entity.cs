@@ -17,7 +17,8 @@ namespace Pixeye.Framework
 		public int id;
 		public bool isPooled;
 		public bool isAlive;
-		public byte age; // caching age of entity for retrivieng it in future. ( ParseBy method )
+		public bool isDirty; // the entity was created recently;
+		public byte age;     // caching age of entity for retrivieng it in future. ( ParseBy method )
 	}
 
 	public readonly struct bitBool
@@ -139,7 +140,7 @@ namespace Pixeye.Framework
 			ptrCache->age      = age;
 			ptrCache->isAlive  = true;
 			ptrCache->isPooled = pooled;
-
+			ptrCache->isDirty  = true;
 			Count++;
 		}
 
@@ -181,20 +182,21 @@ namespace Pixeye.Framework
 		public static ref T Set<T>(in this ent entity)
 		{
 			var id = entity.id;
-			components[id].Add(Storage<T>.componentID);
-
+			
 			if (id >= Storage<T>.components.Length)
 				Array.Resize(ref Storage<T>.components, id << 1);
 
-			#if ACTORS_COMPONENTS_STRUCTS
-			return ref Storage<T>.components[id];
-			#else
+			components[id].Add(Storage<T>.componentID);
+			
 			ref var val = ref Storage<T>.components[id];
+			
+			#if !ACTORS_COMPONENTS_STRUCTS
 			if (val == null)
 				val = Storage<T>.Instance.Create();
-
-			return ref val;
 			#endif
+			
+			return ref val;
+			 
 		}
 		/// <summary>
 		/// Used in Models and Actors for setting up components to Storage. Doesn't send the component to systems.
@@ -207,17 +209,10 @@ namespace Pixeye.Framework
 		{
 			var id = entity.id;
 			components[id].Add(Storage<T>.componentID);
-
-			// #if !ACTORS_COMPONENTS_STRUCTS
-			// ref var componentInStorage = ref Storage<T>.components[id];
-			// if (componentInStorage != null)
-			// 	Storage<T>.Instance.DisposeAction(entity);
-			//
-			// componentInStorage = component;
-			// #else
+ 
 			ref var componentInStorage = ref Storage<T>.components[id];
 			componentInStorage = component;
-			//#endif
+		 
 		}
 		/// <summary>
 		/// Deploy entity components to systems.
@@ -243,25 +238,50 @@ namespace Pixeye.Framework
 			}
 			#endif
 
-			if ((generations[id, Storage<T>.generation] & Storage<T>.componentMask) != Storage<T>.componentMask)
-			{
-			//	generations[id, Storage<T>.generation] |= Storage<T>.componentMask;
-				EntityOperations.Set(entity, Storage<T>.componentID, EntityOperations.Action.Add);
-			}
-
 			if (id >= Storage<T>.components.Length)
 				Array.Resize(ref Storage<T>.components, id << 1);
+			
+			if ((generations[id, Storage<T>.generation] & Storage<T>.componentMask) != Storage<T>.componentMask)
+			{
 
-			#if ACTORS_COMPONENTS_STRUCTS
-			return ref Storage<T>.components[id];
-			#else
+				generations[id, Storage<T>.generation] |= Storage<T>.componentMask;
+				components[id].Add(Storage<T>.componentID);
+
+				if (cache[id].isDirty)
+				{
+					for (int l = 0; l < Storage<T>.Instance.groupsLen; l++)
+					{
+						var group = Storage<T>.Instance.groups[l];
+						if (!group.composition.Check(id))
+							group.TryRemove(id);
+					}
+				}
+				else
+				{
+					for (int l = 0; l < Storage<T>.Instance.groupsLen; l++)
+					{
+						var group = Storage<T>.Instance.groups[l];
+						if (!group.composition.Check(id))
+							group.TryRemove(id);
+						else
+							group.Insert(entity);
+					}
+				}
+				
+			}
+
+	 
+
+		 
 			ref var val = ref Storage<T>.components[id];
+		
+			#if !ACTORS_COMPONENTS_STRUCTS
 			if (val == null)
 				val = Storage<T>.Instance.Create();
-
+			#endif
 
 			return ref val;
-			#endif
+		 
 		}
 
 
@@ -276,30 +296,61 @@ namespace Pixeye.Framework
 		{
 			var id = entity.id;
 
+	
+			if (id >= Storage<T>.components.Length)
+				Array.Resize(ref Storage<T>.components, id << 1);
+
+
+		 
+ 
+	 
+			ref var val = ref Storage<T>.components[id];
+			#if !ACTORS_COMPONENTS_STRUCTS
+			if (val == null)
+				val = Storage<T>.Instance.Create();
+			#endif
+
 			#if UNITY_EDITOR
 			if (!entity.Exist)
 			{
 				Debug.LogError($"-> Entity [{id}] is not active. You should not add components to inactive entity, [{typeof(T)}] ");
 				return ref Storage<T>.Get(id);
 			}
- 
+
+			if ((generations[id, Storage<T>.generation] & Storage<T>.componentMask) == Storage<T>.componentMask)
+			{
+				Debug.LogError($"-> Entity [{id}] already have this component {typeof(T)}!");
+				return ref val;
+			}
 			#endif
-
-			EntityOperations.Set(entity, Storage<T>.componentID, EntityOperations.Action.Add);
-
-			if (id >= Storage<T>.components.Length)
-				Array.Resize(ref Storage<T>.components, id << 1);
-
-			#if ACTORS_COMPONENTS_STRUCTS
-			return ref Storage<T>.components[id];
-			#else
-			ref var val = ref Storage<T>.components[id];
-			if (val == null)
-				val = Storage<T>.Instance.Create();
+		 
+			generations[id, Storage<T>.generation] |= Storage<T>.componentMask;
+			components[id].Add(Storage<T>.componentID);
+			
+			if (cache[id].isDirty)
+			{
+				for (int l = 0; l < Storage<T>.Instance.groupsLen; l++)
+				{
+					var group = Storage<T>.Instance.groups[l];
+					if (!group.composition.Check(id))
+						group.TryRemove(id);
+				}
+			}
+			else
+			{
+				for (int l = 0; l < Storage<T>.Instance.groupsLen; l++)
+				{
+					var group = Storage<T>.Instance.groups[l];
+					if (!group.composition.Check(id))
+						group.TryRemove(id);
+					else
+						group.Insert(entity);
+				}
+			}
 
 
 			return ref val;
-			#endif
+	
 		}
 
 		/// <summary>
@@ -327,19 +378,38 @@ namespace Pixeye.Framework
 			}
 			#endif
 
-			EntityOperations.Set(entity, Storage<T>.componentID, EntityOperations.Action.Add);
-		//	generations[id, Storage<T>.generation] |= Storage<T>.componentMask;
+			// EntityOperations.Set(entity, Storage<T>.componentID, EntityOperations.Action.Add);
+			 
+		 ref var componentInStorage = ref Storage<T>.components[id];
+	  	componentInStorage = component;
 
-			// #if !ACTORS_COMPONENTS_STRUCTS
-			// ref var componentInStorage = ref Storage<T>.components[id];
-			// if (componentInStorage != null)
-			// 	Storage<T>.Instance.DisposeAction(entity);
-			//
-			// componentInStorage = component;
-			// #else
-			ref var componentInStorage = ref Storage<T>.components[id];
-			componentInStorage = component;
-			//	#endif
+
+
+			generations[id, Storage<T>.generation] |= Storage<T>.componentMask;
+			components[id].Add(Storage<T>.componentID);
+
+			if (cache[id].isDirty)
+			{
+				for (int l = 0; l < Storage<T>.Instance.groupsLen; l++)
+				{
+					var group = Storage<T>.Instance.groups[l];
+					if (!group.composition.Check(id))
+						group.TryRemove(id);
+				}
+			}
+			else
+			{
+				for (int l = 0; l < Storage<T>.Instance.groupsLen; l++)
+				{
+					var group = Storage<T>.Instance.groups[l];
+					if (!group.composition.Check(id))
+						group.TryRemove(id);
+					else
+						group.Insert(entity);
+				}
+			}
+			
+			
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
