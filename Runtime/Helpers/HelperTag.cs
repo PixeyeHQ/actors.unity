@@ -89,39 +89,39 @@ namespace Pixeye.Framework
 		}
 
 
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static void CheckDuplicateID()
-		{
-			List<string> listTagName = GetMembersString();
-			List<int> listTagID = new List<int>();
-			Type typeTag = GetTypeTag();
-
-			for (int i = 1; i < listTagName.Count; i++)
-			{
-				int tagId = (int) GetFieldId(listTagName[i], typeTag);
-				listTagID.Add(tagId);
-			}
-
-			var listDuplicateID = listTagID.GroupBy(x => x).Where(x => x.Count() != 1).Select(x => x.Key).ToList();
-
-			if (listDuplicateID.Count != 0)
-			{
-				var listDuplicateName = new List<string>();
-				for (int i = 1; i < listTagName.Count; i++)
-				{
-					int tagId = (int) GetFieldId(listTagName[i], typeTag);
-
-					if (listDuplicateID.Any(t => t == tagId)) listDuplicateName.Add(listTagName[i]);
-
-				}
-
-				foreach (var v in listDuplicateName)
-				{
-					Debug.LogError($"TAG duplicate: {v} = {(int) GetFieldId(v, typeTag)}");
-				}
-
-			}
-
-		}
+		// [MethodImpl(MethodImplOptions.AggressiveInlining)]
+		// public static void CheckDuplicateID()
+		// {
+		// 	List<string> listTagName = GetMembersString();
+		// 	List<int> listTagID = new List<int>();
+		// 	Type typeTag = GetTypeTag();
+		//
+		// 	for (int i = 1; i < listTagName.Count; i++)
+		// 	{
+		// 		int tagId = (int) GetFieldId(listTagName[i], typeTag);
+		// 		listTagID.Add(tagId);
+		// 	}
+		//
+		// 	var listDuplicateID = listTagID.GroupBy(x => x).Where(x => x.Count() != 1).Select(x => x.Key).ToList();
+		//
+		// 	if (listDuplicateID.Count != 0)
+		// 	{
+		// 		var listDuplicateName = new List<string>();
+		// 		for (int i = 1; i < listTagName.Count; i++)
+		// 		{
+		// 			int tagId = (int) GetFieldId(listTagName[i], typeTag);
+		//
+		// 			if (listDuplicateID.Any(t => t == tagId)) listDuplicateName.Add(listTagName[i]);
+		//
+		// 		}
+		//
+		// 		foreach (var v in listDuplicateName)
+		// 		{
+		// 			Debug.LogError($"TAG duplicate: {v} = {(int) GetFieldId(v, typeTag)}");
+		// 		}
+		//
+		// 	}
+		//
+		// }
 	}
 }
