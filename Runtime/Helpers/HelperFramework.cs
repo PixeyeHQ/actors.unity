@@ -452,6 +452,12 @@ namespace Pixeye.Framework
 			return val;
 		}
 
+		public static ref T RandomRef<T>(this T[] vals)
+		{
+			return ref vals[UnityEngine.Random.Range(0, vals.Length)];
+		}
+
+		
 		public static T Random<T>(this List<T> list, T[] itemsToExclude)
 		{
 			var val = list[UnityEngine.Random.Range(0, list.Count)];
