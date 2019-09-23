@@ -256,21 +256,26 @@ namespace Pixeye.Framework
 			if ((generations[id, Storage<T>.generation] & Storage<T>.componentMask) != Storage<T>.componentMask)
 			{
 
-				generations[id, Storage<T>.generation] |= Storage<T>.componentMask;
 				components[id].Add(Storage<T>.componentID);
 
 				if (cache[id].isDirty)
 				{
+
+				}
+				else
+				{
+
+					EntityOperations.Set(entity, Storage<T>.componentID, EntityOperations.Action.Add);
+
+					generations[id, Storage<T>.generation] |= Storage<T>.componentMask;
+
 					for (int l = 0; l < Storage<T>.Instance.groupsLen; l++)
 					{
 						var group = Storage<T>.Instance.groups[l];
 						if (!group.composition.Check(id))
 							group.TryRemove(id);
 					}
-				}
-				else
-				{
-					EntityOperations.Set(entity, Storage<T>.componentID, EntityOperations.Action.Add);
+
 				}
 				
 			}
@@ -306,10 +311,9 @@ namespace Pixeye.Framework
 				Array.Resize(ref Storage<T>.components, id << 1);
 
 
-		 
- 
-	 
+		
 			ref var val = ref Storage<T>.components[id];
+		
 			#if !ACTORS_COMPONENTS_STRUCTS
 			if (val == null)
 				val = Storage<T>.Instance.Create();
@@ -328,25 +332,27 @@ namespace Pixeye.Framework
 				return ref val;
 			}
 			#endif
-		 
-			generations[id, Storage<T>.generation] |= Storage<T>.componentMask;
+
+
 			components[id].Add(Storage<T>.componentID);
 			
 			if (cache[id].isDirty)
 			{
-				for (int l = 0; l < Storage<T>.Instance.groupsLen; l++)
-				{
-					var group = Storage<T>.Instance.groups[l];
-					if (!group.composition.Check(id))
-						group.TryRemove(id);
-				}
+			 
 			}
 			else
 			{
 
 				EntityOperations.Set(entity, Storage<T>.componentID, EntityOperations.Action.Add);
 				
+				generations[id, Storage<T>.generation] |= Storage<T>.componentMask;
 				
+				for (int l = 0; l < Storage<T>.Instance.groupsLen; l++)
+				{
+					var group = Storage<T>.Instance.groups[l];
+					if (!group.composition.Check(id))
+						group.TryRemove(id);
+				}
 			 
 			}
 
@@ -387,22 +393,31 @@ namespace Pixeye.Framework
 
 
 
-			generations[id, Storage<T>.generation] |= Storage<T>.componentMask;
-			components[id].Add(Storage<T>.componentID);
 
-			if (cache[id].isDirty)
-			{
-				for (int l = 0; l < Storage<T>.Instance.groupsLen; l++)
-				{
-					var group = Storage<T>.Instance.groups[l];
-					if (!group.composition.Check(id))
-						group.TryRemove(id);
-				}
-			}
-			else
-			{
-				EntityOperations.Set(entity, Storage<T>.componentID, EntityOperations.Action.Add);
-			}
+	    components[id].Add(Storage<T>.componentID);
+
+	    if (cache[id].isDirty)
+	    {
+
+	    }
+	    else
+	    {
+
+		    EntityOperations.Set(entity, Storage<T>.componentID, EntityOperations.Action.Add);
+
+		    generations[id, Storage<T>.generation] |= Storage<T>.componentMask;
+
+		    for (int l = 0; l < Storage<T>.Instance.groupsLen; l++)
+		    {
+			    var group = Storage<T>.Instance.groups[l];
+			    if (!group.composition.Check(id))
+				    group.TryRemove(id);
+		    }
+
+	    }
+	    
+	    
+	     
 			
 			
 		}

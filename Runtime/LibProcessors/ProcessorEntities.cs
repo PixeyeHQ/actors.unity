@@ -53,12 +53,13 @@ namespace Pixeye.Framework
 
 							var group = storage.groups[l];
 
-							if (!group.composition.Check(entityID))
+							if (group.composition.Check(entityID))
 							{
-								group.TryRemove(entityID);
-							}
-							else
 								group.Insert(operation.entity);
+								//group.TryRemove(entityID);
+							}
+						//	else
+						//		group.Insert(operation.entity);
 						}
 
 
