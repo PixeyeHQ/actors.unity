@@ -55,7 +55,6 @@ namespace Pixeye.Framework
 
 							if (!group.composition.Check(entityID))
 							{
-
 								group.TryRemove(entityID);
 							}
 							else
@@ -63,9 +62,9 @@ namespace Pixeye.Framework
 						}
 
 
-						break;
+				 
 					}
-					
+							break;
 					
 					
 					case EntityOperations.Action.Kill:
@@ -322,8 +321,20 @@ namespace Pixeye.Framework
 						for (int j = 0; j < components.amount; j++)
 						{
 							var componentID = components.Get(j);
-
 							var storage = Storage.all[componentID];
+							var generation  = Storage.generations[componentID];
+							var mask        = Storage.masks[componentID];
+
+					 
+			 
+			 #if UNITY_EDITOR
+			 	if ((Entity.generations[entityID, generation] & mask) == mask)
+			{
+				Debug.LogError($"-> Entity [{entityID}] already have this component {storage.GetComponentType()}!");
+				continue;
+			}
+			#endif
+			 
 
 							Entity.generations[entityID, Storage.generations[componentID]] |= Storage.masks[componentID];
 
@@ -331,7 +342,6 @@ namespace Pixeye.Framework
 							{
 								var group = storage.groups[l];
 								if (!group.composition.Check(entityID)) continue;
-
 								group.Insert(operation.entity);
 							}
 						}

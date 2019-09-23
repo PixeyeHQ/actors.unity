@@ -25,7 +25,7 @@ namespace Pixeye.Framework
 	{
 		public enum Action : byte
 		{
-			Add,
+			Add = 0,
 			ChangeTag,
 			Remove,
 			Kill,

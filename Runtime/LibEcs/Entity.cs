@@ -182,6 +182,18 @@ namespace Pixeye.Framework
 		public static ref T Set<T>(in this ent entity)
 		{
 			var id = entity.id;
+
+			#if UNITY_EDITOR
+			if (!entity.Exist)
+			{
+				Debug.LogError($"-> Entity [{id}] is not active. You should not add components to inactive entity. ");
+				return ref Storage<T>.Get(id);
+			}
+			
+		 
+			
+			#endif
+			
 			
 			if (id >= Storage<T>.components.Length)
 				Array.Resize(ref Storage<T>.components, id << 1);
