@@ -2,8 +2,10 @@
 // Contacts : Pix - ask@pixeye.games
 
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Unity.IL2CPP.CompilerServices;
+using UnityEngine;
 
 namespace Pixeye.Framework
 {
@@ -12,7 +14,7 @@ namespace Pixeye.Framework
 	{
 		public int length;
 		public ent[] source;
- 
+		
 		public ref ent this[int index]
 		{
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -81,8 +83,14 @@ namespace Pixeye.Framework
 					break;
 				}
 			}
+
+ 
+			if (i < --length)
+				Array.Copy(source, i + 1, source, i, length - i);
+		
 			
-			Array.Copy(source, i + 1, source, i, length-- - i);
+		 
+		 
 			
 		}
 		
@@ -102,9 +110,8 @@ namespace Pixeye.Framework
 				}
 			}
 
-			if (i != length)
-			{
-				Array.Copy(source, i + 1, source, i, length-- - i);
+			if (i < --length){
+				Array.Copy(source, i + 1, source, i, length - i);
 				return true;
 			}
 			else return false;
