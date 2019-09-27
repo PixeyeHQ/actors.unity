@@ -6,14 +6,12 @@ using System.Reflection;
 using Unity.IL2CPP.CompilerServices;
 
 
-namespace Pixeye.Framework
+
+namespace Pixeye.Actors
 {
-	// TODO: refactor.
 	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
 	sealed class ProcessorGroups
 	{
-		internal static DictionaryGroup container = new DictionaryGroup();
-
 		public static void Setup(object b)
 		{
 			var type         = b.GetType();
@@ -21,6 +19,12 @@ namespace Pixeye.Framework
 			int length       = objectFields.Length;
 
 			var groupType = typeof(GroupCore);
+			#if ACTORS_EVENTS_MANUAL
+			var groupEv = Attribute.GetCustomAttribute(type, typeof(EventsAttribute)) as EventsAttribute;
+			#endif
+			var groupByProcAttribute      = Attribute.GetCustomAttribute(type, typeof(GroupByAttribute)) as GroupByAttribute;
+			var groupExcludeProcAttribute = Attribute.GetCustomAttribute(type, typeof(ExcludeAttribute)) as ExcludeAttribute;
+
 
 			for (int i = 0; i < length; i++)
 			{
@@ -28,12 +32,24 @@ namespace Pixeye.Framework
 
 				if (myFieldInfo.FieldType.IsSubclassOf(groupType))
 				{
-					var groupByAttribute      = Attribute.GetCustomAttribute(myFieldInfo, typeof(GroupByAttribute)) as GroupByAttribute;
-					var groupExcludeAttribute = Attribute.GetCustomAttribute(myFieldInfo, typeof(ExcludeAttribute)) as ExcludeAttribute;
+					// check if the group located inside of the base processor
+					var inner = Attribute.GetCustomAttribute(myFieldInfo, typeof(InnerGroupAttribute)) as InnerGroupAttribute;
+
+					#if ACTORS_EVENTS_MANUAL
+					// in case we are looking at the group of the derived processor we want to check it's events
+					if (inner == null)
+					{
+						groupEv = Attribute.GetCustomAttribute(myFieldInfo, typeof(EventsAttribute)) as EventsAttribute;
+					}
+					#endif
+					// if group is located inside of the base processor use processor filtering 
+					var groupByAttribute      = inner != null ? groupByProcAttribute : Attribute.GetCustomAttribute(myFieldInfo, typeof(GroupByAttribute)) as GroupByAttribute;
+					var groupExcludeAttribute = inner != null ? groupExcludeProcAttribute : Attribute.GetCustomAttribute(myFieldInfo, typeof(ExcludeAttribute)) as ExcludeAttribute;
 
 					var includeTagsFilter = groupByAttribute != null ? groupByAttribute.filter : new int[0];
 					var excludeTagsFilter = new int[0];
 					var excludeCompFilter = new int[0];
+
 					if (groupExcludeAttribute != null)
 					{
 						excludeTagsFilter = groupExcludeAttribute.filter;
@@ -47,110 +63,41 @@ namespace Pixeye.Framework
 
 
 					composition.hash = HashCode.OfEach(myFieldInfo.FieldType.GetGenericArguments()).AndEach(composition.includeTags).And(17).AndEach(composition.excludeTags).And(31).AndEach(excludeCompFilter);
-					myFieldInfo.SetValue(b, SetupGroup(myFieldInfo.FieldType, composition, myFieldInfo.GetValue(b)));
-				}
-			}
-		}
 
-		internal static GroupCore SetupGroup(Type groupType, Composition filter, object fieldObj)
-		{
-			if (container.TryGetValue(groupType, filter, out GroupCore group))
-			{
-				return group;
-			}
-
-
-			if (fieldObj != null)
-			{
-				group = fieldObj as GroupCore;
-				return container.Add((Activator.CreateInstance(groupType, true) as GroupCore).Start(filter));
-			}
-
-			return container.Add((Activator.CreateInstance(groupType, true) as GroupCore).Start(filter));
-		}
-
-		public static void Dispose()
-		{
-			container.Dispose();
-		}
-	}
-
-
-	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
-	sealed class ProcessorInitializer
-	{
-		public static void Setup(object b)
-		{
-			var type = b.GetType();
-
-			var groupEv               = Attribute.GetCustomAttribute(type, typeof(WantEventAttribute)) as WantEventAttribute;
-			var groupByAttribute      = Attribute.GetCustomAttribute(type, typeof(GroupByAttribute)) as GroupByAttribute;
-			var groupExcludeAttribute = Attribute.GetCustomAttribute(type, typeof(ExcludeAttribute)) as ExcludeAttribute;
-			var includeTagsFilter     = groupByAttribute != null ? groupByAttribute.filter : new int[0];
-			var excludeTagsFilter     = new int[0];
-			var excludeCompFilter     = new int[0];
-
-			if (groupExcludeAttribute != null)
-			{
-				excludeTagsFilter = groupExcludeAttribute.filter;
-				excludeCompFilter = groupExcludeAttribute.filterType;
-			}
-
-
-			var objectFields = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
-			int length       = objectFields.Length;
-
-			var groupType = typeof(GroupCore);
-
-			for (int i = 0; i < length; i++)
-			{
-				var myFieldInfo = objectFields[i];
-
-				if (myFieldInfo.FieldType.IsSubclassOf(groupType))
-				{
-					if (groupExcludeAttribute != null)
-					{
-						excludeTagsFilter = groupExcludeAttribute.filter;
-						excludeCompFilter = groupExcludeAttribute.filterType;
-					}
-
-					var composition = new Composition();
-					composition.excludeTags = excludeTagsFilter;
-					composition.includeTags = includeTagsFilter;
-					composition.AddTypesExclude(excludeCompFilter);
-
-
-					composition.hash = HashCode.OfEach(myFieldInfo.FieldType.GetGenericArguments()).AndEach(composition.includeTags).And(17).AndEach(composition.excludeTags).And(31).AndEach(excludeCompFilter);
 					var group = SetupGroup(myFieldInfo.FieldType, composition, myFieldInfo.GetValue(b));
 					myFieldInfo.SetValue(b, group);
 
+					#if ACTORS_EVENTS_MANUAL
 					if (groupEv != null)
 					{
-						group.SetSelf(groupEv.ev, b as GroupEvents);
+						group.SetSelf(groupEv.op, b as Processor);
 					}
-
-
-					break;
+					#endif
 				}
 			}
 		}
 
-
-		internal static GroupCore SetupGroup(Type groupType, Composition filter, object fieldObj)
+		internal static GroupCore SetupGroup(Type groupType, Composition composition, object fieldObj)
 		{
-			if (ProcessorGroups.container.TryGetValue(groupType, filter, out GroupCore group))
+			if (Framework.Groups.All.TryGetValue(groupType, composition, out GroupCore group))
 			{
 				return group;
 			}
 
-
 			if (fieldObj != null)
 			{
 				group = fieldObj as GroupCore;
-				return ProcessorGroups.container.Add((Activator.CreateInstance(groupType, true) as GroupCore).Start(filter));
+				return CreateGroup(groupType, composition);
 			}
 
-			return ProcessorGroups.container.Add((Activator.CreateInstance(groupType, true) as GroupCore).Start(filter));
+			return Framework.Groups.All.Add(CreateGroup(groupType, composition));
+		}
+
+		internal static GroupCore CreateGroup(Type groupType, Composition composition)
+		{
+			var gr = (Activator.CreateInstance(groupType, true) as GroupCore).Initialize(composition);
+			gr.id = Framework.Groups.All.length;
+			return gr;
 		}
 	}
 }

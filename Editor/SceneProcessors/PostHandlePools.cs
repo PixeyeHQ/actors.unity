@@ -4,9 +4,8 @@
 #if UNITY_EDITOR
 using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
-using UnityEngine.SceneManagement;
-
-namespace Pixeye.Framework
+ 
+namespace Pixeye.Actors
 {
 	using UnityEditor;
 	using UnityEngine;

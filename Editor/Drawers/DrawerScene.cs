@@ -13,7 +13,7 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace Pixeye.Framework
+namespace Pixeye.Actors
 {
 	/// <summary>
 	/// Display a Scene Reference object in the editor.

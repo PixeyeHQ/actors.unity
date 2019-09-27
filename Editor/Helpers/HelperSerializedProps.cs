@@ -27,7 +27,7 @@ using System.Linq;
 using System.Reflection;
 using UnityEditor;
 
-namespace Pixeye.Framework
+namespace Pixeye.Actors
 {
 	internal static class HelperSerializedProps
 	{

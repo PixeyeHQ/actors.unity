@@ -2,36 +2,36 @@
 // Contacts : Pix - ask@pixeye.games
 
 
- 
-namespace Pixeye.Framework
+namespace Pixeye.Actors
 {
-	[WantEvent(Op.Add | Op.Remove)]
+	#if ACTORS_EVENTS_MANUAL
+	[Events(Op.Add | Op.Remove)]
+	#endif
 	sealed class ProcessorObserver : Processor<ComponentObserver>, ITick
 	{
+		public override void HandleEvents()
+		{
+			foreach (var entity in source.removed)
+			{
+				ref var cObserver = ref entity.ComponentObserver();
+				for (int j = 0; j < cObserver.length; j++)
+					cObserver.wrappers[j].Check();
+			}
+
+			foreach (var entity in source.added)
+			{
+				ref var cObserver = ref entity.ComponentObserver();
+				for (int j = 0; j < cObserver.length; j++)
+					cObserver.wrappers[j].FirstTime();
+			}
+		}
+
+
 		public void Tick(float delta)
 		{
 			for (int i = 0; i < source.length; i++)
 			{
 				ref var cObserver = ref source.entities[i].ComponentObserver();
-				for (int j = 0; j < cObserver.length; j++)
-					cObserver.wrappers[j].Check();
-			}
-		}
-
-		public override void OnAdd(ent[] entities, int length)
-		{
-			for (int i = 0; i < length; i++)
-			{
-				ref var cObserver = ref entities[i].ComponentObserver();
-				for (int j = 0; j < cObserver.length; j++)
-					cObserver.wrappers[j].FirstTime();
-			}
-		}
-		public override void OnRemove(ent[] entities, int length)
-		{
-			for (int i = 0; i < length; i++)
-			{
-				ref var cObserver = ref entities[i].ComponentObserver();
 				for (int j = 0; j < cObserver.length; j++)
 					cObserver.wrappers[j].Check();
 			}

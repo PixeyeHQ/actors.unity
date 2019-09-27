@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace Pixeye.Framework
+namespace Pixeye.Actors
 {
 	public class Profile
 	{

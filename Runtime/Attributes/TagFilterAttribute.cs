@@ -8,7 +8,7 @@ Date:       4/28/2018 5:42 PM
 
 using UnityEngine;
 
-namespace Pixeye.Framework
+namespace Pixeye.Actors
 {
 	public class TagFilterAttribute : PropertyAttribute
 	{

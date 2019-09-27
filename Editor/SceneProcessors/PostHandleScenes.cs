@@ -1,10 +1,8 @@
-using System.IO;
-using Pixeye.Framework;
+using Pixeye.Actors;
 using UnityEditor;
 using UnityEditor.ProjectWindowCallback;
 using UnityEditor.SceneManagement;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using Scene = UnityEngine.SceneManagement.Scene;
 
 public class PostHandleScenes : EndNameEditAction

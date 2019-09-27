@@ -8,7 +8,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Pixeye.Framework
+namespace Pixeye.Actors
 {
 	public class StarterKernel : MonoBehaviour
 	{

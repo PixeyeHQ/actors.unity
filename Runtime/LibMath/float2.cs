@@ -1,4 +1,5 @@
-namespace Pix.Actors.Math
+ 
+namespace Pixeye.Actors.Maths
 {
 	public struct float2
 	{

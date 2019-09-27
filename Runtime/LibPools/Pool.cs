@@ -4,7 +4,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Pixeye.Framework
+namespace Pixeye.Actors
 {
 	public static class Pool
 	{

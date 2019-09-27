@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using Pixeye.Source;
 using UnityEngine;
 
-namespace Pixeye.Framework
+namespace Pixeye.Actors
 {
 	/// <summary>
 	/// <para>Service locator</para>
@@ -24,6 +24,9 @@ namespace Pixeye.Framework
 		public static List<IDisposable> disposables = new List<IDisposable>(64);
 
 		public static Action OnDestroyAction = delegate { };
+
+		public static SceneCoroutine SceneCoroutine = Instance.gameObject.AddComponent<SceneCoroutine>();
+
 
 		/// <summary>
 		/// <para>Creates an object to the toolbox by type.</para> 
@@ -92,7 +95,7 @@ namespace Pixeye.Framework
 		{
 			object resolve;
 			var    hasValue = Instance.data.TryGetValue(typeof(T).GetHashCode(), out resolve);
-			return hasValue ? (T) resolve : default(T); 
+			return hasValue ? (T) resolve : default(T);
 		}
 
 		internal void ClearSessionData()
@@ -111,13 +114,17 @@ namespace Pixeye.Framework
 				needToBeCleaned.Dispose();
 			}
 
+			Instance.StopAllCoroutines();
+
+
+			Box.Default.Dispose();
 			Pool.Dispose();
-			Storage.Wipe();
-			ProcessorGroups.Dispose();
+			Storage.DisposeSelf();
+			Framework.Cleanup();
 			ProcessorTimer.Default.Dispose();
 			ProcessorScene.Default.Dispose();
 			ProcessorUpdate.Default.Dispose();
-			Box.Default.Dispose();
+
 
 			for (var i = 0; i < toWipe.Count; i++)
 			{

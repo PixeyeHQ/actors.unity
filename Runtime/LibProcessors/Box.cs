@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace Pixeye.Framework
+namespace Pixeye.Actors
 {
 	/// <summary>
 	/// <para>Caches / return assets that Developer takes from the Resources folder.

@@ -5,36 +5,37 @@
 #if ACTORS_TAGS_6 || ACTORS_TAGS_12
 #undef ACTORS_TAGS_DEFAULT
 #endif
+
+using System.Collections.Generic;
+using System.Reflection;
 #if! ACTORS_TAGS_0
 using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
- 
-namespace Pixeye.Framework
+
+namespace Pixeye.Actors
 {
 	[StructLayout(LayoutKind.Sequential)]
-	public unsafe struct BufferTags
+	public unsafe struct CacheTags
 	{
-
 		#if ACTORS_TAGS_24 || ACTORS_TAGS_DEFAULT
 		public const int Capacity = 24;
 		public fixed ushort tags[Capacity];
 		public fixed byte size[Capacity];
 		#elif ACTORS_TAGS_12
 		public const int Capacity = 12;
-  	public fixed ushort tags[Capacity];
+		public fixed ushort tags[Capacity];
 		public fixed byte size[Capacity];
 		#elif ACTORS_TAGS_6
 		public const int Capacity = 6;
 		public fixed ushort tags[Capacity];
 		public fixed byte size[Capacity];
-     #endif
- 
+		#endif
+
 
 		public byte length;
 
-		public int Length => length;
 
 		public void Clear()
 		{
@@ -54,10 +55,11 @@ namespace Pixeye.Framework
 
 		public void RemoveAt(int index)
 		{
-			for (int i = index; i < length - 1; ++i)
-				SetElem(i, GetElement(i + 1));
-
-			length--;
+			for (int i = index; i < --length; ++i)
+			{
+				tags[i] = tags[i + 1];
+				size[i] = 1;
+			}
 		}
 
 		public void SetElement(int index, int arg)
@@ -98,16 +100,6 @@ namespace Pixeye.Framework
 			return ref tags[index];
 		}
 
-		void SetElem(int index, int arg)
-		{
-			tags[index] = (ushort) arg;
-			size[index] = 1;
-		}
-
-		ushort GetElement(int index)
-		{
-			return tags[index];
-		}
 
 		public bool HasAny(params int[] tagsID)
 		{
@@ -138,6 +130,7 @@ namespace Pixeye.Framework
 						match++;
 				}
 			}
+
 			return match == tagsID.Length;
 		}
 
@@ -148,6 +141,7 @@ namespace Pixeye.Framework
 				if (tags[i] == tagID)
 					return true;
 			}
+
 			return false;
 		}
 
@@ -162,29 +156,31 @@ namespace Pixeye.Framework
 
 			return -1;
 		}
-		
 	}
 
 	public unsafe static class HelperTags
 	{
+		internal static void ClearAll()
+		{
+			for (int i = 0; i < Entity.lengthTotal; i++)
+			{
+				Entity.Tags[i].length = 0;
+			}
+		}
 
-		internal static DictionaryGroupTags inUseGroups = new DictionaryGroupTags();
-		internal static DictionaryGroupTags inUseGroupsTypes = new DictionaryGroupTags();
-
- 
 		public static void ClearTags(in this ent entity)
 		{
-			Entity.tags[entity.id].Clear();
+			Entity.Tags[entity.id].Clear();
 		}
 
 		public static int TagsAmount(in this ent entity, int tagID)
 		{
-			return Entity.tags[entity.id].GetAmount(tagID);
+			return Entity.Tags[entity.id].GetAmount(tagID);
 		}
-		
+
 		public static void Add(in this ent entity, int tagID)
 		{
-			ref var buffer = ref Entity.tags[entity.id];
+			ref var buffer = ref Entity.Tags[entity.id];
 			int     len    = buffer.length;
 			var     tID    = (ushort) tagID;
 
@@ -202,9 +198,10 @@ namespace Pixeye.Framework
 			}
 
 			#if UNITY_EDITOR
-			if (len == BufferTags.Capacity)
+			if (len == CacheTags.Capacity)
 			{
-				throw new Exception("Tags limit reached!");
+				Framework.Debugger.Log(LogType.TAGS_LIMIT_REACHED, entity, CacheTags.Capacity);
+				return;
 			}
 			#endif
 
@@ -214,7 +211,7 @@ namespace Pixeye.Framework
 
 		public static void Add(in this ent entity, params int[] tagsID)
 		{
-			ref var buffer = ref Entity.tags[entity.id];
+			ref var buffer = ref Entity.Tags[entity.id];
 			int     len    = buffer.length;
 
 			for (int i = 0; i < tagsID.Length; i++)
@@ -230,16 +227,19 @@ namespace Pixeye.Framework
 						{
 							buffer.size[index] += 1;
 						}
+
 						allowToAdd = false;
 						break;
 					}
 				}
+
 				if (!allowToAdd) continue;
 
 				#if UNITY_EDITOR
-				if (len == BufferTags.Capacity)
+				if (len == CacheTags.Capacity)
 				{
-					throw new Exception("Tags limit reached!");
+					Framework.Debugger.Log(LogType.TAGS_LIMIT_REACHED, entity, CacheTags.Capacity);
+					return;
 				}
 				#endif
 
@@ -251,7 +251,7 @@ namespace Pixeye.Framework
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static void Set(in this ent entity, int tagID)
 		{
-			ref var buffer = ref Entity.tags[entity.id];
+			ref var buffer = ref Entity.Tags[entity.id];
 			int     len    = buffer.length;
 			var     tID    = (ushort) tagID;
 			for (int index = 0; index < len; index++)
@@ -268,9 +268,10 @@ namespace Pixeye.Framework
 			}
 
 			#if UNITY_EDITOR
-			if (len == BufferTags.Capacity)
+			if (len == CacheTags.Capacity)
 			{
-				throw new Exception("Tags limit reached!");
+				Framework.Debugger.Log(LogType.TAGS_LIMIT_REACHED, entity, CacheTags.Capacity);
+				return;
 			}
 			#endif
 
@@ -280,7 +281,7 @@ namespace Pixeye.Framework
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static void Set(in this ent entity, params int[] tagsID)
 		{
-			ref var buffer = ref Entity.tags[entity.id];
+			ref var buffer = ref Entity.Tags[entity.id];
 
 			int len = buffer.length;
 
@@ -296,16 +297,19 @@ namespace Pixeye.Framework
 						{
 							buffer.size[index] += 1;
 						}
+
 						allowToAdd = false;
 						break;
 					}
 				}
+
 				if (!allowToAdd) continue;
 
 				#if UNITY_EDITOR
-				if (len == BufferTags.Capacity)
+				if (len == CacheTags.Capacity)
 				{
-					throw new Exception("Tags limit reached!");
+					Framework.Debugger.Log(LogType.TAGS_LIMIT_REACHED, entity, CacheTags.Capacity);
+					return;
 				}
 				#endif
 
@@ -315,7 +319,7 @@ namespace Pixeye.Framework
 
 		public static void Remove(in this ent entity, int tagID)
 		{
-			ref var buffer = ref Entity.tags[entity.id];
+			ref var buffer = ref Entity.Tags[entity.id];
 			int     len    = buffer.length;
 			for (int index = 0; index < len; index++)
 			{
@@ -326,6 +330,7 @@ namespace Pixeye.Framework
 						buffer.RemoveAt(index);
 						HandleChange(entity, tagID);
 					}
+
 					return;
 				}
 			}
@@ -333,7 +338,7 @@ namespace Pixeye.Framework
 
 		public static void RemoveAll(in this ent entity, params int[] tagsID)
 		{
-			ref var buffer = ref Entity.tags[entity.id];
+			ref var buffer = ref Entity.Tags[entity.id];
 			var     len    = buffer.length;
 
 			for (int i = 0; i < tagsID.Length; i++)
@@ -354,7 +359,7 @@ namespace Pixeye.Framework
 
 		public static void RemoveAll(in this ent entity, int tagID)
 		{
-			ref var buffer = ref Entity.tags[entity.id];
+			ref var buffer = ref Entity.Tags[entity.id];
 			int     len    = buffer.length;
 			var     tID    = (ushort) tagID;
 
@@ -371,32 +376,31 @@ namespace Pixeye.Framework
 		}
 
 
-		 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static bool Has(in this ent entity, int tagID)
 		{
-			return Entity.tags[entity.id].Has(tagID);
+			return Entity.Tags[entity.id].Has(tagID);
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static bool Has(in this ent entity, params int[] tagsID)
 		{
-			return Entity.tags[entity.id].Has(tagsID);
+			return Entity.Tags[entity.id].Has(tagsID);
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static bool HasAny(in this ent entity, params int[] tagsID)
 		{
-			return Entity.tags[entity.id].HasAny(tagsID);
+			return Entity.Tags[entity.id].HasAny(tagsID);
 		}
 
 		internal static void Add(GroupCore groupCore)
 		{
-			DictionaryGroup container;
-			var             composition = groupCore.composition;
+			CacheGroup container;
+			var        composition = groupCore.composition;
 			foreach (var tagID in composition.includeTags)
 			{
-				if (inUseGroups.TryGetValue(tagID, out container))
+				if (Framework.Groups.ByTag.TryGetValue(tagID, out container))
 				{
 					if (container.Contain(groupCore)) continue;
 
@@ -404,25 +408,25 @@ namespace Pixeye.Framework
 				}
 				else
 				{
-					container = new DictionaryGroup();
+					container = new CacheGroup();
 
 					container.Add(groupCore);
-					inUseGroups.Add(tagID, container);
+					Framework.Groups.ByTag.Add(tagID, container);
 				}
 			}
 
 			foreach (var tagID in composition.excludeTags)
 			{
-				if (inUseGroups.TryGetValue(tagID, out container))
+				if (Framework.Groups.ByTag.TryGetValue(tagID, out container))
 				{
 					if (container.Contain(groupCore)) continue;
 					container.Add(groupCore);
 				}
 				else
 				{
-					container = new DictionaryGroup();
+					container = new CacheGroup();
 					container.Add(groupCore);
-					inUseGroups.Add(tagID, container);
+					Framework.Groups.ByTag.Add(tagID, container);
 				}
 			}
 
@@ -432,30 +436,103 @@ namespace Pixeye.Framework
 				index++;
 				if (!typeID) continue;
 
-				if (inUseGroupsTypes.TryGetValue(index, out container))
+				if (Framework.Groups.ByType.TryGetValue(index, out container))
 				{
 					if (container.Contain(groupCore)) continue;
 					container.Add(groupCore);
 				}
 				else
 				{
-					container = new DictionaryGroup();
+					container = new CacheGroup();
 					container.Add(groupCore);
-					inUseGroupsTypes.Add(index, container);
+					Framework.Groups.ByType.Add(index, container);
 				}
 			}
 		}
-	  
+
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal static void HandleChange(in ent entity, int tagID)
 		{
-			var indexGroup = inUseGroups.TryGetValue(tagID);
-
+			#if ACTORS_TAGS_CHECKS
+			var indexGroup = Framework.Groups.ByTag.TryGetValue(tagID);
 			if (indexGroup == -1) return;
-		  EntityOperations.Set(entity, indexGroup, EntityOperations.Action.ChangeTag);
+			EntityOperations.Set(entity, indexGroup, EntityOperations.Action.ChangeTag);
+			#endif
 		}
 
-	}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private static Type GetTypeTag()
+		{
+			Type typeTag    = default;
+			var  assemblies = AppDomain.CurrentDomain.GetAssemblies();
+			var  executing  = Assembly.GetExecutingAssembly();
+			for (int i = 0; i < assemblies.Length; i++)
+			{
+				var a = assemblies[i];
+				if (a != executing)
+				{
+					var types = a.GetTypes();
+					foreach (Type type in types)
+					{
+						if (typeof(ITag).IsAssignableFrom(type)) typeTag = type;
+					}
+				}
+			}
+
+			return typeTag;
+		}
+
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private static object GetFieldId(this string fieldName, Type typeTag)
+		{
+			object    value;
+			FieldInfo info = typeTag.GetField(fieldName, BindingFlags.Public | BindingFlags.Static);
+			value = info.GetValue(null);
+
+			return value;
+		}
+
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private static List<string> GetMembersString()
+		{
+			Type typeTag     = GetTypeTag();
+			var  memberArray = typeTag.GetMembers();
+
+			var memberString = new List<string>();
+			foreach (var member in memberArray)
+			{
+				if (member.DeclaringType.ToString() == typeTag.FullName)
+				{
+					memberString.Add(member.Name);
+				}
+			}
+
+			return memberString;
+		}
+
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static string TagToName(in this int tag)
+		{
+			var listTagName = GetMembersString();
+
+			Type typeTag = GetTypeTag();
+
+			for (int i = 1; i < listTagName.Count; i++)
+			{
+				int tagId = (int) GetFieldId(listTagName[i], typeTag);
+
+				if (tag == tagId)
+				{
+					return listTagName[i];
+				}
+			}
+
+			return default;
+		}
+	}
 }
- #endif
+#endif

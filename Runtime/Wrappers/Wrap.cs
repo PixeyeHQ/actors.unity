@@ -7,7 +7,7 @@ using System.Runtime.CompilerServices;
  
 using UnityEngine;
 
-namespace Pixeye.Framework
+namespace Pixeye.Actors
 {
 	public class Wrap<TSource, TProp> : IWrap<TProp>
 	{

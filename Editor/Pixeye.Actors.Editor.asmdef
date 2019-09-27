@@ -1,16 +1,16 @@
 {
-    "name": "Pixeye.Framework.Editor",
+    "name": "Pixeye.Actors.Editor",
     "references": [
-        "Pixeye.Framework"
+        "Pixeye.Actors"
     ],
-    "optionalUnityReferences": [],
     "includePlatforms": [
         "Editor"
     ],
     "excludePlatforms": [],
-    "allowUnsafeCode": false,
+    "allowUnsafeCode": true,
     "overrideReferences": false,
     "precompiledReferences": [],
     "autoReferenced": true,
-    "defineConstraints": []
+    "defineConstraints": [],
+    "versionDefines": []
 }

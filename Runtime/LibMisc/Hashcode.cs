@@ -3,7 +3,7 @@
 
 using System.Collections.Generic;
 
-namespace Pixeye.Framework
+namespace Pixeye.Actors
 {
 	public struct HashCode
 	{

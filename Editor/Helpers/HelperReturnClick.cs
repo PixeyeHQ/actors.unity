@@ -8,7 +8,7 @@ Date:       2/5/2018  2:42 PM
 using UnityEditor;
 using UnityEngine;
 
-namespace Pixeye.Framework
+namespace Pixeye.Actors
 {
 	[InitializeOnLoad]
 	public class HelperReturnClick

@@ -2,8 +2,9 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Unity.IL2CPP.CompilerServices;
+using UnityEngine;
 
-namespace Pixeye.Framework
+namespace Pixeye.Actors
 {
 	[StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Unicode)]
 	struct EntityOperation
@@ -21,7 +22,7 @@ namespace Pixeye.Framework
 	}
 
 	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
-	static class EntityOperations
+	public static class EntityOperations
 	{
 		public enum Action : byte
 		{
@@ -30,14 +31,11 @@ namespace Pixeye.Framework
 			Remove,
 			Kill,
 			Empty,
-			Activate,
-			Deactivate,
-			Unbind,
-			RemoveEntity,
+			Activate
 		}
 
-		internal static EntityOperation[] operations = new EntityOperation[Entity.settings.SizeEntities];
-		internal static int len;
+		internal static EntityOperation[] operations = new EntityOperation[Framework.Settings.SizeEntities];
+		public static int len;
 
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -50,6 +48,7 @@ namespace Pixeye.Framework
 			operation.entity = entity;
 			operation.arg    = arg;
 			operation.action = action;
+ 
 		}
 	}
 }

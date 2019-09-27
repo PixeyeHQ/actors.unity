@@ -5,7 +5,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace Pixeye.Framework
+namespace Pixeye.Actors
 {
     [CustomPropertyDrawer(typeof(InfoBoxAttribute))]
     public class DrawerInfoBox : DecoratorDrawer

@@ -9,7 +9,7 @@ using UnityEngine;
 using static System.Char;
 using Object = UnityEngine.Object;
 
-namespace Pixeye.Framework
+namespace Pixeye.Actors
 {
 	public class PostHandleFactories : EndNameEditAction
 	{

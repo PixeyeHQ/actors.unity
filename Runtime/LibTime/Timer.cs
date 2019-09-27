@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 using Pixeye.Source;
 using UnityEngine;
 
-namespace Pixeye.Framework
+namespace Pixeye.Actors
 {
 	[StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Unicode)]
 	public struct Timer

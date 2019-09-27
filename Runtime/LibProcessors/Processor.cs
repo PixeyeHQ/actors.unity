@@ -3,12 +3,17 @@
 
 using System;
 
-namespace Pixeye.Framework
+namespace Pixeye.Actors
 {
 	public abstract class Processor : IDisposable
 	{
 		protected Processor()
 		{
+			if (Framework.Processors.length == Framework.Processors.storage.Length)
+				Array.Resize(ref Framework.Processors.storage, Framework.Processors.length << 1);
+
+			Framework.Processors.storage[Framework.Processors.length++] = this;
+
 			ProcessorGroups.Setup(this);
 			ProcessorSignals.Add(this);
 			Toolbox.disposables.Add(this);
@@ -18,84 +23,89 @@ namespace Pixeye.Framework
 		{
 			ProcessorSignals.Remove(this);
 			ProcessorUpdate.Remove(this);
-
 			OnDispose();
+		}
+
+	 
+		//===============================//
+		// Events
+		//===============================//
+ 	
+		public virtual void HandleEvents()
+		{
 		}
 
 		protected virtual void OnDispose()
 		{
 		}
+
 	}
 
+	#region PROCESSORS
 
-	public abstract class ProcessorGroup : GroupEvents, IDisposable
+	public abstract class Processor<T> : Processor
 	{
-		protected ProcessorGroup()
-		{
-			ProcessorInitializer.Setup(this);
-			ProcessorSignals.Add(this);
-			Toolbox.disposables.Add(this);
-		}
-
-		public void Dispose()
-		{
-			ProcessorSignals.Remove(this);
-			ProcessorUpdate.Remove(this);
-
-			OnDispose();
-		}
-		protected virtual void OnDispose()
-		{
-		}
+		[InnerGroupAttribute]
+		public Group<T> source = default;
 	}
 
-	public abstract class Processor<T> : ProcessorGroup
+	public abstract class Processor<T, Y> : Processor
 	{
-		public Group<T> source = null;
+		[InnerGroupAttribute]
+		public Group<T, Y> source = default;
 	}
 
-	public abstract class Processor<T, Y> : ProcessorGroup
+	public abstract class Processor<T, Y, U> : Processor
 	{
-		public Group<T, Y> source = null;
+		[InnerGroupAttribute]
+		public Group<T, Y, U> source = default;
 	}
 
-	public abstract class Processor<T, Y, U> : ProcessorGroup
+	public abstract class Processor<T, Y, U, I> : Processor
 	{
-		public Group<T, Y, U> source = null;
+		[InnerGroupAttribute]
+		public Group<T, Y, U, I> source = default;
 	}
 
-	public abstract class Processor<T, Y, U, I> : ProcessorGroup
+	public abstract class Processor<T, Y, U, I, O> : Processor
 	{
-		public Group<T, Y, U, I> source = null;
+		[InnerGroupAttribute]
+		public Group<T, Y, U, I, O> source = default;
 	}
 
-	public abstract class Processor<T, Y, U, I, O> : ProcessorGroup
+	public abstract class Processor<T, Y, U, I, O, P> : Processor
 	{
-		public Group<T, Y, U, I, O> source = null;
+		[InnerGroupAttribute]
+		public Group<T, Y, U, I, O, P> source = default;
 	}
 
-	public abstract class Processor<T, Y, U, I, O, P> : ProcessorGroup
+	public abstract class Processor<T, Y, U, I, O, P, A> : Processor
 	{
-		public Group<T, Y, U, I, O, P> source = null;
+		[InnerGroupAttribute]
+		public Group<T, Y, U, I, O, P, A> source = default;
 	}
 
-	public abstract class Processor<T, Y, U, I, O, P, A> : ProcessorGroup
+	public abstract class Processor<T, Y, U, I, O, P, A, S> : Processor
 	{
-		public Group<T, Y, U, I, O, P, A> source = null;
+		[InnerGroupAttribute]
+		public Group<T, Y, U, I, O, P, A, S> source = default;
 	}
 
-	public abstract class Processor<T, Y, U, I, O, P, A, S> : ProcessorGroup
+	public abstract class Processor<T, Y, U, I, O, P, A, S, D> : Processor
 	{
-		public Group<T, Y, U, I, O, P, A, S> source = null;
+		[InnerGroupAttribute]
+		public Group<T, Y, U, I, O, P, A, S, D> source = default;
 	}
 
-	public abstract class Processor<T, Y, U, I, O, P, A, S, D> : ProcessorGroup
+	public abstract class Processor<T, Y, U, I, O, P, A, S, D, F> : Processor
 	{
-		public Group<T, Y, U, I, O, P, A, S, D> source = null;
+		[InnerGroupAttribute]
+		public Group<T, Y, U, I, O, P, A, S, D, F> source = default;
 	}
 
-	public abstract class Processor<T, Y, U, I, O, P, A, S, D, F> : ProcessorGroup
+	#endregion
+
+	class InnerGroupAttribute : Attribute
 	{
-		public Group<T, Y, U, I, O, P, A, S, D, F> source = null;
 	}
 }

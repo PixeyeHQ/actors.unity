@@ -3,7 +3,7 @@
 
 using System.Runtime.CompilerServices;
 
-namespace Pixeye.Framework
+namespace Pixeye.Actors
 {
 	public interface IActor
 	{

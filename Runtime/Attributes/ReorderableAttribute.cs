@@ -22,7 +22,7 @@ SOFTWARE.*/
 #if !ODIN_INSPECTOR
 using UnityEngine;
 
-namespace Pixeye.Framework
+namespace Pixeye.Actors
 {
 	/// <summary>
 	/// Display a List/Array as a sortable list in the inspector

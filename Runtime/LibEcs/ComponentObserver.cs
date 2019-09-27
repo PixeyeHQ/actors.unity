@@ -1,7 +1,7 @@
 //  Project : ecs
 // Contacts : Pix - ask@pixeye.games
 
-namespace Pixeye.Framework
+namespace Pixeye.Actors
 {
 	#if ACTORS_COMPONENTS_STRUCTS
 	struct ComponentObserver
@@ -30,12 +30,11 @@ namespace Pixeye.Framework
 	{
 		public override ComponentObserver Create() => new ComponentObserver();
 
-		public override void Dispose()
+		public override void Dispose(indexes disposed)
 		{
-			for (int i = 0; i < disposedLen; i++)
+			foreach (var id in disposed)
 			{
-				ref var component = ref components[disposed[i]];
-
+				ref var component = ref components[id];
 				for (int ii = 0; ii < component.length; ii++)
 				{
 					component.wrappers[ii].Dispose();

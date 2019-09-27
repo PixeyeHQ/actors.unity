@@ -3,7 +3,7 @@
 
 using System;
 
-namespace Pixeye.Framework
+namespace Pixeye.Actors
 {
 	public static class Rand
 	{

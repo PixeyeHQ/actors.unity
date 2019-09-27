@@ -9,7 +9,7 @@ using UnityEditor;
 using UnityEngine;
 
 /// TODO: refactor this shit.
-namespace Pixeye.Framework
+namespace Pixeye.Actors
 {
 	[CustomPropertyDrawer(typeof(TagFilterAttribute))]
 	public class DrawerTags : PropertyDrawer

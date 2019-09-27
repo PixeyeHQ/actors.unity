@@ -12,12 +12,11 @@ using Sirenix.OdinInspector;
 using UnityEngine;
 
 
-namespace Pixeye.Framework
+namespace Pixeye.Actors
 {
 	public abstract class MonoCached : MonoBehaviour, IRequireStarter
 	{
-		 
-
+		
 		void Awake()
 		{
 			if (Starter.initialized == false) return;

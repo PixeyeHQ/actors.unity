@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Pixeye.Framework
+namespace Pixeye.Actors
 {
 	public sealed class ProcessorUpdate : MonoBehaviour, IDisposable, IKernel
 	{
@@ -40,8 +40,10 @@ namespace Pixeye.Framework
 
 		public static void RemoveTick(object updateble)
 		{
-			Default.ticks.Remove(updateble as ITick);
-			Default.countTicks--;
+			if (Default.ticks.Remove(updateble as ITick))
+			{
+				Default.countTicks--;
+			}
 		}
 
 
@@ -53,8 +55,10 @@ namespace Pixeye.Framework
 
 		public static void RemoveTickFixed(object updateble)
 		{
-			Default.ticksFixed.Remove(updateble as ITickFixed);
-			Default.countTicksFixed--;
+			if (Default.ticksFixed.Remove(updateble as ITickFixed))
+			{
+				Default.countTicksFixed--;
+			}
 		}
 
 
@@ -66,8 +70,10 @@ namespace Pixeye.Framework
 
 		public static void RemoveTickLate(object updateble)
 		{
-			Default.ticksLate.Remove(updateble as ITickLate);
-			Default.countTicksLate--;
+			if (Default.ticksLate.Remove(updateble as ITickLate))
+			{
+				Default.countTicksLate--;
+			}
 		}
 
 
@@ -118,7 +124,7 @@ namespace Pixeye.Framework
 		{
 			if (Toolbox.changingScene) return;
 
- 
+
 			var delta = Time.delta * Time.Default.timeScale;
 
 			for (int i = 0; i < timesLen; i++)
@@ -151,12 +157,12 @@ namespace Pixeye.Framework
 
 		public void Dispose()
 		{
-			countTicks = 0;
+			countTicks      = 0;
 			countTicksFixed = 0;
-			countTicksLate = 0;
+			countTicksLate  = 0;
 
 			ticks.RemoveAll(t => t is IKernel == false);
-			
+
 			ticksFixed.Clear();
 			ticksLate.Clear();
 

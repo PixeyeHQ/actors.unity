@@ -1,6 +1,6 @@
 //  Project  : ACTORS
 //  Contacts : Pixeye - ask@pixeye.games
-namespace Pixeye.Framework{
+namespace Pixeye.Actors{
 
 public interface IRandom {
     float returnChance { get; }

@@ -7,7 +7,7 @@
 using UnityEngine;
 
 
-namespace Pixeye.Framework{
+namespace Pixeye.Actors{
 public class InfoBoxAttribute : PropertyAttribute {
     public string description;
     public InfoMessageType messageType;

@@ -8,7 +8,7 @@ using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace Pixeye.Framework
+namespace Pixeye.Actors
 {
 	public static class HelperEditor
 	{

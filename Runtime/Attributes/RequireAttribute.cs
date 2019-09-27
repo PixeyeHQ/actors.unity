@@ -4,7 +4,7 @@
 
 using System;
 
-namespace Pixeye.Framework
+namespace Pixeye.Actors
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Enum | AttributeTargets.Delegate, Inherited = false)]
     [System.Runtime.InteropServices.ComVisible(true)]

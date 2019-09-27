@@ -6,7 +6,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-namespace Pixeye.Framework
+namespace Pixeye.Actors
 {
 	/// <summary>
 	/// Adds the given define symbols to PlayerSettings define symbols.
@@ -34,7 +34,7 @@ namespace Pixeye.Framework
 			{
 				str = "ACTORS_TAGS_12";
 			}
-			else  if (DataFramework.sizeTags == 6)
+			else if (DataFramework.sizeTags == 6)
 			{
 				str = "ACTORS_TAGS_6";
 			}
@@ -49,8 +49,8 @@ namespace Pixeye.Framework
 
 
 			index = allDefines.FindIndex(d => d.Contains("ACTORS_TAGS_CHECKS"));
- 
-			str   = DataFramework.tagsCheck ? "ACTORS_TAGS_CHECKS" : string.Empty;
+
+			str = DataFramework.tagsCheck ? "ACTORS_TAGS_CHECKS" : string.Empty;
 			if (index > -1)
 			{
 				allDefines[index] = str;
@@ -61,8 +61,8 @@ namespace Pixeye.Framework
 			}
 
 			index = allDefines.FindIndex(d => d.Contains("ACTORS_COMPONENTS_STRUCTS"));
- 
-			str   = DataFramework.onStructs ? "ACTORS_COMPONENTS_STRUCTS" : string.Empty;
+
+			str = DataFramework.onStructs ? "ACTORS_COMPONENTS_STRUCTS" : string.Empty;
 			if (index > -1)
 			{
 				allDefines[index] = str;
@@ -71,7 +71,19 @@ namespace Pixeye.Framework
 			{
 				allDefines.Add(str);
 			}
-			
+
+			index = allDefines.FindIndex(d => d.Contains("ACTORS_EVENTS_MANUAL"));
+
+			str = DataFramework.eventsManual ? "ACTORS_EVENTS_MANUAL" : string.Empty;
+			if (index > -1)
+			{
+				allDefines[index] = str;
+			}
+			else
+			{
+				allDefines.Add(str);
+			}
+
 
 			PlayerSettings.SetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup, string.Join(";", allDefines.ToArray()));
 		}

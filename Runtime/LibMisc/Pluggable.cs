@@ -4,7 +4,7 @@
 
 using UnityEngine;
 
-namespace Pixeye.Framework
+namespace Pixeye.Actors
 {
 	public abstract class Pluggable : ScriptableObject
 	{

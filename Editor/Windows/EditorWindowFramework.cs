@@ -6,11 +6,11 @@ using UnityEditor;
 using UnityEngine;
 
 
-namespace Pixeye.Framework
+namespace Pixeye.Actors
 {
 	public class EditorWindowFramework : EditorWindow
 	{
-		[MenuItem("Tools/Actors/Preferences", priority = -10)]
+		[MenuItem("Tools/Actors/Preferences", priority = -200)]
 		public static void ShowWindow()
 		{
 			GetWindow<EditorWindowFramework>(false, "Actors preferences");

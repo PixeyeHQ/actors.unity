@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Pixeye.Framework
+namespace Pixeye.Actors
 {
 	public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
 	{

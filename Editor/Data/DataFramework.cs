@@ -4,12 +4,19 @@
 #if UNITY_EDITOR
 using System.IO;
 using UnityEditor;
-using UnityEngine;
 
-namespace Pixeye.Framework
+
+namespace Pixeye.Actors
 {
 	static class DataFramework
 	{
+		public static bool eventsManual
+		{
+			get { return EditorPrefs.GetBool("hba.data.eventsManual", false); }
+			set { EditorPrefs.SetBool("hba.data.eventsManual", value); }
+		}
+
+
 		public static bool onStructs
 		{
 			get { return EditorPrefs.GetBool("hba.data.onStructs", false); }

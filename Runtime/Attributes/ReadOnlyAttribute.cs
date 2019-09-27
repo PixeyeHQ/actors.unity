@@ -3,7 +3,7 @@
 //     Date : 2/20/2019 
 
 #if !ODIN_INSPECTOR
-namespace Pixeye.Framework
+namespace Pixeye.Actors
 {
 	using UnityEngine;
 	using System;

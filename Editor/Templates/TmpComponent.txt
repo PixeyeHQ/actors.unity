@@ -1,5 +1,5 @@
  
-using Pixeye.Framework;
+using Pixeye.Actors;
 
 ##NAMESPACE##
 {
@@ -11,7 +11,7 @@ using Pixeye.Framework;
        }
     
        #region HELPERS
-       static partial class component
+       static partial class Component
         {
             public const string ##NAME2## = "##NAMESPACE2##.##NAME##";
             
@@ -24,14 +24,13 @@ using Pixeye.Framework;
     	    public override ##NAME## Create() => new ##NAME##();
     	     
     	     
-    	     // Use for cleaning components that were removed at the current frame.
-             public override void Dispose()
+    	    // Use for cleaning components that were removed at the current frame.
+           	public override void Dispose(indexes disposed)
              {
-              for (int i = 0; i < disposedLen; i++)
-              {
-              	ref var component = ref components[disposed[i]];
-              
-              }
+            	foreach (var id in disposed)
+                {
+            		ref var component = ref components[id];
+                }
              }
          }
         #endregion

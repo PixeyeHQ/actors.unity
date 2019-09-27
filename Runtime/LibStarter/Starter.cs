@@ -13,7 +13,7 @@ using System.Linq;
 using System.Reflection;
 using UnityEngine;
 
-namespace Pixeye.Framework
+namespace Pixeye.Actors
 {
 	/// <summary>
 	/// <para>A scene point of entry. The developer defines here scene dependencies and processing that will work on the scene.</para> 
@@ -49,7 +49,7 @@ namespace Pixeye.Framework
 			if (!typesBinded)
 			{
 				var asmFramework = Assembly.GetExecutingAssembly();
-				var asmDataRaw   = Entity.settings.DataNamespace;
+				var asmDataRaw   = Framework.Settings.DataNamespace;
 
 				var q = asmFramework.GetTypes()
 					.Where(t => t.IsSubclassOf(typeof(Storage)) && !t.ContainsGenericParameters);
@@ -68,7 +68,7 @@ namespace Pixeye.Framework
 
 					foreach (var item in q)
 					{
-					  	Activator.CreateInstance(item);
+						Activator.CreateInstance(item);
 					}
 				}
 				else
@@ -190,6 +190,14 @@ namespace Pixeye.Framework
 
 		public void BindScene()
 		{
+			ProcessorScene.Default.OnSceneLoad  =  delegate { };
+			ProcessorScene.Default.OnSceneClose =  delegate { };
+			ProcessorScene.Default.OnSceneClose += Dispose;
+
+			// zero entity
+			Entity.Create();
+
+
 			for (int i = 0; i < nodes.Count; i++)
 				nodes[i].Populate();
 
@@ -220,6 +228,9 @@ namespace Pixeye.Framework
 			return Toolbox.Add<T>();
 		}
 
+		/// <summary>
+		/// This method will execute when the scene loaded. Use it to add your processors.
+		/// </summary>
 		protected virtual void Setup()
 		{
 		}
@@ -228,24 +239,17 @@ namespace Pixeye.Framework
 		{
 		}
 
+
 		protected virtual void OnDestroy()
 		{
 			initialized = false;
 		}
-	}
 
-
-	//===============================//
-	// FEATURES
-	//===============================//
-
-	public abstract class Feature : IAwake
-	{
-		public void Add<T>() where T : new()
+		/// <summary>
+		/// This method will execute when the scene get removed. Use this method for reference cleanup.
+		/// </summary>
+		protected virtual void Dispose()
 		{
-			Toolbox.Add<T>();
 		}
-
-		public abstract void OnAwake();
 	}
 }

@@ -4,7 +4,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace Pixeye.Framework
+namespace Pixeye.Actors
 {
 	public class HelperObjectLoader
 	{

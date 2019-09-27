@@ -3,7 +3,7 @@
 
 
 
-namespace Pixeye.Framework
+namespace Pixeye.Actors
 {
    public interface IBind
     {

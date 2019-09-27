@@ -8,7 +8,7 @@ Date:       4/28/2018 5:23 PM
 
 using System;
 
-namespace Pixeye.Framework
+namespace Pixeye.Actors
 {
 	[AttributeUsage(AttributeTargets.Field)]
 	public class TagFieldAttribute : Attribute

@@ -4,7 +4,7 @@
 using System;
 using System.Runtime.CompilerServices;
 
-namespace Pixeye.Framework
+namespace Pixeye.Actors
 {
 	public interface IWrap<TProp> : IWrap
 	{

@@ -7,7 +7,7 @@ Date:       5/14/2018  6:33 PM
 
 using System;
 
-namespace Pixeye.Framework
+namespace Pixeye.Actors
 {
 	public class GroupByAttribute : Attribute
 	{

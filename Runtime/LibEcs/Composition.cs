@@ -3,34 +3,34 @@
 
 
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Unity.IL2CPP.CompilerServices;
- 
 
-namespace Pixeye.Framework
+
+namespace Pixeye.Actors
 {
 	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
 	public unsafe class Composition : IEquatable<Composition>
 	{
-		//public int[] excludeCompFilterCache; // dirty : ( 
 		public int[] generations = new int[0];
 		public int[] ids = new int[0];
 
 		internal int[] includeTags = new int[0];
 		internal int[] excludeTags = new int[0];
 
-		public bool[] includeComponents = new bool[Entity.settings.SizeComponents];
-		internal bool[] excludeComponents = new bool[Entity.settings.SizeComponents];
+		public bool[] includeComponents = new bool[Framework.Settings.SizeComponents];
+		internal bool[] excludeComponents = new bool[Framework.Settings.SizeComponents];
 
 		internal HashCode hash;
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		internal bool OverlapComponents(in BufferComponents entityComponents)
+		internal bool OverlapComponents(in CacheEntity cache)
 		{
 			int match = 0;
-			for (int i = 0; i < entityComponents.amount; i++)
+			for (int i = 0; i < cache.componentsAmount; i++)
 			{
-				if (includeComponents[entityComponents.ids[i]])
+				if (includeComponents[cache.componentsIds[i]])
 					match++;
 			}
 
@@ -50,13 +50,10 @@ namespace Pixeye.Framework
 
 		internal void SetupExcludeTypes(GroupCore g)
 		{
-			//  AddTypesExclude(excludeCompFilterCache);
-			//	AddTypesExclude(excludeCompFilterCache);
-
 			for (int i = 0; i < Storage.lastID; i++)
 			{
 				var t = excludeComponents[i];
-				if (t) Storage.all[i].AddGroupExclude(g);
+				if (t) Storage.All[i].groups.Add(g);
 			}
 		}
 
@@ -89,7 +86,7 @@ namespace Pixeye.Framework
 		internal bool CanProceed(int entityID)
 		{
 			for (int ll = 0; ll < ids.Length; ll++)
-				if ((Entity.generations[entityID, generations[ll]] & ids[ll]) != ids[ll])
+				if ((Entity.Generations[entityID, generations[ll]] & ids[ll]) != ids[ll])
 					return false;
 
 			return true;
@@ -98,8 +95,8 @@ namespace Pixeye.Framework
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal bool IncludeTags(int entityID)
 		{
-			ref var tags = ref Entity.tags[entityID];
-			var     len  = tags.Length;
+			ref var tags = ref Entity.Tags[entityID];
+			int     len  = tags.length;
 
 			if (len == 0) return false;
 			var match = 0;
@@ -120,8 +117,8 @@ namespace Pixeye.Framework
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal bool ExcludeTags(int entityID)
 		{
-			ref var tags = ref Entity.tags[entityID];
-			var     len  = tags.Length;
+			ref var tags = ref Entity.Tags[entityID];
+			int     len  = tags.length;
 			if (len == 0) return true;
 
 			for (int l = 0; l < excludeTags.Length; l++)
@@ -140,11 +137,11 @@ namespace Pixeye.Framework
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal bool ExcludeTypes(int entityID)
 		{
-			ref var components = ref Entity.components[entityID];
+			ref var components = ref Entity.entities[entityID];
 
-			for (int i = 0; i < components.amount; i++)
+			for (int i = 0; i < components.componentsAmount; i++)
 			{
-				if (excludeComponents[components.ids[i]])
+				if (excludeComponents[components.componentsIds[i]])
 				{
 					return true;
 				}

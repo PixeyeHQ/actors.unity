@@ -7,14 +7,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace Pixeye.Framework
+namespace Pixeye.Actors
 {
 	public sealed class ProcessorScene : IKernel
 	{
 		public static ProcessorScene Default = new ProcessorScene();
 
-		public Action sceneLoaded = delegate { };
-		public Action sceneClosing = delegate { };
+		public Action OnSceneLoad = delegate { };
+		public Action OnSceneClose = delegate { };
 
 		readonly Dictionary<string, Transform> sceneObjs = new Dictionary<string, Transform>();
 
@@ -73,7 +73,7 @@ namespace Pixeye.Framework
 				this.sceneDependsOn.Add(sceneDependsOn[i].Path);
 			}
 
-			Toolbox.Instance.StartCoroutine(_Setup(starter));
+			Toolbox.SceneCoroutine.StartCoroutine(_Setup(starter));
 		}
 
 		IEnumerator _Setup(Starter starter)
@@ -108,14 +108,15 @@ namespace Pixeye.Framework
 				yield return 0;
 			}
 
-			sceneLoaded();
+			OnSceneLoad();
 
 			starter.BindScene();
 		}
 
 		IEnumerator _Load(string name)
 		{
-			sceneClosing();
+			ProcessorEntities.Clean();
+			OnSceneClose();
 			Toolbox.changingScene = true;
 			Toolbox.Instance.ClearSessionData();
 
@@ -172,7 +173,8 @@ namespace Pixeye.Framework
 
 		IEnumerator _Load(int id)
 		{
-			sceneClosing();
+			ProcessorEntities.Clean();
+			OnSceneClose();
 			Toolbox.changingScene = true;
 			Toolbox.Instance.ClearSessionData();
 
@@ -194,6 +196,7 @@ namespace Pixeye.Framework
 			{
 				yield return 0;
 			}
+
 
 			scenes.Remove(sName);
 
@@ -234,20 +237,20 @@ namespace Pixeye.Framework
 
 		public static void Add(int id)
 		{
-			Toolbox.Instance.StartCoroutine(_Add(id));
+			Toolbox.SceneCoroutine.StartCoroutine(_Add(id));
 		}
 		public static void Add(string id)
 		{
-			Toolbox.Instance.StartCoroutine(_Add(id));
+			Toolbox.SceneCoroutine.StartCoroutine(_Add(id));
 		}
 
 		public static void Remove(int id)
 		{
-			Toolbox.Instance.StartCoroutine(_Remove(id));
+			Toolbox.SceneCoroutine.StartCoroutine(_Remove(id));
 		}
 		public static void Remove(string id)
 		{
-			Toolbox.Instance.StartCoroutine(_Remove(id));
+			Toolbox.SceneCoroutine.StartCoroutine(_Remove(id));
 		}
 		static IEnumerator _Add(int id)
 		{
@@ -345,20 +348,19 @@ namespace Pixeye.Framework
 					actors[i].entity.Release();
 				}
 			}
-
 		}
 
 		public static void To(int id)
 		{
 			var processing = Default;
-
-			Toolbox.Instance.StartCoroutine(processing._Load(id));
+			//	Processor.processorsLen = 0;
+			Toolbox.SceneCoroutine.StartCoroutine(processing._Load(id));
 		}
 
 		public static void To(string name)
 		{
 			var processing = Default;
-			Toolbox.Instance.StartCoroutine(processing._Load(name));
+			Toolbox.SceneCoroutine.StartCoroutine(processing._Load(name));
 		}
 	}
 }

@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-namespace Pixeye.Framework
+namespace Pixeye.Actors
 {
 	public sealed unsafe class UnmanagedMemory
 	{

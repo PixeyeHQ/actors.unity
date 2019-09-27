@@ -7,7 +7,7 @@ using System.Reflection;
 using UnityEditor;
 
 /// Contributor : Dark-A-l https://github.com/Dark-A-l
-namespace Pixeye.Framework
+namespace Pixeye.Actors
 {
 	[InitializeOnLoad]
 	public class PostHandleTags
@@ -21,7 +21,7 @@ namespace Pixeye.Framework
 		static readonly string debugLog1 = "Two or more tags use one ID: <color=red>{0}</color>";
 		static readonly string debugLog2 = "Tags amount: {0} Last ID: <color=#66cc33ff>{1}</color>";
 
-		//	static string pathWithMeta => DataFramework.pathTags + DataFramework.pathTagsMeta;
+ 
 		static string path => DataFramework.pathTags;
 
 
@@ -29,34 +29,71 @@ namespace Pixeye.Framework
 
 		static PostHandleTags()
 		{
-			UpdateTypes();
+			//UpdateTypes();
 		}
 
 		//[UnityEditor.Callbacks.DidReloadScripts]
-		[MenuItem("Tools/Actors/Tags/Update Types", false, 0)]
-		private static void UpdateTypes()
+		// [MenuItem("Tools/Actors/Tags/Update Types", false, 0)]
+		// private static void UpdateTypes()
+		// {
+		// 	tagTypes.Clear();
+		// 	var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+		// 	var executing  = Assembly.GetExecutingAssembly();
+		// 	for (int i = 0; i < assemblies.Length; i++)
+		// 	{
+		// 		var a = assemblies[i];
+		// 		if (a != executing)
+		// 		{
+		// 			var types = a.GetTypes();
+		// 			foreach (Type type in types)
+		// 			{
+		// 				if (typeof(ITag).IsAssignableFrom(type))
+		// 					tagTypes.Add(type);
+		// 			}
+		// 		}
+		// 	}
+		// }
+
+		#if !ACTORS_EVENTS_MANUAL
+
+		[MenuItem("Tools/Actors/Set Manual Events", false, 2)]
+		static public void SetManualEvents()
 		{
-			tagTypes.Clear();
-			var assemblies = AppDomain.CurrentDomain.GetAssemblies();
-			var executing  = Assembly.GetExecutingAssembly();
-			for (int i = 0; i < assemblies.Length; i++)
+			DataFramework.eventsManual = true;
+			string definesString = PlayerSettings.GetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup);
+			var    allDefines    = definesString.Split(';').ToList();
+
+			var index = allDefines.FindIndex(d => d.Contains("ACTORS_EVENTS_MANUAL"));
+			if (index == -1)
 			{
-				var a = assemblies[i];
-				if (a != executing)
-				{
-					var types = a.GetTypes();
-					foreach (Type type in types)
-					{
-						if (typeof(ITag).IsAssignableFrom(type))
-							tagTypes.Add(type);
-					}
-				}
+				allDefines.Add("ACTORS_EVENTS_MANUAL");
 			}
+
+
+			PlayerSettings.SetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup, string.Join(";", allDefines.ToArray()));
 		}
 
+		#else
+		[MenuItem("Tools/Actors/Set Auto Events", false, 2)]
+		static public void SetNoManualEvents()
+		{
+			DataFramework.eventsManual = false;
+			string definesString = PlayerSettings.GetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup);
+			var    allDefines = definesString.Split(';').ToList();
 
-		
-	#if !ACTORS_COMPONENTS_STRUCTS	
+			var index = allDefines.FindIndex(d => d.Contains("ACTORS_EVENTS_MANUAL"));
+			if (index != -1)
+			{
+				allDefines[index] = string.Empty;
+			}
+
+
+			PlayerSettings.SetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup, string.Join(";", allDefines.ToArray()));
+		}
+		#endif
+
+
+		#if !ACTORS_COMPONENTS_STRUCTS
 		[MenuItem("Tools/Actors/Set Struct Components", false, 2)]
 		static public void SetStructsChecks()
 		{
@@ -73,13 +110,13 @@ namespace Pixeye.Framework
 
 			PlayerSettings.SetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup, string.Join(";", allDefines.ToArray()));
 		}
-	#else
+		#else
 		[MenuItem("Tools/Actors/Remove Struct Components", false, 2)]
 		static public void SetNoStructsChecks()
 		{
 			DataFramework.onStructs = false;
 			string definesString = PlayerSettings.GetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup);
-			var    allDefines    = definesString.Split(';').ToList();
+			var    allDefines = definesString.Split(';').ToList();
 
 			var index = allDefines.FindIndex(d => d.Contains("ACTORS_COMPONENTS_STRUCTS"));
 			if (index != -1)
@@ -90,10 +127,16 @@ namespace Pixeye.Framework
 
 			PlayerSettings.SetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup, string.Join(";", allDefines.ToArray()));
 		}
- #endif
+		#endif
 
+		[MenuItem("Tools/Actors/Tags", true, 50)]
+		static public void Tags()
+		{
+			
+		}
+		
 		#if ACTORS_TAGS_CHECKS
-		[MenuItem("Tools/Actors/Tags/Remove Tag Checks", false, 1)]
+		[MenuItem("Tools/Actors/Tags/Remove Tag Checks", false, -100)]
 		static public void SetNoChecks()
 		{
 			DataFramework.tagsCheck = false;
@@ -109,13 +152,13 @@ namespace Pixeye.Framework
 
 			PlayerSettings.SetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup, string.Join(";", allDefines.ToArray()));
 		}
-	  #else	
-		[MenuItem("Tools/Actors/Tags/Set Tag Checks", false, 1)]
+		#else
+		[MenuItem("Tools/Actors/Tags/Set Tag Checks", false, 0)]
 		static public void SetChecks()
 		{
 			DataFramework.tagsCheck = true;
 			string definesString = PlayerSettings.GetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup);
-			var    allDefines    = definesString.Split(';').ToList();
+			var    allDefines = definesString.Split(';').ToList();
 
 			var index = allDefines.FindIndex(d => d.Contains("ACTORS_TAGS_CHECKS"));
 			if (index == -1)
@@ -182,12 +225,12 @@ namespace Pixeye.Framework
 			allDefines[index] = "ACTORS_TAGS_0";
 			PlayerSettings.SetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup, string.Join(";", allDefines.ToArray()));
 		}
-    #if !ACTORS_DEBUG
+		#if !ACTORS_DEBUG
 		[MenuItem("Tools/Actors/Set Debug", false, 4)]
 		static public void SetDebug()
 		{
 			string definesString = PlayerSettings.GetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup);
-			var    allDefines    = definesString.Split(';').ToList();
+			var    allDefines = definesString.Split(';').ToList();
 
 			var index = allDefines.FindIndex(d => d.Contains("ACTORS_DEBUG"));
 			if (index == -1)

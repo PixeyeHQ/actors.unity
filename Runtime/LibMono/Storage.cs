@@ -10,42 +10,38 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Unity.IL2CPP.CompilerServices;
 
-namespace Pixeye.Framework
+namespace Pixeye.Actors
 {
 	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
 	public abstract class Storage
 	{
-		internal static int[] masks = new int[32];
-		internal static int[] generations = new int[32];
-		internal static Storage[] all = new Storage[32];
 		internal static Dictionary<int, int> typeNames = new Dictionary<int, int>(FastComparable.Default);
-
 		internal static int lastID;
+		internal static int[] Masks = new int[32];
+		internal static int[] Generations = new int[32];
+		internal static Storage[] All = new Storage[32];
 
-		internal GroupCore[] groups = new GroupCore[8];
-		internal int groupsLen;
+		internal CacheGroup groups = new CacheGroup();
 
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		internal abstract void AddGroupExclude(GroupCore groupCore);
-
-
-		internal static void Wipe()
-		{
-			for (int i = 0; i < lastID; i++)
-				all[i].groupsLen = 0;
-		}
-
-
-		public int[] disposed = new int[Entity.settings.SizeEntities];
-		public int disposedLen;
-
-
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public virtual void Dispose()
-		{
-		}
+		internal indexes toDispose = new indexes(Framework.Settings.SizeEntities);
 
 		internal abstract Type GetComponentType();
+
+		internal static void DisposeSelf()
+		{
+			//	GroupInt
+
+			for (int i = 0; i < lastID; i++)
+			{
+				All[i].Dispose(All[i].toDispose);
+				All[i].toDispose.length = 0;
+				All[i].groups.length    = 0;
+			}
+		}
+
+		public virtual void Dispose(indexes disposed)
+		{
+		}
 	}
 
 
@@ -53,35 +49,34 @@ namespace Pixeye.Framework
 	public class Storage<T> : Storage
 	{
 		public static Storage<T> Instance;
+		public static int componentId;
+		internal static int ComponentMask;
+		internal static int Generation;
 
-		public static int componentID;
-		public static int componentMask;
-		public static int generation;
-
+		public static T[] components = new T[Framework.Settings.SizeEntities];
 		internal int componentsLen = 0;
-
-		public static T[] components = new T[Entity.settings.SizeEntities];
 
 
 		public Storage()
 		{
-			if (lastID == all.Length)
+			Instance = this;
+
+			if (lastID == All.Length)
 			{
 				var l = lastID << 1;
-				Array.Resize(ref all, l);
-				Array.Resize(ref masks, l);
-				Array.Resize(ref generations, l);
+				Array.Resize(ref All, l);
+				Array.Resize(ref Masks, l);
+				Array.Resize(ref Generations, l);
 			}
 
-			componentID      = lastID++;
-			all[componentID] = this;
+			componentId      = lastID++;
+			All[componentId] = this;
 
-			masks[componentID]       = componentMask = 1 << (componentID % 32);
-			generations[componentID] = generation    = componentID / 32;
+			Masks[componentId]       = ComponentMask = 1 << (componentId % 32);
+			Generations[componentId] = Generation    = componentId / 32;
 
-			var type = typeof(T);
-			typeNames.Add(type.GetHashCode(), componentID);
-			Instance = this;
+			// add componentID by type for exclude injection
+			typeNames.Add(typeof(T).GetHashCode(), componentId);
 		}
 
 
@@ -90,6 +85,7 @@ namespace Pixeye.Framework
 		{
 			return default;
 		}
+
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal override Type GetComponentType()
 		{
@@ -113,30 +109,11 @@ namespace Pixeye.Framework
 		}
 
 
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		internal void Add(GroupCore groupCore)
-		{
-			if (groupsLen == groups.Length)
-				Array.Resize(ref groups, groupsLen << 1);
-
-			groups[groupsLen++] = groupCore;
-		}
-
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		internal override void AddGroupExclude(GroupCore groupCore)
-		{
-			if (groupsLen == groups.Length)
-				Array.Resize(ref groups, groupsLen << 1);
-
-			groups[groupsLen++] = groupCore;
-		}
-
-
 		#if !ACTORS_COMPONENTS_STRUCTS
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public T TryGet(int entityID)
 		{
-			return (Entity.generations[entityID, generation] & componentMask) == componentMask ? components[entityID] : default;
+			return (Entity.Generations[entityID, Generation] & ComponentMask) == ComponentMask ? components[entityID] : default;
 		}
 		#endif
 	}

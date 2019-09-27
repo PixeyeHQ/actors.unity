@@ -12,7 +12,7 @@ using UnityEditor.ProjectWindowCallback;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace Pixeye.Framework
+namespace Pixeye.Actors
 {
 	public class PostHandleComponents : EndNameEditAction
 	{

@@ -1,6 +1,6 @@
 using System;
 
-namespace Pixeye.Framework
+namespace Pixeye.Actors
 {
 	public unsafe struct MemPool
 	{

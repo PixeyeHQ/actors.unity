@@ -10,7 +10,7 @@ Date:       5/17/2018 6:31 AM
  
 using UnityEngine;
 
-namespace Pixeye.Framework
+namespace Pixeye.Actors
 {
 	public class FoldoutGroupAttribute : PropertyAttribute
 	{

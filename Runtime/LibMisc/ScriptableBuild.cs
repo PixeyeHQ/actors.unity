@@ -10,7 +10,7 @@ using UnityEditor;
 
 #endif
 
-namespace Pixeye.Framework
+namespace Pixeye.Actors
 {
 	public class ScriptableBuild : ScriptableObject
 

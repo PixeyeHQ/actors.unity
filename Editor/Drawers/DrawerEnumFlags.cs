@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEditor;
 
-namespace Pixeye.Framework
+namespace Pixeye.Actors
 {
 	[CustomPropertyDrawer(typeof(EnumFlagAttribute))]
 	public class DrawerEnumFlags : PropertyDrawer

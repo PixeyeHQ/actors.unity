@@ -3,14 +3,14 @@
 
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 
-namespace Pixeye.Framework
+namespace Pixeye.Actors
 {
 	public class ExcludeAttribute : Attribute
 	{
 		public int[] filter = new int[0];
 		public int[] filterType = new int[0];
+
 
 		public ExcludeAttribute(params int[] filter)
 		{
