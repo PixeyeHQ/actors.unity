@@ -13,6 +13,6 @@ namespace Pixeye.Actors
 		public int SizeGenerations = 4;
 		public int SizeGroups = 256;
 		public bool DebugNames = true;
-		public string Namespace = "Pixeye.Source";
+		public string Namespace = "";
 	}
 }
