@@ -201,7 +201,7 @@ namespace Pixeye.Actors
 			for (int i = 0; i < nodes.Count; i++)
 				nodes[i].Populate();
 
-			Add<ProcessorEntities>();
+	  
 			Add<ProcessorObserver>();
 
 

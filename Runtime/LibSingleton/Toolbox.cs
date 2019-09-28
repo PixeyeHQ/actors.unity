@@ -11,6 +11,9 @@ namespace Pixeye.Actors
 	/// <summary>
 	/// <para>Service locator</para>
 	/// </summary>
+	/// 
+	
+	// todo: redesign class.
 	public class Toolbox : Singleton<Toolbox>
 	{
 		[SerializeField]
@@ -20,11 +23,8 @@ namespace Pixeye.Actors
 		{
 			return Instance.data.ContainsKey(typeof(T).GetHashCode());
 		}
-
 		public static List<IDisposable> disposables = new List<IDisposable>(64);
-
 		public static Action OnDestroyAction = delegate { };
-
 		public static SceneCoroutine SceneCoroutine = Instance.gameObject.AddComponent<SceneCoroutine>();
 
 
@@ -43,7 +43,12 @@ namespace Pixeye.Actors
 
 			var created = new T();
 
-			InitializeObject(created);
+			var proc = typeof(T).IsSubclassOf(typeof(Processor));
+			if (!proc)
+			{
+				InitializeObject(created);
+			}
+ 
 			Instance.data.Add(hash, created);
 
 			return created;
@@ -70,8 +75,9 @@ namespace Pixeye.Actors
 			var add             = obj;
 			var scriptable      = obj as ScriptableObject;
 			if (scriptable) add = Instantiate(scriptable);
-			InitializeObject(obj);
 
+		 
+			InitializeObject(obj);
 			Instance.data.Add(obj.GetType().GetHashCode(), add);
 		}
 

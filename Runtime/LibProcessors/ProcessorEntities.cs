@@ -10,12 +10,14 @@ using UnityEngine;
 namespace Pixeye.Actors
 {
 	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
-	sealed unsafe class ProcessorEntities : Processor, ITick
+	sealed unsafe class ProcessorEntities  
 	{
-		GroupCore[] groupsChecked = new GroupCore[Framework.Settings.SizeProcessors];
-		int groupsCheckedLen;
 
-		bool AlreadyChecked(GroupCore group)
+	 
+		static GroupCore[] groupsChecked = new GroupCore[Framework.Settings.SizeProcessors];
+		  static int   groupsCheckedLen;
+
+		  static bool   AlreadyChecked(GroupCore group)
 		{
 			for (int i = 0; i < groupsCheckedLen; i++)
 				if (groupsChecked[i].id == group.id)
@@ -25,7 +27,7 @@ namespace Pixeye.Actors
 		}
 
 
-		public void Tick(float delta)
+		public   static void Tick(float delta)
 		{
 			if (!Starter.initialized) return;
 
@@ -42,18 +44,18 @@ namespace Pixeye.Actors
 					case EntityOperations.Action.Add:
 					{
 						var componentID = operation.arg;
+						var generation = Storage.Generations[componentID];
+						var mask       = Storage.Masks[componentID];
 						var storage     = Storage.All[componentID];
-
+ 
 						for (int l = 0; l < storage.groups.length; l++)
 						{
 							var group = storage.groups.Elements[l];
-
-							if (group.composition.Check(entityID))
-							{
-								group.Insert(operation.entity);
-							}
+							if (!group.composition.Check(entityID))
+								group.TryRemove(entityID);
+							else group.Insert(operation.entity);
 						}
-
+					 
 						#if ACTORS_DEBUG
 						Entity.RenameGameobject(operation.entity);
 						#endif
@@ -109,7 +111,7 @@ namespace Pixeye.Actors
 						ent.entStack.source[ent.entStack.length++] = operation.entity;
 
 
-						Entity.Alive.Remove(operation.entity);
+						Entity.alive.Remove(operation.entity);
 						break;
 					}
 
@@ -193,14 +195,14 @@ namespace Pixeye.Actors
 						Entity.Tags[entityID].Clear();
 						#endif
 
-						Entity.Count--;
+						//Entity.Count--;
 
 
 						if (ent.entStack.length >= ent.entStack.source.Length)
 							Array.Resize(ref ent.entStack.source, ent.entStack.length << 1);
 						ent.entStack.source[ent.entStack.length++] = operation.entity;
 
-						Entity.Alive.Remove(operation.entity);
+						Entity.alive.Remove(operation.entity);
 						break;
 					}
 
@@ -275,14 +277,22 @@ namespace Pixeye.Actors
 						break;
 					}
 				}
+				
+				
+				
+				
 			}
 
-			EntityOperations.len = 0;
+ 
 
-			for (int i = 0; i < Framework.Processors.length; i++)
-				Framework.Processors.storage[i].HandleEvents();
+			if (EntityOperations.len > 0)
+			{
+				EntityOperations.len = 0;
+				
+				for (int i = 0; i < Framework.Processors.length; i++)
+					Framework.Processors.storage[i].HandleEvents();
 
-			#if ACTORS_EVENTS_MANUAL
+				#if ACTORS_EVENTS_MANUAL
 			for (int ii = 0; ii < Framework.Groups.All.length; ii++)
 			{
 				var nextGroup = Framework.Groups.All.Elements[ii];
@@ -294,20 +304,21 @@ namespace Pixeye.Actors
 				if (nextGroup.hasEventAdd)
 					nextGroup.added.length = 0;
 			}
-			#else
-			for (int ii = 0; ii < Framework.Groups.All.length; ii++)
-			{
-				var nextGroup = Framework.Groups.All.Elements[ii];
-				nextGroup.removed.length = 0;
-				nextGroup.added.length   = 0;
-			}
-			#endif
+				#else
+				for (int ii = 0; ii < Framework.Groups.All.length; ii++)
+				{
+					var nextGroup = Framework.Groups.All.Elements[ii];
+					nextGroup.removed.length = 0;
+					nextGroup.added.length   = 0;
+				}
+				#endif
 
-			for (int i = 0; i < Storage.lastID; i++)
-			{
-				var st = Storage.All[i];
-				st.Dispose(st.toDispose);
-				st.toDispose.length = 0;
+				for (int i = 0; i < Storage.lastID; i++)
+				{
+					var st = Storage.All[i];
+					st.Dispose(st.toDispose);
+					st.toDispose.length = 0;
+				}
 			}
 		}
 
@@ -318,11 +329,11 @@ namespace Pixeye.Actors
 		{
 			if (Toolbox.applicationIsQuitting) return;
 
-			Entity.Count                = 0;
+		//	Entity.Count                = 0;
 			EntityOperations.len        = 0;
 			Framework.Processors.length = 0;
 
-			foreach (ent entity in Entity.Alive)
+			foreach (ent entity in Entity.alive)
 			{
 				ref var entityCache = ref Entity.entities[entity.id];
 				ref var tagCache    = ref Entity.Tags[entity.id];

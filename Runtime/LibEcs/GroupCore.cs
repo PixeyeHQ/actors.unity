@@ -193,10 +193,11 @@ namespace Pixeye.Actors
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal void TryRemove(int entityID)
 		{
-			if (length == 0) return;
+			if (length  == 0) return;
 
 			var i = HelperArray.BinarySearch(ref entities, entityID, 0, length);
 			if (i == -1) return;
+		
 			#if ACTORS_EVENTS_MANUAL
 			if (hasEventRemove)
 				removed.source[removed.length++] = entities[i];
@@ -204,7 +205,8 @@ namespace Pixeye.Actors
 			removed.source[removed.length++] = entities[i];
 			#endif
 
-			Array.Copy(entities, i + 1, entities, i, --length - i);
+			if (i<--length)
+			Array.Copy(entities, i + 1, entities, i, length - i);
 		}
 
 
@@ -221,7 +223,9 @@ namespace Pixeye.Actors
 			removed.source[removed.length++] = entities[i];
 			#endif
 
-			Array.Copy(entities, i + 1, entities, i, --length - i);
+			if (i < --length)
+				Array.Copy(entities, i + 1, entities, i, length - i);
+			//Array.Copy(entities, i + 1, entities, i, --length - i);
 		}
 
 

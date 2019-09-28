@@ -16,8 +16,7 @@ namespace Pixeye.Actors
 	{
 		public const bool Pooled = true;
 
-		public static int Count;
-
+	 
 		#if !ACTORS_TAGS_0
 		static readonly int sizeBufferTags = UnsafeUtility.SizeOf<CacheTags>();
 		#endif
@@ -34,7 +33,7 @@ namespace Pixeye.Actors
 		internal static int lengthTotal;
 		internal static int[,] Generations;
 
-		public static ents Alive;
+		internal static ents alive;
 		
 		//===============================//
 		// Initialize 
@@ -71,7 +70,7 @@ namespace Pixeye.Actors
 				entities[i] = new CacheEntity(6);
 			}
 
-			Alive = new ents(Framework.Settings.SizeEntities);
+			alive = new ents(Framework.Settings.SizeEntities);
 			
 			#if UNITY_EDITOR
 			Toolbox.OnDestroyAction += Dispose;
@@ -79,6 +78,14 @@ namespace Pixeye.Actors
 			
 		}
 
+		// Use for other libraries
+		public static int GetLiveEntities()
+		{
+			return alive.length;
+		}
+		
+		
+		
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal static void Initialize(int id, byte age, bool isPooled = false, bool isNested = false)
 		{
@@ -110,12 +117,12 @@ namespace Pixeye.Actors
 			ptrCache->isNested = isNested;
 			ptrCache->isPooled = isPooled;
 			ptrCache->isDirty  = true;
-			Count++;
+			//Count++;
 
 			ent e;
 			e.id = id;
 			e.age = age;
-			Alive.Add(e);
+			alive.Add(e);
 			
 		}
 
@@ -246,20 +253,31 @@ namespace Pixeye.Actors
 			if ((Generations[id, Storage<T>.Generation] & Storage<T>.ComponentMask) != Storage<T>.ComponentMask)
 			{
 				entities[id].Add(Storage<T>.componentId);
-
 				if (!entities[id].isDirty)
 				{
-					EntityOperations.Set(entity, Storage<T>.componentId, EntityOperations.Action.Add);
 					Generations[id, Storage<T>.Generation] |= Storage<T>.ComponentMask;
-
-					for (int l = 0; l < Storage<T>.Instance.groups.length; l++)
-					{
-						var group = Storage<T>.Instance.groups.Elements[l];
-						if (!group.composition.Check(id))
-							group.TryRemove(id);
-					}
+					EntityOperations.Set(entity, Storage<T>.componentId, EntityOperations.Action.Add);
 				}
 			}
+			 
+
+			// if ((Generations[id, Storage<T>.Generation] & Storage<T>.ComponentMask) != Storage<T>.ComponentMask)
+			// {
+			// 	entities[id].Add(Storage<T>.componentId);
+			//
+			// 	if (!entities[id].isDirty)
+			// 	{
+			// 		EntityOperations.Set(entity, Storage<T>.componentId, EntityOperations.Action.Add);
+			// 		Generations[id, Storage<T>.Generation] |= Storage<T>.ComponentMask;
+			//
+			// 		for (int l = 0; l < Storage<T>.Instance.groups.length; l++)
+			// 		{
+			// 			var group = Storage<T>.Instance.groups.Elements[l];
+			// 			if (!group.composition.Check(id))
+			// 				group.TryRemove(id);
+			// 		}
+			// 	}
+			// }
 
 
 			ref var val = ref Storage<T>.components[id];
@@ -316,20 +334,14 @@ namespace Pixeye.Actors
 
 			if (!entities[id].isDirty)
 			{
-				//	EntityOperations.Set(entity, Storage<T>.componentId, EntityOperations.Action.Add);
 				Generations[id, Storage<T>.Generation] |= Storage<T>.ComponentMask;
+			 	EntityOperations.Set(entity, Storage<T>.componentId, EntityOperations.Action.Add);
+				
+			   
 
-				for (int l = 0; l < Storage<T>.Instance.groups.length; l++)
-				{
-					var gr = Storage<T>.Instance.groups.Elements[l];
-					if (!gr.composition.Check(id))
-						gr.TryRemove(id);
-					else gr.Insert(entity);
-				}
-
-				#if ACTORS_DEBUG
-				RenameGameobject(id);
-				#endif
+				// #if ACTORS_DEBUG
+				// RenameGameobject(id);
+				// #endif
 
 				// for (int l = 0; l < storage.Groups.length; l++)
 				// {
@@ -382,17 +394,22 @@ namespace Pixeye.Actors
 
 			if (!entities[id].isDirty)
 			{
-				EntityOperations.Set(entity, Storage<T>.componentId, EntityOperations.Action.Add);
-
 				Generations[id, Storage<T>.Generation] |= Storage<T>.ComponentMask;
-
-				for (int l = 0; l < Storage<T>.Instance.groups.length; l++)
-				{
-					var gr = Storage<T>.Instance.groups.Elements[l];
-					if (!gr.composition.Check(id))
-						gr.TryRemove(id);
-				}
+				EntityOperations.Set(entity, Storage<T>.componentId, EntityOperations.Action.Add);
 			}
+			// if (!entities[id].isDirty)
+			// {
+			// 	EntityOperations.Set(entity, Storage<T>.componentId, EntityOperations.Action.Add);
+			//
+			// 	Generations[id, Storage<T>.Generation] |= Storage<T>.ComponentMask;
+			//
+			// 	for (int l = 0; l < Storage<T>.Instance.groups.length; l++)
+			// 	{
+			// 		var gr = Storage<T>.Instance.groups.Elements[l];
+			// 		if (!gr.composition.Check(id))
+			// 			gr.TryRemove(id);
+			// 	}
+			// }
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]

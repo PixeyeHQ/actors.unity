@@ -61,13 +61,13 @@ namespace Pixeye.Actors
 			#if UNITY_EDITOR
 			if (!Exist)
 			{
-				Framework.Debugger.Log(LogType.DESTROYED);
+				Framework.Debugger.Log(LogType.DESTROYED, this);
 				return;
 			}
 			#endif
 
 			EntityOperations.Set(this, 0, EntityOperations.Action.Kill);
-			Entity.Count--;
+		//	Entity.Count--;
 		}
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public bool Equals(ent other)

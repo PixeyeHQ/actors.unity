@@ -14,10 +14,12 @@ namespace Pixeye.Actors
 		internal static List<Time> times = new List<Time>();
 		internal static int timesLen = 0;
 
-		List<ITick> ticks = new List<ITick>(1000);
+		List<ITick> ticks = new List<ITick>(128);
+		List<ITick> ticksProc = new List<ITick>(64);
 		List<ITickFixed> ticksFixed = new List<ITickFixed>();
 		List<ITickLate> ticksLate = new List<ITickLate>();
 
+		int countTicksProc;
 		int countTicks;
 		int countTicksFixed;
 		int countTicksLate;
@@ -29,7 +31,7 @@ namespace Pixeye.Actors
 
 		public int GetTicksCount()
 		{
-			return countTicks;
+			return countTicks+ countTicksProc+ countTicksFixed+ countTicksLate;
 		}
 
 		public static void AddTick(object updateble)
@@ -76,6 +78,52 @@ namespace Pixeye.Actors
 			}
 		}
 
+		public static void AddProc(object updateble)
+		{
+			var tickable = updateble as ITick;
+			if (tickable != null)
+			{
+				Default.ticksProc.Add(tickable);
+
+				Default.countTicksProc++;
+			}
+
+			var tickableFixed = updateble as ITickFixed;
+			if (tickableFixed != null)
+			{
+				Default.ticksFixed.Add(tickableFixed);
+				Default.countTicksFixed++;
+			}
+
+			var tickableLate = updateble as ITickLate;
+			if (tickableLate != null)
+			{
+				Default.ticksLate.Add(tickableLate);
+				Default.countTicksLate++;
+			}
+		}
+
+
+		public static void RemoveProc(object updateble)
+		{
+			if (Default.ticksProc.Remove(updateble as ITick))
+			{
+				Default.countTicksProc--;
+			}
+
+			if (Default.ticksFixed.Remove(updateble as ITickFixed))
+			{
+				Default.countTicksFixed--;
+			}
+
+			if (Default.ticksLate.Remove(updateble as ITickLate))
+			{
+				Default.countTicksLate--;
+			}
+		}
+		
+		
+		
 
 		public static void Add(object updateble)
 		{
@@ -132,10 +180,21 @@ namespace Pixeye.Actors
 				times[i].Tick();
 			}
 
+			
+		 
 			for (var i = 0; i < countTicks; i++)
 			{
 				ticks[i].Tick(delta);
 			}
+
+			ProcessorEntities.Tick(delta);
+		
+			for (var i = 0; i < countTicksProc; i++)
+			{
+				ticksProc[i].Tick(delta);
+				ProcessorEntities.Tick(delta);
+			}
+	 
 		}
 
 		void FixedUpdate()
@@ -160,11 +219,12 @@ namespace Pixeye.Actors
 			countTicks      = 0;
 			countTicksFixed = 0;
 			countTicksLate  = 0;
-
+			countTicksProc = 0;
 			ticks.RemoveAll(t => t is IKernel == false);
 
 			ticksFixed.Clear();
 			ticksLate.Clear();
+			ticksProc.Clear();
 
 			countTicks = ticks.Count;
 		}
