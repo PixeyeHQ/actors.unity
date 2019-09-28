@@ -10,14 +10,12 @@ using UnityEngine;
 namespace Pixeye.Actors
 {
 	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
-	sealed unsafe class ProcessorEntities  
+	sealed unsafe class ProcessorEntities
 	{
+		static GroupCore[] groupsChecked = new GroupCore[Framework.Settings.SizeGroups];
+		static int groupsCheckedLen;
 
-	 
-		static GroupCore[] groupsChecked = new GroupCore[Framework.Settings.SizeProcessors];
-		  static int   groupsCheckedLen;
-
-		  static bool   AlreadyChecked(GroupCore group)
+		static bool AlreadyChecked(GroupCore group)
 		{
 			for (int i = 0; i < groupsCheckedLen; i++)
 				if (groupsChecked[i].id == group.id)
@@ -27,7 +25,7 @@ namespace Pixeye.Actors
 		}
 
 
-		public   static void Tick(float delta)
+		public static void Tick(float delta)
 		{
 			if (!Starter.initialized) return;
 
@@ -44,10 +42,12 @@ namespace Pixeye.Actors
 					case EntityOperations.Action.Add:
 					{
 						var componentID = operation.arg;
-						var generation = Storage.Generations[componentID];
-						var mask       = Storage.Masks[componentID];
+						var generation  = Storage.Generations[componentID];
+						var mask        = Storage.Masks[componentID];
 						var storage     = Storage.All[componentID];
- 
+
+						Entity.Generations[entityID, generation] |= mask;
+
 						for (int l = 0; l < storage.groups.length; l++)
 						{
 							var group = storage.groups.Elements[l];
@@ -55,7 +55,7 @@ namespace Pixeye.Actors
 								group.TryRemove(entityID);
 							else group.Insert(operation.entity);
 						}
-					 
+
 						#if ACTORS_DEBUG
 						Entity.RenameGameobject(operation.entity);
 						#endif
@@ -277,18 +277,13 @@ namespace Pixeye.Actors
 						break;
 					}
 				}
-				
-				
-				
-				
 			}
 
- 
 
 			if (EntityOperations.len > 0)
 			{
 				EntityOperations.len = 0;
-				
+
 				for (int i = 0; i < Framework.Processors.length; i++)
 					Framework.Processors.storage[i].HandleEvents();
 
@@ -329,7 +324,7 @@ namespace Pixeye.Actors
 		{
 			if (Toolbox.applicationIsQuitting) return;
 
-		//	Entity.Count                = 0;
+			//	Entity.Count                = 0;
 			EntityOperations.len        = 0;
 			Framework.Processors.length = 0;
 

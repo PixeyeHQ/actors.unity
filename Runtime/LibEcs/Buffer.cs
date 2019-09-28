@@ -26,7 +26,7 @@ namespace Pixeye.Actors
 
 		public void Clear()
 		{
-			length = 0;
+			length     = 0;
 			queueIndex = 0;
 		}
 
@@ -79,34 +79,34 @@ namespace Pixeye.Actors
 		int indexLast;
 		int offset;
 		//int offsetBase;
-		/// <summary>
-		/// Can be used to safely remove elements by index. Don't use it inside loops. Use Remove instead.
-		/// </summary>
-		/// <param name="index"></param>
+		// /// <summary>
+		// /// Can be used to safely remove elements by index. Don't use it inside loops. Use Remove instead.
+		// /// </summary>
+		// /// <param name="index"></param>
+		// public void RemoveAt(int index)
+		// {
+		// 	// if (index - indexLast > 0)
+		// 	// {
+		// 	// 	indexLast =  index;
+		// 	// 	index     -= ++offset;
+		// 	// }
+		// 	// else
+		// 	// {
+		// 	// 	indexLast = index;
+		// 	// 	offset    = 0;
+		// 	// }
+		//
+		// 	queue[queueIndex++] = pointers[index];
+		//
+		// 	if (index < --length)
+		// 	{
+		// 		Array.Copy(pointers, index + 1, pointers, index, length - index);
+		// 	}
+		// }
+
 		public void RemoveAt(int index)
 		{
-			if (index - indexLast > 0)
-			{
-				indexLast =  index;
-				index     -= ++offset;
-			}
-			else
-			{
-				indexLast = index;
-				offset    = 0;
-			}
-
 			queue[queueIndex++] = pointers[index];
-
-			if (index < --length)
-			{
-				Array.Copy(pointers, index + 1, pointers, index, length - index);
-			}
-		}
-
-		public void Remove(int index)
-		{
-  		queue[queueIndex++] = pointers[index];
 
 			if (index < --length)
 			{
@@ -134,7 +134,6 @@ namespace Pixeye.Actors
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			internal Enumerator(Buffer<T> buffer)
 			{
-			 
 				position    = -1;
 				this.buffer = buffer;
 			}
@@ -142,14 +141,12 @@ namespace Pixeye.Actors
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			public bool MoveNext()
 			{
-			 
-				return ++position  < buffer.length;
+				return ++position < buffer.length;
 			}
 
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			public void Reset()
 			{
- 
 				position = -1;
 			}
 

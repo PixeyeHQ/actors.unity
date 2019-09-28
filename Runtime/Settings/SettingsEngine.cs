@@ -9,10 +9,10 @@ namespace Pixeye.Actors
 	public class SettingsEngine
 	{
 		public int SizeEntities = 1024;
-		public int SizeComponents = 256;
+		public int SizeComponents = 128;
 		public int SizeGenerations = 4;
-		public int SizeProcessors = 256;
+		public int SizeGroups = 256;
 		public bool DebugNames = true;
-		public string DataNamespace = "Pixeye.Source";
+		public string Namespace = "Pixeye.Source";
 	}
 }

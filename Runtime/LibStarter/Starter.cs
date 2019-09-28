@@ -49,7 +49,7 @@ namespace Pixeye.Actors
 			if (!typesBinded)
 			{
 				var asmFramework = Assembly.GetExecutingAssembly();
-				var asmDataRaw   = Framework.Settings.DataNamespace;
+				var asmDataRaw   = Framework.Settings.Namespace;
 
 				var q = asmFramework.GetTypes()
 					.Where(t => t.IsSubclassOf(typeof(Storage)) && !t.ContainsGenericParameters);

@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.IL2CPP.CompilerServices;
 using UnityEngine;
- 
+
 
 namespace Pixeye.Actors
 {
@@ -16,7 +16,7 @@ namespace Pixeye.Actors
 	{
 		public const bool Pooled = true;
 
-	 
+
 		#if !ACTORS_TAGS_0
 		static readonly int sizeBufferTags = UnsafeUtility.SizeOf<CacheTags>();
 		#endif
@@ -34,7 +34,7 @@ namespace Pixeye.Actors
 		internal static int[,] Generations;
 
 		internal static ents alive;
-		
+
 		//===============================//
 		// Initialize 
 		//===============================//
@@ -50,8 +50,9 @@ namespace Pixeye.Actors
 			if (t != null)
 				JsonUtility.FromJsonOverwrite(t.text, Framework.Settings);
 
+			Framework.Settings.SizeGenerations = Framework.Settings.SizeComponents / 32;
 
-			
+
 			lengthTotal = Framework.Settings.SizeEntities;
 			Generations = new int[Framework.Settings.SizeEntities, Framework.Settings.SizeGenerations];
 			Transforms  = new Transform[Framework.Settings.SizeEntities];
@@ -71,11 +72,10 @@ namespace Pixeye.Actors
 			}
 
 			alive = new ents(Framework.Settings.SizeEntities);
-			
+
 			#if UNITY_EDITOR
 			Toolbox.OnDestroyAction += Dispose;
 			#endif
-			
 		}
 
 		// Use for other libraries
@@ -83,9 +83,8 @@ namespace Pixeye.Actors
 		{
 			return alive.length;
 		}
-		
-		
-		
+
+
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal static void Initialize(int id, byte age, bool isPooled = false, bool isNested = false)
 		{
@@ -120,10 +119,9 @@ namespace Pixeye.Actors
 			//Count++;
 
 			ent e;
-			e.id = id;
+			e.id  = id;
 			e.age = age;
 			alive.Add(e);
-			
 		}
 
 
@@ -255,11 +253,11 @@ namespace Pixeye.Actors
 				entities[id].Add(Storage<T>.componentId);
 				if (!entities[id].isDirty)
 				{
-					Generations[id, Storage<T>.Generation] |= Storage<T>.ComponentMask;
+					//	Generations[id, Storage<T>.Generation] |= Storage<T>.ComponentMask;
 					EntityOperations.Set(entity, Storage<T>.componentId, EntityOperations.Action.Add);
 				}
 			}
-			 
+
 
 			// if ((Generations[id, Storage<T>.Generation] & Storage<T>.ComponentMask) != Storage<T>.ComponentMask)
 			// {
@@ -334,10 +332,9 @@ namespace Pixeye.Actors
 
 			if (!entities[id].isDirty)
 			{
-				Generations[id, Storage<T>.Generation] |= Storage<T>.ComponentMask;
-			 	EntityOperations.Set(entity, Storage<T>.componentId, EntityOperations.Action.Add);
-				
-			   
+				//Generations[id, Storage<T>.Generation] |= Storage<T>.ComponentMask;
+				EntityOperations.Set(entity, Storage<T>.componentId, EntityOperations.Action.Add);
+
 
 				// #if ACTORS_DEBUG
 				// RenameGameobject(id);
@@ -394,9 +391,10 @@ namespace Pixeye.Actors
 
 			if (!entities[id].isDirty)
 			{
-				Generations[id, Storage<T>.Generation] |= Storage<T>.ComponentMask;
+				//	Generations[id, Storage<T>.Generation] |= Storage<T>.ComponentMask;
 				EntityOperations.Set(entity, Storage<T>.componentId, EntityOperations.Action.Add);
 			}
+
 			// if (!entities[id].isDirty)
 			// {
 			// 	EntityOperations.Set(entity, Storage<T>.componentId, EntityOperations.Action.Add);
