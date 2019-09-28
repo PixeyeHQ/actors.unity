@@ -76,25 +76,16 @@ namespace Pixeye.Actors
 		}
 
 
-		int indexLast;
-		int offset;
-		//int offsetBase;
+		// int indexLast;
+		// int offset;
+	 //  int offsetBase;
 		// /// <summary>
 		// /// Can be used to safely remove elements by index. Don't use it inside loops. Use Remove instead.
 		// /// </summary>
 		// /// <param name="index"></param>
 		// public void RemoveAt(int index)
 		// {
-		// 	// if (index - indexLast > 0)
-		// 	// {
-		// 	// 	indexLast =  index;
-		// 	// 	index     -= ++offset;
-		// 	// }
-		// 	// else
-		// 	// {
-		// 	// 	indexLast = index;
-		// 	// 	offset    = 0;
-		// 	// }
+
 		//
 		// 	queue[queueIndex++] = pointers[index];
 		//
@@ -106,6 +97,17 @@ namespace Pixeye.Actors
 
 		public void RemoveAt(int index)
 		{
+			// if (index - indexLast > 0)
+			// {
+			// 	indexLast =  index;
+			// 	index     -= ++offset;
+			// }
+			// else
+			// {
+			// 	indexLast = index;
+			// 	offset    = 0;
+			// }
+
 			queue[queueIndex++] = pointers[index];
 
 			if (index < --length)
@@ -134,20 +136,20 @@ namespace Pixeye.Actors
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			internal Enumerator(Buffer<T> buffer)
 			{
-				position    = -1;
+				position    = buffer.length;
 				this.buffer = buffer;
 			}
 
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			public bool MoveNext()
 			{
-				return ++position < buffer.length;
+				return --position >= 0;
 			}
 
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			public void Reset()
 			{
-				position = -1;
+				position = buffer.length;
 			}
 
 			object IEnumerator.Current => Current;

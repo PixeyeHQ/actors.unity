@@ -96,20 +96,21 @@ namespace Pixeye.Actors
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			internal Enumerator(ents g)
 			{
-				position = -1;
+				position = g.length;
 				this.g   = g;
 			}
 
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			public bool MoveNext()
 			{
-				return ++position < g.length;
+				return --position >= 0;
+			 
 			}
 
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			public void Reset()
 			{
-				position = -1;
+				position = g.length;
 			}
 
 			object IEnumerator.Current => Current;
@@ -203,20 +204,20 @@ namespace Pixeye.Actors
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			internal Enumerator(indexes g)
 			{
-				position = -1;
+				position = g.length;
 				this.g   = g;
 			}
 
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			public bool MoveNext()
 			{
-				return ++position < g.length;
+				return --position >= 0;
 			}
 
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			public void Reset()
 			{
-				position = -1;
+				position = g.length;
 			}
 
 			object IEnumerator.Current => Current;
