@@ -29,7 +29,7 @@ namespace Pixeye.Actors
 			base.OnEnable();
 			scriptIcon = (EditorGUIUtility.IconContent("cs Script Icon").image as Texture2D);
 		}
-		[MenuItem("Assets/Create/Actors/Generate/Component", false, MENU_ITEM_PRIORITY)]
+		[MenuItem("Assets/Create/Actors/Add/Component", false, MENU_ITEM_PRIORITY)]
 		public static void CreateSample()
 		{
 			var path = HelperFramework.GetPathLibrary();

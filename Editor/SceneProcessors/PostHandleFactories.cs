@@ -24,16 +24,16 @@ namespace Pixeye.Actors
 			scriptIcon = (EditorGUIUtility.IconContent("cs Script Icon").image as Texture2D);
 		}
 
-		[MenuItem("Assets/Create/Actors/Generate/Factory", false, MENU_ITEM_PRIORITY)]
-		public static void CreateSample()
-		{
-			var path = HelperFramework.GetPathLibrary();
-			if (path == string.Empty)
-				path = PATH_TO_TEMPLATE;
-			else path = string.Format($"{path}/Editor/Templates/TmpFactory.txt");
-
-			CreateFromTemplate("FactoryDefault.cs", path);
-		}
+		// [MenuItem("Assets/Create/Actors/Generate/Factory", false, MENU_ITEM_PRIORITY)]
+		// public static void CreateSample()
+		// {
+		// 	var path = HelperFramework.GetPathLibrary();
+		// 	if (path == string.Empty)
+		// 		path = PATH_TO_TEMPLATE;
+		// 	else path = string.Format($"{path}/Editor/Templates/TmpFactory.txt");
+		//
+		// 	CreateFromTemplate("FactoryDefault.cs", path);
+		// }
 
 		public static void CreateFromTemplate(string name, string pathName)
 		{
