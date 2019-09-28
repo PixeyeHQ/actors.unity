@@ -82,7 +82,7 @@ namespace Pixeye.Actors
 			entity.age = age;
 
 			Initialize(id, age, pooled);
-			Transforms[id] = pooled ? Obj.Spawn(Pool.Entities, prefabID) : Obj.Spawn(prefabID);
+			Transforms[id] = pooled ? Obj.Spawn(Pool.Entities, prefabID, position) : Obj.Spawn(prefabID, position);
 
 			EntityOperations.Set(entity, -1, EntityOperations.Action.Activate);
 			return entity;
@@ -110,7 +110,7 @@ namespace Pixeye.Actors
 			entity.age = age;
 
 			Initialize(id, age, pooled);
-			Transforms[id] = pooled ? Obj.Spawn(Pool.Entities, prefabID) : Obj.Spawn(prefabID);
+			Transforms[id] = pooled ? Obj.Spawn(Pool.Entities, prefabID, position) : Obj.Spawn(prefabID, position);
 			model(entity);
 
 			EntityOperations.Set(entity, -1, EntityOperations.Action.Activate);
