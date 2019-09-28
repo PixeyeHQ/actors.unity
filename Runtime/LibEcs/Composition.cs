@@ -64,16 +64,16 @@ namespace Pixeye.Actors
 			return CanProceed(entityID) && !ExcludeTypes(entityID) && (includeTags.Length == 0 || IncludeTags(entityID)) & (excludeTags.Length == 0 || ExcludeTags(entityID));
 			#else
 			for (int ll = 0; ll < ids.Length; ll++)
-				if ((Entity.generations[entityID, generations[ll]] & ids[ll]) != ids[ll])
+				if ((Entity.Generations[entityID, generations[ll]] & ids[ll]) != ids[ll])
 				{
 					return false;
 				}
 
-			ref var components = ref Entity.components[entityID];
+			ref var components = ref Entity.entities[entityID];
 
-			for (int i = 0; i < components.amount; i++)
+			for (int i = 0; i < components.componentsAmount; i++)
 			{
-				if (excludeComponents[components.ids[i]])
+				if (excludeComponents[components.componentsIds[i]])
 				{
 					return false;
 				}

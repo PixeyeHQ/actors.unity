@@ -25,7 +25,7 @@ namespace Pixeye.Actors
 
 		public static bool tagsCheck
 		{
-			get { return EditorPrefs.GetBool("hba.data.tagsCheck", false); }
+			get { return EditorPrefs.GetBool("hba.data.tagsCheck", true); }
 			set { EditorPrefs.SetBool("hba.data.tagsCheck", value); }
 		}
 
