@@ -272,5 +272,34 @@ namespace Pixeye.Actors
 			EntityOperations.Set(entity, -1, EntityOperations.Action.Activate);
 			return entity;
 		}
+
+		public static ent CreateFor(string name)
+		{
+			int  id;
+			byte age = 0;
+
+			if (ent.entStack.length > 0)
+			{
+				var pop = ent.entStack.source[--ent.entStack.length];
+				id = pop.id;
+				unchecked
+				{
+					age = (byte) (pop.age + 1);
+				}
+			}
+			else
+				id = ent.lastID++;
+
+			ent entity;
+			entity.id  = id;
+			entity.age = age;
+
+			Initialize(id, age);
+
+			Transforms[id] = GameObject.Find(name).transform;
+			EntityOperations.Set(entity, -1, EntityOperations.Action.Activate);
+			return entity;
+		}
+		
 	}
 }
