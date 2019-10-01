@@ -226,5 +226,12 @@ namespace Pixeye.Actors
 		{
 			return obj.transform.Find(path).GetComponent<T>();
 		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static T Get<T>(this Behaviour obj)
+		{
+			return obj.GetComponent<T>();
+		}
+		
 	}
 }
