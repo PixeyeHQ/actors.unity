@@ -43,7 +43,7 @@ namespace Pixeye.Actors
 		{
 			if (len == operations.Length)
 				Array.Resize(ref operations, len << 1);
-
+ 	
 			ref var operation = ref operations[len++];
 			operation.entity = entity;
 			operation.arg    = arg;

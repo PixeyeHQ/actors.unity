@@ -37,7 +37,7 @@ namespace Pixeye.Actors
 		public bool Exist
 		{
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			get { return id > 0 && Entity.entities[id].componentsAmount > 0; }
+			get { return id > 0 && Entity.entities[id].age == age && Entity.entities[id].componentsAmount > 0; }
 		}
 
 		public ent(int value)
@@ -65,9 +65,10 @@ namespace Pixeye.Actors
 				return;
 			}
 			#endif
-
+		 
 			EntityOperations.Set(this, 0, EntityOperations.Action.Kill);
-		//	Entity.Count--;
+		  //id = 0; todo: think how to set id to zero from release.
+	
 		}
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public bool Equals(ent other)
