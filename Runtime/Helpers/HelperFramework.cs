@@ -668,7 +668,13 @@ namespace Pixeye.Actors
 			obj.GetComponentsInChildren(results);
 			return results;
 		}
-
+    public static List<T> GetAll<T>(this Transform obj, string path)
+    		{
+    			var results = new List<T>();
+    			obj.Find(path).GetComponentsInChildren(results);
+    			return results;
+    		}
+   
 		#endregion
 
 		#region EASE
