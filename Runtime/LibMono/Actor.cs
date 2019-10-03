@@ -119,7 +119,7 @@ namespace Pixeye.Actors
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		void IRequireStarter.Launch()
 		{
-			if (!entity.Exist)
+			if (!entity.exist)
 			{
 				Launch();
 			}

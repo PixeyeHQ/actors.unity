@@ -184,7 +184,7 @@ namespace Pixeye.Actors
 
 					case EntityOperations.Action.Empty:
 					{
-						if (operation.entity.Exist) continue;
+						if (operation.entity.exist) continue;
 
 						if (!Entity.entities[entityID].isNested && Entity.Transforms.Length > entityID && Entity.Transforms[entityID] != null)
 						{

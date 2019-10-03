@@ -59,7 +59,7 @@ namespace Pixeye.Actors
 		public void Release()
 		{
 			#if UNITY_EDITOR
-			if (!Exist)
+			if (!exist)
 			{
 				Framework.Debugger.Log(LogType.DESTROYED, this);
 				return;

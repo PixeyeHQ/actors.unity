@@ -238,7 +238,7 @@ namespace Pixeye.Actors
 
 			#if UNITY_EDITOR
 
-			if (!entity.Exist)
+			if (!entity.exist)
 			{
 				Framework.Debugger.Log(LogType.NOT_ACTIVE, entity, typeof(T).Name);
 				return ref Storage<T>.Get(id);
@@ -315,7 +315,7 @@ namespace Pixeye.Actors
 
 			#if UNITY_EDITOR
 
-			if (!entity.Exist)
+			if (!entity.exist)
 			{
 				Framework.Debugger.Log(LogType.NOT_ACTIVE, entity, typeof(T).Name);
 				return ref Storage<T>.Get(id);
@@ -371,7 +371,7 @@ namespace Pixeye.Actors
 
 			#if UNITY_EDITOR
 
-			if (!entity.Exist)
+			if (!entity.exist)
 			{
 				Framework.Debugger.Log(LogType.NOT_ACTIVE, entity, typeof(T).Name);
 				return;
@@ -416,7 +416,7 @@ namespace Pixeye.Actors
 		{
 			#if UNITY_EDITOR
 
-			if (!entity.Exist)
+			if (!entity.exist)
 			{
 				Framework.Debugger.Log(LogType.REMOVE_NON_EXISTANT, entity, typeof(T).Name);
 				return;
