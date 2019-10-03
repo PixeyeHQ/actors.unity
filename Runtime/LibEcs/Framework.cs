@@ -50,7 +50,7 @@ namespace Pixeye.Actors
 						Debug.LogError($"Entity <b>{contenxt[0]}</b> has reached tag capacity. Go to Tools->Actors->Tags->Size to increase cap. Current cap: <b>{contenxt[1]}</b> ");
 						break;
 					case DESTROYED:
-						Debug.LogError($"You are trying to release already destroyed entity with ID <b>{contenxt[0]}</b>");
+						Debug.LogError($"You are trying to release already destroyed entity with ID <b>{contenxt[0]}</b>, <b>{contenxt[1]}</b>");
 						break;
 				}
 			}

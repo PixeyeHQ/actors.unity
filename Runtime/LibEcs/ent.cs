@@ -61,7 +61,8 @@ namespace Pixeye.Actors
 			#if UNITY_EDITOR
 			if (!exist)
 			{
-				Framework.Debugger.Log(LogType.DESTROYED, this);
+      
+				Framework.Debugger.Log(LogType.DESTROYED, this, this.transform);
 				return;
 			}
 			#endif
