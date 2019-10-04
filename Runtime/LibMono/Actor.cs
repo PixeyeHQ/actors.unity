@@ -49,11 +49,11 @@ namespace Pixeye.Actors
 
 			if (ent.entStack.length > 0)
 			{
-				var pop = ent.entStack.source[--ent.entStack.length];
+				ref var pop = ref ent.entStack.source[--ent.entStack.length];
 				id = pop.id;
 				unchecked
 				{
-					age = (byte) (pop.age + 1);
+					age = (byte) (pop.age);
 				}
 			}
 			else
@@ -93,11 +93,11 @@ namespace Pixeye.Actors
 
 			if (ent.entStack.length > 0)
 			{
-				var pop = ent.entStack.source[--ent.entStack.length];
+				ref var pop = ref ent.entStack.source[--ent.entStack.length];
 				id = pop.id;
 				unchecked
 				{
-					age = (byte) (pop.age + 1);
+					age = (byte) (pop.age);
 				}
 			}
 			else

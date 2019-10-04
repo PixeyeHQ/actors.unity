@@ -108,6 +108,13 @@ namespace Pixeye.Actors
 
 						if (ent.entStack.length >= ent.entStack.source.Length)
 							Array.Resize(ref ent.entStack.source, ent.entStack.length << 1);
+						
+						unchecked
+						{
+					   operation.entity.age += 1;
+					   Entity.entities[entityID].age += 1;
+						}
+			 
 						ent.entStack.source[ent.entStack.length++] = operation.entity;
 
 
@@ -200,6 +207,14 @@ namespace Pixeye.Actors
 
 						if (ent.entStack.length >= ent.entStack.source.Length)
 							Array.Resize(ref ent.entStack.source, ent.entStack.length << 1);
+
+
+						unchecked
+						{
+							operation.entity.age += 1;
+							Entity.entities[entityID].age += 1;
+						}
+						
 						ent.entStack.source[ent.entStack.length++] = operation.entity;
 
 						Entity.alive.Remove(operation.entity);

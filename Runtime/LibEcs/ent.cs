@@ -37,7 +37,7 @@ namespace Pixeye.Actors
 		public bool exist
 		{
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			get { return id > 0 && Entity.entities[id].age == age && Entity.entities[id].componentsAmount > 0; }
+			get { return id > 0 && Entity.entities[id].age == age; }
 		}
 
 		public ent(int value)
