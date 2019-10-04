@@ -63,7 +63,7 @@ namespace Pixeye.Actors
 
 	public static class HelperWrapper
 	{
-		public static void ValueChange<TSource, TProp>(this TSource source, Func<TSource, TProp> propertySelector, Action<TProp> callback, ent e)
+		public static void ValueChange<TSource, TProp>(this TSource source, Func<TSource, TProp> propertySelector, Action<TProp> callback, ref ent e)
 		{
 			var w = new Wrap<TSource, TProp>();
 			w.source   = source;
@@ -82,8 +82,16 @@ namespace Pixeye.Actors
 			#else
 			w.comparer = Comparers.storage[typeof(TProp).GetHashCode()]  as IEqualityComparer<TProp>;
 			#endif
-
-			ref var cObserver = ref e.ComponentObserver();
+			  var cObserver = default(ComponentObserver);
+			if (!e.exist)
+			{
+				e = Entity.Create();
+				    cObserver =   e.Set<ComponentObserver>(); 
+			}
+			else
+			{
+				    cObserver =   e.ComponentObserver();
+			}
 
 			#if ACTORS_COMPONENTS_STRUCTS
 			if (cObserver.wrappers == null)

@@ -42,6 +42,7 @@ namespace Pixeye.Actors
 				}
 
 				component.length = 0;
+			 
 			}
 		}
 	}
