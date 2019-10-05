@@ -65,7 +65,7 @@ namespace Pixeye.Actors
 
 					case EntityOperations.Action.Kill:
 					{
-						if (!Entity.entities[entityID].isAlive) continue;
+					 
 						
 						ref var entityCache = ref Entity.entities[entityID];
 
@@ -126,7 +126,7 @@ namespace Pixeye.Actors
 					case EntityOperations.Action.Remove:
 					{
 						// important check
-						//if (!Entity.entities[entityID].isAlive) continue;
+					  if (!Entity.entities[entityID].isAlive) continue;
 						
 						var generation = Storage.Generations[operation.arg];
 						var mask       = Storage.Masks[operation.arg];
@@ -230,7 +230,8 @@ namespace Pixeye.Actors
 					{
 						// check if dead 
 						if (Entity.entities[entityID].componentsAmount == 0) continue;
-
+						if (!Entity.entities[entityID].isAlive) continue;
+						
 						var groups = Framework.Groups.ByTag.cache[operation.arg];
 
 						for (int l = 0; l < groups.length; l++)
