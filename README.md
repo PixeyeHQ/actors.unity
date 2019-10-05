@@ -79,15 +79,15 @@ If you don't use Unity for generating components, you can easily make a template
 	{
 	        // This is for performance. Adding new Component is much faster than new T();
 		public override ComponentHealth Create() => new ComponentHealth();
-		// Every time one or more components are removed from the entity the dispose method will run.
+		
+                // Every time one or more components are removed from the entity the dispose method will run.
                 // Use this method for cleanup and reverting settings of the component.
-		public override void Dispose()
+		public override void Dispose(indexes disposed)
 		{
-			for (int i = 0; i < disposedLen; i++)
+			foreach (var id in disposed)
 			{
-				ref var component = ref components[disposed[i]];
-				component.val = 0;
-				component.valMax = 100;
+				ref var component = ref components[id];
+                                component.val = 0;
 			}
 		}
 	}
