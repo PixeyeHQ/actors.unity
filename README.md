@@ -251,13 +251,10 @@ sealed class ProcessorMove : Processor, ITick
 	  	public void Tick(float delta)
 		{
 		        // iteration through group
-			for (int i = 0; i < groupMovables.length; i++)
+			foreach (ent entity in groupMovables)
 			{
-				ref var entity = ref groupMovables.entities[i];
-
 				var cMove     = entity.ComponentMove();
 				var cPosition = entity.ComponentPosition();
-
 				// do some logic
 			}
 		}
@@ -276,10 +273,8 @@ sealed class ProcessorMove : Processor<ComponentMove,ComponentPosition>, ITick
 	  	public void Tick(float delta)
 		{
 		        // iteration through group
-			for (int i = 0; i < source.length; i++)
+			foreach (ent entity in source)
 			{
-				ref var entity = ref source.entities[i];
-
 				var cMove     = entity.ComponentMove();
 				var cPosition = entity.ComponentPosition();
 
@@ -298,98 +293,38 @@ sealed class ProcessorMove : Processor, ITick
 	{
           // Define a group. The group is defined via Processor parent class
           Group<ComponentMove,ComponentPosition> groupMovables;
-	  
-          public ProcessorMove()
-	  {
-	  // register EventsForMovables for group. Choose events to work with.
-	  // sending this processor as param allows to use it from events class
-	  groupMovables.Set<EventsForMovables>(Op.Add | Op.Remove, this);
-	  }
- 
-	        // ITick interface Adds Tick method. It's an update with delta time.
-	  	public void Tick(float delta)
+	     
+	     // To work with events use method HandleEvents
+	        public override void HandleEvents()
 		{
-		        // iteration through group
-			for (int i = 0; i < groupMovables.length; i++)
+		         // work with all entities that were removed to the group on the current frame
+	                foreach (ent entity in groupMovables.removed)
 			{
-				ref var entity = ref groupMovables.entities[i];
-
-				var cMove     = entity.ComponentMove();
-				var cPosition = entity.ComponentPosition();
-
-				// do some logic
-			}
-		}
-		
-		class EventsForMovables : GroupEvents<ProcessorMove>
-		{
-                        public override void OnAdd(ent[] entities, int length)
-			{
-			   // work with all entities that were added to the group on the current frame
-			   for (int i = 0; i < length; i++)
-			   {
-			        ref var entity = ref entities[i];
-			   }
-			   // if you need a link to the Processor from the events  class use variable proc
-                           proc.DoStuff();
-			}
-			public override void OnRemove(ent[] entities, int length)
-                        {
-			   for (int i = 0; i < length; i++)
-			   {
-			        ref var entity = ref entities[i];
-			   }
+			
 			}
 			
+                        // work with all entities that were added to the group on the current frame
+			foreach (ent entity in groupMovables.added)
+			{
+			
+			}
                 }
-		
-	  
-        }
-```
-The code below shows how to add events to group from the processor.
 
-```csharp
-// Define a group from the processor. The group defined in this way called source.
- // register EventsForMovables for group. Choose events to work with.
-[WantEvent(Op.Add | Op.Remove)]
-sealed class ProcessorMove : Processor<ComponentMove,ComponentPosition>, ITick
-	{
+
 	        // ITick interface Adds Tick method. It's an update with delta time.
 	  	public void Tick(float delta)
 		{
 		        // iteration through group
-			for (int i = 0; i < source.length; i++)
+			foreach (ent entity in groupMovables)
 			{
-				ref var entity = ref source.entities[i];
-
 				var cMove     = entity.ComponentMove();
 				var cPosition = entity.ComponentPosition();
 
 				// do some logic
 			}
 		}
-	
-	                 public override void OnAdd(ent[] entities, int length)
-			{
-			   // work with all entities that were added to the group on the current frame
-			   for (int i = 0; i < length; i++)
-			   {
-			        ref var entity = ref entities[i];
-			   }
-			}
-			public override void OnRemove(ent[] entities, int length)
-                        {
-			   for (int i = 0; i < length; i++)
-			   {
-			        ref var entity = ref entities[i];
-			   }
-			}
         }
 ```
-
-```Tip. You can use Op.All instead of Op.Add | Op.Remove```
-
-
 
 ## Starters
 The Starter class is the entry point of a game scene. You define all your Processors and Scene dependecies there. How you define your processors matters for execution order.
