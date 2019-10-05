@@ -113,11 +113,11 @@ namespace Pixeye.Actors
 			entities[id].componentsAmount = 0;
 
 			var ptrCache = &entities[id];
-			ptrCache->age = age;
+			ptrCache->age      = age;
 			ptrCache->isNested = isNested;
 			ptrCache->isPooled = isPooled;
 			ptrCache->isDirty  = true;
-		 
+			ptrCache->isAlive  = true;
 
 			ent e;
 			e.id  = id;

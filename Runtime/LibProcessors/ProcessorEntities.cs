@@ -65,6 +65,8 @@ namespace Pixeye.Actors
 
 					case EntityOperations.Action.Kill:
 					{
+						if (!Entity.entities[entityID].isAlive) continue;
+						
 						ref var entityCache = ref Entity.entities[entityID];
 
 						for (int j = 0; j < entityCache.componentsAmount; j++)
@@ -116,14 +118,16 @@ namespace Pixeye.Actors
 						}
 			 
 						ent.entStack.source[ent.entStack.length++] = operation.entity;
-
-
+						
 						Entity.alive.Remove(operation.entity);
 						break;
 					}
 
 					case EntityOperations.Action.Remove:
 					{
+						// important check
+						//if (!Entity.entities[entityID].isAlive) continue;
+						
 						var generation = Storage.Generations[operation.arg];
 						var mask       = Storage.Masks[operation.arg];
 						var storage    = Storage.All[operation.arg];
@@ -183,6 +187,7 @@ namespace Pixeye.Actors
 
 						if (components.componentsAmount == 0)
 						{
+						 
 							EntityOperations.Set(operation.entity, 0, EntityOperations.Action.Empty);
 						}
 
@@ -216,7 +221,7 @@ namespace Pixeye.Actors
 						}
 						
 						ent.entStack.source[ent.entStack.length++] = operation.entity;
-
+						Entity.entities[entityID].isAlive = false;
 						Entity.alive.Remove(operation.entity);
 						break;
 					}

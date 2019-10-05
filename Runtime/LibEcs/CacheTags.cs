@@ -39,7 +39,7 @@ namespace Pixeye.Actors
 
 		public void Clear()
 		{
-			for (int i = 0; i < length; i++)
+			for (int i = 0; i < Capacity; i++)
 			{
 				tags[i] = 0;
 				size[i] = 0;

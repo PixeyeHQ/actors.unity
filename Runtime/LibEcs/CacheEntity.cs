@@ -17,8 +17,8 @@ namespace Pixeye.Actors
 		public bool isPooled;
 		public bool isNested;
 		public bool isDirty;
+		public bool isAlive;
 
-	 
 		public CacheEntity(int size)
 		{
 			componentsIds    = (ushort*) Marshal.AllocHGlobal(size * sizeof(ushort));
@@ -26,7 +26,8 @@ namespace Pixeye.Actors
 			isPooled         = false;
 			isNested         = false;
 			isDirty          = false;
-			age = 0;
+			isAlive          = false;
+			age              = 0;
 			componentsAmount = 0;
 		}
 
@@ -50,7 +51,7 @@ namespace Pixeye.Actors
 		{
 			var typeConverted = (ushort) type;
 
-			for (int i = componentsAmount-1; i >= 0; i--)
+			for (int i = componentsAmount - 1; i >= 0; i--)
 			{
 				if (componentsIds[i] == typeConverted)
 				{

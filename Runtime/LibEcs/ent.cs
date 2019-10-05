@@ -37,7 +37,7 @@ namespace Pixeye.Actors
 		public bool exist
 		{
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			get { return id > 0 && Entity.entities[id].age == age; }
+			get { return id > 0 && Entity.entities[id].isAlive && Entity.entities[id].age == age; }
 		}
 
 		public ent(int value)
@@ -61,15 +61,14 @@ namespace Pixeye.Actors
 			#if UNITY_EDITOR
 			if (!exist)
 			{
-      
-				Framework.Debugger.Log(LogType.DESTROYED, this, this.transform);
+				Framework.Debugger.Log(LogType.DESTROYED, this, transform);
 				return;
 			}
 			#endif
-		 
+
 			EntityOperations.Set(this, 0, EntityOperations.Action.Kill);
-		  //id = 0; todo: think how to set id to zero from release.
-	
+			Entity.entities[id].isAlive = false;
+			//id = 0; todo: think how to set id to zero from release.
 		}
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public bool Equals(ent other)
