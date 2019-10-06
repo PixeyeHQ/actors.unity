@@ -345,7 +345,7 @@ namespace Pixeye.Actors
 		{
 			if (Toolbox.applicationIsQuitting) return;
 
-			//	Entity.Count                = 0;
+	 
 			EntityOperations.len        = 0;
 			Framework.Processors.length = 0;
 
@@ -366,6 +366,7 @@ namespace Pixeye.Actors
 				entityCache.componentsAmount = 0;
 			}
 
+			Entity.alive.length = 0;
 			ent.entStack.length = 0;
 			ent.lastID          = 0;
 		}
