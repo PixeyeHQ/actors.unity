@@ -49,7 +49,7 @@ namespace Pixeye.Actors
 
 		internal int TryGetValue(int tagID)
 		{
-			return len == 0 ? -1 : HelperArray.BinarySearch(ref tagsID, tagID, 0, len);
+			return len == 0 ? -1 : HelperArray.BinarySearch(ref tagsID, tagID, 0, len-1);
 		}
 
 		internal void Add(int tagID, CacheGroup anotherGroupStorage)
