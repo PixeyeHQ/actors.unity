@@ -178,7 +178,7 @@ namespace Pixeye.Actors
 								group.TryRemove(entityID);
 							else
 							{
-								var inGroup = group.length == 0 ? -1 : HelperArray.BinarySearch(ref group.entities, entityID, 0, group.length);
+								var inGroup = group.length == 0 ? -1 : HelperArray.BinarySearch(ref group.entities, entityID, 0, group.length - 1);
 								if (inGroup == -1)
 									group.Insert(operation.entity);
 							}
@@ -238,11 +238,11 @@ namespace Pixeye.Actors
 						{
 							var group      = groups.Elements[l];
 							var canBeAdded = group.composition.Check(entityID);
-							var inGroup    = group.length == 0 ? -1 : HelperArray.BinarySearch(ref group.entities, entityID, 0, group.length);
-
+							var inGroup    = group.length == 0 ? -1 : HelperArray.BinarySearch(ref group.entities, entityID, 0, group.length-1);
+						 
 							if (inGroup == -1)
 							{
-								if (!canBeAdded) continue;
+							 	if (!canBeAdded) continue;
 								group.Insert(operation.entity);
 							}
 							else if (!canBeAdded)
@@ -345,7 +345,7 @@ namespace Pixeye.Actors
 		{
 			if (Toolbox.applicationIsQuitting) return;
 
-	 
+			//	Entity.Count                = 0;
 			EntityOperations.len        = 0;
 			Framework.Processors.length = 0;
 
@@ -361,12 +361,10 @@ namespace Pixeye.Actors
 
 				for (int ii = 0; ii < Framework.Settings.SizeGenerations; ii++)
 					Entity.Generations[entity.id, ii] = 0;
-				
-				entityCache.isAlive = false;
+
 				entityCache.componentsAmount = 0;
 			}
 
-			Entity.alive.length = 0;
 			ent.entStack.length = 0;
 			ent.lastID          = 0;
 		}
