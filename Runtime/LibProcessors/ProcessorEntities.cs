@@ -362,9 +362,11 @@ namespace Pixeye.Actors
 				for (int ii = 0; ii < Framework.Settings.SizeGenerations; ii++)
 					Entity.Generations[entity.id, ii] = 0;
 
+				entityCache.isAlive = false;
 				entityCache.componentsAmount = 0;
 			}
 
+			Entity.alive.length = 0;
 			ent.entStack.length = 0;
 			ent.lastID          = 0;
 		}
