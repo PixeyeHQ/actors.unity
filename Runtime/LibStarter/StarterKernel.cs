@@ -32,12 +32,12 @@ namespace Pixeye.Actors
 			yield return new WaitForSeconds(0.01f);
 			if (!hasFocus)
 			{
-				Time.Default.timeScaleCached = Time.Default.timeScale;
-				Time.Default.timeScale       = 0;
+				time.Default.timeScaleCached = time.Default.timeScale;
+				time.Default.timeScale       = 0;
 			}
 			else
 			{
-				Time.Default.timeScale = Time.Default.timeScaleCached;
+				time.Default.timeScale = time.Default.timeScaleCached;
 			}
 		}
 	}

@@ -11,7 +11,7 @@ namespace Pixeye.Actors
 	{
 		public static ProcessorUpdate Default;
 
-		internal static List<Time> times = new List<Time>();
+		internal static List<time> times = new List<time>();
 		internal static int timesLen = 0;
 
 		List<ITick> ticks = new List<ITick>(128);
@@ -31,7 +31,7 @@ namespace Pixeye.Actors
 
 		public int GetTicksCount()
 		{
-			return countTicks+ countTicksProc+ countTicksFixed+ countTicksLate;
+			return countTicks + countTicksProc + countTicksFixed + countTicksLate;
 		}
 
 		public static void AddTick(object updateble)
@@ -121,9 +121,7 @@ namespace Pixeye.Actors
 				Default.countTicksLate--;
 			}
 		}
-		
-		
-		
+
 
 		public static void Add(object updateble)
 		{
@@ -170,37 +168,39 @@ namespace Pixeye.Actors
 
 		void Update()
 		{
+			var delta = time.delta * time.Default.timeScale;
+
+ 
 			if (Toolbox.changingScene) return;
 
-
-			var delta = Time.delta * Time.Default.timeScale;
 
 			for (int i = 0; i < timesLen; i++)
 			{
 				times[i].Tick();
 			}
 
-			
-		 
+			routines.Default.Tick(delta);
+
+
 			for (var i = 0; i < countTicks; i++)
 			{
 				ticks[i].Tick(delta);
 			}
 
+
 			ProcessorEntities.Tick(delta);
-		
+
 			for (var i = 0; i < countTicksProc; i++)
 			{
 				ticksProc[i].Tick(delta);
 				ProcessorEntities.Tick(delta);
 			}
-	 
 		}
 
 		void FixedUpdate()
 		{
 			if (Toolbox.changingScene) return;
-			var delta = Time.deltaFixed;
+			var delta = time.deltaFixed;
 			for (var i = 0; i < countTicksFixed; i++)
 				ticksFixed[i].TickFixed(delta);
 		}
@@ -208,7 +208,7 @@ namespace Pixeye.Actors
 		void LateUpdate()
 		{
 			if (Toolbox.changingScene) return;
-			var delta = Time.delta;
+			var delta = time.delta;
 			for (var i = 0; i < countTicksLate; i++)
 				ticksLate[i].TickLate(delta);
 		}
@@ -219,7 +219,7 @@ namespace Pixeye.Actors
 			countTicks      = 0;
 			countTicksFixed = 0;
 			countTicksLate  = 0;
-			countTicksProc = 0;
+			countTicksProc  = 0;
 			ticks.RemoveAll(t => t is IKernel == false);
 
 			ticksFixed.Clear();

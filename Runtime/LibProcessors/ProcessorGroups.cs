@@ -6,7 +6,6 @@ using System.Reflection;
 using Unity.IL2CPP.CompilerServices;
 
 
-
 namespace Pixeye.Actors
 {
 	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
@@ -24,6 +23,7 @@ namespace Pixeye.Actors
 			#endif
 			var groupByProcAttribute      = Attribute.GetCustomAttribute(type, typeof(GroupByAttribute)) as GroupByAttribute;
 			var groupExcludeProcAttribute = Attribute.GetCustomAttribute(type, typeof(ExcludeAttribute)) as ExcludeAttribute;
+			var groupBindProcAttribute    = Attribute.GetCustomAttribute(type, typeof(BindAttribute)) as BindAttribute;
 
 
 			for (int i = 0; i < length; i++)
@@ -45,6 +45,8 @@ namespace Pixeye.Actors
 					// if group is located inside of the base processor use processor filtering 
 					var groupByAttribute      = inner != null ? groupByProcAttribute : Attribute.GetCustomAttribute(myFieldInfo, typeof(GroupByAttribute)) as GroupByAttribute;
 					var groupExcludeAttribute = inner != null ? groupExcludeProcAttribute : Attribute.GetCustomAttribute(myFieldInfo, typeof(ExcludeAttribute)) as ExcludeAttribute;
+					var bindAttribute         = inner != null ? groupBindProcAttribute : Attribute.GetCustomAttribute(myFieldInfo, typeof(BindAttribute)) as BindAttribute;
+
 
 					var includeTagsFilter = groupByAttribute != null ? groupByAttribute.filter : new int[0];
 					var excludeTagsFilter = new int[0];
@@ -67,6 +69,14 @@ namespace Pixeye.Actors
 					var group = SetupGroup(myFieldInfo.FieldType, composition, myFieldInfo.GetValue(b));
 					myFieldInfo.SetValue(b, group);
 
+					if (bindAttribute != null)
+					{
+						if (bindAttribute.id >= groups.globals.Length)
+							Array.Resize(ref groups.globals, bindAttribute.id + 5);
+
+						groups.globals[bindAttribute.id] = group;
+					}
+
 					#if ACTORS_EVENTS_MANUAL
 					if (groupEv != null)
 					{
@@ -79,7 +89,7 @@ namespace Pixeye.Actors
 
 		internal static GroupCore SetupGroup(Type groupType, Composition composition, object fieldObj)
 		{
-			if (Framework.Groups.All.TryGetValue(groupType, composition, out GroupCore group))
+			if (groups.All.TryGetValue(groupType, composition, out GroupCore group))
 			{
 				return group;
 			}
@@ -87,16 +97,16 @@ namespace Pixeye.Actors
 			if (fieldObj != null)
 			{
 				group = fieldObj as GroupCore;
-				return CreateGroup(groupType, composition);
+				return groups.All.Add(CreateGroup(groupType, composition));
 			}
 
-			return Framework.Groups.All.Add(CreateGroup(groupType, composition));
+			return groups.All.Add(CreateGroup(groupType, composition));
 		}
 
 		internal static GroupCore CreateGroup(Type groupType, Composition composition)
 		{
 			var gr = (Activator.CreateInstance(groupType, true) as GroupCore).Initialize(composition);
-			gr.id = Framework.Groups.All.length;
+			gr.id = groups.All.length;
 			return gr;
 		}
 	}

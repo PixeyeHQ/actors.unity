@@ -43,7 +43,10 @@ namespace Pixeye.Actors
 		void Awake()
 		{
 			if (ProcessorUpdate.Default == null)
+			{
 				ProcessorUpdate.Create();
+		 
+			}
 
 
 			if (!typesBinded)
@@ -195,13 +198,13 @@ namespace Pixeye.Actors
 			ProcessorScene.Default.OnSceneClose += Dispose;
 
 			// zero entity
-			Entity.Create();
+			entity.Create();
 
 
 			for (int i = 0; i < nodes.Count; i++)
 				nodes[i].Populate();
 
-	  
+
 			Add<ProcessorObserver>();
 
 
@@ -215,7 +218,7 @@ namespace Pixeye.Actors
 				obj.Launch();
 
 
-			Timer.Add(Time.deltaFixed, PostSetup);
+			Timer.Add(time.deltaFixed, PostSetup);
 		}
 
 		/// <summary>

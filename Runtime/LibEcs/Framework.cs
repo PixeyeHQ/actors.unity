@@ -9,13 +9,6 @@ namespace Pixeye.Actors
 {
 	public static class Framework
 	{
-		public static class Groups
-		{
-			internal static CacheGroup All = new CacheGroup();
-			internal static FamilyGroupTags ByTag = new FamilyGroupTags();
-			internal static FamilyGroupTags ByType = new FamilyGroupTags();
-		}
-
 		public static class Processors
 		{
 			internal static Processor[] storage = new Processor[64];
@@ -25,7 +18,12 @@ namespace Pixeye.Actors
 
 		public static void Cleanup()
 		{
-			Groups.All.Dispose();
+			groups.All.Dispose();
+
+			for (int i = 0; i < groups.globals.Length; i++)
+			{
+				groups.globals[i] = null;
+			}
 		}
 
 		public static class Debugger
@@ -57,6 +55,17 @@ namespace Pixeye.Actors
 		}
 
 		public static SettingsEngine Settings = new SettingsEngine();
+	}
+
+
+	public class groups
+	{
+		public GroupCore this[int index] => globals[index];
+
+		internal static GroupCore[] globals = new GroupCore[32];
+		internal static CacheGroup All = new CacheGroup();
+		internal static FamilyGroupTags ByTag = new FamilyGroupTags();
+		internal static FamilyGroupTags ByType = new FamilyGroupTags();
 	}
 
 	struct LogType

@@ -4,7 +4,7 @@ using UnityEngine;
 namespace Pixeye.Actors
 {
 	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
-	public static partial class Entity
+	public static partial class entity
 	{
 		public static ent Create()
 		{

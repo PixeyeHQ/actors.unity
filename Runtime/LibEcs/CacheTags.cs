@@ -162,25 +162,25 @@ namespace Pixeye.Actors
 	{
 		internal static void ClearAll()
 		{
-			for (int i = 0; i < Entity.lengthTotal; i++)
+			for (int i = 0; i < entity.lengthTotal; i++)
 			{
-				Entity.Tags[i].length = 0;
+				entity.Tags[i].length = 0;
 			}
 		}
 
 		public static void ClearTags(in this ent entity)
 		{
-			Entity.Tags[entity.id].Clear();
+			Actors.entity.Tags[entity.id].Clear();
 		}
 
 		public static int TagsAmount(in this ent entity, int tagID)
 		{
-			return Entity.Tags[entity.id].GetAmount(tagID);
+			return Actors.entity.Tags[entity.id].GetAmount(tagID);
 		}
 
 		public static void Add(in this ent entity, int tagID)
 		{
-			ref var buffer = ref Entity.Tags[entity.id];
+			ref var buffer = ref Actors.entity.Tags[entity.id];
 			int     len    = buffer.length;
 			var     tID    = (ushort) tagID;
 
@@ -211,7 +211,7 @@ namespace Pixeye.Actors
 
 		public static void Add(in this ent entity, params int[] tagsID)
 		{
-			ref var buffer = ref Entity.Tags[entity.id];
+			ref var buffer = ref Actors.entity.Tags[entity.id];
 			int     len    = buffer.length;
 
 			for (int i = 0; i < tagsID.Length; i++)
@@ -251,7 +251,7 @@ namespace Pixeye.Actors
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static void Set(in this ent entity, int tagID)
 		{
-			ref var buffer = ref Entity.Tags[entity.id];
+			ref var buffer = ref Actors.entity.Tags[entity.id];
 			int     len    = buffer.length;
 			var     tID    = (ushort) tagID;
 			for (int index = 0; index < len; index++)
@@ -281,7 +281,7 @@ namespace Pixeye.Actors
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static void Set(in this ent entity, params int[] tagsID)
 		{
-			ref var buffer = ref Entity.Tags[entity.id];
+			ref var buffer = ref Actors.entity.Tags[entity.id];
 
 			int len = buffer.length;
 
@@ -319,7 +319,7 @@ namespace Pixeye.Actors
 
 		public static void Remove(in this ent entity, int tagID)
 		{
-			ref var buffer = ref Entity.Tags[entity.id];
+			ref var buffer = ref Actors.entity.Tags[entity.id];
 			int     len    = buffer.length;
 			for (int index = 0; index < len; index++)
 			{
@@ -338,7 +338,7 @@ namespace Pixeye.Actors
 
 		public static void RemoveAll(in this ent entity, params int[] tagsID)
 		{
-			ref var buffer = ref Entity.Tags[entity.id];
+			ref var buffer = ref Actors.entity.Tags[entity.id];
 			var     len    = buffer.length;
 
 			for (int i = 0; i < tagsID.Length; i++)
@@ -359,7 +359,7 @@ namespace Pixeye.Actors
 
 		public static void RemoveAll(in this ent entity, int tagID)
 		{
-			ref var buffer = ref Entity.Tags[entity.id];
+			ref var buffer = ref Actors.entity.Tags[entity.id];
 			int     len    = buffer.length;
 			var     tID    = (ushort) tagID;
 
@@ -379,19 +379,19 @@ namespace Pixeye.Actors
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static bool Has(in this ent entity, int tagID)
 		{
-			return Entity.Tags[entity.id].Has(tagID);
+			return Actors.entity.Tags[entity.id].Has(tagID);
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static bool Has(in this ent entity, params int[] tagsID)
 		{
-			return Entity.Tags[entity.id].Has(tagsID);
+			return Actors.entity.Tags[entity.id].Has(tagsID);
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static bool HasAny(in this ent entity, params int[] tagsID)
 		{
-			return Entity.Tags[entity.id].HasAny(tagsID);
+			return Actors.entity.Tags[entity.id].HasAny(tagsID);
 		}
 
 		internal static void Add(GroupCore groupCore)
@@ -400,7 +400,7 @@ namespace Pixeye.Actors
 			var        composition = groupCore.composition;
 			foreach (var tagID in composition.includeTags)
 			{
-				if (Framework.Groups.ByTag.TryGetValue(tagID, out container))
+				if (groups.ByTag.TryGetValue(tagID, out container))
 				{
 					if (container.Contain(groupCore)) continue;
 
@@ -411,13 +411,13 @@ namespace Pixeye.Actors
 					container = new CacheGroup();
 
 					container.Add(groupCore);
-					Framework.Groups.ByTag.Add(tagID, container);
+					groups.ByTag.Add(tagID, container);
 				}
 			}
 
 			foreach (var tagID in composition.excludeTags)
 			{
-				if (Framework.Groups.ByTag.TryGetValue(tagID, out container))
+				if (groups.ByTag.TryGetValue(tagID, out container))
 				{
 					if (container.Contain(groupCore)) continue;
 					container.Add(groupCore);
@@ -426,7 +426,7 @@ namespace Pixeye.Actors
 				{
 					container = new CacheGroup();
 					container.Add(groupCore);
-					Framework.Groups.ByTag.Add(tagID, container);
+					groups.ByTag.Add(tagID, container);
 				}
 			}
 
@@ -436,7 +436,7 @@ namespace Pixeye.Actors
 				index++;
 				if (!typeID) continue;
 
-				if (Framework.Groups.ByType.TryGetValue(index, out container))
+				if (groups.ByType.TryGetValue(index, out container))
 				{
 					if (container.Contain(groupCore)) continue;
 					container.Add(groupCore);
@@ -445,7 +445,7 @@ namespace Pixeye.Actors
 				{
 					container = new CacheGroup();
 					container.Add(groupCore);
-					Framework.Groups.ByType.Add(index, container);
+					groups.ByType.Add(index, container);
 				}
 			}
 		}
@@ -454,7 +454,7 @@ namespace Pixeye.Actors
 		internal static void HandleChange(in ent entity, int tagID)
 		{
 			#if ACTORS_TAGS_CHECKS
-			var indexGroup = Framework.Groups.ByTag.TryGetValue(tagID);
+			var indexGroup = groups.ByTag.TryGetValue(tagID);
 			if (indexGroup == -1) return;
 			EntityOperations.Set(entity, indexGroup, EntityOperations.Action.ChangeTag);
 			#endif

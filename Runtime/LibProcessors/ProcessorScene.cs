@@ -115,6 +115,8 @@ namespace Pixeye.Actors
 
 		IEnumerator _Load(string name)
 		{
+ 
+		  routines.Default.StopAll();
 			ProcessorEntities.Clean();
 			OnSceneClose();
 			Toolbox.changingScene = true;
@@ -123,8 +125,15 @@ namespace Pixeye.Actors
 			if (scenes.Keys.Count == 1)
 			{
 				scenes.Clear();
-				SceneManager.LoadScene(name);
+				var jScene = SceneManager.LoadSceneAsync(name);
+				while (!jScene.isDone)
+				{
+					yield return 0;
+				}
+
 				SceneManager.SetActiveScene(SceneManager.GetSceneByName(name));
+				// SceneManager.LoadScene(name);
+				// SceneManager.SetActiveScene(SceneManager.GetSceneByName(name));
 				Toolbox.changingScene = false;
 				yield break;
 			}
@@ -173,6 +182,9 @@ namespace Pixeye.Actors
 
 		IEnumerator _Load(int id)
 		{
+
+
+			routines.Default.StopAll();
 			ProcessorEntities.Clean();
 			OnSceneClose();
 			Toolbox.changingScene = true;
@@ -181,7 +193,12 @@ namespace Pixeye.Actors
 			if (scenes.Keys.Count == 1)
 			{
 				scenes.Clear();
-				SceneManager.LoadScene(id);
+				
+				var jScene = SceneManager.LoadSceneAsync(id);
+				while (!jScene.isDone)
+				{
+					yield return 0;
+				}
 				SceneManager.SetActiveScene(SceneManager.GetSceneByBuildIndex(id));
 				Toolbox.changingScene = false;
 				yield break;

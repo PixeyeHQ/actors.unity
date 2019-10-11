@@ -12,7 +12,7 @@ using UnityEngine;
 namespace Pixeye.Actors
 {
 	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
-	public static unsafe partial class Entity
+	public static unsafe partial class entity
 	{
 		public const bool Pooled = true;
 
@@ -35,6 +35,8 @@ namespace Pixeye.Actors
 
 		internal static ents alive;
 
+ 
+		
 		//===============================//
 		// Initialize 
 		//===============================//
@@ -116,6 +118,7 @@ namespace Pixeye.Actors
 			ptrCache->age      = age;
 			ptrCache->isNested = isNested;
 			ptrCache->isPooled = isPooled;
+			// todo: need to refactor in future
 			ptrCache->isDirty  = true;
 			ptrCache->isAlive  = true;
 

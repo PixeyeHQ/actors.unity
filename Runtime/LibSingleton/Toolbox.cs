@@ -159,6 +159,7 @@ namespace Pixeye.Actors
 
 		protected override void OnApplicationQuit()
 		{
+			routines.Global.StopAll();
 			base.OnApplicationQuit();
 			OnDestroyAction();
 		}

@@ -47,7 +47,7 @@ namespace Pixeye.Actors
 			var               hasValue = cachedObjects.TryGetValue(key, out stack);
 			if (!hasValue) cachedObjects.Add(key, new Stack<GameObject>(amount));
 
-			Timer.Add(Time.delta * timeRate, Pop);
+			Timer.Add(time.delta * timeRate, Pop);
 
 			void Pop()
 			{
@@ -60,7 +60,7 @@ namespace Pixeye.Actors
 
 				if (amount > 0)
 				{
-					Timer.Add(Time.delta * timeRate, () => PopulateWith(prefab, amount, amountPerTick, timeRate));
+					Timer.Add(time.delta * timeRate, () => PopulateWith(prefab, amount, amountPerTick, timeRate));
 				}
 			}
 
