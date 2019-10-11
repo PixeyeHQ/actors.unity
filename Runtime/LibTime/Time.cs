@@ -25,7 +25,15 @@ namespace Pixeye.Actors
 
 		internal float timeScaleCached = 1.0f;
 
-		public static float scale => Default.timeScale;
+		public static float scale
+		{
+			get
+			{
+				return Default.timeScale;
+			}
+			set { Default.timeScale = value; }
+		}
+
 		/// <summary>
 		/// <para> The time in seconds it took to complete the last frame</para>
 		/// </summary>
