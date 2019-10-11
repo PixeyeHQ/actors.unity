@@ -17,7 +17,7 @@ namespace Pixeye.Actors
 		internal int currentIndex;
 		int length;
 
-		public CoroutineHandle Run(float delay, IEnumerator routine)
+		public coroutine Run(float delay, IEnumerator routine)
 		{
 			if (length == running.Length)
 			{
@@ -28,10 +28,10 @@ namespace Pixeye.Actors
 			running[length]  = routine;
 			delays[length++] = delay;
 
-			return new CoroutineHandle(this, routine);
+			return new coroutine(this, routine);
 		}
 
-		public CoroutineHandle Run(IEnumerator routine)
+		public coroutine Run(IEnumerator routine)
 		{
 			if (length == running.Length)
 			{
@@ -42,9 +42,9 @@ namespace Pixeye.Actors
 			running[length]  = routine;
 			delays[length++] = 0f;
 
-			return new CoroutineHandle(this, routine);
+			return new coroutine(this, routine);
 		}
-		public CoroutineHandle run(IEnumerator routine)
+		public coroutine run(IEnumerator routine)
 		{
 			return Run(0, routine);
 		}
@@ -68,7 +68,7 @@ namespace Pixeye.Actors
 		}
 
 
-		public bool Stop(CoroutineHandle routine)
+		public bool Stop(coroutine routine)
 		{
 			return routine.stop();
 		}
@@ -90,7 +90,7 @@ namespace Pixeye.Actors
 			return false;
 		}
 
-		public bool IsRunning(CoroutineHandle routine)
+		public bool IsRunning(coroutine routine)
 		{
 			return routine.isRunning;
 		}
@@ -138,14 +138,14 @@ namespace Pixeye.Actors
 		/// <summary>
 		/// Local coroutines that work only on main scene.
 		/// </summary>
-		public static CoroutineHandle run(float delay, IEnumerator routine)
+		public static coroutine run(float delay, IEnumerator routine)
 		{
 			return Default.Run(delay, routine);
 		}
 		/// <summary>
 		/// Local coroutines that work only on main scene.
 		/// </summary>
-		public static CoroutineHandle run(IEnumerator routine)
+		public static coroutine run(IEnumerator routine)
 		{
 			return Default.Run(0, routine);
 		}
@@ -168,11 +168,11 @@ namespace Pixeye.Actors
 		/// </summary>
 		public static class app
 		{
-			public static CoroutineHandle run(float delay, IEnumerator routine)
+			public static coroutine run(float delay, IEnumerator routine)
 			{
 				return Global.Run(delay, routine);
 			}
-			public static CoroutineHandle run(IEnumerator routine)
+			public static coroutine run(IEnumerator routine)
 			{
 				return Global.Run(0, routine);
 			}
@@ -200,7 +200,7 @@ namespace Pixeye.Actors
 	/// <summary>
 	/// A handle to a (potentially running) coroutine.
 	/// </summary>
-	public struct CoroutineHandle
+	public struct coroutine
 	{
 		/// <summary>
 		/// Reference to the routine's runner.
@@ -217,7 +217,7 @@ namespace Pixeye.Actors
 		/// </summary>
 		/// <param name="processorCoroutines">The routine's runner.</param>
 		/// <param name="enumerator">The routine's enumerator.</param>
-		public CoroutineHandle(ProcessorCoroutines processorCoroutines, IEnumerator enumerator)
+		public coroutine(ProcessorCoroutines processorCoroutines, IEnumerator enumerator)
 		{
 			this.processorCoroutines = processorCoroutines;
 			this.enumerator          = enumerator;
