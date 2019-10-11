@@ -25,6 +25,7 @@ namespace Pixeye.Actors
 
 		internal float timeScaleCached = 1.0f;
 
+		public static float scale => Default.timeScale;
 		/// <summary>
 		/// <para> The time in seconds it took to complete the last frame</para>
 		/// </summary>
