@@ -162,25 +162,25 @@ namespace Pixeye.Actors
 	{
 		internal static void ClearAll()
 		{
-			for (int i = 0; i < entity.lengthTotal; i++)
+			for (int i = 0; i < Entity.lengthTotal; i++)
 			{
-				entity.Tags[i].length = 0;
+				Entity.Tags[i].length = 0;
 			}
 		}
 
 		public static void ClearTags(in this ent entity)
 		{
-			Actors.entity.Tags[entity.id].Clear();
+			Actors.Entity.Tags[entity.id].Clear();
 		}
 
 		public static int TagsAmount(in this ent entity, int tagID)
 		{
-			return Actors.entity.Tags[entity.id].GetAmount(tagID);
+			return Actors.Entity.Tags[entity.id].GetAmount(tagID);
 		}
 
 		public static void Add(in this ent entity, int tagID)
 		{
-			ref var buffer = ref Actors.entity.Tags[entity.id];
+			ref var buffer = ref Actors.Entity.Tags[entity.id];
 			int     len    = buffer.length;
 			var     tID    = (ushort) tagID;
 
@@ -211,7 +211,7 @@ namespace Pixeye.Actors
 
 		public static void Add(in this ent entity, params int[] tagsID)
 		{
-			ref var buffer = ref Actors.entity.Tags[entity.id];
+			ref var buffer = ref Actors.Entity.Tags[entity.id];
 			int     len    = buffer.length;
 
 			for (int i = 0; i < tagsID.Length; i++)
@@ -251,7 +251,7 @@ namespace Pixeye.Actors
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static void Set(in this ent entity, int tagID)
 		{
-			ref var buffer = ref Actors.entity.Tags[entity.id];
+			ref var buffer = ref Actors.Entity.Tags[entity.id];
 			int     len    = buffer.length;
 			var     tID    = (ushort) tagID;
 			for (int index = 0; index < len; index++)
@@ -281,7 +281,7 @@ namespace Pixeye.Actors
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static void Set(in this ent entity, params int[] tagsID)
 		{
-			ref var buffer = ref Actors.entity.Tags[entity.id];
+			ref var buffer = ref Actors.Entity.Tags[entity.id];
 
 			int len = buffer.length;
 
@@ -319,7 +319,7 @@ namespace Pixeye.Actors
 
 		public static void Remove(in this ent entity, int tagID)
 		{
-			ref var buffer = ref Actors.entity.Tags[entity.id];
+			ref var buffer = ref Actors.Entity.Tags[entity.id];
 			int     len    = buffer.length;
 			for (int index = 0; index < len; index++)
 			{
@@ -338,7 +338,7 @@ namespace Pixeye.Actors
 
 		public static void RemoveAll(in this ent entity, params int[] tagsID)
 		{
-			ref var buffer = ref Actors.entity.Tags[entity.id];
+			ref var buffer = ref Actors.Entity.Tags[entity.id];
 			var     len    = buffer.length;
 
 			for (int i = 0; i < tagsID.Length; i++)
@@ -359,7 +359,7 @@ namespace Pixeye.Actors
 
 		public static void RemoveAll(in this ent entity, int tagID)
 		{
-			ref var buffer = ref Actors.entity.Tags[entity.id];
+			ref var buffer = ref Actors.Entity.Tags[entity.id];
 			int     len    = buffer.length;
 			var     tID    = (ushort) tagID;
 
@@ -379,19 +379,19 @@ namespace Pixeye.Actors
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static bool Has(in this ent entity, int tagID)
 		{
-			return Actors.entity.Tags[entity.id].Has(tagID);
+			return Actors.Entity.Tags[entity.id].Has(tagID);
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static bool Has(in this ent entity, params int[] tagsID)
 		{
-			return Actors.entity.Tags[entity.id].Has(tagsID);
+			return Actors.Entity.Tags[entity.id].Has(tagsID);
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static bool HasAny(in this ent entity, params int[] tagsID)
 		{
-			return Actors.entity.Tags[entity.id].HasAny(tagsID);
+			return Actors.Entity.Tags[entity.id].HasAny(tagsID);
 		}
 
 		internal static void Add(GroupCore groupCore)

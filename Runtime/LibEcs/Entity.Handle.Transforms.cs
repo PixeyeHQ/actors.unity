@@ -6,7 +6,7 @@ using UnityEngine;
 namespace Pixeye.Actors
 {
 	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
-	public static partial class entity
+	public static partial class Entity
 	{
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static Transform transform(this in ent entity, int index)
