@@ -10,5 +10,10 @@ namespace Pixeye.Actors
 		{
 			this.id = id;
 		}
+
+		public BindAttribute()
+		{
+			
+		}
 	}
 }
