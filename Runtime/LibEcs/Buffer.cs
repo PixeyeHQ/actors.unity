@@ -6,7 +6,7 @@ namespace Pixeye.Actors
 {
 	public class Buffer<T> : IEnumerable where T : struct
 	{
-		public static Buffer<T> Instance = new Buffer<T>(256);
+		public static Buffer<T> Instance;
 		public int length;
 
 		int[] queue;
