@@ -145,7 +145,7 @@ namespace Pixeye.Actors
 		/// <summary>
 		/// Local coroutines that work only on main scene.
 		/// </summary>
-		public static coroutine run(IEnumerator routine)
+		public static new coroutine run(IEnumerator routine)
 		{
 			return Default.Run(0, routine);
 		}
