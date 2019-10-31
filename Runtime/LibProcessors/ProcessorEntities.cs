@@ -309,9 +309,9 @@ namespace Pixeye.Actors
 					Framework.Processors.storage[i].HandleEvents();
 
 				#if ACTORS_EVENTS_MANUAL
-			for (int ii = 0; ii < Framework.Groups.All.length; ii++)
+			for (int ii = 0; ii < groups.All.length; ii++)
 			{
-				var nextGroup = Framework.Groups.All.Elements[ii];
+				var nextGroup = groups.All.Elements[ii];
 
 				if (nextGroup.hasEventRemove)
 					nextGroup.removed.length = 0;
