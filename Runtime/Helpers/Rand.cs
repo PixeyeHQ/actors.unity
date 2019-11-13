@@ -11,12 +11,12 @@ namespace Pixeye.Actors
 
 		public static float Get(float minimum, float maximum)
 		{
-			return (float) Source.NextDouble() * (maximum - minimum) + minimum;
+			return (float) (Source.NextDouble() * (maximum - minimum) + minimum);
 		}
 
 		public static int Get(int minimum, int maximum)
 		{
-			return (int) Source.NextDouble() * (maximum - minimum) + minimum;
+			return (int) (Source.NextDouble() * (maximum - minimum) + minimum);
 		}
 		
 		public static bool NextBool(int truePercentage = 50)
