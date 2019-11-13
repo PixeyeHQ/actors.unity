@@ -169,7 +169,7 @@ namespace Pixeye.Actors
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static T[] Slice<T>(this T[] source, Predicate<T> predicate, int end, int times, bool lastIsNull = false)
+		public static T[] SliceLastIsNull<T>(this T[] source, Predicate<T> predicate, int end, int times)
 		{
 			var start = -1;
 
@@ -189,10 +189,8 @@ namespace Pixeye.Actors
 			#endif
 
 			int len = (start + end - start)*times;
-			int count = len;
-			if (lastIsNull) count += 1;
 			// Return new array.
-			var res = new T[count];
+			var res = new T[len+1];
 			for (int i = 0; i < len; i++)
 			{
 				res[i] = source[i/times + start];
