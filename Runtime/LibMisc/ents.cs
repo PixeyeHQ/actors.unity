@@ -51,6 +51,18 @@ namespace Pixeye.Actors
 			source[length++] = entity;
 		}
 
+		[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
+		public void Add(params ent[] entity)
+		{
+			foreach (var e in entity)
+			{
+				if (length >= source.Length)
+					Array.Resize(ref source, length << 1);
+
+				source[length++] = e;
+			}
+		}
+
 
 		[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
 		public bool Remove(in ent entity)
@@ -176,7 +188,7 @@ namespace Pixeye.Actors
 
 		public void Clear()
 		{
-			source = new int[cap > 0 ? cap : 5];
+			source = new int[source.Length];
 			length = 0;
 		}
 
