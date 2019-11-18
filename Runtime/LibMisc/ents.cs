@@ -161,6 +161,20 @@ namespace Pixeye.Actors
 			source[length++] = id;
 		}
 
+		[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
+		public void Add(params int[] ids)
+		{
+			foreach (var id in ids)
+			{
+				if (length >= source.Length)
+					Array.Resize(ref source, length << 1);
+
+				source[length++] = id;
+			}
+			 
+		}
+		
+
 
 		[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
 		public bool Remove(int id)
