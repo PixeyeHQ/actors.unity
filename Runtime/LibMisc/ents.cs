@@ -173,7 +173,12 @@ namespace Pixeye.Actors
 			}
 			 
 		}
-		
+
+		public void Clear()
+		{
+			source = new int[cap > 0 ? cap : 5];
+			length = 0;
+		}
 
 
 		[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
