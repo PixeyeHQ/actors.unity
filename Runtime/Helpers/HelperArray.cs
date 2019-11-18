@@ -169,6 +169,37 @@ namespace Pixeye.Actors
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static T[] SliceFlip<T>(this T[] source, Predicate<T> predicate, int end, int times)
+		{
+			var start = -1;
+
+			for (int i = 0; i < source.Length; i++)
+			{
+				ref var val = ref source[i];
+				if (predicate(val))
+				{
+					start = i;
+					break;
+				}
+			}
+
+#if UNITY_EDITOR
+			if (start == -1)
+				throw new Exception($"Couldn't find object typeof {typeof(T)}");
+#endif
+
+			int len = (start + end - start)*times;
+
+			// Return new array.
+			var res = new T[len];
+			for (int i = 0; i < len; i++)
+			{
+				res[i] = source[(len-i)/times + start];
+			}
+			return res;
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static T[] SliceLastIsNull<T>(this T[] source, Predicate<T> predicate, int end, int times)
 		{
 			var start = -1;
