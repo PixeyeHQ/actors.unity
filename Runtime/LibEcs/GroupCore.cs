@@ -66,7 +66,7 @@ namespace Pixeye.Actors
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			get => ref entities[index];
 		}
-
+ 
 
 		public void Release(int index)
 		{
@@ -226,7 +226,6 @@ namespace Pixeye.Actors
 
 			if (i < --length)
 				Array.Copy(entities, i + 1, entities, i, length - i);
-			//Array.Copy(entities, i + 1, entities, i, --length - i);
 		}
 
 

@@ -55,11 +55,14 @@ namespace Pixeye.Actors
 
 		public void RemoveAt(int index)
 		{
-			for (int i = index; i < --length; ++i)
+			for (int i = index; i < length; ++i)
 			{
 				tags[i] = tags[i + 1];
 				size[i] = 1;
 			}
+
+		  length--;
+		  
 		}
 
 		public void SetElement(int index, int arg)
@@ -321,13 +324,15 @@ namespace Pixeye.Actors
 		{
 			ref var buffer = ref Actors.Entity.Tags[entity.id];
 			int     len    = buffer.length;
+			 
 			for (int index = 0; index < len; index++)
 			{
 				if (buffer.tags[index] == tagID)
 				{
 					if (--buffer.size[index] == 0)
 					{
-						buffer.RemoveAt(index);
+				 
+					    buffer.RemoveAt(index);
 						HandleChange(entity, tagID);
 					}
 

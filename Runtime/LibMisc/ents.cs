@@ -188,6 +188,7 @@ namespace Pixeye.Actors
 
 		public void Clear()
 		{
+			//source = new int[source.Length];
 			length = 0;
 		}
 

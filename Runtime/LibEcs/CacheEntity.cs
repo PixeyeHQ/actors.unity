@@ -55,9 +55,11 @@ namespace Pixeye.Actors
 			{
 				if (componentsIds[i] == typeConverted)
 				{
-					for (int j = i; j < --componentsAmount; ++j)
+					for (int j = i; j < componentsAmount; ++j)
 						componentsIds[j] = componentsIds[j + 1];
-
+				
+					componentsAmount--;
+					
 					break;
 				}
 			}

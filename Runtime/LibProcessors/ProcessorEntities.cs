@@ -239,7 +239,7 @@ namespace Pixeye.Actors
 							var group      = groups.Elements[l];
 							var canBeAdded = group.composition.Check(entityID);
 							var inGroup    = group.length == 0 ? -1 : HelperArray.BinarySearch(ref group.entities, entityID, 0, group.length-1);
-						 
+					 
 							if (inGroup == -1)
 							{
 							 	if (!canBeAdded) continue;
