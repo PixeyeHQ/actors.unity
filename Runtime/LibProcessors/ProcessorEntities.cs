@@ -210,11 +210,11 @@ namespace Pixeye.Actors
 
 						//Entity.Count--;
 
+						Entity.alive.Remove(operation.entity);
 
 						if (ent.entStack.length >= ent.entStack.source.Length)
 							Array.Resize(ref ent.entStack.source, ent.entStack.length << 1);
 
-						Entity.entities[entityID].isAlive = false;
 
 						unchecked
 						{
@@ -223,7 +223,7 @@ namespace Pixeye.Actors
 						}
 						
 						ent.entStack.source[ent.entStack.length++] = operation.entity;
-						Entity.alive.Remove(operation.entity);
+						Entity.entities[entityID].isAlive = false;
 						break;
 					}
 
