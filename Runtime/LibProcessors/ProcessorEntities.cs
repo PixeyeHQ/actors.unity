@@ -111,6 +111,8 @@ namespace Pixeye.Actors
 						if (ent.entStack.length >= ent.entStack.source.Length)
 							Array.Resize(ref ent.entStack.source, ent.entStack.length << 1);
 						
+						Entity.alive.Remove(operation.entity);
+						
 						unchecked
 						{
 					   operation.entity.age += 1;
@@ -119,7 +121,6 @@ namespace Pixeye.Actors
 			 
 						ent.entStack.source[ent.entStack.length++] = operation.entity;
 						
-						Entity.alive.Remove(operation.entity);
 						break;
 					}
 
@@ -196,7 +197,7 @@ namespace Pixeye.Actors
 
 					case EntityOperations.Action.Empty:
 					{
-						if (operation.entity.exist) continue;
+						//if (operation.entity.exist) continue;
 
 						if (!Entity.entities[entityID].isNested && Entity.Transforms.Length > entityID && Entity.Transforms[entityID] != null)
 						{
@@ -213,6 +214,7 @@ namespace Pixeye.Actors
 						if (ent.entStack.length >= ent.entStack.source.Length)
 							Array.Resize(ref ent.entStack.source, ent.entStack.length << 1);
 
+						Entity.entities[entityID].isAlive = false;
 
 						unchecked
 						{
@@ -221,7 +223,6 @@ namespace Pixeye.Actors
 						}
 						
 						ent.entStack.source[ent.entStack.length++] = operation.entity;
-						Entity.entities[entityID].isAlive = false;
 						Entity.alive.Remove(operation.entity);
 						break;
 					}
