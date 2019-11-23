@@ -196,8 +196,7 @@ namespace Pixeye.Actors
 
 					case EntityOperations.Action.Empty:
 					{
-						// Сущность не уничтожалась, если у нее не было компонентов
-						//if (operation.entity.exist) continue;
+						if (operation.entity.exist) continue;
 
 						if (!Entity.entities[entityID].isNested && Entity.Transforms.Length > entityID && Entity.Transforms[entityID] != null)
 						{
