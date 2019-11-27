@@ -74,40 +74,10 @@ namespace Pixeye.Actors
 
 			return ref elements[pointers[index]];
 		}
-
-
-		// int indexLast;
-		// int offset;
-	 //  int offsetBase;
-		// /// <summary>
-		// /// Can be used to safely remove elements by index. Don't use it inside loops. Use Remove instead.
-		// /// </summary>
-		// /// <param name="index"></param>
-		// public void RemoveAt(int index)
-		// {
-
-		//
-		// 	queue[queueIndex++] = pointers[index];
-		//
-		// 	if (index < --length)
-		// 	{
-		// 		Array.Copy(pointers, index + 1, pointers, index, length - index);
-		// 	}
-		// }
-
+ 
 		public void RemoveAt(int index)
 		{
-			// if (index - indexLast > 0)
-			// {
-			// 	indexLast =  index;
-			// 	index     -= ++offset;
-			// }
-			// else
-			// {
-			// 	indexLast = index;
-			// 	offset    = 0;
-			// }
-
+	 
 			queue[queueIndex++] = pointers[index];
 
 			if (index < --length)
