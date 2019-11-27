@@ -85,6 +85,12 @@ namespace Pixeye.Actors
 			return removed;
 		}
 
+		[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
+		public void RemoveAt(int index)
+		{
+			Array.Copy(source, index + 1, source, index, --length - index);
+		}
+
 
 		#region ENUMERATOR
 
