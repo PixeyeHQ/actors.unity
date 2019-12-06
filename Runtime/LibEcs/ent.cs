@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace Pixeye.Actors
 {
-	[StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Unicode)]
+	[StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
 	public unsafe struct ent
 	{
 		//===============================//
