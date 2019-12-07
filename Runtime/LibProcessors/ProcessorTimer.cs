@@ -39,9 +39,11 @@ namespace Pixeye.Source
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal void RemoveAt(int index)
 		{
+			if (length == 0) return;
 			--length;
 			for (int i = index; i < length; ++i)
 				SetElement(i, ref source[i + 1]);
+			 
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -55,7 +57,7 @@ namespace Pixeye.Source
 		{
 			if (length >= source.Length)
 				Array.Resize(ref source, length << 1);
-
+	 
 			var index = length++;
 			Timer timer;
 			timer.action = action;
@@ -86,6 +88,7 @@ namespace Pixeye.Source
 				source[i].action = null;
 			}
 			length = 0;
+ 
 		}
 
 	}

@@ -81,10 +81,10 @@ namespace Pixeye.Actors
 		public static void AddProc(object updateble)
 		{
 			var tickable = updateble as ITick;
+		
 			if (tickable != null)
 			{
 				Default.ticksProc.Add(tickable);
-
 				Default.countTicksProc++;
 			}
 

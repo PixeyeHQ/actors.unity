@@ -116,7 +116,10 @@ namespace Pixeye.Actors
 
         IEnumerator _Load(int id)
         {
-            IEnumerator load = _Load(SceneManager.GetSceneByBuildIndex(id).name);
+	        string pathToScene = SceneUtility.GetScenePathByBuildIndex(0);
+	        string sceneName   = System.IO.Path.GetFileNameWithoutExtension(pathToScene);
+	        
+            IEnumerator load = _Load(sceneName);
 
             while (load.MoveNext())
                 yield return 0;

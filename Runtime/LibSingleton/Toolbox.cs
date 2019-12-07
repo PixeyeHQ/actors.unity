@@ -121,13 +121,13 @@ namespace Pixeye.Actors
 			}
 
 			Instance.StopAllCoroutines();
+			ProcessorTimer.Default.Dispose();
 
 
 			Box.Default.Dispose();
 			Pool.Dispose();
 			Storage.DisposeSelf();
 			Framework.Cleanup();
-			ProcessorTimer.Default.Dispose();
 			ProcessorScene.Default.Dispose();
 			ProcessorUpdate.Default.Dispose();
 
