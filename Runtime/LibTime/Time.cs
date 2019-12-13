@@ -57,7 +57,7 @@ namespace Pixeye.Actors
 		public void Tick()
 		{
 			deltaTime      =  UnityEngine.Time.deltaTime * timeScale;
-			deltaTimeFixed *= timeScale;
+			deltaTimeFixed = 1 / fps * timeScale;
 		}
 	}
 }
