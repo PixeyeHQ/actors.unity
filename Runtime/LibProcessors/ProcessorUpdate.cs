@@ -7,233 +7,239 @@ using UnityEngine;
 
 namespace Pixeye.Actors
 {
-	public sealed class ProcessorUpdate : MonoBehaviour, IDisposable, IKernel
-	{
-		public static ProcessorUpdate Default;
+  public sealed class ProcessorUpdate : MonoBehaviour, IDisposable, IKernel
+  {
+    public static ProcessorUpdate Default;
 
-		internal static List<time> times = new List<time>();
-		internal static int timesLen = 0;
+    internal static List<time> times = new List<time>();
+    internal static int timesLen = 0;
 
-		List<ITick> ticks = new List<ITick>(128);
-		List<ITick> ticksProc = new List<ITick>(64);
-		List<ITickFixed> ticksFixed = new List<ITickFixed>();
-		List<ITickLate> ticksLate = new List<ITickLate>();
+    List<ITick> ticks = new List<ITick>(128);
+    List<ITick> ticksProc = new List<ITick>(64);
+    List<ITickFixed> ticksFixed = new List<ITickFixed>();
+    List<ITickLate> ticksLate = new List<ITickLate>();
 
-		int countTicksProc;
-		int countTicks;
-		int countTicksFixed;
-		int countTicksLate;
+    int countTicksProc;
+    int countTicks;
+    int countTicksFixed;
+    int countTicksLate;
 
-		void Awake()
-		{
-			Default = this;
-		}
+    void Awake()
+    {
+      Default = this;
+    }
 
-		public int GetTicksCount()
-		{
-			return countTicks + countTicksProc + countTicksFixed + countTicksLate;
-		}
+    public int GetTicksCount()
+    {
+      return countTicks + countTicksProc + countTicksFixed + countTicksLate;
+    }
 
-		public static void AddTick(object updateble)
-		{
-			Default.ticks.Add(updateble as ITick);
-			Default.countTicks++;
-		}
+    public static void AddTick(object updateble)
+    {
+      Default.ticks.Add(updateble as ITick);
+      Default.countTicks++;
+    }
 
-		public static void RemoveTick(object updateble)
-		{
-			if (Default.ticks.Remove(updateble as ITick))
-			{
-				Default.countTicks--;
-			}
-		}
-
-
-		public static void AddTickFixed(object updateble)
-		{
-			Default.ticksFixed.Add(updateble as ITickFixed);
-			Default.countTicksFixed++;
-		}
-
-		public static void RemoveTickFixed(object updateble)
-		{
-			if (Default.ticksFixed.Remove(updateble as ITickFixed))
-			{
-				Default.countTicksFixed--;
-			}
-		}
+    public static void RemoveTick(object updateble)
+    {
+      if (Default.ticks.Remove(updateble as ITick))
+      {
+        Default.countTicks--;
+      }
+    }
 
 
-		public static void AddTickLate(object updateble)
-		{
-			Default.ticksLate.Add(updateble as ITickLate);
-			Default.countTicksLate++;
-		}
+    public static void AddTickFixed(object updateble)
+    {
+      Default.ticksFixed.Add(updateble as ITickFixed);
+      Default.countTicksFixed++;
+    }
 
-		public static void RemoveTickLate(object updateble)
-		{
-			if (Default.ticksLate.Remove(updateble as ITickLate))
-			{
-				Default.countTicksLate--;
-			}
-		}
-
-		public static void AddProc(object updateble)
-		{
-			var tickable = updateble as ITick;
-		
-			if (tickable != null)
-			{
-				Default.ticksProc.Add(tickable);
-				Default.countTicksProc++;
-			}
-
-			var tickableFixed = updateble as ITickFixed;
-			if (tickableFixed != null)
-			{
-				Default.ticksFixed.Add(tickableFixed);
-				Default.countTicksFixed++;
-			}
-
-			var tickableLate = updateble as ITickLate;
-			if (tickableLate != null)
-			{
-				Default.ticksLate.Add(tickableLate);
-				Default.countTicksLate++;
-			}
-		}
+    public static void RemoveTickFixed(object updateble)
+    {
+      if (Default.ticksFixed.Remove(updateble as ITickFixed))
+      {
+        Default.countTicksFixed--;
+      }
+    }
 
 
-		public static void RemoveProc(object updateble)
-		{
-			if (Default.ticksProc.Remove(updateble as ITick))
-			{
-				Default.countTicksProc--;
-			}
+    public static void AddTickLate(object updateble)
+    {
+      Default.ticksLate.Add(updateble as ITickLate);
+      Default.countTicksLate++;
+    }
 
-			if (Default.ticksFixed.Remove(updateble as ITickFixed))
-			{
-				Default.countTicksFixed--;
-			}
+    public static void RemoveTickLate(object updateble)
+    {
+      if (Default.ticksLate.Remove(updateble as ITickLate))
+      {
+        Default.countTicksLate--;
+      }
+    }
 
-			if (Default.ticksLate.Remove(updateble as ITickLate))
-			{
-				Default.countTicksLate--;
-			}
-		}
+    public static void AddProc(object updateble)
+    {
+      var tickable = updateble as ITick;
 
+      if (tickable != null)
+      {
+        Default.ticksProc.Add(tickable);
+        Default.countTicksProc++;
+      }
 
-		public static void Add(object updateble)
-		{
-			var tickable = updateble as ITick;
-			if (tickable != null)
-			{
-				Default.ticks.Add(tickable);
+      var tickableFixed = updateble as ITickFixed;
+      if (tickableFixed != null)
+      {
+        Default.ticksFixed.Add(tickableFixed);
+        Default.countTicksFixed++;
+      }
 
-				Default.countTicks++;
-			}
-
-			var tickableFixed = updateble as ITickFixed;
-			if (tickableFixed != null)
-			{
-				Default.ticksFixed.Add(tickableFixed);
-				Default.countTicksFixed++;
-			}
-
-			var tickableLate = updateble as ITickLate;
-			if (tickableLate != null)
-			{
-				Default.ticksLate.Add(tickableLate);
-				Default.countTicksLate++;
-			}
-		}
-
-		public static void Remove(object updateble)
-		{
-			if (Default.ticks.Remove(updateble as ITick))
-			{
-				Default.countTicks--;
-			}
-
-			if (Default.ticksFixed.Remove(updateble as ITickFixed))
-			{
-				Default.countTicksFixed--;
-			}
-
-			if (Default.ticksLate.Remove(updateble as ITickLate))
-			{
-				Default.countTicksLate--;
-			}
-		}
-
-		void Update()
-		{
-			var delta = time.delta * time.Default.timeScale;
-
- 
-			if (Toolbox.changingScene) return;
+      var tickableLate = updateble as ITickLate;
+      if (tickableLate != null)
+      {
+        Default.ticksLate.Add(tickableLate);
+        Default.countTicksLate++;
+      }
+    }
 
 
-			for (int i = 0; i < timesLen; i++)
-			{
-				times[i].Tick();
-			}
+    public static void RemoveProc(object updateble)
+    {
+      if (Default.ticksProc.Remove(updateble as ITick))
+      {
+        Default.countTicksProc--;
+      }
 
-			routines.Default.Tick(delta);
+      if (Default.ticksFixed.Remove(updateble as ITickFixed))
+      {
+        Default.countTicksFixed--;
+      }
 
-
-			for (var i = 0; i < countTicks; i++)
-			{
-				ticks[i].Tick(delta);
-			}
-
-
-			ProcessorEntities.Tick(delta);
-
-			for (var i = 0; i < countTicksProc; i++)
-			{
-				ticksProc[i].Tick(delta);
-				ProcessorEntities.Tick(delta);
-			}
-		}
-
-		void FixedUpdate()
-		{
-			if (Toolbox.changingScene) return;
-			var delta = time.deltaFixed;
-			for (var i = 0; i < countTicksFixed; i++)
-				ticksFixed[i].TickFixed(delta);
-		}
-
-		void LateUpdate()
-		{
-			if (Toolbox.changingScene) return;
-			var delta = time.delta;
-			for (var i = 0; i < countTicksLate; i++)
-				ticksLate[i].TickLate(delta);
-		}
+      if (Default.ticksLate.Remove(updateble as ITickLate))
+      {
+        Default.countTicksLate--;
+      }
+    }
 
 
-		public void Dispose()
-		{
-			countTicks      = 0;
-			countTicksFixed = 0;
-			countTicksLate  = 0;
-			countTicksProc  = 0;
-			ticks.RemoveAll(t => t is IKernel == false);
+    public static void Add(object updateble)
+    {
+      var tickable = updateble as ITick;
+      if (tickable != null)
+      {
+        Default.ticks.Add(tickable);
 
-			ticksFixed.Clear();
-			ticksLate.Clear();
-			ticksProc.Clear();
+        Default.countTicks++;
+      }
 
-			countTicks = ticks.Count;
-		}
+      var tickableFixed = updateble as ITickFixed;
+      if (tickableFixed != null)
+      {
+        Default.ticksFixed.Add(tickableFixed);
+        Default.countTicksFixed++;
+      }
 
-		public static void Create()
-		{
-			var obj = new GameObject("ActorsUpdate");
-			DontDestroyOnLoad(obj);
-			Default = obj.AddComponent<ProcessorUpdate>();
-		}
-	}
+      var tickableLate = updateble as ITickLate;
+      if (tickableLate != null)
+      {
+        Default.ticksLate.Add(tickableLate);
+        Default.countTicksLate++;
+      }
+    }
+
+    public static void Remove(object updateble)
+    {
+      if (Default.ticks.Remove(updateble as ITick))
+      {
+        Default.countTicks--;
+      }
+
+      if (Default.ticksFixed.Remove(updateble as ITickFixed))
+      {
+        Default.countTicksFixed--;
+      }
+
+      if (Default.ticksLate.Remove(updateble as ITickLate))
+      {
+        Default.countTicksLate--;
+      }
+    }
+
+    void Update()
+    {
+      var delta = time.delta * time.Default.timeScale;
+
+
+      if (Toolbox.changingScene) return;
+
+
+      for (int i = 0; i < timesLen; i++)
+      {
+        times[i].Tick();
+      }
+
+      routines.Default.Tick(delta);
+
+
+      for (var i = 0; i < countTicks; i++)
+      {
+        ticks[i].Tick(delta);
+      }
+
+
+      ProcessorEntities.Tick(delta);
+
+      for (var i = 0; i < countTicksProc; i++)
+      {
+        ticksProc[i].Tick(delta);
+        ProcessorEntities.Tick(delta);
+      }
+    }
+
+    void FixedUpdate()
+    {
+      if (Toolbox.changingScene) return;
+      var delta = time.deltaFixed;
+      for (var i = 0; i < countTicksFixed; i++)
+      {
+        ticksFixed[i].TickFixed(delta);
+        ProcessorEntities.Tick(delta);
+      }
+    }
+
+    void LateUpdate()
+    {
+      if (Toolbox.changingScene) return;
+      var delta = time.delta;
+      for (var i = 0; i < countTicksLate; i++)
+      {
+        ticksLate[i].TickLate(delta);
+        ProcessorEntities.Tick(delta);
+      }
+    }
+
+
+    public void Dispose()
+    {
+      countTicks      = 0;
+      countTicksFixed = 0;
+      countTicksLate  = 0;
+      countTicksProc  = 0;
+      ticks.RemoveAll(t => t is IKernel == false);
+
+      ticksFixed.Clear();
+      ticksLate.Clear();
+      ticksProc.Clear();
+
+      countTicks = ticks.Count;
+    }
+
+    public static void Create()
+    {
+      var obj = new GameObject("ActorsUpdate");
+      DontDestroyOnLoad(obj);
+      Default = obj.AddComponent<ProcessorUpdate>();
+    }
+  }
 }
