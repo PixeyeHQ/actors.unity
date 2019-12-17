@@ -19,14 +19,14 @@ namespace Pixeye.Actors
 		
 		void Awake()
 		{
-			if (Starter.initialized == false) return;
+			if (!Starter.initialized || Toolbox.changingScene) return;
 			Setup();
 		}
 
 
 		void OnEnable()
 		{
-			if (Starter.initialized == false) return;
+			if (!Starter.initialized || Toolbox.changingScene) return;
 			HandleEnable();
 		}
 
@@ -39,7 +39,7 @@ namespace Pixeye.Actors
 		public void Launch()
 		{
 			Setup();
-			OnEnable();
+			HandleEnable();
 		}
 
 
