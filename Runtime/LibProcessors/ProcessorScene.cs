@@ -252,13 +252,10 @@ namespace Pixeye.Actors
 
 				foreach (var tr in transforms)
 				{
-					var o = tr.GetComponent("MonoBehaviour");
-
-					if (o != null)
+					var oo = tr.GetComponents<IRequireStarter>();
+					foreach (var o in oo)
 					{
-						var req = o as IRequireStarter;
-						if (req != null)
-							req.Launch();
+						o.Launch();
 					}
 				}
 			}
