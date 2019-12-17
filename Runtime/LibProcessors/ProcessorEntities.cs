@@ -34,8 +34,6 @@ namespace Pixeye.Actors
 				ref var operation = ref EntityOperations.operations[i];
 				var     entityID  = operation.entity.id;
 
-				if (Toolbox.changingScene) break;
-
 
 				switch (operation.action)
 				{
