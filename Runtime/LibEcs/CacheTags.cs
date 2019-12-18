@@ -58,7 +58,7 @@ namespace Pixeye.Actors
 			for (int i = index; i < length; ++i)
 			{
 				tags[i] = tags[i + 1];
-				size[i] = 1;
+				size[i] = size[i + 1];
 			}
 
 		  length--;
@@ -173,7 +173,17 @@ namespace Pixeye.Actors
 
 		public static void ClearTags(in this ent entity)
 		{
-			Actors.Entity.Tags[entity.id].Clear();
+      		ref var buffer = ref Actors.Entity.Tags[entity.id];
+      		var     len    = buffer.length;
+
+      		for (int i = 0; i < len; i++)
+      		{
+      		  var tID = (ushort) buffer.tags[i];
+      		  buffer.size[i] = 0;
+      		  buffer.tags[i] = 0;
+      		  buffer.length--;
+      		  HandleChange(entity, tID);
+      		}
 		}
 
 		public static int TagsAmount(in this ent entity, int tagID)
