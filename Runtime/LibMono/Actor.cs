@@ -29,6 +29,11 @@ namespace Pixeye.Actors
 		[FoldoutGroup("Main")]
 		public ScriptableBuild buildFrom;
 
+		void Awake()
+		{
+			if (!Starter.initialized || Toolbox.changingScene) return;
+			Setup();
+		}
 
 		/// <summary>
 		/// Initialize entity here.
