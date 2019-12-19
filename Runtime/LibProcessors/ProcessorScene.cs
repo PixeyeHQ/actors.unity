@@ -253,6 +253,7 @@ namespace Pixeye.Actors
 				foreach (var tr in transforms)
 				{
     			    var oo = tr.GetComponents<MonoBehaviour>();
+					if(!tr.gameObject.activeInHierarchy) continue;
     			    foreach (var o in oo)
     			    {
     			      var req = o as IRequireStarter;
