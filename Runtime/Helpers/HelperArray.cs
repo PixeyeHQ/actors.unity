@@ -194,7 +194,7 @@ namespace Pixeye.Actors
 			var res = new T[len];
 			for (int i = 0; i < len; i++)
 			{
-				res[i] = source[(len-i)/times + start];
+				res[i] = source[(len-i)/times + start-1];
 			}
 			return res;
 		}
