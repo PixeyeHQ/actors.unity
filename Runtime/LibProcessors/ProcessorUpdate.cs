@@ -178,10 +178,7 @@ namespace Pixeye.Actors
       {
         times[i].Tick();
       }
-
-      routines.Default.Tick(delta);
-
-
+ 
       for (var i = 0; i < countTicks; i++)
       {
         ticks[i].Tick(delta);
@@ -195,6 +192,8 @@ namespace Pixeye.Actors
         ticksProc[i].Tick(delta);
         ProcessorEntities.Tick(delta);
       }
+
+      routines.Default.Tick(delta);
     }
 
     void FixedUpdate()
