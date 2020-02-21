@@ -1,6 +1,8 @@
 //  Project  : ACTORS
 //  Contacts : Pixeye - ask@pixeye.games
 
+using UnityEngine;
+
 namespace Pixeye.Actors
 {
   public class time : IKernel
@@ -12,7 +14,8 @@ namespace Pixeye.Actors
     /// </summary>
     internal static time Default = new time();
     public static int frame => UnityEngine.Time.frameCount;
-
+    public static float fromStart => Time.time;
+    
 
     /// <summary>
     ///   <para> The scale at which the time is passing. This can be used for slow motion effects.</para>
