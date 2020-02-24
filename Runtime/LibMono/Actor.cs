@@ -42,7 +42,7 @@ namespace Pixeye.Actors
 		// Launch methods
 		//===============================//
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		internal void Launch()
+		public void Launch()
 		{
 			int  id;
 			byte age = 0;
@@ -86,7 +86,7 @@ namespace Pixeye.Actors
 			}
 		}
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		internal void Launch(ModelComposer model)
+		public void Launch(ModelComposer model)
 		{
 			int  id;
 			byte age = 0;
