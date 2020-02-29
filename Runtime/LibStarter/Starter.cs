@@ -40,6 +40,11 @@ namespace Pixeye.Actors
 		[FoldoutGroup("Pool Cache")]
 		public List<PoolNode> nodes = new List<PoolNode>();
 
+		protected virtual void OnAwake()
+		{
+			
+		}
+		
 		void Awake()
 		{
 			if (ProcessorUpdate.Default == null)
@@ -48,6 +53,7 @@ namespace Pixeye.Actors
 		 
 			}
 
+			OnAwake();
 
 			if (!typesBinded)
 			{
