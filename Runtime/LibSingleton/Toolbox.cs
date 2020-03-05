@@ -13,6 +13,8 @@ namespace Pixeye.Actors
 	/// </summary>
 	/// 
 	
+	
+	
 	// todo: redesign class.
 	public class Toolbox : Singleton<Toolbox>
 	{
@@ -25,7 +27,6 @@ namespace Pixeye.Actors
 		}
 		public static List<IDisposable> disposables = new List<IDisposable>(64);
 		public static Action OnDestroyAction = delegate { };
-		public static SceneCoroutine SceneCoroutine = Instance.gameObject.AddComponent<SceneCoroutine>();
 
 
 		/// <summary>
