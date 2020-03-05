@@ -186,7 +186,7 @@ namespace Pixeye.Actors
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public bool Get<T>(out T arg0)
 		{
-			return (arg0 = (Entity.Generations[id, Storage<T>.Generation] & Storage<T>.ComponentMask) == Storage<T>.ComponentMask ? Storage<T>.components[id] : default) != null;
+			return (arg0 = (Entity.GenerationsInstant[id, Storage<T>.Generation] & Storage<T>.ComponentMask) == Storage<T>.ComponentMask ? Storage<T>.components[id] : default) != null;
 		}
 
 		/// <summary>
