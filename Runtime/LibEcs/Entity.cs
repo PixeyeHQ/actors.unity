@@ -56,7 +56,8 @@ namespace Pixeye.Actors
  
       lengthTotal        = Framework.Settings.SizeEntities;
       Generations        = new int[Framework.Settings.SizeEntities, Framework.Settings.SizeGenerations];
-      GenerationsInstant = Generations;
+      GenerationsInstant = new int[Framework.Settings.SizeEntities, Framework.Settings.SizeGenerations];
+     
 
       Transforms = new Transform[Framework.Settings.SizeEntities];
 
@@ -198,7 +199,8 @@ namespace Pixeye.Actors
         Array.Resize(ref Storage<T>.components, id << 1);
 
       entities[id].Add(Storage<T>.componentId);
-
+      GenerationsInstant[id, Storage<T>.Generation] |= Storage<T>.ComponentMask;
+      
       ref var val = ref Storage<T>.components[id];
 
       #if !ACTORS_COMPONENTS_STRUCTS
@@ -218,8 +220,9 @@ namespace Pixeye.Actors
     public static void Set<T>(in this ent entity, T component)
     {
       var id = entity.id;
-      entities[id].Add(Storage<T>.componentId);
-
+      entities[id].Add(Storage<T>.componentId); 
+      GenerationsInstant[id, Storage<T>.Generation] |= Storage<T>.ComponentMask;
+      
       ref var componentInStorage = ref Storage<T>.components[id];
       componentInStorage = component;
     }
