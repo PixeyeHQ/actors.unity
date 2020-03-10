@@ -71,6 +71,9 @@ namespace Pixeye.Actors
 			}
 			#endif
 
+
+
+			Entity.entities[id].CleanMask(id);
 			EntityOperations.Set(this, 0, EntityOperations.Action.Kill);
 			Entity.entities[id].isAlive = false;
 			//id = 0; todo: think how to set id to zero from release.
@@ -114,7 +117,7 @@ namespace Pixeye.Actors
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public bool Has<T>()
 		{
-			return (Entity.Generations[id, Storage<T>.Generation] & Storage<T>.ComponentMask) == Storage<T>.ComponentMask;
+			return (Entity.GenerationsInstant[id, Storage<T>.Generation] & Storage<T>.ComponentMask) == Storage<T>.ComponentMask;
 		}
 
 		[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
@@ -124,8 +127,8 @@ namespace Pixeye.Actors
 			var mask  = Storage<T>.ComponentMask;
 			var mask2 = Storage<Y>.ComponentMask;
 
-			return (Entity.Generations[id, Storage<T>.Generation] & mask) == mask &&
-			       (Entity.Generations[id, Storage<Y>.Generation] & mask2) == mask2;
+			return (Entity.GenerationsInstant[id, Storage<T>.Generation] & mask) == mask &&
+			       (Entity.GenerationsInstant[id, Storage<Y>.Generation] & mask2) == mask2;
 		}
 
 		[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
@@ -136,9 +139,9 @@ namespace Pixeye.Actors
 			var mask2 = Storage<Y>.ComponentMask;
 			var mask3 = Storage<U>.ComponentMask;
 
-			return (Entity.Generations[id, Storage<T>.Generation] & mask) == mask &&
-			       (Entity.Generations[id, Storage<Y>.Generation] & mask2) == mask2 &&
-			       (Entity.Generations[id, Storage<U>.Generation] & mask3) == mask3;
+			return (Entity.GenerationsInstant[id, Storage<T>.Generation] & mask) == mask &&
+			       (Entity.GenerationsInstant[id, Storage<Y>.Generation] & mask2) == mask2 &&
+			       (Entity.GenerationsInstant[id, Storage<U>.Generation] & mask3) == mask3;
 		}
 
 
@@ -151,10 +154,10 @@ namespace Pixeye.Actors
 			var mask3 = Storage<U>.ComponentMask;
 			var mask4 = Storage<I>.ComponentMask;
 
-			return (Entity.Generations[id, Storage<T>.Generation] & mask) == mask &&
-			       (Entity.Generations[id, Storage<Y>.Generation] & mask2) == mask2 &&
-			       (Entity.Generations[id, Storage<U>.Generation] & mask3) == mask3 &&
-			       (Entity.Generations[id, Storage<I>.Generation] & mask4) == mask4;
+			return (Entity.GenerationsInstant[id, Storage<T>.Generation] & mask) == mask &&
+			       (Entity.GenerationsInstant[id, Storage<Y>.Generation] & mask2) == mask2 &&
+			       (Entity.GenerationsInstant[id, Storage<U>.Generation] & mask3) == mask3 &&
+			       (Entity.GenerationsInstant[id, Storage<I>.Generation] & mask4) == mask4;
 		}
 
 
@@ -168,11 +171,11 @@ namespace Pixeye.Actors
 			var mask4 = Storage<I>.ComponentMask;
 			var mask5 = Storage<O>.ComponentMask;
 
-			return (Entity.Generations[id, Storage<T>.Generation] & mask) == mask &&
-			       (Entity.Generations[id, Storage<Y>.Generation] & mask2) == mask2 &&
-			       (Entity.Generations[id, Storage<U>.Generation] & mask3) == mask3 &&
-			       (Entity.Generations[id, Storage<I>.Generation] & mask4) == mask4 &&
-			       (Entity.Generations[id, Storage<O>.Generation] & mask5) == mask5;
+			return (Entity.GenerationsInstant[id, Storage<T>.Generation] & mask) == mask &&
+			       (Entity.GenerationsInstant[id, Storage<Y>.Generation] & mask2) == mask2 &&
+			       (Entity.GenerationsInstant[id, Storage<U>.Generation] & mask3) == mask3 &&
+			       (Entity.GenerationsInstant[id, Storage<I>.Generation] & mask4) == mask4 &&
+			       (Entity.GenerationsInstant[id, Storage<O>.Generation] & mask5) == mask5;
 		}
 		#if !ACTORS_COMPONENTS_STRUCTS
 		/// <summary>

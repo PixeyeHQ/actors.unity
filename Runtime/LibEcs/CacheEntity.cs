@@ -47,6 +47,16 @@ namespace Pixeye.Actors
 
       componentsIds[componentsAmount++] = (ushort) type;
     }
+
+    public void CleanMask(int id)
+    {
+      for (int i = componentsAmount - 1; i >= 0; i--)
+      {
+        var generation = Storage.Generations[componentsIds[i]];
+        var mask = Storage.Masks[componentsIds[i]];
+        Entity.GenerationsInstant[id, generation] &= ~mask;
+      }
+    }
  
     // public void Remove(int type)
     // {
