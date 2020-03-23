@@ -169,7 +169,7 @@ namespace Pixeye.Actors
     void Update()
     {
       var delta = time.delta * time.Default.timeScale;
-
+      routines.Global.Tick(delta);
 
       if (Toolbox.changingScene) return;
 
@@ -193,6 +193,7 @@ namespace Pixeye.Actors
         ProcessorEntities.Tick(delta);
       }
 
+      
       routines.Default.Tick(delta);
     }
 
