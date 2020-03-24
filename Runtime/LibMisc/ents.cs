@@ -91,6 +91,16 @@ namespace Pixeye.Actors
 			Array.Copy(source, index + 1, source, index, --length - index);
 		}
 
+		public override string ToString()
+		{
+			var s = "";
+			foreach (var entity in this)
+			{
+				s += $" {entity}";
+			}
+
+			return $"len: {length} |{s}";
+		}
 
 		#region ENUMERATOR
 
