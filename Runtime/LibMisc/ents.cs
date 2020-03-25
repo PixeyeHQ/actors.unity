@@ -27,6 +27,16 @@ namespace Pixeye.Actors
 		{
 			source = new ent[cap > 0 ? cap : 5];
 			length = 0;
+		}		
+		
+		public ents(ents list)
+		{
+			length = list.length;
+			source = new ent[length+1];
+			for (int i = 0; i < length; i++)
+			{
+				source[i] = list[i];
+			}
 		}
 
 		[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
@@ -43,7 +53,7 @@ namespace Pixeye.Actors
 		}
 
 		[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
-		public void Add(in ent entity)
+		public void Add(ent entity)
 		{
 			if (length >= source.Length)
 				Array.Resize(ref source, length << 1);
@@ -94,9 +104,9 @@ namespace Pixeye.Actors
 		public override string ToString()
 		{
 			var s = "";
-			foreach (var entity in this)
+			for (int i = 0; i < length; i++)
 			{
-				s += $" {entity}";
+				s += $" {source[i]}";
 			}
 
 			return $"len: {length} |{s}";
