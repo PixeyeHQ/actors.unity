@@ -12,7 +12,7 @@ namespace Pixeye.Actors
     /// <summary>
     /// <para> Default Framework Time. Use it for independent timing</para>
     /// </summary>
-    internal static time Default = new time();
+    public static readonly time Default = new time();
     public static int frame => UnityEngine.Time.frameCount;
     public static float fromStart => Time.time;
     
