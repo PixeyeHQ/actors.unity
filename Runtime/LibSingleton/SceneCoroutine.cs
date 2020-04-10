@@ -3,7 +3,7 @@
 
 using UnityEngine;
 
-namespace Pixeye.Source
+namespace Pixeye.Actors
 {
 	public sealed class SceneCoroutine : MonoBehaviour
     { 

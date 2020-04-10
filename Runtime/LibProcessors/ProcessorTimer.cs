@@ -3,10 +3,9 @@
 
 using System;
 using System.Runtime.CompilerServices;
-using Pixeye.Actors;
 using Unity.IL2CPP.CompilerServices;
  
-namespace Pixeye.Source
+namespace Pixeye.Actors
 {
 	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
 	sealed class ProcessorTimer : ITick, IKernel
