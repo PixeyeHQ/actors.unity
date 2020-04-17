@@ -72,7 +72,15 @@ namespace Pixeye.Actors
 				source[length++] = e;
 			}
 		}
-
+		
+		[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
+		public void Add(ents entities)
+		{
+			for (int i = 0; i < entities.length; i++)
+			{
+				Add(entities[i]);
+			}
+		}
 
 		[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
 		public bool Remove(in ent entity)
