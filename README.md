@@ -5,6 +5,7 @@
 [![Discord](https://img.shields.io/discord/320945300892286996.svg?label=Discord)](https://discord.gg/suZuhyt)
 [![Twitter Follow](https://img.shields.io/badge/twitter-%40dimmPixeye-blue.svg?style=flat-square&label=Follow)](https://twitter.com/dimmPixeye)
 [![license](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](https://github.com/dimmpixeye/Actors-Unity3d-Framework/blob/master/LICENSE)
+[![openupm](https://img.shields.io/npm/v/com.pixeye.ecs?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.pixeye.ecs/)
 
 # ACTORS - Fast ECS (Entity Component System) Framework for Unity 
 ACTORS is a complete game framework with multiscene editing, game object pooling, ECS and data-driven approach for game logic explicitly built for Unity. It is used to ease the pain of decoupling data from behaviors without tons of boilerplate code and unnecessary overhead. 
@@ -14,17 +15,26 @@ ACTORS is a complete game framework with multiscene editing, game object pooling
 - Unity 2018 and higher 
 
 ### How to Install
-#### From packages ( Preferable )
 
-- Create a new Unity Project
-- Open the manifest.json file in the Packages folder inside of the Project
+#### From OpenUPM
+The package is available on the [openupm registry](https://openupm.com). It's recommended to install it via [openupm-cli](https://github.com/openupm/openupm-cli).
+
+```
+openupm add com.pixeye.ecs
+```
+
+#### From Git URL
+
+- Open the manifest.json file in the Packages folder inside of your Unity project
 - Add ```"com.pixeye.ecs": "https://github.com/dimmpixeye/actors.git",```
 
 #### From Unity
 - Download from https://github.com/dimmpixeye/ecs/releases 
 
 #### How To Update
-If you use packages you can automatically get fresh updates inside Unity editor!  
+If you install via OpenUPM registry, you can update the package using the Unity package manager.
+
+If you install via Git URL you can get fresh updates inside Unity editor.
 Press Tools->Actors->Update Framework[GIT] to get new update when needed.
 
 ## Documentation 
