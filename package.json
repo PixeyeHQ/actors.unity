@@ -4,7 +4,7 @@
     "displayName": "Actors",
     "description": "ACTORS is a complete game framework with multiscene editing, game object pooling, ECS and data-driven approach for game logic explicitly built for Unity3d. It is used to ease the pain of decoupling data from behaviors without tons of boilerplate code and unnecessary overhead.",
     "unity": "2019.3",
-    "version": "2020.3.23",
+    "version": "2020.4.16",
     "keywords": [
         "ecs",
         "pixeye",
