@@ -220,9 +220,13 @@ namespace Pixeye.Actors
     public static void Set<T>(in this ent entity, T component)
     {
       var id = entity.id;
+
+      if (id >= Storage<T>.components.Length)
+        Array.Resize(ref Storage<T>.components, id << 1);
+      
       entities[id].Add(Storage<T>.componentId); 
       GenerationsInstant[id, Storage<T>.Generation] |= Storage<T>.ComponentMask;
-      
+   
       ref var componentInStorage = ref Storage<T>.components[id];
       componentInStorage = component;
     }

@@ -57,23 +57,6 @@ namespace Pixeye.Actors
         Entity.GenerationsInstant[id, generation] &= ~mask;
       }
     }
- 
-    // public void Remove(int type)
-    // {
-    //   var typeConverted = (ushort) type;
-    //
-    //   for (int i = componentsAmount - 1; i >= 0; i--)
-    //   {
-    //     if (componentsIds[i] == typeConverted)
-    //     {
-    //       for (int j = i; j < componentsAmount; ++j)
-    //         componentsIds[j] = componentsIds[j + 1];
-    //
-    //       componentsAmount--;
-    //
-    //       break;
-    //     }
-    //   }
-    // }
+  
   }
 }
