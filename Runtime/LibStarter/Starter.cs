@@ -59,6 +59,7 @@ namespace Pixeye.Actors
 			{
 				var asmFramework = Assembly.GetExecutingAssembly();
 				var asmDataRaw   = Framework.Settings.Namespace;
+				RegisterAttributeComponents(asmFramework.GetTypes());
 
 				var q = asmFramework.GetTypes()
 					.Where(t => t.IsSubclassOf(typeof(Storage)) && !t.ContainsGenericParameters);
@@ -72,6 +73,7 @@ namespace Pixeye.Actors
 				if (asmDataRaw != string.Empty)
 				{
 					asmData = Assembly.Load(asmDataRaw);
+					RegisterAttributeComponents(asmData.GetTypes());
 					q = asmData.GetTypes()
 						.Where(t => t.IsSubclassOf(typeof(Storage)) && !t.ContainsGenericParameters);
 
@@ -82,9 +84,11 @@ namespace Pixeye.Actors
 				}
 				else
 				{
-					q = AppDomain.CurrentDomain.GetAssemblies().Where(asm => asm != asmFramework)
-						.SelectMany(t => t.GetTypes())
-						.Where(t => t.IsSubclassOf(typeof(Storage)) && !t.ContainsGenericParameters);
+					
+					var types = AppDomain.CurrentDomain.GetAssemblies().Where(asm => asm != asmFramework)
+						.SelectMany(t => t.GetTypes());
+					RegisterAttributeComponents(types);
+					q = types.Where(t => t.IsSubclassOf(typeof(Storage)) && !t.ContainsGenericParameters);
 					foreach (var item in q)
 					{
 						Activator.CreateInstance(item);
@@ -96,6 +100,16 @@ namespace Pixeye.Actors
 
 
 			ProcessorScene.Default.Setup(ScenesToKeep, SceneDependsOn, this);
+		}
+
+		private void RegisterAttributeComponents(IEnumerable<Type> enumerable)
+		{
+			foreach (var type in enumerable.Where(t=>t.IsDefined(typeof(ActorsComponent), false)))
+			{
+				Type genericStorage = typeof(Storage<>);
+				Type constructedStorage = genericStorage.MakeGenericType(type);
+				Activator.CreateInstance(constructedStorage);
+			}
 		}
 
 		public static IEnumerable<Type> GetAllSubclassOf(Type parent)
