@@ -83,7 +83,7 @@ namespace Pixeye.Actors
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public virtual T Create()
 		{
-			return default;
+			return new T();
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
