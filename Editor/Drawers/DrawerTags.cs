@@ -100,7 +100,16 @@ namespace Pixeye.Actors
 
 			if (val > -1)
 			{
-				property.intValue = (int) fields[val].GetValue(this);
+				var parentProp = property.GetParentProp();
+
+				if (parentProp != null && parentProp.isArray)
+				{
+					parentProp.GetArrayElementAtIndex(val).intValue = (int) fields[val].GetValue(this);
+				}
+				else
+				{
+					property.intValue = (int) fields[val].GetValue(this);
+				}
 				val = -1;
 			}
 
