@@ -188,18 +188,19 @@ namespace Pixeye.Actors
 	    {
 	      	var actors = tr.GetComponentsInChildren<Actor>();
 
-			#if UNITY_EDITOR
 	      	if (actors.Length == 0)
 	      	{
-				Debug.LogError("Error: the number of actor children equals to zero");
+				#if UNITY_EDITOR
+				Debug.LogAssertion("Assertion: the number of actor children equals to zero");
+				#endif
 	        	return tr;
 	      	}
-			#endif
 	
 	      	var isSelfActor = actors[0].transform.GetHashCode() == tr.GetHashCode();
 	      	for (int i = isSelfActor ? 1 : 0; i < actors.Length; i++)
 	      	{
-	        	actors[i].Launch();
+				if(actors[i].entity.id == 0)
+	        		actors[i].Launch();
 	      	}
 
 	      	return tr;
