@@ -187,35 +187,4 @@ namespace Pixeye.Actors
       return actor;
     }
   }
-
-  public static class HelperActor
-  {
-    public static Transform InitChilds(this Transform tr)
-    {
-      var actors = tr.GetComponentsInChildren<Actor>();
-
-      if (actors.Length == 0)
-      {
-#if UNITY_EDITOR
-        Debug.LogAssertion("Assertion: the number of actor children equals to zero");
-#endif
-        return tr;
-      }
-
-      var isSelfActor = actors[0].transform.GetHashCode() == tr.GetHashCode();
-      for (int i = isSelfActor ? 1 : 0; i < actors.Length; i++)
-      {
-        if (actors[i].entity.id == 0)
-          actors[i].Launch();
-      }
-
-      return tr;
-    }
-
-    public static Actor InitChilds(this Actor actor)
-    {
-      actor.transform.InitChilds();
-      return actor;
-    }
-  }
 }

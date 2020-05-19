@@ -8,9 +8,11 @@ namespace Pixeye.Actors
 {
   public static class Obj
   {
-    
+    /// <summary>
+    /// Initialize every actor or monocache on childs of the selected gameobject
+    /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void InitChilds(GameObject obj)
+    public static void InitEveryChild(GameObject obj)
     {
       var transforms = obj.GetComponentsInChildren<Transform>();
 
@@ -27,11 +29,26 @@ namespace Pixeye.Actors
         }
       }
     }
-    
+
+    /// <summary>
+    /// Initialize every actor or monocache on the selected gameobject
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void Init(GameObject obj)
+    {
+      if (!obj.activeInHierarchy) return;
+      var oo = obj.GetComponents<MonoBehaviour>();
+      foreach (var o in oo)
+      {
+        if (o is IRequireStarter req && o.enabled)
+          req.Launch();
+      }
+    }
+
     //===============================//
     // By GameObject ID
     //===============================//
-     
+
     // Default
     public static Transform Spawn(GameObject prefab, Vector3 startPosition = default, Quaternion startRotation = default)
     {
