@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Pixeye.Actors
 {
@@ -228,9 +229,30 @@ namespace Pixeye.Actors
 
       initialized = true;
 
-      var objs = FindObjectsOfType<MonoBehaviour>().OfType<IRequireStarter>();
-      foreach (var obj in objs)
-        obj.Launch();
+      for (var i = 0; i < SceneManager.sceneCount; i++)
+      {
+        var scene = SceneManager.GetSceneAt(i);					
+        var objs  = scene.GetRootGameObjects();
+	
+	
+        foreach (var obj in objs)
+        {
+          var transforms = obj.GetComponentsInChildren<Transform>();
+	
+          foreach (var tr in transforms)
+          {
+            var oo = tr.GetComponents<MonoBehaviour>();
+            if (!tr.gameObject.activeInHierarchy) continue;
+            foreach (var o in oo)
+            {
+              if (o is IRequireStarter req && o.enabled)
+              {
+                req.Launch();
+              }
+            }
+          }
+        }
+      }
 
 
       Timer.Add(time.deltaFixed, PostSetup);
