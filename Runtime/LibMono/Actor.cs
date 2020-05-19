@@ -6,6 +6,7 @@ using System;
 using System.Runtime.CompilerServices;
 using Unity.IL2CPP.CompilerServices;
 using UnityEngine;
+
 #if ODIN_INSPECTOR
 using Sirenix.OdinInspector;
 
@@ -13,203 +14,212 @@ using Sirenix.OdinInspector;
 
 namespace Pixeye.Actors
 {
-	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
-	public class Actor : MonoBehaviour, IRequireStarter
-	{
-		public ent entity;
-
-		#if UNITY_EDITOR
-		[FoldoutGroup("Main"), SerializeField, ReadOnly]
-		internal int _entity;
-		#endif
-
-		[FoldoutGroup("Main")]
-		public bool isPooled;
-
-		[FoldoutGroup("Main")]
-		public ScriptableBuild buildFrom;
+  [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
+  public class Actor : MonoBehaviour, IRequireStarter
+  {
+    public ent entity;
 
 
-		/// <summary>
-		/// Initialize entity here.
-		/// </summary>
-		protected virtual void Setup()
-		{
-		}
+#if UNITY_EDITOR
+    [FoldoutGroup("Main"), SerializeField, ReadOnly]
+    internal int _entity;
+#endif
+
+    [FoldoutGroup("Main")]
+    public bool isPooled;
+
+    [FoldoutGroup("Main")]
+    public ScriptableBuild buildFrom;
 
 
-		//===============================//
-		// Launch methods
-		//===============================//
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public void Launch()
-		{
-			int  id;
-			byte age = 0;
-
-			if (ent.entStack.length > 0)
-			{
-				ref var pop = ref ent.entStack.source[--ent.entStack.length];
-				id = pop.id;
-				unchecked
-				{
-					age = (byte) (pop.age);
-				}
-			}
-			else
-				id = ent.lastID++;
-
-			entity.id  = id;
-			entity.age = age;
+    /// <summary>
+    /// Initialize entity here.
+    /// </summary>
+    protected virtual void Setup()
+    {
+    }
 
 
-			#if UNITY_EDITOR
-			_entity = id;
-			#endif
+    //===============================//
+    // Launch methods
+    //===============================//
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Launch()
+    {
+      int  id;
+      byte age = 0;
+
+      if (ent.entStack.length > 0)
+      {
+        ref var pop = ref ent.entStack.source[--ent.entStack.length];
+        id = pop.id;
+        unchecked
+        {
+          age = (byte) (pop.age);
+        }
+      }
+      else
+        id = ent.lastID++;
+
+      entity.id  = id;
+      entity.age = age;
 
 
-			Actors.Entity.Initialize(id, age, isPooled);
-			Actors.Entity.Transforms[id] = transform;
+#if UNITY_EDITOR
+      _entity = id;
+#endif
 
-			if (isActiveAndEnabled)
-			{
-				if (buildFrom != null)
-				{
-					buildFrom.ExecuteOnStart(entity, this);
-					Setup();
-				}
-				else
-				{
-					Setup();
-					EntityOperations.Set(entity, -1, EntityOperations.Action.Activate);
-				}
-			}
-		}
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public void Launch(ModelComposer model)
-		{
-			int  id;
-			byte age = 0;
 
-			if (ent.entStack.length > 0)
-			{
-				ref var pop = ref ent.entStack.source[--ent.entStack.length];
-				id = pop.id;
-				unchecked
-				{
-					age = (byte) (pop.age);
-				}
-			}
-			else
-				id = ent.lastID++;
+      Actors.Entity.Initialize(id, age, isPooled);
+      Actors.Entity.Transforms[id] = transform;
 
-			entity.id  = id;
-			entity.age = age;
+      if (isActiveAndEnabled)
+      {
+        if (buildFrom != null)
+        {
+          buildFrom.ExecuteOnStart(entity, this);
+          Setup();
+        }
+        else
+        {
+          Setup();
+          EntityOperations.Set(entity, -1, EntityOperations.Action.Activate);
+        }
+ 
+      }
+    }
 
-			#if UNITY_EDITOR
-			_entity = id;
-			#endif
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Launch(ModelComposer model)
+    {
+      int  id;
+      byte age = 0;
 
-			Actors.Entity.Initialize(id, age, isPooled);
-			Actors.Entity.Transforms[id] = transform;
-			model(entity);
-			Setup();
-			EntityOperations.Set(entity, -1, EntityOperations.Action.Activate);
-		}
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		void IRequireStarter.Launch()
-		{
-			if (!entity.exist)
-			{
-				Launch();
-			}
-		}
+      if (ent.entStack.length > 0)
+      {
+        ref var pop = ref ent.entStack.source[--ent.entStack.length];
+        id = pop.id;
+        unchecked
+        {
+          age = (byte) (pop.age);
+        }
+      }
+      else
+        id = ent.lastID++;
 
-		//===============================//
-		// Create methods
-		//===============================//
+      entity.id  = id;
+      entity.age = age;
 
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static Actor Create(GameObject prefab, Vector3 position = default, bool pooled = false)
-		{
-			var tr    = pooled ? Obj.Spawn(Pool.Entities, prefab, position) : Obj.Spawn(prefab, position);
-			var actor = tr.AddGetActor();
+#if UNITY_EDITOR
+      _entity = id;
+#endif
 
-			actor.isPooled = pooled;
-			actor.Launch();
+      Actors.Entity.Initialize(id, age, isPooled);
+      Actors.Entity.Transforms[id] = transform;
+      model(entity);
+      Setup();
+      EntityOperations.Set(entity, -1, EntityOperations.Action.Activate);
+ 
+    }
 
-			return actor;
-		}
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static Actor Create(GameObject prefab, Transform parent, Vector3 position = default, bool pooled = false)
-		{
-			var tr    = pooled ? Obj.Spawn(Pool.Entities, prefab, parent, position) : Obj.Spawn(prefab, parent, position);
-			var actor = tr.AddGetActor();
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    void IRequireStarter.Launch()
+    {
+      if (!entity.exist)
+      {
+        Launch();
+      }
+    }
 
-			actor.isPooled = pooled;
-			actor.Launch();
+    //===============================//
+    // Create methods
+    //===============================//
 
-			return actor;
-		}
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static Actor Create(GameObject prefab, ModelComposer model, Vector3 position = default, bool pooled = false)
-		{
-			var tr    = pooled ? Obj.Spawn(Pool.Entities, prefab, position) : Obj.Spawn(prefab, position);
-			var actor = tr.AddGetActor();
-			actor.isPooled = pooled;
-			actor.Launch(model);
-			return actor;
-		}
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static Actor Create(string prefabID, Vector3 position = default, bool pooled = false)
-		{
-			var tr    = pooled ? Obj.Spawn(Pool.Entities, prefabID, position) : Obj.Spawn(prefabID, position);
-			var actor = tr.AddGetActor();
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Actor Create(GameObject prefab, Vector3 position = default, bool pooled = false)
+    {
+      var tr    = pooled ? Obj.Spawn(Pool.Entities, prefab, position) : Obj.Spawn(prefab, position);
+      var actor = tr.AddGetActor();
 
-			actor.isPooled = pooled;
-			actor.Launch();
+      actor.isPooled = pooled;
+      actor.Launch();
 
-			return actor;
-		}
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static Actor Create(string prefabID, ModelComposer model, Vector3 position = default, bool pooled = false)
-		{
-			var tr    = pooled ? Obj.Spawn(Pool.Entities, prefabID, position) : Obj.Spawn(prefabID, position);
-			var actor = tr.AddGetActor();
-			actor.isPooled = pooled;
-			actor.Launch(model);
-			return actor;
-		}
-	}
+      return actor;
+    }
 
-	public static class HelperActor
-	{
-	    public static Transform InitChilds(this Transform tr)
-	    {
-	      	var actors = tr.GetComponentsInChildren<Actor>();
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Actor Create(GameObject prefab, Transform parent, Vector3 position = default, bool pooled = false)
+    {
+      var tr    = pooled ? Obj.Spawn(Pool.Entities, prefab, parent, position) : Obj.Spawn(prefab, parent, position);
+      var actor = tr.AddGetActor();
 
-	      	if (actors.Length == 0)
-	      	{
-				#if UNITY_EDITOR
-				Debug.LogAssertion("Assertion: the number of actor children equals to zero");
-				#endif
-	        	return tr;
-	      	}
-	
-	      	var isSelfActor = actors[0].transform.GetHashCode() == tr.GetHashCode();
-	      	for (int i = isSelfActor ? 1 : 0; i < actors.Length; i++)
-	      	{
-				if(actors[i].entity.id == 0)
-	        		actors[i].Launch();
-	      	}
+      actor.isPooled = pooled;
+      actor.Launch();
 
-	      	return tr;
-	    }
+      return actor;
+    }
 
-	    public static Actor InitChilds(this Actor actor)
-	    {
-	      	actor.transform.InitChilds();
-	      	return actor;
-	    }
-	}
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Actor Create(GameObject prefab, ModelComposer model, Vector3 position = default, bool pooled = false)
+    {
+      var tr    = pooled ? Obj.Spawn(Pool.Entities, prefab, position) : Obj.Spawn(prefab, position);
+      var actor = tr.AddGetActor();
+      actor.isPooled = pooled;
+      actor.Launch(model);
+      return actor;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Actor Create(string prefabID, Vector3 position = default, bool pooled = false)
+    {
+      var tr    = pooled ? Obj.Spawn(Pool.Entities, prefabID, position) : Obj.Spawn(prefabID, position);
+      var actor = tr.AddGetActor();
+
+      actor.isPooled = pooled;
+      actor.Launch();
+
+      return actor;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Actor Create(string prefabID, ModelComposer model, Vector3 position = default, bool pooled = false)
+    {
+      var tr    = pooled ? Obj.Spawn(Pool.Entities, prefabID, position) : Obj.Spawn(prefabID, position);
+      var actor = tr.AddGetActor();
+      actor.isPooled = pooled;
+      actor.Launch(model);
+      return actor;
+    }
+  }
+
+  public static class HelperActor
+  {
+    public static Transform InitChilds(this Transform tr)
+    {
+      var actors = tr.GetComponentsInChildren<Actor>();
+
+      if (actors.Length == 0)
+      {
+#if UNITY_EDITOR
+        Debug.LogAssertion("Assertion: the number of actor children equals to zero");
+#endif
+        return tr;
+      }
+
+      var isSelfActor = actors[0].transform.GetHashCode() == tr.GetHashCode();
+      for (int i = isSelfActor ? 1 : 0; i < actors.Length; i++)
+      {
+        if (actors[i].entity.id == 0)
+          actors[i].Launch();
+      }
+
+      return tr;
+    }
+
+    public static Actor InitChilds(this Actor actor)
+    {
+      actor.transform.InitChilds();
+      return actor;
+    }
+  }
 }

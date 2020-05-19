@@ -14,45 +14,46 @@ using UnityEngine;
 
 namespace Pixeye.Actors
 {
-	public abstract class MonoCached : MonoBehaviour, IRequireStarter
-	{
-		
-		void Awake()
-		{
-			if (!Starter.initialized || Toolbox.changingScene) return;
-			Setup();
-		}
+  public abstract class MonoCached : MonoBehaviour, IRequireStarter
+  {
+ 
+    void Awake()
+    {
+      if (!Starter.initialized || Toolbox.changingScene) return;
+      Setup();
+    }
 
 
-		void OnEnable()
-		{
-			if (!Starter.initialized || Toolbox.changingScene) return;
-			HandleEnable();
-		}
+    void OnEnable()
+    {
+      if (!Starter.initialized || Toolbox.changingScene) return;
+      HandleEnable();
+    }
 
-		void OnDisable()
-		{
-			HandleDisable();
-		}
-
-
-		public void Launch()
-		{
-			Setup();
-			HandleEnable();
-		}
+    void OnDisable()
+    {
+      HandleDisable();
+    }
 
 
-		protected virtual void HandleEnable()
-		{
-		}
+    public void Launch()
+    {
+      Setup();
+      HandleEnable();
+ 
+    }
 
-		protected virtual void HandleDisable()
-		{
-		}
 
-		protected virtual void Setup()
-		{
-		}
-	}
+    protected virtual void HandleEnable()
+    {
+    }
+
+    protected virtual void HandleDisable()
+    {
+    }
+
+    protected virtual void Setup()
+    {
+    }
+  }
 }

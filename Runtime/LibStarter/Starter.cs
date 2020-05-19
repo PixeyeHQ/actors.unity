@@ -183,7 +183,6 @@ namespace Pixeye.Actors
 
     public void RemoveFromNode(GameObject instance, int pool)
     {
-   
 #if UNITY_2018_3_OR_NEWER
       var prefab = PrefabUtility.GetCorrespondingObjectFromSource(instance);
 #else
@@ -227,33 +226,24 @@ namespace Pixeye.Actors
       Setup();
 
 
-      initialized = true;
-
       for (var i = 0; i < SceneManager.sceneCount; i++)
       {
-        var scene = SceneManager.GetSceneAt(i);					
+        var scene = SceneManager.GetSceneAt(i);
         var objs  = scene.GetRootGameObjects();
-	
-	
         foreach (var obj in objs)
         {
-          var transforms = obj.GetComponentsInChildren<Transform>();
-	
-          foreach (var tr in transforms)
+          if (!obj.activeInHierarchy) continue;
+          var oo = obj.GetComponents<MonoBehaviour>();
+          foreach (var o in oo)
           {
-            var oo = tr.GetComponents<MonoBehaviour>();
-            if (!tr.gameObject.activeInHierarchy) continue;
-            foreach (var o in oo)
-            {
-              if (o is IRequireStarter req && o.enabled)
-              {
-                req.Launch();
-              }
-            }
+            if (o is IRequireStarter req && o.enabled)
+              req.Launch();
           }
         }
       }
 
+      initialized = true;
+ 
 
       Timer.Add(time.deltaFixed, PostSetup);
     }
@@ -291,5 +281,7 @@ namespace Pixeye.Actors
     protected virtual void Dispose()
     {
     }
+
+     
   }
 }
