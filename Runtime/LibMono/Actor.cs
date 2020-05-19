@@ -73,19 +73,16 @@ namespace Pixeye.Actors
       Actors.Entity.Initialize(id, age, isPooled);
       Actors.Entity.Transforms[id] = transform;
 
-      if (isActiveAndEnabled)
+
+      if (buildFrom != null)
       {
-        if (buildFrom != null)
-        {
-          buildFrom.ExecuteOnStart(entity, this);
-          Setup();
-        }
-        else
-        {
-          Setup();
-          EntityOperations.Set(entity, -1, EntityOperations.Action.Activate);
-        }
- 
+        buildFrom.ExecuteOnStart(entity, this);
+        Setup();
+      }
+      else
+      {
+        Setup();
+        EntityOperations.Set(entity, -1, EntityOperations.Action.Activate);
       }
     }
 
@@ -119,7 +116,6 @@ namespace Pixeye.Actors
       model(entity);
       Setup();
       EntityOperations.Set(entity, -1, EntityOperations.Action.Activate);
- 
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
