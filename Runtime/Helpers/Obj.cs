@@ -14,18 +14,20 @@ namespace Pixeye.Actors
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void InitEveryChild(GameObject obj)
     {
-      var transforms = obj.GetComponentsInChildren<Transform>();
-
+      var transforms = obj.GetComponentsInChildren<Transform>(true);
       for (var i = 1; i < transforms.Length; i++)
       {
         var tr = transforms[i];
-        if (!tr.gameObject.activeInHierarchy) continue;
+        tr.gameObject.SetActive(true);
         var oo = tr.GetComponents<MonoBehaviour>();
 
         foreach (var o in oo)
         {
-          if (o is IRequireStarter req && o.enabled)
+          if (o is IRequireStarter req)
+          {
             req.Launch();
+            o.enabled = true;
+          }
         }
       }
     }
@@ -36,12 +38,25 @@ namespace Pixeye.Actors
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void Init(GameObject obj)
     {
-      if (!obj.activeInHierarchy) return;
+#if ACTORS_DEBUG
+
+      var parent = obj.transform.parent;
+      if (!obj.activeInHierarchy && parent!=null && parent.gameObject.activeSelf == false)
+      {
+        Debug.LogError("You are trying to init an object that is not active in hierarchy");
+        return;
+      }
+
+#endif
+      obj.SetActive(true);
       var oo = obj.GetComponents<MonoBehaviour>();
       foreach (var o in oo)
       {
-        if (o is IRequireStarter req && o.enabled)
+        if (o is IRequireStarter req)
+        {
           req.Launch();
+          o.enabled = true;
+        }
       }
     }
 
