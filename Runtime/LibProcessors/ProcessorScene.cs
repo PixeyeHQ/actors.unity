@@ -124,10 +124,9 @@ namespace Pixeye.Actors
       while (load.MoveNext())
       {
         yield return 0;
-    
       }
     }
-    
+
     IEnumerator _Load(string name)
     {
       void CalculateProgress(AsyncOperation curJob, int _totalStages, ref float _prevProgress, ref float _curProgress)
@@ -139,18 +138,27 @@ namespace Pixeye.Actors
         OnSceneLoading(_curProgress);
       }
 
-      routines.Default.StopAll();
+      for (var i = 0; i < ProcessorCoroutines.coroutine_handlers.Count; i++)
+      {
+        ProcessorCoroutines.coroutine_handlers[i].StopAll();
+      }
+
+      if (ProcessorCoroutines.coroutine_handlers.Count > 1)
+      {
+        ProcessorCoroutines.coroutine_handlers.RemoveRange(1, ProcessorCoroutines.coroutine_handlers.Count-1);
+      }
+ 
       OnSceneClose();
       ProcessorEntities.Clean();
       Toolbox.changingScene = true;
       Toolbox.Instance.ClearSessionData();
 
       //Plus two for unload assets and load target scene
-      int   totalStagesNeed = 0;
+      var   totalStagesNeed = 0;
       float curProgress     = 0f, prevProgress = 0f;
 
       AsyncOperation job            = null;
-      List<string>   scenesToUnload = new List<string>();
+      var            scenesToUnload = new List<string>();
 
       //Add main scene
       scenesToUnload.Add(SceneManager.GetActiveScene().name);
@@ -203,6 +211,7 @@ namespace Pixeye.Actors
     {
       Toolbox.Instance.StartCoroutine(_Add(id));
     }
+
     public static void Add(string id)
     {
       Toolbox.Instance.StartCoroutine(_Add(id));
@@ -212,10 +221,12 @@ namespace Pixeye.Actors
     {
       Toolbox.Instance.StartCoroutine(_Remove(id));
     }
+
     public static void Remove(string id)
     {
       Toolbox.Instance.StartCoroutine(_Remove(id));
     }
+
     static IEnumerator _Add(int id)
     {
       Toolbox.changingScene    =  true;

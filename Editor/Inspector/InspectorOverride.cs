@@ -5,289 +5,263 @@ using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
+
 #if!ODIN_INSPECTOR
 namespace Pixeye.Actors
 {
-	[CustomEditor(typeof(Object), true, isFallback = true)]
-	[CanEditMultipleObjects]
-	public class InspectorOverride : InspectorReordarable
-	{
+  [CustomEditor(typeof(Object), true, isFallback = true)]
+  [CanEditMultipleObjects]
+  public class InspectorOverride : InspectorReordarable
+  {
+    readonly Dictionary<string, CacheFoldProp> cacheFolds = new Dictionary<string, CacheFoldProp>();
+    readonly List<SerializedProperty> props = new List<SerializedProperty>();
+    List<MethodInfo> methods;
+    bool initialized;
 
-		Dictionary<string, CacheFoldProp> cacheFolds = new Dictionary<string, CacheFoldProp>();
-		List<SerializedProperty> props = new List<SerializedProperty>();
-		List<MethodInfo> methods;
-		bool initialized;
+    void OnEnable()
+    {
+      initialized = false;
+    }
 
-		void OnEnable()
-		{
-			initialized = false;
- 
-	 	}
- 
-		void OnDisable()
-		{
-			if (Toolbox.isQuittingOrChangingScene()) return;
-			if (target != null)
-				foreach ( var c in cacheFolds )
-				{
-					EditorPrefs.SetBool(string.Format($"{c.Value.atr.name}{c.Value.props[0].name}{target.name}"), c.Value.expanded);
-					c.Value.Dispose();
-				}
-		}
- 
-		
-		
-	 
-		
-		
-		public override bool RequiresConstantRepaint()
-		{
-			return EditorFramework.needToRepaint;
-		}
+    void OnDisable()
+    {
+      if (Toolbox.isQuittingOrChangingScene()) return;
+      if (target != null)
+        foreach (var c in cacheFolds)
+        {
+          EditorPrefs.SetBool(string.Format($"{c.Value.atr.name}{c.Value.props[0].name}{target.name}"), c.Value.expanded);
+          c.Value.Dispose();
+        }
+    }
 
-		public override void OnInspectorGUI()
-		{
-			 
-			serializedObject.Update();
 
-	 
-			
-			Setup();
+    public override bool RequiresConstantRepaint()
+    {
+      return EditorFramework.needToRepaint;
+    }
 
-			if (props.Count == 0)
-			{
-				DrawDefaultInspector();
-				return;
-			}
+    public override void OnInspectorGUI()
+    {
+      serializedObject.Update();
 
-			Header();
-			Body();
 
-			serializedObject.ApplyModifiedProperties();
+      Setup();
 
-			void Header()
-			{
-				using (new EditorGUI.DisabledScope("m_Script" == props[0].propertyPath))
-				{
-					EditorGUILayout.Space();
-					EditorGUILayout.PropertyField(props[0], true);
-					EditorGUILayout.Space();
-				}
-			}
+      if (props.Count == 0)
+      {
+        DrawDefaultInspector();
+        return;
+      }
 
-			void Body()
-			{
-				foreach ( var pair in cacheFolds )
-				{
-					this.UseVerticalLayout(() => Foldout(pair.Value), StyleFramework.box);
-					EditorGUI.indentLevel = 0;
-				}
+      Header();
+      Body();
 
-				EditorGUILayout.Space();
+      serializedObject.ApplyModifiedProperties();
 
-				for ( var i = 1; i < props.Count; i++ )
-				{
-					
-					
-					if (props[i].isArray)
-					{
-						DrawPropertySortableArray(props[i]);
-					}
-					else
-					{
-						EditorGUILayout.PropertyField(props[i], true);
-					}
-					
-					
-			 
-				}
+      void Header()
+      {
+        using (new EditorGUI.DisabledScope("m_Script" == props[0].propertyPath))
+        {
+          EditorGUILayout.Space();
+          EditorGUILayout.PropertyField(props[0], true);
+          EditorGUILayout.Space();
+        }
+      }
 
-				EditorGUILayout.Space();
+      void Body()
+      {
+        foreach (var pair in cacheFolds)
+        {
+          this.UseVerticalLayout(() => Foldout(pair.Value), StyleFramework.box);
+          EditorGUI.indentLevel = 0;
+        }
 
-				if (methods == null) return;
-				foreach ( MethodInfo memberInfo in methods )
-				{
-					this.UseButton(memberInfo);
-				}
-			}
+        EditorGUILayout.Space();
 
-			void Foldout(CacheFoldProp cache)
-			{
-				cache.expanded = EditorGUILayout.Foldout(cache.expanded, cache.atr.name, true,
-						StyleFramework.foldout);
+        for (var i = 1; i < props.Count; i++)
+        {
+          if (props[i].isArray)
+          {
+            DrawPropertySortableArray(props[i]);
+          }
+          else
+          {
+            EditorGUILayout.PropertyField(props[i], true);
+          }
+        }
 
-				if (cache.expanded)
-				{
-					EditorGUI.indentLevel = 1;
+        EditorGUILayout.Space();
 
-					for ( int i = 0; i < cache.props.Count; i++ )
-					{
-						this.UseVerticalLayout(() => Child(i), StyleFramework.boxChild);
-					}
-				}
+        if (methods == null) return;
+        foreach (var memberInfo in methods)
+        {
+          this.UseButton(memberInfo);
+        }
+      }
 
-				void Child(int i)
-				{
+      void Foldout(CacheFoldProp cache)
+      {
+        cache.expanded = EditorGUILayout.Foldout(cache.expanded, cache.atr.name, true, StyleFramework.foldout);
 
-					if (cache.props[i].isArray)
-					{
-						DrawPropertySortableArray(cache.props[i]);
-					}
-					else
-					{
-						EditorGUILayout.PropertyField(cache.props[i], new GUIContent(cache.props[i].name.FirstLetterToUpperCase()), true);
-					}
- 
-				}
-			}
+        if (cache.expanded)
+        {
+          EditorGUI.indentLevel = 1;
 
-			void Setup()
-			{
-				EditorFramework.currentEvent = Event.current;
-				if (!initialized)
-				{
-					InitInspector();
-					SetupButtons();
+          for (var i = 0; i < cache.props.Count; i++)
+          {
+            this.UseVerticalLayout(() => Child(i), StyleFramework.boxChild);
+          }
+        }
 
-					List<FieldInfo>       objectFields;
-			  		FoldoutGroupAttribute prevFold = default;
+        void Child(int i)
+        {
+          if (cache.props[i].isArray)
+          {
+            DrawPropertySortableArray(cache.props[i]);
+          }
+          else
+          {
+            EditorGUILayout.PropertyField(cache.props[i], new GUIContent(cache.props[i].name.FirstLetterToUpperCase()), true);
+          }
+        }
+      }
 
-					var length = EditorTypes.Get(target, out objectFields);
+      void Setup()
+      {
+        EditorFramework.currentEvent = Event.current;
+        if (!initialized)
+        {
+          InitInspector();
+          SetupButtons();
 
-					for ( var i = 0; i < length; i++ )
-					{
-						#region FOLDERS
+          FoldoutGroupAttribute prevFold = default;
+          var length = EditorTypes.Get(target, out var objectFields);
 
-						var           fold = Attribute.GetCustomAttribute(objectFields[i], typeof(FoldoutGroupAttribute)) as FoldoutGroupAttribute;
-						CacheFoldProp c;
-						if (fold == null)
-						{
-							if (prevFold != null && prevFold.foldEverything)
-							{
-								if (!cacheFolds.TryGetValue(prevFold.name, out c))
-								{
-									cacheFolds.Add(prevFold.name, new CacheFoldProp {atr = prevFold, types = new HashSet<string> {objectFields[i].Name}});
-								}
-								else
-								{
-									c.types.Add(objectFields[i].Name);
-								}
-							}
+          for (var i = 0; i < length; i++)
+          {
+            #region FOLDERS
 
-							continue;
-						}
+            var           fold = Attribute.GetCustomAttribute(objectFields[i], typeof(FoldoutGroupAttribute)) as FoldoutGroupAttribute;
+            CacheFoldProp c;
+            if (fold == null)
+            {
+              if (prevFold != null && prevFold.foldEverything)
+              {
+                if (!cacheFolds.TryGetValue(prevFold.name, out c))
+                {
+                  cacheFolds.Add(prevFold.name, new CacheFoldProp {atr = prevFold, types = new HashSet<string> {objectFields[i].Name}});
+                }
+                else
+                {
+                  c.types.Add(objectFields[i].Name);
+                }
+              }
 
-						prevFold = fold;
+              continue;
+            }
 
-						if (!cacheFolds.TryGetValue(fold.name, out c))
-						{
-							var expanded = EditorPrefs.GetBool(string.Format($"{fold.name}{objectFields[i].Name}{target.name}"), false);
-							cacheFolds.Add(fold.name, new CacheFoldProp {atr = fold, types = new HashSet<string> {objectFields[i].Name}, expanded = expanded});
-						}
-						else c.types.Add(objectFields[i].Name);
+            prevFold = fold;
 
-						#endregion
-					}
+            if (!cacheFolds.TryGetValue(fold.name, out c))
+            {
+              var expanded = EditorPrefs.GetBool(string.Format($"{fold.name}{objectFields[i].Name}{target.name}"), false);
+              cacheFolds.Add(fold.name, new CacheFoldProp {atr = fold, types = new HashSet<string> {objectFields[i].Name}, expanded = expanded});
+            }
+            else c.types.Add(objectFields[i].Name);
 
-					var property = serializedObject.GetIterator();
-					var next     = property.NextVisible(true);
-					if (next)
-					{
-						do
-						{
-							HandleFoldProp(property);
-						} while (property.NextVisible(false));
-					}
+            #endregion
+          }
 
-					initialized = true;
-				}
-			}
+          var property = serializedObject.GetIterator();
+          var next     = property.NextVisible(true);
+          if (next)
+          {
+            do
+            {
+              HandleFoldProp(property);
+            } while (property.NextVisible(false));
+          }
 
-			void SetupButtons()
-			{
-				var members = GetButtonMembers(target);
+          initialized = true;
+        }
+      }
 
-				foreach ( var memberInfo in members )
-				{
-					var method = memberInfo as MethodInfo;
-					if (method == null)
-					{
-						continue;
-					}
+      void SetupButtons()
+      {
+        var members = GetButtonMembers(target);
 
-					if (method.GetParameters().Length > 0)
-					{
-						continue;
-					}
+        foreach (var memberInfo in members)
+        {
+          var method = memberInfo as MethodInfo;
+          if (method == null)
+          {
+            continue;
+          }
 
-					if (methods == null) methods = new List<MethodInfo>();
-					methods.Add(method);
-				}
-			}
-		}
+          if (method.GetParameters().Length > 0)
+          {
+            continue;
+          }
 
-		public void HandleFoldProp(SerializedProperty prop)
-		{
-			bool shouldBeFolded = false;
+          if (methods == null) methods = new List<MethodInfo>();
+          methods.Add(method);
+        }
+      }
+    }
 
-			foreach ( var pair in cacheFolds )
-			{
-				if (pair.Value.types.Contains(prop.name))
-				{
-					var pr = prop.Copy();
-					shouldBeFolded = true;
-					pair.Value.props.Add(pr);
+    public void HandleFoldProp(SerializedProperty prop)
+    {
+      var shouldBeFolded = false;
 
-					break;
-				}
-			}
+      foreach (var pair in cacheFolds)
+      {
+        if (pair.Value.types.Contains(prop.name))
+        {
+          var pr = prop.Copy();
+          shouldBeFolded = true;
+          pair.Value.props.Add(pr);
 
-			if (shouldBeFolded == false)
-			{
-				var pr = prop.Copy();
-				props.Add(pr);
-			}
-		}
+          break;
+        }
+      }
 
-		IEnumerable<MemberInfo> GetButtonMembers(object target)
-		{
+      if (shouldBeFolded == false)
+      {
+        var pr = prop.Copy();
+        props.Add(pr);
+      }
+    }
 
-			var vals = 
-					target.GetType()
-					.GetMembers(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
-					.Where(CheckButtonAttribute).ToList();
+    IEnumerable<MemberInfo> GetButtonMembers(object target)
+    {
+      var vals = target.GetType().GetMembers(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic).Where(CheckButtonAttribute).ToList();
 
-			var vals2 = target.GetType().BaseType.GetMembers(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
-					.Where(CheckButtonAttribute);
+      var vals2 = target.GetType().BaseType.GetMembers(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic).Where(CheckButtonAttribute);
 
-			vals.AddRange(vals2);
-	 
-			return vals;
-	 
-		}
+      vals.AddRange(vals2);
 
-		bool CheckButtonAttribute(MemberInfo memberInfo)
-		{
-			return Attribute.IsDefined(memberInfo, typeof(ButtonAttribute));
-		}
+      return vals;
+    }
 
-		class CacheFoldProp
-		{
+    bool CheckButtonAttribute(MemberInfo memberInfo)
+    {
+      return Attribute.IsDefined(memberInfo, typeof(ButtonAttribute));
+    }
 
-			public HashSet<string> types = new HashSet<string>();
-			public List<SerializedProperty> props = new List<SerializedProperty>();
-			public FoldoutGroupAttribute atr;
-			public bool expanded;
+    class CacheFoldProp
+    {
+      public readonly List<SerializedProperty> props = new List<SerializedProperty>();
+      public HashSet<string> types = new HashSet<string>();
+      public FoldoutGroupAttribute atr;
+      public bool expanded;
 
-			public void Dispose()
-			{
-				props.Clear();
-				types.Clear();
-				atr = null;
-			}
-
-		}
-
-	}
+      public void Dispose()
+      {
+        props.Clear();
+        types.Clear();
+        atr = null;
+      }
+    }
+  }
 }
 #endif

@@ -12,289 +12,262 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 namespace Pixeye.Actors
 {
-	/// <summary>
-	/// <para>A scene point of entry. The developer defines here scene dependencies and processing that will work on the scene.</para> 
-	/// </summary>
-	public class Starter : MonoBehaviour
-	{
-		public static bool initialized;
-		static bool typesBinded;
+  /// <summary>
+  /// <para>A scene point of entry. The developer defines here scene dependencies and processing that will work on the scene.</para> 
+  /// </summary>
+  public class Starter : MonoBehaviour
+  {
+    public static bool initialized;
+    static bool typesBinded;
 
-		#if ODIN_INSPECTOR
+#if ODIN_INSPECTOR
 		[FoldoutGroup("Setup")]
-		#else
-		[FoldoutGroup("Setup"), Reorderable]
-		#endif
-		public List<SceneReference> ScenesToKeep;
+#else
+    [FoldoutGroup("Setup"), Reorderable]
+#endif
+    public List<SceneReference> ScenesToKeep;
 
-		#if ODIN_INSPECTOR
+#if ODIN_INSPECTOR
 		[FoldoutGroup("Setup")]
-		#else
-		[FoldoutGroup("Setup"), Reorderable]
-		#endif
-		public List<SceneReference> SceneDependsOn;
+#else
+    [FoldoutGroup("Setup"), Reorderable]
+#endif
+    public List<SceneReference> SceneDependsOn;
 
-		[FoldoutGroup("Pool Cache")]
-		public List<PoolNode> nodes = new List<PoolNode>();
+    [FoldoutGroup("Pool Cache")]
+    public List<PoolNode> nodes = new List<PoolNode>();
 
-		protected virtual void OnAwake()
-		{
-			
-		}
-		
-		void Awake()
-		{
-			if (ProcessorUpdate.Default == null)
-			{
-				ProcessorUpdate.Create();
-		 
-			}
+    protected virtual void OnAwake()
+    {
+    }
 
-			OnAwake();
+    void Awake()
+    {
+      if (ProcessorUpdate.Default == null)
+      {
+        ProcessorUpdate.Create();
+      }
 
-			if (!typesBinded)
-			{
-				var asmFramework = Assembly.GetExecutingAssembly();
-				var asmDataRaw   = Framework.Settings.Namespace;
-				RegisterAttributeComponents(asmFramework.GetTypes());
+      OnAwake();
 
-				var q = asmFramework.GetTypes()
-					.Where(t => t.IsSubclassOf(typeof(Storage)) && !t.ContainsGenericParameters);
+      if (!typesBinded)
+      {
+        var asmFramework = Assembly.GetExecutingAssembly();
+        var asmDataRaw   = Framework.Settings.Namespace;
+        RegisterAttributeComponents(asmFramework.GetTypes());
 
-				foreach (var item in q)
-				{
-					Activator.CreateInstance(item);
-				}
+        var q = asmFramework.GetTypes().Where(t => t.IsSubclassOf(typeof(Storage)) && !t.ContainsGenericParameters);
 
-				var asmData = default(Assembly);
-				if (asmDataRaw != string.Empty)
-				{
-					asmData = Assembly.Load(asmDataRaw);
-					RegisterAttributeComponents(asmData.GetTypes());
-					q = asmData.GetTypes()
-						.Where(t => t.IsSubclassOf(typeof(Storage)) && !t.ContainsGenericParameters);
+        foreach (var item in q)
+        {
+          Activator.CreateInstance(item);
+        }
 
-					foreach (var item in q)
-					{
-						Activator.CreateInstance(item);
-					}
-				}
-				else
-				{
-					
-					var types = AppDomain.CurrentDomain.GetAssemblies().Where(asm => asm != asmFramework)
-						.SelectMany(t => t.GetTypes());
-					RegisterAttributeComponents(types);
-					q = types.Where(t => t.IsSubclassOf(typeof(Storage)) && !t.ContainsGenericParameters);
-					foreach (var item in q)
-					{
-						Activator.CreateInstance(item);
-					}
-				}
+        var asmData = default(Assembly);
+        if (asmDataRaw != string.Empty)
+        {
+          asmData = Assembly.Load(asmDataRaw);
+          RegisterAttributeComponents(asmData.GetTypes());
+          q = asmData.GetTypes().Where(t => t.IsSubclassOf(typeof(Storage)) && !t.ContainsGenericParameters);
 
-				typesBinded = true;
-			}
+          foreach (var item in q)
+          {
+            Activator.CreateInstance(item);
+          }
+        }
+        else
+        {
+          var types = AppDomain.CurrentDomain.GetAssemblies().Where(asm => asm != asmFramework).SelectMany(t => t.GetTypes());
+          RegisterAttributeComponents(types);
+          q = types.Where(t => t.IsSubclassOf(typeof(Storage)) && !t.ContainsGenericParameters);
+          foreach (var item in q)
+          {
+            Activator.CreateInstance(item);
+          }
+        }
+
+        typesBinded = true;
+      }
 
 
-			ProcessorScene.Default.Setup(ScenesToKeep, SceneDependsOn, this);
-		}
+      ProcessorScene.Default.Setup(ScenesToKeep, SceneDependsOn, this);
+    }
 
-		private void RegisterAttributeComponents(IEnumerable<Type> enumerable)
-		{
-			foreach (var type in enumerable.Where(t=>t.IsDefined(typeof(ActorsComponent), false)))
-			{
-				Type genericStorage = typeof(Storage<>);
-				Type constructedStorage = genericStorage.MakeGenericType(type);
-				Activator.CreateInstance(constructedStorage);
-			}
-		}
+    private void RegisterAttributeComponents(IEnumerable<Type> enumerable)
+    {
+      foreach (var type in enumerable.Where(t => t.IsDefined(typeof(ActorsComponent), false)))
+      {
+        Type genericStorage     = typeof(Storage<>);
+        Type constructedStorage = genericStorage.MakeGenericType(type);
+        Activator.CreateInstance(constructedStorage);
+      }
+    }
 
-		public static IEnumerable<Type> GetAllSubclassOf(Type parent)
-		{
-			foreach (var a in AppDomain.CurrentDomain.GetAssemblies())
-			foreach (var t in a.GetTypes())
-			{
-				Debug.Log(t);
-				if (t.IsSubclassOf(parent))
-					yield return t;
-			}
-		}
+    public static IEnumerable<Type> GetAllSubclassOf(Type parent)
+    {
+      foreach (var a in AppDomain.CurrentDomain.GetAssemblies())
+      foreach (var t in a.GetTypes())
+      {
+        if (t.IsSubclassOf(parent))
+          yield return t;
+      }
+    }
 
-		#if UNITY_EDITOR
-		public void ClearNodes()
-		{
-			for (int i = 0; i < nodes.Count; i++)
-			{
-				var n = nodes[i];
-				n.createdObjs.Clear();
-				n.prefab = null;
-			}
+#if UNITY_EDITOR
+    public void ClearNodes()
+    {
+      for (int i = 0; i < nodes.Count; i++)
+      {
+        var n = nodes[i];
+        n.createdObjs.Clear();
+        n.prefab = null;
+      }
 
-			nodes.Clear();
-		}
-		public void AddToNode(GameObject prefab, GameObject instance, int pool)
-		{
-			var id                  = prefab.GetInstanceID();
-			var nodesValid          = nodes.FindValidNodes(id);
-			var conditionNodeCreate = true;
-			var nodesToKill         = new List<int>();
+      nodes.Clear();
+    }
 
-			for (int i = 0; i < nodesValid.Count; i++)
-			{
-				var node = nodes[nodesValid[i]];
+    public void AddToNode(GameObject prefab, GameObject instance, int pool)
+    {
+      var id                  = prefab.GetInstanceID();
+      var nodesValid          = nodes.FindValidNodes(id);
+      var conditionNodeCreate = true;
+      var nodesToKill         = new List<int>();
 
-				var index = node.createdObjs.FindInstanceID(instance);
-				if (index != -1 && pool != node.pool)
-				{
-					node.createdObjs.RemoveAt(index);
-				}
-				else if (index == -1 && pool == node.pool)
-				{
-					conditionNodeCreate = false;
-					node.createdObjs.Add(instance);
-				}
+      for (var i = 0; i < nodesValid.Count; i++)
+      {
+        var node = nodes[nodesValid[i]];
 
-				if (index != -1 && pool == node.pool)
-				{
-					conditionNodeCreate = false;
-				}
+        var index = node.createdObjs.FindInstanceID(instance);
+        if (index != -1 && pool != node.pool)
+        {
+          node.createdObjs.RemoveAt(index);
+        }
+        else if (index == -1 && pool == node.pool)
+        {
+          conditionNodeCreate = false;
+          node.createdObjs.Add(instance);
+        }
 
-				if (node.createdObjs.Count == 0)
-				{
-					node.prefab = null;
-					nodesToKill.Add(nodesValid[i]);
-				}
-			}
+        if (index != -1 && pool == node.pool)
+        {
+          conditionNodeCreate = false;
+        }
 
-			for (int i = 0; i < nodesToKill.Count; i++)
-			{
-				nodes.RemoveAt(nodesToKill[i]);
-			}
+        if (node.createdObjs.Count == 0)
+        {
+          node.prefab = null;
+          nodesToKill.Add(nodesValid[i]);
+        }
+      }
 
-			if (conditionNodeCreate)
-			{
-				var node = new PoolNode();
-				node.id          = id;
-				node.prefab      = prefab;
-				node.pool        = pool;
-				node.createdObjs = new List<GameObject>();
-				node.createdObjs.Add(instance);
-				nodes.Add(node);
-			}
-		}
-		public void RemoveFromNode(GameObject instance, int pool)
-		{
-			GameObject prefab;
-			#if UNITY_2018_3_OR_NEWER
-			prefab = PrefabUtility.GetCorrespondingObjectFromSource(instance);
-			#else
-			prefab = (GameObject)PrefabUtility.GetPrefabObject(instance);
-			#endif
+      for (var i = 0; i < nodesToKill.Count; i++)
+      {
+        nodes.RemoveAt(nodesToKill[i]);
+      }
 
-			if (prefab == null) return;
-			var id    = prefab.GetInstanceID();
-			var index = nodes.FindValidNode(id, pool);
-			if (index != -1)
-			{
-				var n = nodes[index];
+      if (conditionNodeCreate)
+      {
+        var node = new PoolNode();
+        node.id          = id;
+        node.prefab      = prefab;
+        node.pool        = pool;
+        node.createdObjs = new List<GameObject>();
+        node.createdObjs.Add(instance);
+        nodes.Add(node);
+      }
+    }
 
-				n.createdObjs.Remove(instance);
-				if (n.createdObjs.Count == 0)
-				{
-					n.prefab = null;
-					nodes.RemoveAt(index);
-				}
-			}
-		}
-		#endif
+    public void RemoveFromNode(GameObject instance, int pool)
+    {
+   
+#if UNITY_2018_3_OR_NEWER
+      var prefab = PrefabUtility.GetCorrespondingObjectFromSource(instance);
+#else
+      var prefab = (GameObject)PrefabUtility.GetPrefabObject(instance);
+#endif
 
-		public void BindScene()
-		{
-			ProcessorScene.Default.OnSceneLoad  =  delegate { };
-			ProcessorScene.Default.OnSceneClose =  delegate { };
-			ProcessorScene.Default.OnSceneClose += Dispose;
+      if (prefab == null) return;
+      var id    = prefab.GetInstanceID();
+      var index = nodes.FindValidNode(id, pool);
+      if (index != -1)
+      {
+        var n = nodes[index];
 
-			// zero entity
-			Entity.Create();
+        n.createdObjs.Remove(instance);
+        if (n.createdObjs.Count == 0)
+        {
+          n.prefab = null;
+          nodes.RemoveAt(index);
+        }
+      }
+    }
+#endif
 
+    public void BindScene()
+    {
+      ProcessorScene.Default.OnSceneLoad  =  delegate { };
+      ProcessorScene.Default.OnSceneClose =  delegate { };
+      ProcessorScene.Default.OnSceneClose += Dispose;
 
-			for (int i = 0; i < nodes.Count; i++)
-				nodes[i].Populate();
+      // zero entity
+      Entity.Create();
 
 
-			Add<ProcessorObserver>();
+      for (var i = 0; i < nodes.Count; i++)
+        nodes[i].Populate();
 
 
-			Setup();
+      Add<ProcessorObserver>();
 
 
-			initialized = true;
-
-			for (int i = 0; i < SceneManager.sceneCount; i++)
-			{
-				var scene = SceneManager.GetSceneAt(i);					
-				var objs = scene.GetRootGameObjects();
-	
-	
-				foreach (var obj in objs)
-				{
-					var transforms = obj.GetComponentsInChildren<Transform>();
-	
-					foreach (var tr in transforms)
-					{
-						var oo = tr.GetComponents<MonoBehaviour>();
-						if (!tr.gameObject.activeInHierarchy) continue;
-						foreach (var o in oo)
-						{
-							var req = o as IRequireStarter;
-							if (req != null && o.enabled)
-							{
-								req.Launch();
-							}
-						}
-					}
-				}
-			}
-
-			Timer.Add(time.deltaFixed, PostSetup);
-		}
-
-		/// <summary>
-		/// <para>Adds an object to the toolbox by type. It is mainly used to add processing scripts.</para>
-		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <returns></returns>
-		protected static T Add<T>() where T : new()
-		{
-			return Toolbox.Add<T>();
-		}
-
-		/// <summary>
-		/// This method will execute when the scene loaded. Use it to add your processors.
-		/// </summary>
-		protected virtual void Setup()
-		{
-		}
-
-		protected virtual void PostSetup()
-		{
-		}
+      Setup();
 
 
-		protected virtual void OnDestroy()
-		{
-			initialized = false;
-		}
+      initialized = true;
 
-		/// <summary>
-		/// This method will execute when the scene get removed. Use this method for reference cleanup.
-		/// </summary>
-		protected virtual void Dispose()
-		{
-		}
-	}
+      var objs = FindObjectsOfType<MonoBehaviour>().OfType<IRequireStarter>();
+      foreach (var obj in objs)
+        obj.Launch();
+
+
+      Timer.Add(time.deltaFixed, PostSetup);
+    }
+
+    /// <summary>
+    /// <para>Adds an object to the toolbox by type. It is mainly used to add processing scripts.</para>
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    protected static T Add<T>() where T : new()
+    {
+      return Toolbox.Add<T>();
+    }
+
+    /// <summary>
+    /// This method will execute when the scene loaded. Use it to add your processors.
+    /// </summary>
+    protected virtual void Setup()
+    {
+    }
+
+    protected virtual void PostSetup()
+    {
+    }
+
+
+    protected virtual void OnDestroy()
+    {
+      initialized = false;
+    }
+
+    /// <summary>
+    /// This method will execute when the scene get removed. Use this method for reference cleanup.
+    /// </summary>
+    protected virtual void Dispose()
+    {
+    }
+  }
 }

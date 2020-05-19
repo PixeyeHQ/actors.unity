@@ -43,16 +43,16 @@ namespace Pixeye.Actors
     public int length;
 
 
-    #if ACTORS_EVENTS_MANUAL
+#if ACTORS_EVENTS_MANUAL
 		public ents added;
 		public ents removed;
 		
 		internal bool hasEventAdd;
 		internal bool hasEventRemove;
-    #else
+#else
     public ents added = new ents(Framework.Settings.SizeEntities);
     public ents removed = new ents(Framework.Settings.SizeEntities);
-    #endif
+#endif
 
 
     protected internal Composition composition;
@@ -75,7 +75,7 @@ namespace Pixeye.Actors
       entities[index].Release();
     }
 
-    #if ACTORS_EVENTS_MANUAL
+#if ACTORS_EVENTS_MANUAL
 		internal void SetSelf(Op op, Processor pr)
 		{
 			if ((op & Op.Add) == Op.Add)
@@ -94,14 +94,14 @@ namespace Pixeye.Actors
 				hasEventRemove = true;
 			}
 		}
-    #endif
+#endif
 
     internal virtual GroupCore Initialize(Composition composition)
     {
       this.composition = composition;
-      #if !ACTORS_TAGS_0
+#if !ACTORS_TAGS_0
       HelperTags.Add(this);
-      #endif
+#endif
 
       this.composition.SetupExcludeTypes(this);
       return this;
@@ -121,28 +121,28 @@ namespace Pixeye.Actors
       if (entity.id >= entities.Length)
       {
         Array.Resize(ref entities, entity.id << 1);
-        #if ACTORS_EVENTS_MANUAL
+#if ACTORS_EVENTS_MANUAL
 				if (hasEventAdd)
 				Array.Resize(ref added.source, entity.id << 1);
 				if (hasEventRemove)
 				Array.Resize(ref removed.source, entity.id << 1);
-        #else
+#else
         Array.Resize(ref added.source, entity.id << 1);
         Array.Resize(ref removed.source, entity.id << 1);
-        #endif
+#endif
       }
       else if (length >= entities.Length)
       {
         Array.Resize(ref entities, length << 1);
-        #if ACTORS_EVENTS_MANUAL
+#if ACTORS_EVENTS_MANUAL
 				if (hasEventAdd)
 				Array.Resize(ref added.source, length << 1);
 				if (hasEventRemove)
 				Array.Resize(ref removed.source, length << 1);
-        #else
+#else
         Array.Resize(ref added.source, length << 1);
         Array.Resize(ref removed.source, length << 1);
-        #endif
+#endif
       }
 
       var consitionSort = right - 1;
@@ -169,22 +169,22 @@ namespace Pixeye.Actors
 
         Array.Copy(entities, index, entities, index + 1, length - index);
         entities[index] = entity;
-        #if ACTORS_EVENTS_MANUAL
+#if ACTORS_EVENTS_MANUAL
 				if (hasEventAdd)
 					added.source[added.length++] = entity;
-        #else
+#else
         added.source[added.length++] = entity;
-        #endif
+#endif
       }
       else
       {
         entities[right] = entity;
-        #if ACTORS_EVENTS_MANUAL
+#if ACTORS_EVENTS_MANUAL
 				if (hasEventAdd)
 					added.source[added.length++] = entity;
-        #else
+#else
         added.source[added.length++] = entity;
-        #endif
+#endif
       }
     }
 
@@ -202,12 +202,12 @@ namespace Pixeye.Actors
       var i = HelperArray.BinarySearch(ref entities, entityID, 0, length - 1);
       if (i == -1) return;
 
-      #if ACTORS_EVENTS_MANUAL
+#if ACTORS_EVENTS_MANUAL
 			if (hasEventRemove)
 				removed.source[removed.length++] = entities[i];
-      #else
+#else
       removed.source[removed.length++] = entities[i];
-      #endif
+#endif
 
       if (i < --length)
         Array.Copy(entities, i + 1, entities, i, length - i);
@@ -220,12 +220,12 @@ namespace Pixeye.Actors
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal void Remove(int i)
     {
-      #if ACTORS_EVENTS_MANUAL
+#if ACTORS_EVENTS_MANUAL
 			if (hasEventRemove)
 				removed.source[removed.length++] = entities[i];
-      #else
+#else
       removed.source[removed.length++] = entities[i];
-      #endif
+#endif
 
       if (i < --length)
         Array.Copy(entities, i + 1, entities, i, length - i);
@@ -234,17 +234,17 @@ namespace Pixeye.Actors
 
     public virtual void Dispose()
     {
-      #if ACTORS_EVENTS_MANUAL
+#if ACTORS_EVENTS_MANUAL
 			hasEventAdd = false;
 			hasEventRemove = false;
 
 			added = default;
 			removed = default;
-      #else
+#else
 
       added   = new ents(Framework.Settings.SizeEntities);
       removed = new ents(Framework.Settings.SizeEntities);
-      #endif
+#endif
 
 
       //parallel
@@ -303,6 +303,7 @@ namespace Pixeye.Actors
         nextSegment.thread.Start(nextSegment);
       }
     }
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Execute(float delta)
     {
@@ -344,6 +345,7 @@ namespace Pixeye.Actors
         }
       }
     }
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Execute()
     {
@@ -383,6 +385,7 @@ namespace Pixeye.Actors
         }
       }
     }
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     protected void HandleThread(object objSegmentGroup)
     {
@@ -451,6 +454,7 @@ namespace Pixeye.Actors
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
       internal Enumerator(GroupCore g)
       {
+        ProcessorEntities.Execute();
         position = -1;
         this.g   = g;
       }

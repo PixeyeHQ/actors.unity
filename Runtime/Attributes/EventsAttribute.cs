@@ -6,15 +6,15 @@ using System;
 
 namespace Pixeye.Actors
 {
- 
-	public sealed class EventsAttribute : Attribute
-	{
-		public Op op;
-		public EventsAttribute(Op op)
-		{
-			this.op = op;
-		}
-	}
- 
+  public class EventsAttribute : Attribute
+  {
+    public Op op;
+
+    public EventsAttribute(Op op)
+    {
+      this.op = op;
+    }
+  }
 }
+
 #endif

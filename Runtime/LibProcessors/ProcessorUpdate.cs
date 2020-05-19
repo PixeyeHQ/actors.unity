@@ -14,10 +14,10 @@ namespace Pixeye.Actors
     internal static List<time> times = new List<time>();
     internal static int timesLen = 0;
 
-    List<ITick> ticks = new List<ITick>(128);
-    List<ITick> ticksProc = new List<ITick>(64);
-    List<ITickFixed> ticksFixed = new List<ITickFixed>();
-    List<ITickLate> ticksLate = new List<ITickLate>();
+    readonly List<ITick> ticks = new List<ITick>(128);
+    readonly List<ITick> ticksProc = new List<ITick>(64);
+    readonly List<ITickFixed> ticksFixed = new List<ITickFixed>();
+    readonly List<ITickLate> ticksLate = new List<ITickLate>();
 
     int countTicksProc;
     int countTicks;
@@ -168,33 +168,34 @@ namespace Pixeye.Actors
 
     void Update()
     {
-      var delta = time.delta * time.Default.timeScale;
-      routines.Global.Tick(delta);
+      var delta = time.delta;
+     
+
+      routines.Global.Tick(time.deltaUnscaled);
 
       if (Toolbox.changingScene) return;
 
-
-      for (int i = 0; i < timesLen; i++)
+      for (var i = 0; i < timesLen; i++)
       {
         times[i].Tick();
       }
- 
+
+      ProcessorEntities.Execute();
+
       for (var i = 0; i < countTicks; i++)
       {
         ticks[i].Tick(delta);
       }
 
-
-      ProcessorEntities.Tick(delta);
-
       for (var i = 0; i < countTicksProc; i++)
       {
         ticksProc[i].Tick(delta);
-        ProcessorEntities.Tick(delta);
       }
 
-      
-      routines.Default.Tick(delta);
+      for (var i = 0; i < ProcessorCoroutines.coroutine_handlers.Count; i++)
+      {
+        ProcessorCoroutines.coroutine_handlers[i].Tick(delta);
+      }
     }
 
     void FixedUpdate()
@@ -204,7 +205,6 @@ namespace Pixeye.Actors
       for (var i = 0; i < countTicksFixed; i++)
       {
         ticksFixed[i].TickFixed(delta);
-        ProcessorEntities.Tick(delta);
       }
     }
 
@@ -215,7 +215,6 @@ namespace Pixeye.Actors
       for (var i = 0; i < countTicksLate; i++)
       {
         ticksLate[i].TickLate(delta);
-        ProcessorEntities.Tick(delta);
       }
     }
 

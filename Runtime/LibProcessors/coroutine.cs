@@ -4,248 +4,414 @@
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using Unity.IL2CPP.CompilerServices;
+using UnityEngine;
 
 
 namespace Pixeye.Actors
 {
-	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
-	public class ProcessorCoroutines : ITick
-	{
-		IEnumerator[] running = new IEnumerator[36];
-		internal float[] delays = new float[36];
-		internal int currentIndex;
-		int length;
+  [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
+  public class ProcessorCoroutines
+  {
+    public bool timescaled = false;
+    public float period = -1;
 
-		public coroutine Run(float delay, IEnumerator routine)
-		{
-			if (length == running.Length)
-			{
-				Array.Resize(ref running, length << 1);
-				Array.Resize(ref delays, length << 1);
-			}
+    internal static List<ProcessorCoroutines> coroutine_handlers = new List<ProcessorCoroutines>();
+    internal static List<ProcessorCoroutines> coroutine_handlers_global = new List<ProcessorCoroutines>();
 
-			running[length]  = routine;
-			delays[length++] = delay;
+    IEnumerator[] running = new IEnumerator[36];
+    internal float[] delays = new float[36];
 
-			return new coroutine(this, routine);
-		}
+    internal int currentIndex;
+    int length;
 
-		public coroutine Run(IEnumerator routine)
-		{
-			if (length == running.Length)
-			{
-				Array.Resize(ref running, length << 1);
-				Array.Resize(ref delays, length << 1);
-			}
+    public coroutine Run(float delay, IEnumerator routine)
+    {
+      if (length == running.Length)
+      {
+        Array.Resize(ref running, length << 1);
+        Array.Resize(ref delays, length << 1);
+      }
 
-			running[length]  = routine;
-			delays[length++] = 0f;
+      running[length] = routine;
 
-			return new coroutine(this, routine);
-		}
-		public coroutine run(IEnumerator routine)
-		{
-			return Run(0, routine);
-		}
+      delays[length++] = delay;
 
 
-		public bool Stop(IEnumerator routine)
-		{
-			int i = 0;
+      return new coroutine(this, routine);
+    }
 
-			for (; i < length; i++)
-			{
-				if (routine == running[i]) break;
-			}
+    public coroutine Run(IEnumerator routine)
+    {
+      if (length == running.Length)
+      {
+        Array.Resize(ref running, length << 1);
+        Array.Resize(ref delays, length << 1);
+      }
 
-			if (i < 0)
-				return false;
+      running[length] = routine;
 
-			running[i] = null;
-			delays[i]  = 0f;
-			return true;
-		}
+      delays[length++] = 0;
 
+      return new coroutine(this, routine);
+    }
 
-		public bool Stop(coroutine routine)
-		{
-			return routine.stop();
-		}
+    public coroutine run(IEnumerator routine)
+    {
+      return Run(0, routine);
+    }
 
+    public bool Stop(IEnumerator routine)
+    {
+      var i = 0;
 
-		public void StopAll()
-		{
-			length = 0;
-		}
+      for (; i < length; i++)
+      {
+        if (routine == running[i]) break;
+      }
 
+      if (i < 0)
+        return false;
 
-		public bool IsRunning(IEnumerator routine)
-		{
-			for (int i = 0; i < length; i++)
-			{
-				if (routine == running[i]) return true;
-			}
-
-			return false;
-		}
-
-		public bool IsRunning(coroutine routine)
-		{
-			return routine.isRunning;
-		}
+      running[i] = null;
+      delays[i]  = 0f;
+      return true;
+    }
 
 
-		public void Tick(float delta)
-		{
-			for (int i = length - 1; i >= 0; i--)
-			{
-				if (delays[i] > 0f)
-					delays[i] -= delta;
-
-				else if (running[i] == null || !MoveNext(running[i], i))
-				{
-					if (i < --length)
-					{
-						Array.Copy(running, i + 1, running, i, length - i);
-						Array.Copy(delays, i + 1, delays, i, length - i);
-					}
-				}
-			}
-		}
-
-		bool MoveNext(IEnumerator routine, int index)
-		{
-			currentIndex = index;
-			if (routine.Current is IEnumerator)
-			{
-				if (MoveNext((IEnumerator) routine.Current, index))
-					return true;
-
-				delays[index] = 0f;
-			}
+    public bool Stop(coroutine routine)
+    {
+      return routine.stop();
+    }
 
 
-			return routine.MoveNext();
-		}
-	}
-
-	public class routines : ProcessorCoroutines
-	{
-		public static readonly routines Default = new routines();
-		internal static readonly routines Global = new routines();
-
-		/// <summary>
-		/// Local coroutines that work only on main scene.
-		/// </summary>
-		public static coroutine run(float delay, IEnumerator routine)
-		{
-			return Default.Run(delay, routine);
-		}
-		/// <summary>
-		/// Local coroutines that work only on main scene.
-		/// </summary>
-		public static new coroutine run(IEnumerator routine)
-		{
-			return Default.Run(0, routine);
-		}
-
-		public static bool stop(IEnumerator routine)
-		{
-			return Default.Stop(routine);
-		}
+    public void StopAll()
+    {
+      length = 0;
+    }
 
 
-		public static IEnumerator waitFrame => null;
-		public static IEnumerator wait(float t)
-		{
-			Default.delays[Default.currentIndex] = t;
-			return null;
-		}
+    public bool IsRunning(IEnumerator routine)
+    {
+      for (var i = 0; i < length; i++)
+      {
+        if (routine == running[i]) return true;
+      }
 
-		/// <summary>
-		/// Coroutines that runs globally and are not affected by scene changes.
-		/// </summary>
-		public static class app
-		{
-			public static coroutine run(float delay, IEnumerator routine)
-			{
-				return Global.Run(delay, routine);
-			}
-			public static coroutine run(IEnumerator routine)
-			{
-				return Global.Run(0, routine);
-			}
+      return false;
+    }
+
+    public bool IsRunning(coroutine routine)
+    {
+      return routine.isRunning;
+    }
+
+    internal float accum;
+
+    public void Tick(float d)
+    {
+      if (timescaled == false)
+      {
+        d = time.Default.deltaTimeUnscaled;
+      }
+
+      if (period > -1)
+      {
+        accum += d;
+        if (accum >= period)
+        {
+          for (var i = length - 1; i >= 0; i--)
+          {
+            if (delays[i] > 0f)
+              delays[i] -= accum;
+
+            else if (running[i] == null || !MoveNext(running[i], i))
+            {
+              if (i < --length)
+              {
+                Array.Copy(running, i + 1, running, i, length - i);
+                Array.Copy(delays, i + 1, delays, i, length - i);
+              }
+            }
+          }
+
+          accum -= period;
+        }
+      }
+      else
+      {
+        for (var i = length - 1; i >= 0; i--)
+        {
+          if (delays[i] > 0f)
+            delays[i] -= d;
+
+          else if (running[i] == null || !MoveNext(running[i], i))
+          {
+            if (i < --length)
+            {
+              Array.Copy(running, i + 1, running, i, length - i);
+              Array.Copy(delays, i + 1, delays, i, length - i);
+            }
+          }
+        }
+      }
+    }
+
+    bool MoveNext(IEnumerator routine, int index)
+    {
+      currentIndex = index;
+      if (routine.Current is IEnumerator current)
+      {
+        if (MoveNext(current, index))
+          return true;
+
+        delays[index] = 0f;
+      }
 
 
-			public static bool stop(IEnumerator routine)
-			{
-				return Global.Stop(routine);
-			}
-		}
-	}
+      return routine.MoveNext();
+    }
+  }
+
+  public class ProcessorRoutine
+  {
+    ProcessorCoroutines Local;
+    public App app;
+
+    bool timescaled = true;
+    float period = -1;
+
+    public ProcessorRoutine()
+    {
+      app        = new App();
+      app.Global = new ProcessorCoroutines();
+
+      app.Global.timescaled = true;
+      app.Global.period     = -1;
+
+      ProcessorCoroutines.coroutine_handlers.Add(Local);
+      ProcessorCoroutines.coroutine_handlers_global.Add(app.Global);
+    }
+
+    public void addLocalRoutines()
+    {
+      Local            = new ProcessorCoroutines();
+      Local.timescaled = timescaled;
+      Local.period     = period;
+      Local.accum      = period;
+    }
+
+    public ProcessorRoutine ignoreTimescale()
+    {
+      timescaled            = false;
+      app.Global.timescaled = false;
+      return this;
+    }
+
+    public ProcessorRoutine setUpdatePeriod(float arg)
+    {
+      period            = arg;
+      app.Global.period = arg;
+      app.Global.accum  = arg;
+      return this;
+    }
+
+    /// <summary>
+    /// Local coroutines that work only on main scene.
+    /// </summary>
+    public coroutine run(float delay, IEnumerator routine)
+    {
+      return Local.Run(delay, routine);
+    }
+
+    /// <summary>
+    /// Local coroutines that work only on main scene.
+    /// </summary>
+    public coroutine run(IEnumerator routine)
+    {
+      return Local.Run(0, routine);
+    }
 
 
-	public class WaitFrame : IEnumerator
-	{
-		public object Current => null;
+    public bool stop(IEnumerator routine)
+    {
+      return Local.Stop(routine);
+    }
 
-		public bool MoveNext() => true;
 
-		public void Reset()
-		{
-		}
-	}
+    public IEnumerator waitFrame => null;
 
-	/// <summary>
-	/// A handle to a (potentially running) coroutine.
-	/// </summary>
-	public struct coroutine
-	{
-		/// <summary>
-		/// Reference to the routine's runner.
-		/// </summary>
-		public ProcessorCoroutines processorCoroutines;
+    public IEnumerator wait(float t)
+    {
+      Local.delays[Local.currentIndex] = t;
+      return null;
+    }
 
-		/// <summary>
-		/// Reference to the routine's enumerator.
-		/// </summary>
-		public IEnumerator enumerator;
+    /// <summary>
+    /// Coroutines that runs globally and are not affected by scene changes.
+    /// </summary>
+    public class App
+    {
+      internal ProcessorCoroutines Global;
 
-		/// <summary>
-		/// Construct a coroutine. Never call this manually, only use return values from Coroutines.Run().
-		/// </summary>
-		/// <param name="processorCoroutines">The routine's runner.</param>
-		/// <param name="enumerator">The routine's enumerator.</param>
-		public coroutine(ProcessorCoroutines processorCoroutines, IEnumerator enumerator)
-		{
-			this.processorCoroutines = processorCoroutines;
-			this.enumerator          = enumerator;
-		}
+      public coroutine run(float delay, IEnumerator routine)
+      {
+        return Global.Run(delay, routine);
+      }
 
-		/// <summary>
-		/// Stop this coroutine if it is running.
-		/// </summary>
-		/// <returns>True if the coroutine was stopped.</returns>
-		public bool stop()
-		{
-			return isRunning && processorCoroutines.Stop(enumerator);
-		}
+      public coroutine run(IEnumerator routine)
+      {
+        return Global.Run(0, routine);
+      }
 
-		/// <summary>
-		/// A routine to wait until this coroutine has finished running.
-		/// </summary>
-		/// <returns>The wait enumerator.</returns>
-		public IEnumerator wait()
-		{
-			if (enumerator != null)
-				while (processorCoroutines.IsRunning(enumerator))
-					yield return null;
-		}
 
-		/// <summary>
-		/// True if the enumerator is currently running.
-		/// </summary>
-		public bool isRunning => enumerator != null && processorCoroutines.IsRunning(enumerator);
-	}
+      public bool stop(IEnumerator routine)
+      {
+        return Global.Stop(routine);
+      }
+    }
+  }
+
+  public static class routines
+  {
+    internal static ProcessorCoroutines Local;
+    internal static ProcessorCoroutines Global;
+
+    [RuntimeInitializeOnLoadMethod]
+    public static void init()
+    {
+      Local  = new ProcessorCoroutines();
+      Global = new ProcessorCoroutines();
+
+      Local.timescaled  = true;
+      Global.timescaled = true;
+
+      Local.period  = -1;
+      Global.period = -1;
+
+      ProcessorCoroutines.coroutine_handlers.Add(Local);
+      ProcessorCoroutines.coroutine_handlers_global.Add(Global);
+    }
+
+    /// <summary>
+    /// Local coroutines that work only on main scene.
+    /// </summary>
+    public static coroutine run(float delay, IEnumerator routine)
+    {
+      return Local.Run(delay, routine);
+    }
+
+    /// <summary>
+    /// Local coroutines that work only on main scene.
+    /// </summary>
+    public static coroutine run(IEnumerator routine)
+    {
+      return Local.Run(0, routine);
+    }
+
+
+    public static bool stop(IEnumerator routine)
+    {
+      return Local.Stop(routine);
+    }
+
+
+    public static IEnumerator waitFrame => null;
+
+    public static IEnumerator wait(float t)
+    {
+      Local.delays[Local.currentIndex] = t;
+      return null;
+    }
+
+
+    /// <summary>
+    /// Coroutines that runs globally and are not affected by scene changes.
+    /// </summary>
+    public static class app
+    {
+      public static coroutine run(float delay, IEnumerator routine)
+      {
+        return Global.Run(delay, routine);
+      }
+
+      public static coroutine run(IEnumerator routine)
+      {
+        return Global.Run(0, routine);
+      }
+
+
+      public static bool stop(IEnumerator routine)
+      {
+        return Global.Stop(routine);
+      }
+    }
+  }
+
+
+  public class WaitFrame : IEnumerator
+  {
+    public object Current => null;
+
+    public bool MoveNext() => true;
+
+    public void Reset()
+    {
+    }
+  }
+
+
+  /// <summary>
+  /// A handle to a (potentially running) coroutine.
+  /// </summary>
+  public struct coroutine
+  {
+    /// <summary>
+    /// Reference to the routine's runner.
+    /// </summary>
+    public ProcessorCoroutines processorCoroutines;
+
+    /// <summary>
+    /// Reference to the routine's enumerator.
+    /// </summary>
+    public IEnumerator enumerator;
+
+
+    /// <summary>
+    /// Construct a coroutine. Never call this manually, only use return values from Coroutines.Run().
+    /// </summary>
+    /// <param name="processorCoroutines">The routine's runner.</param>
+    /// <param name="enumerator">The routine's enumerator.</param>
+    public coroutine(ProcessorCoroutines processorCoroutines, IEnumerator enumerator)
+    {
+      this.processorCoroutines = processorCoroutines;
+      this.enumerator          = enumerator;
+    }
+
+    /// <summary>
+    /// Stop this coroutine if it is running.
+    /// </summary>
+    /// <returns>True if the coroutine was stopped.</returns>
+    public bool stop()
+    {
+      return isRunning && processorCoroutines.Stop(enumerator);
+    }
+
+    /// <summary>
+    /// A routine to wait until this coroutine has finished running.
+    /// </summary>
+    /// <returns>The wait enumerator.</returns>
+    public IEnumerator wait()
+    {
+      if (enumerator != null)
+        while (processorCoroutines.IsRunning(enumerator))
+          yield return null;
+    }
+
+    /// <summary>
+    /// True if the enumerator is currently running.
+    /// </summary>
+    public bool isRunning => enumerator != null && processorCoroutines.IsRunning(enumerator);
+  }
 }

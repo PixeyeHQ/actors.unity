@@ -85,7 +85,7 @@ namespace Pixeye.Actors
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal bool CanProceed(int entityID)
     {
-      for (int ll = 0; ll < ids.Length; ll++)
+      for (var ll = 0; ll < ids.Length; ll++)
         if ((Entity.Generations[entityID, generations[ll]] & ids[ll]) != ids[ll])
           return false;
 

@@ -24,7 +24,7 @@ namespace Pixeye.Actors
 
 		static StyleFramework()
 		{
-			bool pro = EditorGUIUtility.isProSkin;
+			var pro = EditorGUIUtility.isProSkin;
 
 			var uiTex_in    = Resources.Load<Texture2D>("IN foldout focus-6510");
 			var uiTex_in_on = Resources.Load<Texture2D>("IN foldout focus on-5718");
@@ -41,7 +41,7 @@ namespace Pixeye.Actors
 
 			foldout = new GUIStyle(EditorStyles.foldout);
 
-			foldout.overflow = new RectOffset(-10, 0, 3, 0);
+			foldout.overflow = new RectOffset(0, 0, 3, 0);
 			foldout.padding = new RectOffset(25, 0, -3, 0);
 
 			foldout.active.textColor = c_on;
@@ -61,7 +61,7 @@ namespace Pixeye.Actors
 			foldout.onHover.background = uiTex_in_on;
 
 			box = new GUIStyle(GUI.skin.box);
-			box.padding = new RectOffset(10, 0, 10, 0);
+			box.padding = new RectOffset(20, 0, 3, 0);
 
 			boxChild = new GUIStyle(GUI.skin.box);
 			boxChild.active.textColor = c_on;
@@ -96,7 +96,7 @@ namespace Pixeye.Actors
 			if (string.IsNullOrEmpty(s))
 				return string.Empty;
 
-			char[] a = s.ToCharArray();
+			var a = s.ToCharArray();
 			a[0] = char.ToUpper(a[0]);
 			return new string(a);
 		}
