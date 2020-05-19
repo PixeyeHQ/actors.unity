@@ -189,8 +189,7 @@ namespace Pixeye.Actors
 
       app.Global.timescaled = true;
       app.Global.period     = -1;
-
-      ProcessorCoroutines.coroutine_handlers.Add(Local);
+      
       ProcessorCoroutines.coroutine_handlers_global.Add(app.Global);
     }
 
@@ -200,6 +199,7 @@ namespace Pixeye.Actors
       Local.timescaled = timescaled;
       Local.period     = period;
       Local.accum      = period;
+      ProcessorCoroutines.coroutine_handlers.Add(Local);
     }
 
     public ProcessorRoutine ignoreTimescale()
