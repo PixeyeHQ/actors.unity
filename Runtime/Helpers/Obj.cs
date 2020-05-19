@@ -9,6 +9,7 @@ namespace Pixeye.Actors
   public static class Obj
   {
     
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void InitChilds(GameObject obj)
     {
       var transforms = obj.GetComponentsInChildren<Transform>();

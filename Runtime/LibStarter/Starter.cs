@@ -232,18 +232,25 @@ namespace Pixeye.Actors
         var objs  = scene.GetRootGameObjects();
         foreach (var obj in objs)
         {
-          if (!obj.activeInHierarchy) continue;
-          var oo = obj.GetComponents<MonoBehaviour>();
-          foreach (var o in oo)
+          var transforms = obj.GetComponentsInChildren<Transform>();
+
+          foreach (var tr in transforms)
           {
-            if (o is IRequireStarter req && o.enabled)
-              req.Launch();
+            if (!tr.gameObject.activeInHierarchy) continue;
+            var oo = tr.GetComponents<MonoBehaviour>();
+            foreach (var o in oo)
+            {
+              if (o is IRequireStarter req && o.enabled)
+              {
+                req.Launch();
+              }
+            }
           }
         }
       }
 
       initialized = true;
- 
+
 
       Timer.Add(time.deltaFixed, PostSetup);
     }
@@ -281,7 +288,5 @@ namespace Pixeye.Actors
     protected virtual void Dispose()
     {
     }
-
-     
   }
 }
