@@ -179,17 +179,17 @@ namespace Pixeye.Actors
       {
         times[i].Tick();
       }
-      
+
+
       for (var i = 0; i < countTicks; i++)
       {
         ticks[i].Tick(delta);
       }
-
-      ProcessorEntities.Execute();
       
+      ProcessorEntities.Execute();
+
       for (var i = 0; i < countTicksProc; i++)
       {
-        
         ticksProc[i].Tick(delta);
         ProcessorEntities.Execute();
       }
