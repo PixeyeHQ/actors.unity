@@ -454,9 +454,9 @@ namespace Pixeye.Actors
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
       internal Enumerator(GroupCore g)
       {
-        ProcessorEntities.Execute();
         position = -1;
         this.g   = g;
+        ProcessorEntities.Execute();
       }
 
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
