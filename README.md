@@ -26,7 +26,7 @@ openupm add com.pixeye.ecs
 #### From Git URL
 
 - Open the manifest.json file in the Packages folder inside of your Unity project
-- Add ```"com.pixeye.ecs": "https://github.com/dimmpixeye/actors-unity.git",```
+- Add ```"com.pixeye.ecs": "https://github.com/dimmpixeye/actors.unity.git",```
 
 #### From Unity
 - Download from https://github.com/dimmpixeye/ecs/releases 
