@@ -6,15 +6,21 @@ using UnityEngine;
 
 namespace Pixeye.Actors
 {
+  public enum InitMode
+  {
+    All,
+    ActiveOnly
+  }
+  
   public static class Obj
   {
     /// <summary>
     /// Initialize every actor or monocache on childs of the selected gameobject
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void InitEveryChild(GameObject obj)
+    public static void InitChilds(GameObject obj, InitMode mode = InitMode.All)
     {
-      var transforms = obj.GetComponentsInChildren<Transform>(true);
+      var transforms = obj.GetComponentsInChildren<Transform>(mode == InitMode.All);
       for (var i = 1; i < transforms.Length; i++)
       {
         var tr = transforms[i];
@@ -59,6 +65,7 @@ namespace Pixeye.Actors
         }
       }
     }
+
 
     //===============================//
     // By GameObject ID

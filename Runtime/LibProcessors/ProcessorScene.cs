@@ -170,12 +170,12 @@ namespace Pixeye.Actors
       totalStagesNeed = scenesToUnload.Count + 2;
 
       //Do all work
-      for (int i = 0; i < totalStagesNeed; i++)
+      for (var i = 0; i < totalStagesNeed; i++)
       {
         //Unload scenes
         if (i < scenesToUnload.Count)
         {
-          string key = scenesToUnload[i];
+          var key = scenesToUnload[i];
 
           job = SceneManager.UnloadSceneAsync(scenes[key]);
         }
@@ -273,8 +273,7 @@ namespace Pixeye.Actors
           if (!tr.gameObject.activeInHierarchy) continue;
           foreach (var o in oo)
           {
-            var req = o as IRequireStarter;
-            if (req != null && o.enabled)
+            if (o is IRequireStarter req && o.enabled)
               req.Launch();
           }
         }
