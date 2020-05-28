@@ -26,10 +26,10 @@ openupm add com.pixeye.ecs
 #### From Git URL
 
 - Open the manifest.json file in the Packages folder inside of your Unity project
-- Add ```"com.pixeye.ecs": "https://github.com/dimmpixeye/actors.unity.git",```
+- Add ```"com.pixeye.ecs": "https://github.com/PixeyeHQ/actors.unity.git",```
 
 #### From Unity
-- Download from https://github.com/dimmpixeye/ecs/releases 
+- Download from https://github.com/PixeyeHQ/actors.unity/releases 
 
 #### How To Update
 If you install via OpenUPM registry, you can update the package using the Unity package manager.
@@ -39,8 +39,8 @@ Press Tools->Actors->Update Framework[GIT] to get new update when needed.
 
 ## Documentation 
 
-* [Examples](https://github.com/dimmpixeye/CryoshockMini) ( In progress ) 
-* [Wiki](https://github.com/dimmpixeye/ecs/wiki) ( In progress ) 
+* [Examples](https://github.com/PixeyeHQ/CryoshockMini) ( In progress ) 
+* [Wiki](https://github.com/PixeyeHQ/actors.unity/wiki) ( In progress ) 
  
 ## Basic
 
