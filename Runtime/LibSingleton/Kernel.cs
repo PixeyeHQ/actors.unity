@@ -196,7 +196,7 @@ namespace Pixeye.Actors
     IEnumerator OnApplicationFocus(bool hasFocus)
     {
       yield return new WaitForSeconds(0.01f);
-      if (Settings.FocusLostPause == false) yield break;
+      if (Settings.PauseOnFocusLost == false) yield break;
       if (!hasFocus)
       {
         timescale_cache = time.Default.timeScale;

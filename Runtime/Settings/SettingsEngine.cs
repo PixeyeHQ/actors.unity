@@ -15,6 +15,6 @@ namespace Pixeye.Actors
     public bool DebugNames = false;
     public string Namespace = "";
     public string[] Plugins = new string[0];
-    public bool FocusLostPause = true;
+    public bool PauseOnFocusLost = true;
   }
 }

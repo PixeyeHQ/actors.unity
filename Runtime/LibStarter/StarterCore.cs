@@ -25,7 +25,10 @@ namespace Pixeye.Actors
     static bool typesBinded;
     public static bool initialized;
 
+
     internal Updates Update;
+    internal bool isMainScene;
+    internal string sceneName;
 
     [HideInInspector]
     public List<PoolNode> nodes = new List<PoolNode>();
@@ -33,6 +36,15 @@ namespace Pixeye.Actors
 
     Dictionary<int, object> objectStorage = new Dictionary<int, object>(5, new FastComparable());
 
+
+    IEnumerator CoWait()
+    {
+      while (!gameObject.scene.isLoaded)
+      {
+        yield return 0;
+      }
+      SceneManager.SetActiveScene(gameObject.scene);
+    }
 
     void Awake()
     {
@@ -53,6 +65,27 @@ namespace Pixeye.Actors
           }
         }
       }
+
+      if (ProcessorScene.Default.next_main_scene == gameObject.scene.name)
+      {
+        routines.run(CoWait());
+      }
+      Debug.Log(gameObject.scene.isLoaded);
+      //  SceneManager.SetActiveScene(gameObject.scene);
+      // if (isMainScene)
+      // {
+      //   Debug.Log("ME");
+      //   SceneManager.SetActiveScene(SceneManager.GetSceneByName(sceneName));
+      // }
+      // var str = SceneManager.GetActiveScene().GetRootGameObjects().Get(x => x == gameObject);
+      // if (str)
+      // {
+      //   Debug.Log("BOO " + str);
+      // }
+      // else
+      // {
+      //   Debug.Log("HER " + gameObject + SceneManager.GetActiveScene().name);
+      // }
 
       OnAwake();
 
@@ -95,7 +128,6 @@ namespace Pixeye.Actors
       }
 
       Toolbox.Instance.StartCoroutine(ProcessorScene.Default.coSetup(this));
-      // ProcessorScene.Default.Setup(ScenesToKeep, SceneDependsOn, this);
     }
 
     private void RegisterAttributeComponents(IEnumerable<Type> enumerable)
