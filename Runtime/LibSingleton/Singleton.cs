@@ -12,8 +12,7 @@ namespace Pixeye.Actors
       _instance = this as T;
       DontDestroyOnLoad(_instance);
     }
-
-
+ 
     public static T Instance
     {
       get

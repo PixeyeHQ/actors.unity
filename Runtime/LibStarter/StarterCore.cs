@@ -25,6 +25,7 @@ namespace Pixeye.Actors
     static bool typesBinded;
     public static bool initialized;
 
+    internal Updates Update;
 
     [HideInInspector]
     public List<PoolNode> nodes = new List<PoolNode>();
@@ -35,6 +36,7 @@ namespace Pixeye.Actors
 
     void Awake()
     {
+      Update = new Updates();
       // starting kernel
       if (ProcessorUpdate.Default == null)
       {
@@ -260,7 +262,7 @@ namespace Pixeye.Actors
     }
 
 
-    ///  Adds an object to the scene by type. It is mainly used to add processing scripts. 
+    /// Adds an object to the scene by type. It is mainly used to add processing scripts. 
     protected T Add<T>(Type type = null) where T : new() => Kernel.Add<T>(objectStorage, type);
 
 
@@ -278,7 +280,7 @@ namespace Pixeye.Actors
       initialized = false;
     }
 
- 
+
     /// This method will execute when the scene get removed. Use this method for reference cleanup.
     protected virtual void Dispose()
     {
@@ -287,10 +289,9 @@ namespace Pixeye.Actors
 
     internal void CleanScene()
     {
-      
     }
-    
-    
+
+
     internal float timescale_cache;
 
     IEnumerator OnApplicationFocus(bool hasFocus)

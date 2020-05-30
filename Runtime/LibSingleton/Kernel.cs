@@ -6,7 +6,7 @@ namespace Pixeye.Actors
 {
   public class Kernel : MonoBehaviour
   {
-    static Kernel instance_local;
+    static Kernel instanceLocal;
 
     public static Kernel Instance
     {
@@ -20,22 +20,22 @@ namespace Pixeye.Actors
           return null;
         }
 
-        if (instance_local != null) return instance_local;
-        instance_local = (Kernel) FindObjectOfType(typeof(Kernel));
+        if (instanceLocal != null) return instanceLocal;
+        instanceLocal = (Kernel) FindObjectOfType(typeof(Kernel));
         if (FindObjectsOfType(typeof(Kernel)).Length > 1)
         {
           Debug.LogError("[Kernel] Something went really wrong " +
                          " - there should never be more than 1 singleton!" +
                          " Reopening the scene might fix it.");
-          return instance_local;
+          return instanceLocal;
         }
 
-        if (instance_local != null) return instance_local;
+        if (instanceLocal != null) return instanceLocal;
         var singleton = new GameObject();
-        instance_local = singleton.AddComponent<Kernel>();
+        instanceLocal = singleton.AddComponent<Kernel>();
         singleton.name = "Actors Kernel";
         DontDestroyOnLoad(singleton);
-        return instance_local;
+        return instanceLocal;
       }
     }
 
@@ -47,11 +47,6 @@ namespace Pixeye.Actors
     public static bool applicationIsQuitting;
     public static bool isQuittingOrChangingScene() => applicationIsQuitting || changingScene;
 
-    internal static void AwakeObject(object obj)
-    {
-      if (obj is IAwake awakeble) awakeble.OnAwake();
-      ProcessorUpdate.Add(obj);
-    }
 
     internal static Dictionary<int, object> objectStorage = new Dictionary<int, object>(5, new FastComparable());
 
@@ -73,8 +68,25 @@ namespace Pixeye.Actors
       return created;
     }
 
+    internal static void AwakeObject(object obj)
+    {
+      if (obj is IAwake awakeObj) awakeObj.OnAwake();
+      if (obj is IKernel kernelObj)
+      {
+        ProcessorUpdate.AddKernel(obj);
+      }
+      else
+        ProcessorUpdate.Add(obj);
+    }
+
+    internal static void Remove(Dictionary<int, object> objectStorage, object obj)
+    {
+      objectStorage.Remove(obj.GetType().GetHashCode());
+    }
+
     public static T Add<T>(Type type = null) where T : new() => Add<T>(objectStorage, type);
 
+    public static void Remove(object obj) => Remove(objectStorage, obj);
 
     internal static void ClearSessionData()
     {
@@ -149,6 +161,8 @@ namespace Pixeye.Actors
     }
 
     public static SettingsEngine Settings = new SettingsEngine();
+
+    public static int GetTicksCount() => ProcessorUpdate.Default.GetTicksCount();
   }
 
   public class groups

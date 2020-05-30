@@ -7,11 +7,7 @@ using UnityEngine;
 
 namespace Pixeye.Actors
 {
-  /// <summary>
-  /// <para>Service locator</para>
-  /// </summary>
-  /// 
-
+ 
   // todo: redesign class.
   public class Toolbox : Singleton<Toolbox>
   {
