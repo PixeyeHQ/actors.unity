@@ -31,7 +31,7 @@ namespace Pixeye.Actors
       var    hash = type == null ? typeof(T).GetHashCode() : type.GetHashCode();
       if (Instance.data.TryGetValue(hash, out o))
       {
-        Kernel.AwakeObject(o);
+        //Kernel.AwakeObject(o);
         return (T) o;
       }
 
@@ -40,7 +40,7 @@ namespace Pixeye.Actors
       var proc = typeof(T).IsSubclassOf(typeof(Processor));
       if (!proc)
       {
-        Kernel.AwakeObject(created);
+        //Kernel.AwakeObject(created);
       }
 
       Instance.data.Add(hash, created);
@@ -68,7 +68,7 @@ namespace Pixeye.Actors
     {
       if (Instance.data.TryGetValue(obj.GetType().GetHashCode(), out var possibleObj))
       {
-        Kernel.AwakeObject(possibleObj);
+        //Kernel.AwakeObject(possibleObj);
       }
 
       var add             = obj;
@@ -76,13 +76,13 @@ namespace Pixeye.Actors
       if (scriptable) add = Instantiate(scriptable);
 
 
-      Kernel.AwakeObject(obj);
+      //Kernel.AwakeObject(obj);
       Instance.data.Add(obj.GetType().GetHashCode(), add);
     }
 
     public static void Remove(object obj)
     {
-      if (Kernel.applicationIsQuitting) return;
+      if (Kernel.ApplicationIsQuitting) return;
       Instance.data.Remove(obj.GetType().GetHashCode());
     }
 
@@ -92,7 +92,7 @@ namespace Pixeye.Actors
 
     public static void DisposeObject(object obj)
     {
-      if (Kernel.isQuittingOrChangingScene()) return;
+      if (Kernel.IsQuittingOrChangingScene()) return;
 
       if (obj is IDisposable disposable)
       {

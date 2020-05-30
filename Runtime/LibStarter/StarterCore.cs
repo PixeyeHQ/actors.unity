@@ -22,13 +22,14 @@ namespace Pixeye.Actors
   /// </summary>
   public class StarterCore : MonoBehaviour
   {
-    static bool typesBinded;
     public static bool initialized;
 
+    internal static StarterCore ActiveStarter;
+
+    /// Always bigger than actual scene index by 1. This is because 0 index is reserved by framework. 
+    internal int sceneIndex => gameObject.scene.buildIndex + 1;
 
     internal Updates Update;
-    internal bool isMainScene;
-    internal string sceneName;
 
     [HideInInspector]
     public List<PoolNode> nodes = new List<PoolNode>();
@@ -37,23 +38,182 @@ namespace Pixeye.Actors
     Dictionary<int, object> objectStorage = new Dictionary<int, object>(5, new FastComparable());
 
 
-    IEnumerator CoWait()
-    {
-      while (!gameObject.scene.isLoaded)
-      {
-        yield return 0;
-      }
-      SceneManager.SetActiveScene(gameObject.scene);
-    }
-
     void Awake()
     {
+      BootStrap();
+
+      OnAwake();
+
+      Toolbox.Instance.StartCoroutine(ProcessorScene.Default.coSetup(this));
+    }
+
+    private void RegisterAttributeComponents(IEnumerable<Type> enumerable)
+    {
+      foreach (var type in enumerable.Where(t => t.IsDefined(typeof(ActorsComponent), false)))
+      {
+        var genericStorage = typeof(Storage<>);
+        var constructedStorage = genericStorage.MakeGenericType(type);
+        Activator.CreateInstance(constructedStorage);
+      }
+    }
+
+    protected virtual void OnAwake()
+    {
+    }
+
+
+    public static IEnumerable<Type> GetAllSubclassOf(Type parent)
+    {
+      foreach (var a in AppDomain.CurrentDomain.GetAssemblies())
+        foreach (var t in a.GetTypes())
+        {
+          if (t.IsSubclassOf(parent))
+            yield return t;
+        }
+    }
+
+
+    public void BindScene()
+    {
+      ProcessorScene.Default.OnSceneLoad = delegate { };
+      ProcessorScene.Default.OnSceneClose = delegate { };
+      ProcessorScene.Default.OnSceneClose += Dispose;
+
+
+      for (var i = 0; i < nodes.Count; i++)
+        nodes[i].Populate();
+
+
+      Add<ProcessorObserver>();
+
+
+      Setup();
+
+
+      for (var i = 0; i < SceneManager.sceneCount; i++)
+      {
+        var scene = SceneManager.GetSceneAt(i);
+        var objs = scene.GetRootGameObjects();
+        foreach (var obj in objs)
+        {
+          var transforms = obj.GetComponentsInChildren<Transform>();
+
+          foreach (var tr in transforms)
+          {
+            if (!tr.gameObject.activeInHierarchy) continue;
+            var oo = tr.GetComponents<MonoBehaviour>();
+            foreach (var o in oo)
+            {
+              if (o is IRequireStarter req && o.enabled)
+              {
+                req.Launch();
+              }
+            }
+          }
+        }
+      }
+
+      initialized = true;
+
+
+      Timer.Add(time.deltaFixed, PostSetup);
+    }
+
+
+    protected T Add<T>(Type type = null) where T : Processor, new()
+    {
+      var o = new T();
+      o.Set(sceneIndex);
+      return o;
+    }
+
+    /// Adds an object to the scene by type. It is mainly used to add processing scripts. 
+    // protected T Add<T>(Type type = null) where T : new()
+    // {
+    //   var o = Kernel.Add<T>(objectStorage, type);
+    //   if (o is Processor proc)
+    //   {
+    //     proc.Set(gameObject.scene.buildIndex);
+    //   }
+    //   return o;
+    // }
+
+    //  protected T Add<T>(Type type = null) where T : new() => Kernel.Add<T>(objectStorage, type);
+
+    /// This method will execute when the scene loaded. Use it to add your processors.
+    protected virtual void Setup()
+    {
+    }
+
+    protected virtual void PostSetup()
+    {
+    }
+
+    protected virtual void OnDestroy()
+    {
+      initialized = false;
+    }
+
+
+    /// This method will execute when the scene get removed. Use this method for reference cleanup.
+    protected virtual void Dispose()
+    {
+    }
+
+
+    internal void CleanScene()
+    {
+      ProcessorUpdate.Default.updates[sceneIndex].Dispose();
+    }
+
+    void BootStrap()
+    {
       Update = new Updates();
-      // starting kernel
+
       if (ProcessorUpdate.Default == null)
       {
+        // zero entity
+        Entity.Create();
+        LoadTypes();
+        LoadPlugins();
         ProcessorUpdate.Create();
+        ActiveStarter = this;
+      }
 
+
+      if (ProcessorScene.Default.next_main_scene == gameObject.scene.name)
+        routines.run(CoWaitForSceneLoading());
+      else
+      {
+        UpdateIndexes();
+      }
+
+      IEnumerator CoWaitForSceneLoading()
+      {
+        while (!gameObject.scene.isLoaded)
+        {
+          yield return 0;
+        }
+        SceneManager.SetActiveScene(gameObject.scene);
+        ActiveStarter = this;
+        UpdateIndexes();
+      }
+
+      void UpdateIndexes()
+      {
+        if (ProcessorUpdate.Default.updates.Count <= sceneIndex)
+        {
+          var diff = sceneIndex - ProcessorUpdate.Default.updates.Count + 1;
+          for (var i = 0; i < diff; i++)
+          {
+            ProcessorUpdate.Default.updates.Add(new Updates());
+          }
+        }
+      }
+
+
+      void LoadPlugins()
+      {
         var t = Resources.Load<TextAsset>("SettingsFramework");
         if (t != null)
         {
@@ -66,30 +226,7 @@ namespace Pixeye.Actors
         }
       }
 
-      if (ProcessorScene.Default.next_main_scene == gameObject.scene.name)
-      {
-        routines.run(CoWait());
-      }
-      Debug.Log(gameObject.scene.isLoaded);
-      //  SceneManager.SetActiveScene(gameObject.scene);
-      // if (isMainScene)
-      // {
-      //   Debug.Log("ME");
-      //   SceneManager.SetActiveScene(SceneManager.GetSceneByName(sceneName));
-      // }
-      // var str = SceneManager.GetActiveScene().GetRootGameObjects().Get(x => x == gameObject);
-      // if (str)
-      // {
-      //   Debug.Log("BOO " + str);
-      // }
-      // else
-      // {
-      //   Debug.Log("HER " + gameObject + SceneManager.GetActiveScene().name);
-      // }
-
-      OnAwake();
-
-      if (!typesBinded)
+      void LoadTypes()
       {
         var asmFramework = Assembly.GetExecutingAssembly();
         var asmDataRaw = Kernel.Settings.Namespace;
@@ -123,39 +260,12 @@ namespace Pixeye.Actors
             Activator.CreateInstance(item);
           }
         }
-
-        typesBinded = true;
-      }
-
-      Toolbox.Instance.StartCoroutine(ProcessorScene.Default.coSetup(this));
-    }
-
-    private void RegisterAttributeComponents(IEnumerable<Type> enumerable)
-    {
-      foreach (var type in enumerable.Where(t => t.IsDefined(typeof(ActorsComponent), false)))
-      {
-        var genericStorage = typeof(Storage<>);
-        var constructedStorage = genericStorage.MakeGenericType(type);
-        Activator.CreateInstance(constructedStorage);
       }
     }
 
-    protected virtual void OnAwake()
-    {
-    }
-
-
-    public static IEnumerable<Type> GetAllSubclassOf(Type parent)
-    {
-      foreach (var a in AppDomain.CurrentDomain.GetAssemblies())
-        foreach (var t in a.GetTypes())
-        {
-          if (t.IsSubclassOf(parent))
-            yield return t;
-        }
-    }
 
 #if UNITY_EDITOR
+
     public void ClearNodes()
     {
       for (int i = 0; i < nodes.Count; i++)
@@ -242,85 +352,7 @@ namespace Pixeye.Actors
         }
       }
     }
+
 #endif
-
-    public void BindScene()
-    {
-      ProcessorScene.Default.OnSceneLoad = delegate { };
-      ProcessorScene.Default.OnSceneClose = delegate { };
-      ProcessorScene.Default.OnSceneClose += Dispose;
-
-      // zero entity
-      Entity.Create();
-
-
-      for (var i = 0; i < nodes.Count; i++)
-        nodes[i].Populate();
-
-
-      Add<ProcessorObserver>();
-
-
-      Setup();
-
-
-      for (var i = 0; i < SceneManager.sceneCount; i++)
-      {
-        var scene = SceneManager.GetSceneAt(i);
-        var objs = scene.GetRootGameObjects();
-        foreach (var obj in objs)
-        {
-          var transforms = obj.GetComponentsInChildren<Transform>();
-
-          foreach (var tr in transforms)
-          {
-            if (!tr.gameObject.activeInHierarchy) continue;
-            var oo = tr.GetComponents<MonoBehaviour>();
-            foreach (var o in oo)
-            {
-              if (o is IRequireStarter req && o.enabled)
-              {
-                req.Launch();
-              }
-            }
-          }
-        }
-      }
-
-      initialized = true;
-
-
-      Timer.Add(time.deltaFixed, PostSetup);
-    }
-
-
-    /// Adds an object to the scene by type. It is mainly used to add processing scripts. 
-    protected T Add<T>(Type type = null) where T : new() => Kernel.Add<T>(objectStorage, type);
-
-
-    /// This method will execute when the scene loaded. Use it to add your processors.
-    protected virtual void Setup()
-    {
-    }
-
-    protected virtual void PostSetup()
-    {
-    }
-
-    protected virtual void OnDestroy()
-    {
-      initialized = false;
-    }
-
-
-    /// This method will execute when the scene get removed. Use this method for reference cleanup.
-    protected virtual void Dispose()
-    {
-    }
-
-
-    internal void CleanScene()
-    {
-    }
   }
 }

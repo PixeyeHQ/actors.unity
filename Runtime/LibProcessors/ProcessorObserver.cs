@@ -5,8 +5,9 @@
 namespace Pixeye.Actors
 {
 #if ACTORS_EVENTS_MANUAL
-	[Events(Op.Add | Op.Remove)]
+  [Events(Op.Add | Op.Remove)]
 #endif
+
   sealed class ProcessorObserver : Processor<ComponentObserver>, ITick
   {
     public override void HandleEvents()
@@ -25,7 +26,6 @@ namespace Pixeye.Actors
           cObserver.wrappers[j].FirstTime();
       }
     }
-
 
     public void Tick(float delta)
     {

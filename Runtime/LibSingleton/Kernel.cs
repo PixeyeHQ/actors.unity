@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Pixeye.Actors
 {
@@ -13,7 +14,7 @@ namespace Pixeye.Actors
     {
       get
       {
-        if (applicationIsQuitting)
+        if (ApplicationIsQuitting)
         {
           Debug.LogWarning("[Kernel] Instance '" + typeof(Kernel) +
                            "' already destroyed on application quit." +
@@ -44,26 +45,48 @@ namespace Pixeye.Actors
     static void SetKernel() => Instance.gameObject.SetActive(true);
 
 
-    public static bool changingScene;
-    public static bool applicationIsQuitting;
-    public static bool isQuittingOrChangingScene() => applicationIsQuitting || changingScene;
+    public static bool ChangingScene;
+    public static bool ApplicationIsQuitting;
+    public static bool IsQuittingOrChangingScene() => ApplicationIsQuitting || ChangingScene;
 
+    /// Always bigger than actual scene index by 1. This is because 0 index is reserved by framework. 
+    public static int ActiveSceneIndex => StarterCore.ActiveStarter.sceneIndex;
+
+    internal static Scene ActiveScene => StarterCore.ActiveStarter.gameObject.scene;
 
     internal static Dictionary<int, object> objectStorage = new Dictionary<int, object>(5, new FastComparable());
 
-    internal static T Add<T>(Dictionary<int, object> objectStorage, Type type = null) where T : new()
+    internal static T Add<T>(Dictionary<int, object> objectStorage, int index, Type type = null) where T : new()
     {
       var hash = type == null ? typeof(T).GetHashCode() : type.GetHashCode();
       if (objectStorage.TryGetValue(hash, out var o))
       {
-        AwakeObject(o);
+        //AwakeObject(o);
         return (T) o;
       }
       var created = new T();
       var proc = typeof(T).IsSubclassOf(typeof(Processor));
       if (!proc)
       {
-        AwakeObject(created);
+        //AwakeObject(created);
+      }
+      objectStorage.Add(hash, created);
+      return created;
+    }
+
+    internal static T Add<T>(Dictionary<int, object> objectStorage, Type type = null) where T : new()
+    {
+      var hash = type == null ? typeof(T).GetHashCode() : type.GetHashCode();
+      if (objectStorage.TryGetValue(hash, out var o))
+      {
+        //AwakeObject(o);
+        return (T) o;
+      }
+      var created = new T();
+      var proc = typeof(T).IsSubclassOf(typeof(Processor));
+      if (!proc)
+      {
+        //AwakeObject(created);
       }
       objectStorage.Add(hash, created);
       return created;
@@ -81,16 +104,15 @@ namespace Pixeye.Actors
       return resolve;
     }
 
-    internal static void AwakeObject(object obj)
-    {
-      if (obj is IAwake awakeObj) awakeObj.OnAwake();
-      if (obj is IKernel kernelObj)
-      {
-        ProcessorUpdate.AddKernel(obj);
-      }
-      else
-        ProcessorUpdate.Add(obj);
-    }
+    // internal static void AwakeObject(object obj)
+    // {
+    //   if (obj is IKernel kernelObj)
+    //   {
+    //     ProcessorUpdate.AddKernel(obj);
+    //   }
+    //   else
+    //     ProcessorUpdate.Add(obj);
+    // }
 
     internal static void Remove(Dictionary<int, object> objectStorage, object obj)
     {
@@ -117,7 +139,7 @@ namespace Pixeye.Actors
 
     internal static void ClearSessionData()
     {
-      if (applicationIsQuitting) return;
+      if (ApplicationIsQuitting) return;
       var toWipe = new List<int>();
       foreach (var pair in objectStorage)
       {

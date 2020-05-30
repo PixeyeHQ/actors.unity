@@ -347,7 +347,7 @@ namespace Pixeye.Actors
 
     internal static void Clean()
     {
-      if (Kernel.applicationIsQuitting) return;
+      if (Kernel.ApplicationIsQuitting) return;
 
   
       EntityOperations.len        = 0;

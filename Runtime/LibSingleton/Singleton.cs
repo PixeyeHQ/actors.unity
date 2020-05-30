@@ -17,7 +17,7 @@ namespace Pixeye.Actors
     {
       get
       {
-        if (Kernel.applicationIsQuitting)
+        if (Kernel.ApplicationIsQuitting)
         {
           Debug.LogWarning("[Singleton] Instance '" + typeof(T) +
                            "' already destroyed on application quit." +
@@ -49,12 +49,12 @@ namespace Pixeye.Actors
 
     void OnDisable()
     {
-      Kernel.applicationIsQuitting = true;
+      Kernel.ApplicationIsQuitting = true;
     }
 
     protected virtual void OnApplicationQuit()
     {
-      Kernel.applicationIsQuitting = true;
+      Kernel.ApplicationIsQuitting = true;
     }
   }
 }

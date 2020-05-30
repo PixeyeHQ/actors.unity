@@ -24,7 +24,7 @@ namespace Pixeye.Actors
     readonly Dictionary<string, Scene> scenes = new Dictionary<string, Scene>();
 
     internal string next_main_scene;
-    
+
     public void Dispose()
     {
       sceneObjs.Clear();
@@ -145,15 +145,16 @@ namespace Pixeye.Actors
       OnSceneClose();
       routines.Local.StopAll();
       ProcessorEntities.Clean();
-      Kernel.changingScene = true;
+      Kernel.ChangingScene = true;
       Kernel.ClearSessionData();
+
+      StarterCore.ActiveStarter.CleanScene();
 
       //Plus two for unload assets and load target scene
       var totalStagesNeed = 0;
       float curProgress = 0f, prevProgress = 0f;
 
       AsyncOperation job = null;
-      //AsyncOperation job_load = null;
 
 
       // routines.app.run(CoAddScene(name));
@@ -163,20 +164,18 @@ namespace Pixeye.Actors
 
       var scene_buffer = SceneManager.CreateScene("Actors Buffer Scene");
 
-      var active_scene_prev = SceneManager.GetActiveScene().name;
-      SceneManager.SetActiveScene(scene_buffer);
-      job = SceneManager.UnloadSceneAsync(scenes[active_scene_prev]);
 
-      
-      
-      Debug.Log("GSAAA");
+      SceneManager.SetActiveScene(scene_buffer);
+      job = SceneManager.UnloadSceneAsync(Kernel.ActiveScene);
+
+
       while (!job.isDone)
       {
         //CalculateProgress(job, totalStagesNeed, ref prevProgress, ref curProgress);
         yield return 0;
       }
       job = Resources.UnloadUnusedAssets();
-      Debug.Log("GSA");
+
       while (!job.isDone)
       {
         //CalculateProgress(job, totalStagesNeed, ref prevProgress, ref curProgress);
@@ -187,14 +186,14 @@ namespace Pixeye.Actors
       job = SceneManager.LoadSceneAsync(name, LoadSceneMode.Additive);
 
       job.allowSceneActivation = true;
- 
+
       while (!job.isDone)
       {
         yield return 0;
       }
       //   SceneManager.SetActiveScene(SceneManager.GetSceneByName(name));
       SceneManager.UnloadSceneAsync(scene_buffer);
-      Kernel.changingScene = false;
+      Kernel.ChangingScene = false;
       //var scenesToUnload = new List<string>();
 
       // //Add main scene
@@ -360,7 +359,7 @@ namespace Pixeye.Actors
 
     static IEnumerator _Add(int id)
     {
-      Kernel.changingScene = true;
+      Kernel.ChangingScene = true;
       SceneManager.sceneLoaded += OnAdditiveLoaded;
       var job = SceneManager.LoadSceneAsync(id, LoadSceneMode.Additive);
       while (!job.isDone)
@@ -369,12 +368,12 @@ namespace Pixeye.Actors
       }
 
 
-      Kernel.changingScene = false;
+      Kernel.ChangingScene = false;
     }
 
     static IEnumerator _Add(string id)
     {
-      Kernel.changingScene = true;
+      Kernel.ChangingScene = true;
       SceneManager.sceneLoaded += OnAdditiveLoaded;
       var job = SceneManager.LoadSceneAsync(id, LoadSceneMode.Additive);
       while (!job.isDone)
@@ -383,7 +382,7 @@ namespace Pixeye.Actors
       }
 
 
-      Kernel.changingScene = false;
+      Kernel.ChangingScene = false;
     }
 
     static void OnAdditiveLoaded(Scene arg0, LoadSceneMode arg1)
@@ -416,7 +415,7 @@ namespace Pixeye.Actors
 
     static IEnumerator _Remove(int id)
     {
-      Kernel.changingScene = true;
+      Kernel.ChangingScene = true;
       KillActors(SceneManager.GetSceneByBuildIndex(id));
       var job = SceneManager.UnloadSceneAsync(id);
       while (!job.isDone)
@@ -424,12 +423,12 @@ namespace Pixeye.Actors
         yield return 0;
       }
 
-      Kernel.changingScene = false;
+      Kernel.ChangingScene = false;
     }
 
     static IEnumerator _Remove(string id)
     {
-      Kernel.changingScene = true;
+      Kernel.ChangingScene = true;
       KillActors(SceneManager.GetSceneByName(id));
       var job = SceneManager.UnloadSceneAsync(id);
       while (!job.isDone)
@@ -437,7 +436,7 @@ namespace Pixeye.Actors
         yield return 0;
       }
 
-      Kernel.changingScene = false;
+      Kernel.ChangingScene = false;
     }
 
     static void KillActors(Scene s)

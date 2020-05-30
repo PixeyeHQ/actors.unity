@@ -2,21 +2,22 @@
 //  Contacts : Pixeye - ask@pixeye.games
 
 using System;
+using UnityEngine;
 
 namespace Pixeye.Actors
 {
   public abstract class Processor : IDisposable
   {
-    protected Processor()
+    internal void Set(int index)
     {
       if (Kernel.Processors.length == Kernel.Processors.storage.Length)
         Array.Resize(ref Kernel.Processors.storage, Kernel.Processors.length << 1);
 
       Kernel.Processors.storage[Kernel.Processors.length++] = this;
-      ProcessorUpdate.AddProc(this);
+ 
+      ProcessorUpdate.AddProc(this, index);
       ProcessorGroups.Setup(this);
       ProcessorSignals.Add(this);
-      //Toolbox.disposables.Add(this);
     }
 
     public void Dispose()

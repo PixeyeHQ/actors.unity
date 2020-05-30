@@ -60,7 +60,7 @@ namespace Pixeye.Actors
 
       routines.Global.Tick(time.deltaUnscaled);
 
-      if (Kernel.changingScene) return;
+      if (Kernel.ChangingScene) return;
 
 
       for (var i = 0; i < timesLen; i++)
@@ -85,7 +85,7 @@ namespace Pixeye.Actors
 
     void FixedUpdate()
     {
-      if (Kernel.changingScene) return;
+      if (Kernel.ChangingScene) return;
       var delta = time.deltaFixed;
 
       for (int i = 0; i < updates.Count; i++)
@@ -96,7 +96,7 @@ namespace Pixeye.Actors
 
     void LateUpdate()
     {
-      if (Kernel.changingScene) return;
+      if (Kernel.ChangingScene) return;
       var delta = time.delta;
 
       for (int i = 0; i < updates.Count; i++)
@@ -108,10 +108,10 @@ namespace Pixeye.Actors
 
     public void Dispose()
     {
-      for (int i = 0; i < updates.Count; i++)
-      {
-        updates[i].Dispose();
-      }
+      // for (int i = 0; i < updates.Count; i++)
+      // {
+      //   updates[i].Dispose();
+      // }
     }
 
     public static void Create()
