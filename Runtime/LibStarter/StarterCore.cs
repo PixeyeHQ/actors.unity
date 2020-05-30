@@ -22,30 +22,16 @@ namespace Pixeye.Actors
   /// </summary>
   public class StarterCore : MonoBehaviour
   {
-    public static bool initialized;
     static bool typesBinded;
+    public static bool initialized;
 
-// #if ODIN_INSPECTOR
-//     [FoldoutGroup("Setup")]
-// #else
-//     [FoldoutGroup("Setup"), Reorderable]
-// #endif
-//       public List<SceneReference> ScenesToKeep;
-//
-// #if ODIN_INSPECTOR
-//     [FoldoutGroup("Setup")]
-// #else
-//     [FoldoutGroup("Setup"), Reorderable]
-// #endif
-//       public List<SceneReference> SceneDependsOn;
 
     [HideInInspector]
-    //[FoldoutGroup("Pooled Objects From Scene [ Do not touch this! ]")]
     public List<PoolNode> nodes = new List<PoolNode>();
 
-    protected virtual void OnAwake()
-    {
-    }
+
+    Dictionary<int, object> data = new Dictionary<int, object>(5, new FastComparable());
+
 
     void Awake()
     {
@@ -107,7 +93,7 @@ namespace Pixeye.Actors
       }
 
       Toolbox.Instance.StartCoroutine(ProcessorScene.Default.coSetup(this));
-     // ProcessorScene.Default.Setup(ScenesToKeep, SceneDependsOn, this);
+      // ProcessorScene.Default.Setup(ScenesToKeep, SceneDependsOn, this);
     }
 
     private void RegisterAttributeComponents(IEnumerable<Type> enumerable)
@@ -119,6 +105,11 @@ namespace Pixeye.Actors
         Activator.CreateInstance(constructedStorage);
       }
     }
+
+    protected virtual void OnAwake()
+    {
+    }
+
 
     public static IEnumerable<Type> GetAllSubclassOf(Type parent)
     {
@@ -268,19 +259,12 @@ namespace Pixeye.Actors
       Timer.Add(time.deltaFixed, PostSetup);
     }
 
-    /// <summary>
-    /// <para>Adds an object to the toolbox by type. It is mainly used to add processing scripts.</para>
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <returns></returns>
-    protected static T Add<T>() where T : new()
-    {
-      return Toolbox.Add<T>();
-    }
 
-    /// <summary>
+    ///  Adds an object to the scene by type. It is mainly used to add processing scripts. 
+    protected T Add<T>(Type type = null) where T : new() => Kernel.Add<T>(data, type);
+
+
     /// This method will execute when the scene loaded. Use it to add your processors.
-    /// </summary>
     protected virtual void Setup()
     {
     }

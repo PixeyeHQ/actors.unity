@@ -35,7 +35,7 @@ namespace Pixeye.Actors
       var    hash = type == null ? typeof(T).GetHashCode() : type.GetHashCode();
       if (Instance.data.TryGetValue(hash, out o))
       {
-        InitializeObject(o);
+        Kernel.AwakeObject(o);
         return (T) o;
       }
 
@@ -44,7 +44,7 @@ namespace Pixeye.Actors
       var proc = typeof(T).IsSubclassOf(typeof(Processor));
       if (!proc)
       {
-        InitializeObject(created);
+        Kernel.AwakeObject(created);
       }
 
       Instance.data.Add(hash, created);
@@ -65,7 +65,7 @@ namespace Pixeye.Actors
     {
       if (Instance.data.TryGetValue(obj.GetType().GetHashCode(), out var possibleObj))
       {
-        InitializeObject(possibleObj);
+        Kernel.AwakeObject(possibleObj);
       }
 
       var add             = obj;
@@ -73,7 +73,7 @@ namespace Pixeye.Actors
       if (scriptable) add = Instantiate(scriptable);
 
 
-      InitializeObject(obj);
+      Kernel.AwakeObject(obj);
       Instance.data.Add(obj.GetType().GetHashCode(), add);
     }
 
@@ -81,12 +81,6 @@ namespace Pixeye.Actors
     {
       if (Kernel.applicationIsQuitting) return;
       Instance.data.Remove(obj.GetType().GetHashCode());
-    }
-
-    public static void InitializeObject(object obj)
-    {
-      if (obj is IAwake awakeble) awakeble.OnAwake();
-      ProcessorUpdate.Add(obj);
     }
 
     /// <summary>
