@@ -49,24 +49,24 @@ namespace Pixeye.Actors
     {
       var t = Resources.Load<TextAsset>("SettingsFramework");
       if (t != null)
-        JsonUtility.FromJsonOverwrite(t.text, Framework.Settings);
+        JsonUtility.FromJsonOverwrite(t.text, Kernel.Settings);
 
-      Framework.Settings.SizeGenerations = Framework.Settings.SizeComponents / 32;
+      Kernel.Settings.SizeGenerations = Kernel.Settings.SizeComponents / 32;
 
-      lengthTotal        = Framework.Settings.SizeEntities;
-      Generations        = new int[Framework.Settings.SizeEntities, Framework.Settings.SizeGenerations];
-      GenerationsInstant = new int[Framework.Settings.SizeEntities, Framework.Settings.SizeGenerations];
+      lengthTotal        = Kernel.Settings.SizeEntities;
+      Generations        = new int[Kernel.Settings.SizeEntities, Kernel.Settings.SizeGenerations];
+      GenerationsInstant = new int[Kernel.Settings.SizeEntities, Kernel.Settings.SizeGenerations];
 
 
-      Transforms = new Transform[Framework.Settings.SizeEntities];
+      Transforms = new Transform[Kernel.Settings.SizeEntities];
 
-      entities = (CacheEntity*) UnmanagedMemory.Alloc(sizeEntityCache * Framework.Settings.SizeEntities);
+      entities = (CacheEntity*) UnmanagedMemory.Alloc(sizeEntityCache * Kernel.Settings.SizeEntities);
 #if !ACTORS_TAGS_0
-      Tags = (CacheTags*) UnmanagedMemory.Alloc(sizeBufferTags * Framework.Settings.SizeEntities);
+      Tags = (CacheTags*) UnmanagedMemory.Alloc(sizeBufferTags * Kernel.Settings.SizeEntities);
 #endif
 
 
-      for (var i = 0; i < Framework.Settings.SizeEntities; i++)
+      for (var i = 0; i < Kernel.Settings.SizeEntities; i++)
       {
 #if !ACTORS_TAGS_0
         Tags[i] = new CacheTags();
@@ -74,7 +74,7 @@ namespace Pixeye.Actors
         entities[i] = new CacheEntity(6);
       }
 
-      alive = new ents(Framework.Settings.SizeEntities);
+      alive = new ents(Kernel.Settings.SizeEntities);
 
 #if UNITY_EDITOR
       Toolbox.OnDestroyAction += Dispose;
@@ -94,8 +94,8 @@ namespace Pixeye.Actors
       if (id >= lengthTotal)
       {
         var l = id << 1;
-        HelperArray.ResizeInt(ref Generations, l, Framework.Settings.SizeGenerations);
-        HelperArray.ResizeInt(ref GenerationsInstant, l, Framework.Settings.SizeGenerations);
+        HelperArray.ResizeInt(ref Generations, l, Kernel.Settings.SizeGenerations);
+        HelperArray.ResizeInt(ref GenerationsInstant, l, Kernel.Settings.SizeGenerations);
         Array.Resize(ref Transforms, l);
 
         entities = (CacheEntity*) UnmanagedMemory.ReAlloc(entities, sizeEntityCache * l);
@@ -139,7 +139,7 @@ namespace Pixeye.Actors
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void RenameGameobject(this ent entity)
     {
-      if (!Framework.Settings.DebugNames) return;
+      if (!Kernel.Settings.DebugNames) return;
       var tr = Transforms[entity.id];
       if (tr != null)
       {
@@ -190,7 +190,7 @@ namespace Pixeye.Actors
 #if UNITY_EDITOR
       if (entity.id == 0)
       {
-        Framework.Debugger.Log(LogType.NULL_ENTITY, entity, typeof(T).Name);
+        Kernel.Debugger.Log(LogType.NULL_ENTITY, entity, typeof(T).Name);
         return ref Storage<T>.Get(id);
       }
 #endif
@@ -254,7 +254,7 @@ namespace Pixeye.Actors
 
       if (!entity.exist)
       {
-        Framework.Debugger.Log(LogType.NOT_ACTIVE, entity, typeof(T).Name);
+        Kernel.Debugger.Log(LogType.NOT_ACTIVE, entity, typeof(T).Name);
         return ref Storage<T>.Get(id);
       }
 
@@ -312,13 +312,13 @@ namespace Pixeye.Actors
 
       if (!entity.exist)
       {
-        Framework.Debugger.Log(LogType.NOT_ACTIVE, entity, typeof(T).Name);
+        Kernel.Debugger.Log(LogType.NOT_ACTIVE, entity, typeof(T).Name);
         return ref Storage<T>.Get(id);
       }
 
       if ((GenerationsInstant[id, Storage<T>.Generation] & Storage<T>.ComponentMask) == Storage<T>.ComponentMask)
       {
-        Framework.Debugger.Log(LogType.ALREADY_HAVE, entity, typeof(T).Name);
+        Kernel.Debugger.Log(LogType.ALREADY_HAVE, entity, typeof(T).Name);
         return ref val;
       }
 #endif
@@ -352,13 +352,13 @@ namespace Pixeye.Actors
 
       if (!entity.exist)
       {
-        Framework.Debugger.Log(LogType.NOT_ACTIVE, entity, typeof(T).Name);
+        Kernel.Debugger.Log(LogType.NOT_ACTIVE, entity, typeof(T).Name);
         return;
       }
 
       if ((Generations[id, Storage<T>.Generation] & Storage<T>.ComponentMask) == Storage<T>.ComponentMask)
       {
-        Framework.Debugger.Log(LogType.ALREADY_HAVE, entity, typeof(T).Name);
+        Kernel.Debugger.Log(LogType.ALREADY_HAVE, entity, typeof(T).Name);
         return;
       }
 #endif
@@ -382,7 +382,7 @@ namespace Pixeye.Actors
 #if UNITY_EDITOR
       if (!entity.exist)
       {
-        Framework.Debugger.Log(LogType.REMOVE_NON_EXISTANT, entity, typeof(T).Name);
+        Kernel.Debugger.Log(LogType.REMOVE_NON_EXISTANT, entity, typeof(T).Name);
         return;
       }
 #endif

@@ -17,7 +17,7 @@ namespace Pixeye.Actors
     // Released entities
     //===============================//
 
-    internal static ents entStack = new ents(Framework.Settings.SizeEntities);
+    internal static ents entStack = new ents(Kernel.Settings.SizeEntities);
     internal static int size = sizeof(ent);
     internal static int lastID;
 
@@ -67,7 +67,7 @@ namespace Pixeye.Actors
 #if UNITY_EDITOR
       if (!exist)
       {
-        Framework.Debugger.Log(LogType.DESTROYED, this, transform);
+        Kernel.Debugger.Log(LogType.DESTROYED, this, transform);
         return;
       }
 #endif

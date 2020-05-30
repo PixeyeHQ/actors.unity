@@ -12,7 +12,7 @@ namespace Pixeye.Actors
   [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
   sealed unsafe class ProcessorEntities
   {
-    static readonly GroupCore[] groupsChecked = new GroupCore[Framework.Settings.SizeGroups];
+    static readonly GroupCore[] groupsChecked = new GroupCore[Kernel.Settings.SizeGroups];
     static int groupsCheckedLen;
 
     static bool AlreadyChecked(GroupCore group)
@@ -139,7 +139,7 @@ namespace Pixeye.Actors
 #if UNITY_EDITOR
               if (Entity.entities[entityID].componentsAmount == 0)
               {
-                Framework.Debugger.Log(LogType.REMOVE_NON_EXISTANT, entityID, storage.GetComponentType().Name);
+                Kernel.Debugger.Log(LogType.REMOVE_NON_EXISTANT, entityID, storage.GetComponentType().Name);
                 continue;
               }
 #endif
@@ -276,7 +276,7 @@ namespace Pixeye.Actors
                 if ((Entity.Generations[entityID, generation] & mask) == mask)
                 {
                   Debug.Log($"{operation.entity.transform}");
-                  Framework.Debugger.Log(LogType.ALREADY_HAVE, entityID, storage.GetComponentType().Name);
+                  Kernel.Debugger.Log(LogType.ALREADY_HAVE, entityID, storage.GetComponentType().Name);
                   continue;
                 }
 #endif
@@ -308,8 +308,8 @@ namespace Pixeye.Actors
         {
           EntityOperations.len = 0;
 
-          for (var i = 0; i < Framework.Processors.length; i++)
-            Framework.Processors.storage[i].HandleEvents();
+          for (var i = 0; i < Kernel.Processors.length; i++)
+            Kernel.Processors.storage[i].HandleEvents();
 
 #if ACTORS_EVENTS_MANUAL
           for (var ii = 0; ii < groups.All.length; ii++)
@@ -351,7 +351,7 @@ namespace Pixeye.Actors
 
   
       EntityOperations.len        = 0;
-      Framework.Processors.length = 0;
+      Kernel.Processors.length = 0;
 
       foreach (var entity in Entity.alive)
       {
@@ -363,7 +363,7 @@ namespace Pixeye.Actors
         for (var i = 0; i < entityCache.componentsAmount; i++)
           Storage.All[entityCache.componentsIds[i]].toDispose.Add(entity.id);
 
-        for (var ii = 0; ii < Framework.Settings.SizeGenerations; ii++)
+        for (var ii = 0; ii < Kernel.Settings.SizeGenerations; ii++)
         {
           Actors.Entity.Generations[entity.id, ii]        = 0;
           Actors.Entity.GenerationsInstant[entity.id, ii] = 0;

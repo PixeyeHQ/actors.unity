@@ -92,38 +92,7 @@ namespace Pixeye.Actors
       return hasValue ? (T) resolve : default(T);
     }
 
-    internal void ClearSessionData()
-    {
-      if (Kernel.applicationIsQuitting) return;
-
-      var toWipe = new List<int>();
-
-      foreach (var pair in data)
-      {
-        if (!(pair.Value is IKernel))
-          toWipe.Add(pair.Key);
-
-        if (!(pair.Value is IDisposable needToBeCleaned)) continue;
-
-        needToBeCleaned.Dispose();
-      }
-
-      Instance.StopAllCoroutines();
-      ProcessorTimer.Default.Dispose();
- 
-      Box.Default.Dispose();
-      Pool.Dispose();
-      Storage.DisposeSelf();
-      Framework.Cleanup();
-      ProcessorScene.Default.Dispose();
-      ProcessorUpdate.Default.Dispose();
-
-
-      foreach (var t in toWipe)
-      {
-        data.Remove(t);
-      }
-    }
+     
 
     public static void DisposeObject(object obj)
     {

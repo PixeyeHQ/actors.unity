@@ -8,7 +8,7 @@ namespace Pixeye.Actors
   {
     static Kernel instance_local;
 
-    static Kernel instance
+    public static Kernel Instance
     {
       get
       {
@@ -22,7 +22,6 @@ namespace Pixeye.Actors
 
         if (instance_local != null) return instance_local;
         instance_local = (Kernel) FindObjectOfType(typeof(Kernel));
-
         if (FindObjectsOfType(typeof(Kernel)).Length > 1)
         {
           Debug.LogError("[Kernel] Something went really wrong " +
@@ -34,28 +33,32 @@ namespace Pixeye.Actors
         if (instance_local != null) return instance_local;
         var singleton = new GameObject();
         instance_local = singleton.AddComponent<Kernel>();
-        singleton.name = nameof(Kernel);
-
+        singleton.name = "Actors Kernel";
         DontDestroyOnLoad(singleton);
-
         return instance_local;
       }
     }
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+    static void SetKernel() => Instance.gameObject.SetActive(true);
+
 
     public static bool changingScene;
     public static bool applicationIsQuitting;
     public static bool isQuittingOrChangingScene() => applicationIsQuitting || changingScene;
 
-    public static void AwakeObject(object obj)
+    internal static void AwakeObject(object obj)
     {
       if (obj is IAwake awakeble) awakeble.OnAwake();
       ProcessorUpdate.Add(obj);
     }
 
-    internal static T Add<T>(Dictionary<int, object> storage, Type type = null) where T : new()
+    internal static Dictionary<int, object> objectStorage = new Dictionary<int, object>(5, new FastComparable());
+
+    internal static T Add<T>(Dictionary<int, object> objectStorage, Type type = null) where T : new()
     {
       var hash = type == null ? typeof(T).GetHashCode() : type.GetHashCode();
-      if (storage.TryGetValue(hash, out var o))
+      if (objectStorage.TryGetValue(hash, out var o))
       {
         AwakeObject(o);
         return (T) o;
@@ -66,8 +69,110 @@ namespace Pixeye.Actors
       {
         AwakeObject(created);
       }
-      storage.Add(hash, created);
+      objectStorage.Add(hash, created);
       return created;
     }
+
+    public static T Add<T>(Type type = null) where T : new() => Add<T>(objectStorage, type);
+
+
+    internal static void ClearSessionData()
+    {
+      if (applicationIsQuitting) return;
+      var toWipe = new List<int>();
+      foreach (var pair in objectStorage)
+      {
+        if (!(pair.Value is IKernel))
+          toWipe.Add(pair.Key);
+        if (!(pair.Value is IDisposable needToBeCleaned)) continue;
+        needToBeCleaned.Dispose();
+      }
+
+      Instance.StopAllCoroutines();
+      ProcessorTimer.Default.Dispose();
+
+      Box.Default.Dispose();
+      Pool.Dispose();
+      Storage.DisposeSelf();
+      Cleanup();
+      ProcessorScene.Default.Dispose();
+      ProcessorUpdate.Default.Dispose();
+
+      foreach (var t in toWipe)
+      {
+        objectStorage.Remove(t);
+      }
+    }
+
+    public static class Processors
+    {
+      internal static Processor[] storage = new Processor[64];
+      internal static int length;
+    }
+
+    public static void Cleanup()
+    {
+      groups.All.Dispose();
+
+      for (int i = 0; i < groups.globals.Length; i++)
+      {
+        groups.globals[i] = null;
+      }
+    }
+
+    public static class Debugger
+    {
+      public static void Log(int logID, params object[] contenxt)
+      {
+        switch (logID)
+        {
+          case LogType.NOT_ACTIVE:
+            Debug.LogError($"Entity <b>{contenxt[0]}</b> is not active. You should not add components to an inactive entity. <b> {contenxt[1]}</b> ");
+            break;
+          case LogType.ALREADY_HAVE:
+            Debug.LogError($"Entity <b>{contenxt[0]}</b> already have this component: <b>{contenxt[1]}</b> ");
+            break;
+          case LogType.REMOVE_NON_EXISTANT:
+            Debug.LogError($"Entity <b>{contenxt[0]}</b> is deleted. You can't remove a component from a deleted entity. <b>{contenxt[1]}</b> ");
+            break;
+          case LogType.NULL_ENTITY:
+            Debug.LogError($"Entity <b>{contenxt[0]}</b> is null. Use <color=#ff0000ff>Entity.Create</color> to register a new entity first. <b>{contenxt[1]}</b> ");
+            break;
+          case LogType.TAGS_LIMIT_REACHED:
+            Debug.LogError($"Entity <b>{contenxt[0]}</b> has reached tag capacity. Go to Tools->Actors->Tags->Size to increase cap. Current cap: <b>{contenxt[1]}</b> ");
+            break;
+          case LogType.DESTROYED:
+            Debug.LogError($"You are trying to release already destroyed entity with ID <b>{contenxt[0]}</b>, <b>{contenxt[1]}</b>");
+            break;
+        }
+      }
+    }
+
+    public static SettingsEngine Settings = new SettingsEngine();
+  }
+
+  public class groups
+  {
+    public GroupCore this[int index] => globals[index];
+
+    public static bool has(int index)
+    {
+      return globals.Length > index && globals[index] != null;
+    }
+
+    public static GroupCore[] globals = new GroupCore[32];
+    internal static CacheGroup All = new CacheGroup();
+    internal static FamilyGroupTags ByTag = new FamilyGroupTags();
+    internal static FamilyGroupTags ByType = new FamilyGroupTags();
+  }
+
+  struct LogType
+  {
+    public const int NOT_ACTIVE = 0;
+    public const int ALREADY_HAVE = 1;
+    public const int REMOVE_NON_EXISTANT = 2;
+    public const int NULL_ENTITY = 3;
+    public const int TAGS_LIMIT_REACHED = 4;
+    public const int DESTROYED = 5;
   }
 }

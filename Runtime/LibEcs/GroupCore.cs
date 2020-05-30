@@ -39,7 +39,7 @@ namespace Pixeye.Actors
   [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
   public abstract class GroupCore : IEnumerable, IEquatable<GroupCore>, IDisposable
   {
-    public ent[] entities = new ent[Framework.Settings.SizeEntities];
+    public ent[] entities = new ent[Kernel.Settings.SizeEntities];
     public int length;
 
 
@@ -50,8 +50,8 @@ namespace Pixeye.Actors
 		internal bool hasEventAdd;
 		internal bool hasEventRemove;
 #else
-    public ents added = new ents(Framework.Settings.SizeEntities);
-    public ents removed = new ents(Framework.Settings.SizeEntities);
+    public ents added = new ents(Kernel.Settings.SizeEntities);
+    public ents removed = new ents(Kernel.Settings.SizeEntities);
 #endif
 
 
@@ -242,8 +242,8 @@ namespace Pixeye.Actors
 			removed = default;
 #else
 
-      added   = new ents(Framework.Settings.SizeEntities);
-      removed = new ents(Framework.Settings.SizeEntities);
+      added   = new ents(Kernel.Settings.SizeEntities);
+      removed = new ents(Kernel.Settings.SizeEntities);
 #endif
 
 

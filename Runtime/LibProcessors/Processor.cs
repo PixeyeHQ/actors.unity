@@ -9,10 +9,10 @@ namespace Pixeye.Actors
   {
     protected Processor()
     {
-      if (Framework.Processors.length == Framework.Processors.storage.Length)
-        Array.Resize(ref Framework.Processors.storage, Framework.Processors.length << 1);
+      if (Kernel.Processors.length == Kernel.Processors.storage.Length)
+        Array.Resize(ref Kernel.Processors.storage, Kernel.Processors.length << 1);
 
-      Framework.Processors.storage[Framework.Processors.length++] = this;
+      Kernel.Processors.storage[Kernel.Processors.length++] = this;
       ProcessorUpdate.AddProc(this);
       ProcessorGroups.Setup(this);
       ProcessorSignals.Add(this);

@@ -144,7 +144,7 @@ namespace Pixeye.Actors
       routines.Local.StopAll();
       ProcessorEntities.Clean();
       Kernel.changingScene = true;
-      Toolbox.Instance.ClearSessionData();
+      Kernel.ClearSessionData();
 
       //Plus two for unload assets and load target scene
       var totalStagesNeed = 0;

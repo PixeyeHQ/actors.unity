@@ -34,7 +34,7 @@ namespace Pixeye.Actors
 			Activate
 		}
 
-		internal static EntityOperation[] operations = new EntityOperation[Framework.Settings.SizeEntities];
+		internal static EntityOperation[] operations = new EntityOperation[Kernel.Settings.SizeEntities];
 		public static int len;
 
 

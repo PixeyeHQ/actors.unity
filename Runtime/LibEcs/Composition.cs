@@ -19,8 +19,8 @@ namespace Pixeye.Actors
     internal int[] includeTags = new int[0];
     internal int[] excludeTags = new int[0];
 
-    public bool[] includeComponents = new bool[Framework.Settings.SizeComponents];
-    internal bool[] excludeComponents = new bool[Framework.Settings.SizeComponents];
+    public bool[] includeComponents = new bool[Kernel.Settings.SizeComponents];
+    internal bool[] excludeComponents = new bool[Kernel.Settings.SizeComponents];
 
     internal HashCode hash;
 

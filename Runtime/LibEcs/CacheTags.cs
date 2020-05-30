@@ -212,7 +212,7 @@ namespace Pixeye.Actors
 #if UNITY_EDITOR
       if (len == CacheTags.Capacity)
       {
-        Framework.Debugger.Log(LogType.TAGS_LIMIT_REACHED, entity, CacheTags.Capacity);
+        Kernel.Debugger.Log(LogType.TAGS_LIMIT_REACHED, entity, CacheTags.Capacity);
         return;
       }
 #endif
@@ -251,7 +251,7 @@ namespace Pixeye.Actors
 #if UNITY_EDITOR
         if (len == CacheTags.Capacity)
         {
-          Framework.Debugger.Log(LogType.TAGS_LIMIT_REACHED, entity, CacheTags.Capacity);
+          Kernel.Debugger.Log(LogType.TAGS_LIMIT_REACHED, entity, CacheTags.Capacity);
           return;
         }
 #endif
@@ -283,7 +283,7 @@ namespace Pixeye.Actors
 #if UNITY_EDITOR
       if (len == CacheTags.Capacity)
       {
-        Framework.Debugger.Log(LogType.TAGS_LIMIT_REACHED, entity, CacheTags.Capacity);
+        Kernel.Debugger.Log(LogType.TAGS_LIMIT_REACHED, entity, CacheTags.Capacity);
         return;
       }
 #endif
@@ -321,7 +321,7 @@ namespace Pixeye.Actors
 #if UNITY_EDITOR
         if (len == CacheTags.Capacity)
         {
-          Framework.Debugger.Log(LogType.TAGS_LIMIT_REACHED, entity, CacheTags.Capacity);
+          Kernel.Debugger.Log(LogType.TAGS_LIMIT_REACHED, entity, CacheTags.Capacity);
           return;
         }
 #endif

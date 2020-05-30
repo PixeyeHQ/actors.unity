@@ -30,7 +30,7 @@ namespace Pixeye.Actors
     public List<PoolNode> nodes = new List<PoolNode>();
 
 
-    Dictionary<int, object> data = new Dictionary<int, object>(5, new FastComparable());
+    Dictionary<int, object> objectStorage = new Dictionary<int, object>(5, new FastComparable());
 
 
     void Awake()
@@ -43,10 +43,10 @@ namespace Pixeye.Actors
         var t = Resources.Load<TextAsset>("SettingsFramework");
         if (t != null)
         {
-          JsonUtility.FromJsonOverwrite(t.text, Framework.Settings);
-          for (int i = 0; i < Framework.Settings.Plugins.Length; i++)
+          JsonUtility.FromJsonOverwrite(t.text, Kernel.Settings);
+          for (int i = 0; i < Kernel.Settings.Plugins.Length; i++)
           {
-            var plugin = Resources.Load<Pluggable>(Framework.Settings.Plugins[i]);
+            var plugin = Resources.Load<Pluggable>(Kernel.Settings.Plugins[i]);
             plugin.Plug();
           }
         }
@@ -57,7 +57,7 @@ namespace Pixeye.Actors
       if (!typesBinded)
       {
         var asmFramework = Assembly.GetExecutingAssembly();
-        var asmDataRaw = Framework.Settings.Namespace;
+        var asmDataRaw = Kernel.Settings.Namespace;
         RegisterAttributeComponents(asmFramework.GetTypes());
 
         var q = asmFramework.GetTypes().Where(t => t.IsSubclassOf(typeof(Storage)) && !t.ContainsGenericParameters);
@@ -261,7 +261,7 @@ namespace Pixeye.Actors
 
 
     ///  Adds an object to the scene by type. It is mainly used to add processing scripts. 
-    protected T Add<T>(Type type = null) where T : new() => Kernel.Add<T>(data, type);
+    protected T Add<T>(Type type = null) where T : new() => Kernel.Add<T>(objectStorage, type);
 
 
     /// This method will execute when the scene loaded. Use it to add your processors.
@@ -278,13 +278,19 @@ namespace Pixeye.Actors
       initialized = false;
     }
 
-    /// <summary>
+ 
     /// This method will execute when the scene get removed. Use this method for reference cleanup.
-    /// </summary>
     protected virtual void Dispose()
     {
     }
 
+
+    internal void CleanScene()
+    {
+      
+    }
+    
+    
     internal float timescale_cache;
 
     IEnumerator OnApplicationFocus(bool hasFocus)

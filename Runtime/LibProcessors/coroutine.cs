@@ -5,6 +5,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using Unity.IL2CPP.CompilerServices;
 using UnityEngine;
 
@@ -75,7 +76,7 @@ namespace Pixeye.Actors
         return false;
 
       running[i] = null;
-      delays[i]  = 0f;
+      delays[i] = 0f;
       return true;
     }
 
@@ -185,36 +186,36 @@ namespace Pixeye.Actors
 
     public ProcessorRoutine()
     {
-      app        = new App();
+      app = new App();
       app.Global = new ProcessorCoroutines();
 
       app.Global.timescaled = true;
-      app.Global.period     = -1;
-      
+      app.Global.period = -1;
+
       ProcessorCoroutines.coroutine_handlers_global.Add(app.Global);
     }
 
     public void addLocalRoutines()
     {
-      Local            = new ProcessorCoroutines();
+      Local = new ProcessorCoroutines();
       Local.timescaled = timescaled;
-      Local.period     = period;
-      Local.accum      = period;
+      Local.period = period;
+      Local.accum = period;
       ProcessorCoroutines.coroutine_handlers.Add(Local);
     }
 
     public ProcessorRoutine ignoreTimescale()
     {
-      timescaled            = false;
+      timescaled = false;
       app.Global.timescaled = false;
       return this;
     }
 
     public ProcessorRoutine setUpdatePeriod(float arg)
     {
-      period            = arg;
+      period = arg;
       app.Global.period = arg;
-      app.Global.accum  = arg;
+      app.Global.accum = arg;
       return this;
     }
 
@@ -274,6 +275,7 @@ namespace Pixeye.Actors
     }
   }
 
+ 
   public static class routines
   {
     internal static ProcessorCoroutines Local;
@@ -282,30 +284,28 @@ namespace Pixeye.Actors
     [RuntimeInitializeOnLoadMethod]
     public static void init()
     {
-      Local  = new ProcessorCoroutines();
+      Local = new ProcessorCoroutines();
       Global = new ProcessorCoroutines();
 
-      Local.timescaled  = true;
+      Local.timescaled = true;
       Global.timescaled = true;
 
-      Local.period  = -1;
+      Local.period = -1;
       Global.period = -1;
 
       ProcessorCoroutines.coroutine_handlers.Add(Local);
       ProcessorCoroutines.coroutine_handlers_global.Add(Global);
     }
 
-    /// <summary>
+
     /// Local coroutines that work only on main scene.
-    /// </summary>
     public static coroutine run(float delay, IEnumerator routine)
     {
       return Local.Run(delay, routine);
     }
 
-    /// <summary>
+
     /// Local coroutines that work only on main scene.
-    /// </summary>
     public static coroutine run(IEnumerator routine)
     {
       return Local.Run(0, routine);
@@ -327,9 +327,7 @@ namespace Pixeye.Actors
     }
 
 
-    /// <summary>
     /// Coroutines that runs globally and are not affected by scene changes.
-    /// </summary>
     public static class app
     {
       public static coroutine run(float delay, IEnumerator routine)
@@ -387,7 +385,7 @@ namespace Pixeye.Actors
     public coroutine(ProcessorCoroutines processorCoroutines, IEnumerator enumerator)
     {
       this.processorCoroutines = processorCoroutines;
-      this.enumerator          = enumerator;
+      this.enumerator = enumerator;
     }
 
     /// <summary>
