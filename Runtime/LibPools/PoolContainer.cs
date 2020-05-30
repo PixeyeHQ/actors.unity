@@ -5,164 +5,202 @@ using Object = UnityEngine.Object;
 
 namespace Pixeye.Actors
 {
-	[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
-	public class PoolContainer
-	{
-		public bool globalPool = false;
-		private List<GameObject> activeObjs = new List<GameObject>(500);
+  [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
+  public class PoolContainer
+  {
+    public bool globalPool = false;
+    private List<GameObject> activeObjs = new List<GameObject>(500);
 
-		private Dictionary<int, Stack<GameObject>> cachedObjects = new Dictionary<int, Stack<GameObject>>(500, new FastComparable());
-		private Dictionary<int, int> cachedIds = new Dictionary<int, int>(500, new FastComparable());
+    private Dictionary<int, Stack<GameObject>> cachedObjects = new Dictionary<int, Stack<GameObject>>(500, new FastComparable());
+    private Dictionary<int, int> cachedIds = new Dictionary<int, int>(500, new FastComparable());
 
-		public void RegisterObject(GameObject prefab)
-		{
-			var               key = prefab.GetInstanceID();
-			Stack<GameObject> stack;
-			var               hasValue = cachedObjects.TryGetValue(key, out stack);
+    public void RegisterObject(GameObject prefab)
+    {
+      var key = prefab.GetInstanceID();
+      Stack<GameObject> stack;
+      var hasValue = cachedObjects.TryGetValue(key, out stack);
 
-			if (!hasValue) cachedObjects.Add(key, new Stack<GameObject>());
-		}
+      if (!hasValue) cachedObjects.Add(key, new Stack<GameObject>());
+    }
 
-		public void Prepopulate(GameObject prefab, GameObject obj)
-		{
-			var               key = prefab.GetInstanceID();
-			Stack<GameObject> stack;
-			var               hasValue = cachedObjects.TryGetValue(key, out stack);
-			if (!hasValue) cachedObjects.Add(key, new Stack<GameObject>());
-			else
-			{
-				cachedIds.Add(obj.GetInstanceID(), key);
-			}
-		}
+    public void Prepopulate(GameObject prefab, GameObject obj)
+    {
+      var key = prefab.GetInstanceID();
+      Stack<GameObject> stack;
+      var hasValue = cachedObjects.TryGetValue(key, out stack);
+      if (!hasValue) cachedObjects.Add(key, new Stack<GameObject>());
+      else
+      {
+        cachedIds.Add(obj.GetInstanceID(), key);
+      }
+    }
 
-		public void AddToPool(GameObject go, GameObject prefab)
-		{
-			cachedIds.Add(go.GetInstanceID(), prefab.GetInstanceID());
-		}
+    public void AddToPool(GameObject go, GameObject prefab)
+    {
+      cachedIds.Add(go.GetInstanceID(), prefab.GetInstanceID());
+    }
 
-		public PoolContainer PopulateWith(GameObject prefab, int amount, int amountPerTick = 10, int timeRate = 1)
-		{
-			var               key = prefab.GetInstanceID();
-			Stack<GameObject> stack;
-			var               hasValue = cachedObjects.TryGetValue(key, out stack);
-			if (!hasValue) cachedObjects.Add(key, new Stack<GameObject>(amount));
+    public PoolContainer PopulateWith(GameObject prefab, int amount, int amountPerTick = 10, int timeRate = 1)
+    {
+      var key = prefab.GetInstanceID();
+      Stack<GameObject> stack;
+      var hasValue = cachedObjects.TryGetValue(key, out stack);
+      if (!hasValue) cachedObjects.Add(key, new Stack<GameObject>(amount));
 
-			Timer.Add(time.delta * timeRate, Pop);
+      Timer.Add(time.delta * timeRate, Pop);
 
-			void Pop()
-			{
-				for (var i = 0; i < amountPerTick; i++)
-				{
-					if (amount == 0) break;
-					Populate(prefab, key);
-					amount--;
-				}
+      void Pop()
+      {
+        for (var i = 0; i < amountPerTick; i++)
+        {
+          if (amount == 0) break;
+          Populate(prefab, key);
+          amount--;
+        }
 
-				if (amount > 0)
-				{
-					Timer.Add(time.delta * timeRate, () => PopulateWith(prefab, amount, amountPerTick, timeRate));
-				}
-			}
+        if (amount > 0)
+        {
+          Timer.Add(time.delta * timeRate, () => PopulateWith(prefab, amount, amountPerTick, timeRate));
+        }
+      }
 
-			return this;
-		}
+      return this;
+    }
 
-		public bool Spawn(GameObject prefab, out GameObject obj, Transform parent = null)
-		{
-			var key = prefab.GetInstanceID();
+    public bool Spawn(GameObject prefab, out GameObject obj, Transform parent = null)
+    {
+      var key = prefab.GetInstanceID();
 
-			Stack<GameObject> objs;
-			var               stacked = cachedObjects.TryGetValue(key, out objs);
+      Stack<GameObject> objs;
+      var stacked = cachedObjects.TryGetValue(key, out objs);
 
-			if (stacked && objs.Count > 0)
-			{
-				obj = objs.Pop();
-				var transform = obj.transform;
-				if (transform.parent != parent)
-					transform.SetParent(parent);
+      if (stacked && objs.Count > 0)
+      {
+        obj = objs.Pop();
+        var transform = obj.transform;
+        if (transform.parent != parent)
+          transform.SetParent(parent);
 
-				transform.gameObject.SetActive(true);
+        transform.gameObject.SetActive(true);
 
-				return true;
-			}
+        return true;
+      }
 
-			if (!stacked)
-			{
-				cachedObjects.Add(key, new Stack<GameObject>(500));
-			}
+      if (!stacked)
+      {
+        cachedObjects.Add(key, new Stack<GameObject>(500));
+      }
 
-			var createdPrefab = Object.Instantiate(prefab, parent);
+      var createdPrefab = Object.Instantiate(prefab, parent);
 
-			var k = createdPrefab.GetInstanceID();
+      var k = createdPrefab.GetInstanceID();
 
-			cachedIds.Add(k, key);
-			obj = createdPrefab;
-			return false;
-		}
+      cachedIds.Add(k, key);
+      obj = createdPrefab;
+      return false;
+    }
 
-		public GameObject Spawn(GameObject prefab, Transform parent = null)
-		{
-			var key = prefab.GetInstanceID();
+    public GameObject Spawn(GameObject prefab, Transform parent = null)
+    {
+      var key = prefab.GetInstanceID();
 
-			Stack<GameObject> objs;
-			var               stacked = cachedObjects.TryGetValue(key, out objs);
+      Stack<GameObject> objs;
+      var stacked = cachedObjects.TryGetValue(key, out objs);
 
-			if (stacked && objs.Count > 0)
-			{
-				var obj       = objs.Pop();
-				var transform = obj.transform;
-				if (transform.parent != parent)
-					transform.SetParent(parent);
+      if (stacked && objs.Count > 0)
+      {
+        var obj = objs.Pop();
+        var transform = obj.transform;
+        if (transform.parent != parent)
+          transform.SetParent(parent);
 
-				transform.gameObject.SetActive(true);
+        transform.gameObject.SetActive(true);
 
-				return obj;
-			}
+        return obj;
+      }
 
-			if (!stacked)
-			{
-				cachedObjects.Add(key, new Stack<GameObject>(600));
-			}
+      if (!stacked)
+      {
+        cachedObjects.Add(key, new Stack<GameObject>(600));
+      }
 
-			var createdPrefab = Object.Instantiate(prefab, parent);
+      var createdPrefab = Object.Instantiate(prefab, parent);
 
-			var k = createdPrefab.GetInstanceID();
+      var k = createdPrefab.GetInstanceID();
 
-			cachedIds.Add(k, key);
-			return createdPrefab;
-		}
+      cachedIds.Add(k, key);
+      return createdPrefab;
+    }
 
-		[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
-		public void Despawn(GameObject go)
-		{
-			go.SetActive(false);
+    public GameObject Spawn(GameObject prefab, Vector3 position, Quaternion rotation, Transform parent = null)
+    {
+      var key = prefab.GetInstanceID();
 
-			cachedObjects[cachedIds[go.GetInstanceID()]].Push(go);
-		}
+      Stack<GameObject> objs;
+      var stacked = cachedObjects.TryGetValue(key, out objs);
 
-		public void DespawnAll()
-		{
-			for (var i = 0; i < activeObjs.Count; i++)
-			{
-				Despawn(activeObjs[i]);
-			}
+      if (stacked && objs.Count > 0)
+      {
+        var obj = objs.Pop();
+        var transform = obj.transform;
+        if (transform.parent != parent)
+          transform.SetParent(parent);
 
-			activeObjs.Clear();
-		}
+        transform.gameObject.SetActive(true);
 
-		public void Dispose()
-		{
-			cachedObjects.Clear();
-			cachedIds.Clear();
-		}
+        return obj;
+      }
 
-		[Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
-		private void Populate(GameObject prefab, int key)
-		{
-			var go = Object.Instantiate(prefab);
-			go.SetActive(false);
-			cachedIds.Add(go.GetInstanceID(), key);
-			cachedObjects[key].Push(go);
-		}
-	}
+      if (!stacked)
+      {
+        cachedObjects.Add(key, new Stack<GameObject>(600));
+      }
+
+      if (parent != null)
+      {
+        position = parent.TransformPoint(position);
+        rotation *= parent.rotation;
+      }
+
+      var createdPrefab = Object.Instantiate(prefab, position, rotation, parent);
+
+      var k = createdPrefab.GetInstanceID();
+
+      cachedIds.Add(k, key);
+      return createdPrefab;
+    }
+
+    [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
+    public void Despawn(GameObject go)
+    {
+      go.SetActive(false);
+
+      cachedObjects[cachedIds[go.GetInstanceID()]].Push(go);
+    }
+
+    public void DespawnAll()
+    {
+      for (var i = 0; i < activeObjs.Count; i++)
+      {
+        Despawn(activeObjs[i]);
+      }
+
+      activeObjs.Clear();
+    }
+
+    public void Dispose()
+    {
+      cachedObjects.Clear();
+      cachedIds.Clear();
+    }
+
+    [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
+    private void Populate(GameObject prefab, int key)
+    {
+      var go = Object.Instantiate(prefab);
+      go.SetActive(false);
+      cachedIds.Add(go.GetInstanceID(), key);
+      cachedObjects[key].Push(go);
+    }
+  }
 }

@@ -1,10 +1,3 @@
-/*===============================================================
-Product:    Battlecruiser
-Developer:  Dimitry Pixeye - pixeye@hbrew.store
-Company:    Homebrew - http://hbrew.store
-Date:       24/06/2017 20:56
-================================================================*/
-
 
 #if ODIN_INSPECTOR
 using Sirenix.OdinInspector;
@@ -16,7 +9,6 @@ namespace Pixeye.Actors
 {
   public abstract class MonoCached : MonoBehaviour, IRequireStarter
   {
- 
     void Awake()
     {
       if (!StarterCore.initialized || Kernel.ChangingScene) return;
@@ -40,7 +32,6 @@ namespace Pixeye.Actors
     {
       Setup();
       HandleEnable();
- 
     }
 
 

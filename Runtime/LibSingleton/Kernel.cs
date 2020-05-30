@@ -48,11 +48,9 @@ namespace Pixeye.Actors
     public static bool ChangingScene;
     public static bool ApplicationIsQuitting;
     public static bool IsQuittingOrChangingScene() => ApplicationIsQuitting || ChangingScene;
-
+ 
     /// Always bigger than actual scene index by 1. This is because 0 index is reserved by framework. 
-    public static int ActiveSceneIndex => StarterCore.ActiveStarter.sceneIndex;
-
-    internal static Scene ActiveScene => StarterCore.ActiveStarter.gameObject.scene;
+    //public static int ActiveSceneIndex => ActiveStarter.sceneIndex;
 
     internal static Dictionary<int, object> objectStorage = new Dictionary<int, object>(5, new FastComparable());
 

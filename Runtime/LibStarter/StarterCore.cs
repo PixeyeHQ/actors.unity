@@ -20,11 +20,15 @@ namespace Pixeye.Actors
   /// <summary>
   /// <para>A scene point of entry. The developer defines here scene dependencies and processing that will work on the scene.</para> 
   /// </summary>
-  public class StarterCore : MonoBehaviour
+  public abstract class StarterCore : MonoBehaviour
   {
     public static bool initialized;
 
+
     internal static StarterCore ActiveStarter;
+    internal static Dictionary<int, StarterCore> Starters = new Dictionary<int, StarterCore>();
+    internal static Scene ActiveScene => ActiveStarter.gameObject.scene;
+
 
     /// Always bigger than actual scene index by 1. This is because 0 index is reserved by framework. 
     internal int sceneIndex => gameObject.scene.buildIndex + 1;
@@ -141,9 +145,8 @@ namespace Pixeye.Actors
     //  protected T Add<T>(Type type = null) where T : new() => Kernel.Add<T>(objectStorage, type);
 
     /// This method will execute when the scene loaded. Use it to add your processors.
-    protected virtual void Setup()
-    {
-    }
+    protected abstract void Setup();
+
 
     protected virtual void PostSetup()
     {
@@ -154,16 +157,19 @@ namespace Pixeye.Actors
       initialized = false;
     }
 
-
     /// This method will execute when the scene get removed. Use this method for reference cleanup.
-    protected virtual void Dispose()
-    {
-    }
+    protected abstract void Dispose();
+
+    // /// This method will execute when the scene get removed. Use this method for reference cleanup.
+    // protected virtual void Dispose()
+    // {
+    // }
 
 
-    internal void CleanScene()
+    internal void ReleaseScene()
     {
       ProcessorUpdate.Default.updates[sceneIndex].Dispose();
+      Dispose();
     }
 
     void BootStrap()
@@ -172,12 +178,14 @@ namespace Pixeye.Actors
 
       if (ProcessorUpdate.Default == null)
       {
+        ProcessorScene.Default.next_main_scene = gameObject.scene.name;
+
         // zero entity
         Entity.Create();
         LoadTypes();
         LoadPlugins();
         ProcessorUpdate.Create();
-        ActiveStarter = this;
+        routines.Init();
       }
 
 
@@ -185,6 +193,7 @@ namespace Pixeye.Actors
         routines.run(CoWaitForSceneLoading());
       else
       {
+        Starters.Add(gameObject.scene.buildIndex, this);
         UpdateIndexes();
       }
 
@@ -210,7 +219,6 @@ namespace Pixeye.Actors
           }
         }
       }
-
 
       void LoadPlugins()
       {

@@ -148,7 +148,8 @@ namespace Pixeye.Actors
       Kernel.ChangingScene = true;
       Kernel.ClearSessionData();
 
-      StarterCore.ActiveStarter.CleanScene();
+      StarterCore.ActiveStarter.ReleaseScene();
+      //  StarterCore.CleanScene();
 
       //Plus two for unload assets and load target scene
       var totalStagesNeed = 0;
@@ -166,7 +167,7 @@ namespace Pixeye.Actors
 
 
       SceneManager.SetActiveScene(scene_buffer);
-      job = SceneManager.UnloadSceneAsync(Kernel.ActiveScene);
+      job = SceneManager.UnloadSceneAsync(StarterCore.ActiveScene);
 
 
       while (!job.isDone)
@@ -339,23 +340,17 @@ namespace Pixeye.Actors
 
     public static void Add(int id)
     {
-      Toolbox.Instance.StartCoroutine(_Add(id));
+      routines.app.run(_Add(id));
     }
 
     public static void Add(string id)
     {
-      Toolbox.Instance.StartCoroutine(_Add(id));
+      routines.app.run(_Add(id));
     }
 
-    public static void Remove(int id)
-    {
-      Toolbox.Instance.StartCoroutine(_Remove(id));
-    }
+    public static void Remove(int index_build) => routines.app.run(CoRemoveSubScene(SceneManager.GetSceneByBuildIndex(index_build)));
 
-    public static void Remove(string id)
-    {
-      Toolbox.Instance.StartCoroutine(_Remove(id));
-    }
+    public static void Remove(string scene_name) => routines.app.run(CoRemoveSubScene(SceneManager.GetSceneByName(scene_name)));
 
     static IEnumerator _Add(int id)
     {
@@ -413,11 +408,13 @@ namespace Pixeye.Actors
       SceneManager.sceneLoaded -= OnAdditiveLoaded;
     }
 
-    static IEnumerator _Remove(int id)
+    static IEnumerator CoRemoveSubScene(Scene scene)
     {
       Kernel.ChangingScene = true;
-      KillActors(SceneManager.GetSceneByBuildIndex(id));
-      var job = SceneManager.UnloadSceneAsync(id);
+      var starter = StarterCore.Starters[scene.buildIndex];
+      starter.ReleaseScene();
+      KillActors(scene);
+      var job = SceneManager.UnloadSceneAsync(scene.buildIndex);
       while (!job.isDone)
       {
         yield return 0;
@@ -426,18 +423,6 @@ namespace Pixeye.Actors
       Kernel.ChangingScene = false;
     }
 
-    static IEnumerator _Remove(string id)
-    {
-      Kernel.ChangingScene = true;
-      KillActors(SceneManager.GetSceneByName(id));
-      var job = SceneManager.UnloadSceneAsync(id);
-      while (!job.isDone)
-      {
-        yield return 0;
-      }
-
-      Kernel.ChangingScene = false;
-    }
 
     static void KillActors(Scene s)
     {

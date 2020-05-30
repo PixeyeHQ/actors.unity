@@ -275,14 +275,13 @@ namespace Pixeye.Actors
     }
   }
 
- 
+
   public static class routines
   {
     internal static ProcessorCoroutines Local;
     internal static ProcessorCoroutines Global;
 
-    [RuntimeInitializeOnLoadMethod]
-    public static void init()
+    internal static void Init()
     {
       Local = new ProcessorCoroutines();
       Global = new ProcessorCoroutines();
