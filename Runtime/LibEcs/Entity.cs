@@ -43,7 +43,7 @@ namespace Pixeye.Actors
 #if UNITY_EDITOR
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
 #else
-		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSplashScreen)]
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSplashScreen)]
 #endif
     internal static void Start()
     {
@@ -139,6 +139,7 @@ namespace Pixeye.Actors
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void RenameGameobject(this ent entity)
     {
+      if (!Framework.Settings.DebugNames) return;
       var tr = Transforms[entity.id];
       if (tr != null)
       {
@@ -151,8 +152,8 @@ namespace Pixeye.Actors
         fstr.Clear();
         fstr.Append($"{id.ToString().PadLeft(4, '0')}: ");
 
-        if (Framework.Settings.DebugNames)
-        {
+         
+       // {
           fstr.Append("[ ");
           for (var j = 0; j < entities[entity.id].componentsAmount; j++)
           {
@@ -162,7 +163,7 @@ namespace Pixeye.Actors
           }
 
           fstr.Append(" ]: ");
-        }
+        //}
 
         fstr.Append(name);
 

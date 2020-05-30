@@ -28,7 +28,7 @@ namespace Pixeye.Actors
     public float deltaTime;
     public float deltaTimeUnscaled;
 
-    internal float timeScaleCached = 1.0f;
+    //internal float timeScaleCached = 1.0f;
 
     public static float scale
     {

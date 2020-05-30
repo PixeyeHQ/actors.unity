@@ -1,7 +1,4 @@
-//  Project : ecs
-// Contacts : Pix - ask@pixeye.games
-
-//  Project  : ACTORS
+﻿//  Project  : ACTORS
 //  Contacts : Pixeye - ask@pixeye.games
 
 using System;
@@ -14,13 +11,9 @@ using Object = UnityEngine.Object;
 
 namespace Pixeye.Actors
 {
-  public class PostHandleComponents : EndNameEditAction
+  public class PostHandleProcessor : EndNameEditAction
   {
-#if !ACTORS_COMPONENTS_STRUCTS
-    public const string PATH_TO_TEMPLATE = @"Assets\Actors\Editor\Templates\TmpComponent.txt";
-#else
-    public const string PATH_TO_TEMPLATE = @"Assets\Actors\Editor\Templates\TmpComponentStruct.txt";
-#endif
+    public const string PATH_TO_TEMPLATE = @"Assets\Actors\Editor\Templates\TmpProcessor.txt";
     const int MENU_ITEM_PRIORITY = 0;
     static Texture2D scriptIcon;
 
@@ -30,26 +23,24 @@ namespace Pixeye.Actors
       scriptIcon = (EditorGUIUtility.IconContent("cs Script Icon").image as Texture2D);
     }
 
-    [MenuItem("Assets/Create/Actors/ECS Component", false, MENU_ITEM_PRIORITY)]
+    [MenuItem("Assets/Create/Actors/ECS Processor", false, MENU_ITEM_PRIORITY)]
     public static void CreateSample()
     {
       var path = HelperFramework.GetPathLibrary();
+
       if (path == string.Empty)
         path = PATH_TO_TEMPLATE;
-#if !ACTORS_COMPONENTS_STRUCTS
-      else path = string.Format($"{path}/Editor/Templates/TmpComponent.txt");
-#else
-      else path = string.Format($"{path}/Editor/Templates/TmpComponentStruct.txt");
-#endif
- 
-      CreateFromTemplate("ComponentDefault.cs", path);
+      else
+        path = string.Format($"{path}/Editor/Templates/TmpProcessor.txt");
+
+      CreateFromTemplate("ProcessorDefault.cs", path);
     }
 
     public static void CreateFromTemplate(string name, string pathName)
     {
       ProjectWindowUtil.StartNameEditingIfProjectWindowExists(
         0,
-        CreateInstance<PostHandleComponents>(),
+        CreateInstance<PostHandleProcessor>(),
         name,
         scriptIcon,
         pathName);
@@ -72,8 +63,6 @@ namespace Pixeye.Actors
       templateContents = templateContents.Replace("##NAMESPACE##", string.Format($"{Environment.NewLine}namespace {DataFramework.nameSpace}"));
       templateContents = templateContents.Replace("##NAME##", className);
 
-      templateContents = templateContents.Replace("##NAMESPACE2##", string.Format($"{DataFramework.nameSpace}"));
-      templateContents = templateContents.Replace("##NAME2##", string.Format($"{className.Replace("Component", "")}"));
       var encoding = new UTF8Encoding(true, false);
 
       using (var tc = new StreamWriter(filePath, false, encoding))
@@ -90,7 +79,7 @@ namespace Pixeye.Actors
     public override void Action(int instanceId, string pathName, string resourceFile)
     {
       var o = CreateScript(pathName, resourceFile);
-      AssetDatabase.SetLabels(o, new[] {"Component"});
+      AssetDatabase.SetLabels(o, new[] {"Processor"});
       ProjectWindowUtil.ShowCreatedAsset(o);
       AssetDatabase.Refresh();
     }

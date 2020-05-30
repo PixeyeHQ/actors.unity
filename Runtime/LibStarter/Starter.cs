@@ -8,6 +8,7 @@ using UnityEditor;
 using Sirenix.OdinInspector;
 #endif
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -24,21 +25,22 @@ namespace Pixeye.Actors
     public static bool initialized;
     static bool typesBinded;
 
-#if ODIN_INSPECTOR
-		[FoldoutGroup("Setup")]
-#else
-    [FoldoutGroup("Setup"), Reorderable]
-#endif
-    public List<SceneReference> ScenesToKeep;
+// #if ODIN_INSPECTOR
+//     [FoldoutGroup("Setup")]
+// #else
+//     [FoldoutGroup("Setup"), Reorderable]
+// #endif
+//       public List<SceneReference> ScenesToKeep;
+//
+// #if ODIN_INSPECTOR
+//     [FoldoutGroup("Setup")]
+// #else
+//     [FoldoutGroup("Setup"), Reorderable]
+// #endif
+//       public List<SceneReference> SceneDependsOn;
 
-#if ODIN_INSPECTOR
-		[FoldoutGroup("Setup")]
-#else
-    [FoldoutGroup("Setup"), Reorderable]
-#endif
-    public List<SceneReference> SceneDependsOn;
-
-    [FoldoutGroup("Pool Cache")]
+    [HideInInspector]
+    //[FoldoutGroup("Pooled Objects From Scene [ Do not touch this! ]")]
     public List<PoolNode> nodes = new List<PoolNode>();
 
     protected virtual void OnAwake()
@@ -47,9 +49,21 @@ namespace Pixeye.Actors
 
     void Awake()
     {
+      // starting kernel
       if (ProcessorUpdate.Default == null)
       {
         ProcessorUpdate.Create();
+
+        var t = Resources.Load<TextAsset>("SettingsFramework");
+        if (t != null)
+        {
+          JsonUtility.FromJsonOverwrite(t.text, Framework.Settings);
+          for (int i = 0; i < Framework.Settings.Plugins.Length; i++)
+          {
+            var plugin = Resources.Load<Pluggable>(Framework.Settings.Plugins[i]);
+            plugin.Plug();
+          }
+        }
       }
 
       OnAwake();
@@ -57,7 +71,7 @@ namespace Pixeye.Actors
       if (!typesBinded)
       {
         var asmFramework = Assembly.GetExecutingAssembly();
-        var asmDataRaw   = Framework.Settings.Namespace;
+        var asmDataRaw = Framework.Settings.Namespace;
         RegisterAttributeComponents(asmFramework.GetTypes());
 
         var q = asmFramework.GetTypes().Where(t => t.IsSubclassOf(typeof(Storage)) && !t.ContainsGenericParameters);
@@ -67,10 +81,9 @@ namespace Pixeye.Actors
           Activator.CreateInstance(item);
         }
 
-        var asmData = default(Assembly);
         if (asmDataRaw != string.Empty)
         {
-          asmData = Assembly.Load(asmDataRaw);
+          var asmData = Assembly.Load(asmDataRaw);
           RegisterAttributeComponents(asmData.GetTypes());
           q = asmData.GetTypes().Where(t => t.IsSubclassOf(typeof(Storage)) && !t.ContainsGenericParameters);
 
@@ -93,16 +106,16 @@ namespace Pixeye.Actors
         typesBinded = true;
       }
 
-
-      ProcessorScene.Default.Setup(ScenesToKeep, SceneDependsOn, this);
+      Toolbox.Instance.StartCoroutine(ProcessorScene.Default.coSetup(this));
+     // ProcessorScene.Default.Setup(ScenesToKeep, SceneDependsOn, this);
     }
 
     private void RegisterAttributeComponents(IEnumerable<Type> enumerable)
     {
       foreach (var type in enumerable.Where(t => t.IsDefined(typeof(ActorsComponent), false)))
       {
-        Type genericStorage     = typeof(Storage<>);
-        Type constructedStorage = genericStorage.MakeGenericType(type);
+        var genericStorage = typeof(Storage<>);
+        var constructedStorage = genericStorage.MakeGenericType(type);
         Activator.CreateInstance(constructedStorage);
       }
     }
@@ -110,11 +123,11 @@ namespace Pixeye.Actors
     public static IEnumerable<Type> GetAllSubclassOf(Type parent)
     {
       foreach (var a in AppDomain.CurrentDomain.GetAssemblies())
-      foreach (var t in a.GetTypes())
-      {
-        if (t.IsSubclassOf(parent))
-          yield return t;
-      }
+        foreach (var t in a.GetTypes())
+        {
+          if (t.IsSubclassOf(parent))
+            yield return t;
+        }
     }
 
 #if UNITY_EDITOR
@@ -132,10 +145,10 @@ namespace Pixeye.Actors
 
     public void AddToNode(GameObject prefab, GameObject instance, int pool)
     {
-      var id                  = prefab.GetInstanceID();
-      var nodesValid          = nodes.FindValidNodes(id);
+      var id = prefab.GetInstanceID();
+      var nodesValid = nodes.FindValidNodes(id);
       var conditionNodeCreate = true;
-      var nodesToKill         = new List<int>();
+      var nodesToKill = new List<int>();
 
       for (var i = 0; i < nodesValid.Count; i++)
       {
@@ -172,9 +185,9 @@ namespace Pixeye.Actors
       if (conditionNodeCreate)
       {
         var node = new PoolNode();
-        node.id          = id;
-        node.prefab      = prefab;
-        node.pool        = pool;
+        node.id = id;
+        node.prefab = prefab;
+        node.pool = pool;
         node.createdObjs = new List<GameObject>();
         node.createdObjs.Add(instance);
         nodes.Add(node);
@@ -190,7 +203,7 @@ namespace Pixeye.Actors
 #endif
 
       if (prefab == null) return;
-      var id    = prefab.GetInstanceID();
+      var id = prefab.GetInstanceID();
       var index = nodes.FindValidNode(id, pool);
       if (index != -1)
       {
@@ -208,8 +221,8 @@ namespace Pixeye.Actors
 
     public void BindScene()
     {
-      ProcessorScene.Default.OnSceneLoad  =  delegate { };
-      ProcessorScene.Default.OnSceneClose =  delegate { };
+      ProcessorScene.Default.OnSceneLoad = delegate { };
+      ProcessorScene.Default.OnSceneClose = delegate { };
       ProcessorScene.Default.OnSceneClose += Dispose;
 
       // zero entity
@@ -229,7 +242,7 @@ namespace Pixeye.Actors
       for (var i = 0; i < SceneManager.sceneCount; i++)
       {
         var scene = SceneManager.GetSceneAt(i);
-        var objs  = scene.GetRootGameObjects();
+        var objs = scene.GetRootGameObjects();
         foreach (var obj in objs)
         {
           var transforms = obj.GetComponentsInChildren<Transform>();
@@ -276,7 +289,6 @@ namespace Pixeye.Actors
     {
     }
 
-
     protected virtual void OnDestroy()
     {
       initialized = false;
@@ -287,6 +299,22 @@ namespace Pixeye.Actors
     /// </summary>
     protected virtual void Dispose()
     {
+    }
+
+    internal float timescale_cache;
+
+    IEnumerator OnApplicationFocus(bool hasFocus)
+    {
+      yield return new WaitForSeconds(0.01f);
+      if (!hasFocus)
+      {
+        timescale_cache = time.Default.timeScale;
+        time.Default.timeScale = 0;
+      }
+      else
+      {
+        time.Default.timeScale = timescale_cache;
+      }
     }
   }
 }

@@ -19,9 +19,9 @@ namespace Pixeye.Actors
 
     readonly Dictionary<string, Transform> sceneObjs = new Dictionary<string, Transform>();
 
-    List<string> scenesToKeep = new List<string>();
-    List<string> sceneDependsOn = new List<string>();
-    Dictionary<string, Scene> scenes = new Dictionary<string, Scene>();
+    readonly List<string> scenesToKeep = new List<string>();
+    readonly List<string> sceneDependsOn = new List<string>();
+    readonly Dictionary<string, Scene> scenes = new Dictionary<string, Scene>();
 
     public void Dispose()
     {
@@ -31,7 +31,7 @@ namespace Pixeye.Actors
     public static Transform Get(string id)
     {
       Transform obj;
-      var       haveFound = Default.sceneObjs.TryGetValue(id, out obj);
+      var haveFound = Default.sceneObjs.TryGetValue(id, out obj);
       if (!haveFound)
       {
         var o = GameObject.Find(id);
@@ -46,7 +46,7 @@ namespace Pixeye.Actors
     public static Transform Get(ref string id)
     {
       Transform obj;
-      var       haveFound = Default.sceneObjs.TryGetValue(id, out obj);
+      var haveFound = Default.sceneObjs.TryGetValue(id, out obj);
       if (!haveFound)
       {
         var o = GameObject.Find(id);
@@ -74,16 +74,18 @@ namespace Pixeye.Actors
         this.sceneDependsOn.Add(sceneDependsOn[i].Path);
       }
 
-      Toolbox.Instance.StartCoroutine(_Setup(starter));
+      Toolbox.Instance.StartCoroutine(coSetup(starter));
     }
-
-    IEnumerator _Setup(Starter starter)
+ 
+    
+    internal IEnumerator coSetup(Starter starter)
     {
       for (var i = 0; i < SceneManager.sceneCount; i++)
       {
         var scene = SceneManager.GetSceneAt(i);
 
-        scenes.Add(scene.name, scene);
+        if (!scenes.ContainsKey(scene.name))
+          scenes.Add(scene.name, scene);
       }
 
       for (var i = 0; i < sceneDependsOn.Count; i++)
@@ -101,7 +103,8 @@ namespace Pixeye.Actors
           yield return 0;
         }
 
-        scenes.Add(name, SceneManager.GetSceneByName(name));
+        if (!scenes.ContainsKey(name))
+          scenes.Add(name, SceneManager.GetSceneByName(name));
       }
 
       if (sceneDependsOn.Count == 0)
@@ -110,102 +113,200 @@ namespace Pixeye.Actors
       }
 
       OnSceneLoad();
-
       starter.BindScene();
     }
 
-    IEnumerator _Load(int id)
-    {
-      string pathToScene = SceneUtility.GetScenePathByBuildIndex(id);
-      string sceneName   = System.IO.Path.GetFileNameWithoutExtension(pathToScene);
-
-      IEnumerator load = _Load(sceneName);
-
-      while (load.MoveNext())
-      {
-        yield return 0;
-      }
-    }
+    // IEnumerator _Load(int id)
+    // {
+    //   string pathToScene = SceneUtility.GetScenePathByBuildIndex(id);
+    //   string sceneName = System.IO.Path.GetFileNameWithoutExtension(pathToScene);
+    //
+    //   var load = _Load(sceneName);
+    //
+    //   while (load.MoveNext())
+    //   {
+    //     yield return 0;
+    //   }
+    // }
 
     IEnumerator _Load(string name)
     {
-      void CalculateProgress(AsyncOperation curJob, int _totalStages, ref float _prevProgress, ref float _curProgress)
-      {
-        _curProgress  += curJob.progress / _totalStages - _prevProgress;
-        _prevProgress =  curJob.progress / _totalStages;
+      // void CalculateProgress(AsyncOperation curJob, int _totalStages, ref float _prevProgress, ref float _curProgress)
+      // {
+      //   _curProgress += curJob.progress / _totalStages - _prevProgress;
+      //   _prevProgress = curJob.progress / _totalStages;
+      //
+      //   _curProgress = Mathf.Clamp(_curProgress, 0f, 1f);
+      //   OnSceneLoading(_curProgress);
+      // }
 
-        _curProgress = Mathf.Clamp(_curProgress, 0f, 1f);
-        OnSceneLoading(_curProgress);
-      }
-
-      for (var i = 0; i < ProcessorCoroutines.coroutine_handlers.Count; i++)
-      {
-        ProcessorCoroutines.coroutine_handlers[i].StopAll();
-      }
-
-      if (ProcessorCoroutines.coroutine_handlers.Count > 1)
-      {
-        ProcessorCoroutines.coroutine_handlers.RemoveRange(1, ProcessorCoroutines.coroutine_handlers.Count-1);
-      }
- 
       OnSceneClose();
+      routines.Local.StopAll();
       ProcessorEntities.Clean();
       Toolbox.changingScene = true;
       Toolbox.Instance.ClearSessionData();
 
       //Plus two for unload assets and load target scene
-      var   totalStagesNeed = 0;
-      float curProgress     = 0f, prevProgress = 0f;
+      var totalStagesNeed = 0;
+      float curProgress = 0f, prevProgress = 0f;
 
-      AsyncOperation job            = null;
-      var            scenesToUnload = new List<string>();
+      AsyncOperation job = null;
 
-      //Add main scene
-      scenesToUnload.Add(SceneManager.GetActiveScene().name);
-      //Add additive scenes
-      scenesToUnload.AddRange(sceneDependsOn);
-      //Exclude scenes to keep
-      scenesToUnload.RemoveAll((scene) => scenesToKeep.Contains(scene));
+      job = SceneManager.LoadSceneAsync(name, LoadSceneMode.Additive);
 
-      totalStagesNeed = scenesToUnload.Count + 2;
-
-      //Do all work
-      for (var i = 0; i < totalStagesNeed; i++)
+      while (!job.isDone)
       {
-        //Unload scenes
-        if (i < scenesToUnload.Count)
-        {
-          var key = scenesToUnload[i];
-
-          job = SceneManager.UnloadSceneAsync(scenes[key]);
-        }
-        //Cleaning
-        else if (i < totalStagesNeed - 1)
-        {
-          job = Resources.UnloadUnusedAssets();
-        }
-        //Load target scene
-        else if (i < totalStagesNeed)
-        {
-          scenes.Clear();
-          job = SceneManager.LoadSceneAsync(name, LoadSceneMode.Additive);
-        }
-
-        //Calculate progress
-        while (!job.isDone)
-        {
-          CalculateProgress(job, totalStagesNeed, ref prevProgress, ref curProgress);
-          yield return 0;
-        }
-
-        CalculateProgress(job, totalStagesNeed, ref prevProgress, ref curProgress);
-        prevProgress = 0f;
+       // CalculateProgress(job, totalStagesNeed, ref prevProgress, ref curProgress);
+        yield return 0;
       }
 
+      var active_scene_prev = SceneManager.GetActiveScene().name;
+
+      job = SceneManager.UnloadSceneAsync(scenes[active_scene_prev]);
+      while (!job.isDone)
+      {
+        //CalculateProgress(job, totalStagesNeed, ref prevProgress, ref curProgress);
+        yield return 0;
+      }
+      job = Resources.UnloadUnusedAssets();
+      while (!job.isDone)
+      {
+        //CalculateProgress(job, totalStagesNeed, ref prevProgress, ref curProgress);
+        yield return 0;
+      }
+      
       SceneManager.SetActiveScene(SceneManager.GetSceneByName(name));
       job.allowSceneActivation = true;
-      Toolbox.changingScene    = false;
+      Toolbox.changingScene = false;
+      //var scenesToUnload = new List<string>();
+
+      // //Add main scene
+      // scenesToUnload.Add(SceneManager.GetActiveScene().name);
+      // //Add additive scenes
+      // scenesToUnload.AddRange(sceneDependsOn);
+      // //Exclude scenes to keep
+      // scenesToUnload.RemoveAll((scene) => scenesToKeep.Contains(scene));
+      //
+      // totalStagesNeed = scenesToUnload.Count + 2;
+
+      // //Do all work
+      // for (var i = 0; i < totalStagesNeed; i++)
+      // {
+      //   //Unload scenes
+      //   if (i < scenesToUnload.Count)
+      //   {
+      //     var key = scenesToUnload[i];
+      //     job = SceneManager.UnloadSceneAsync(scenes[key]);
+      //
+      //   }
+      //   //Cleaning
+      //   else if (i < totalStagesNeed - 1)
+      //   {
+      //     job = Resources.UnloadUnusedAssets();
+      //   }
+      //   //Load target scene
+      //   else if (i < totalStagesNeed)
+      //   {
+      //     scenes.Clear();
+      //     job = SceneManager.LoadSceneAsync(name, LoadSceneMode.Additive);
+      //   }
+      //
+      //   //Calculate progress
+      //   while (!job.isDone)
+      //   {
+      //     CalculateProgress(job, totalStagesNeed, ref prevProgress, ref curProgress);
+      //     yield return 0;
+      //   }
+      //
+      //   CalculateProgress(job, totalStagesNeed, ref prevProgress, ref curProgress);
+      //   prevProgress = 0f;
+      // }
+
+      //SceneManager.SetActiveScene(SceneManager.GetSceneByName(name));
+      //job.allowSceneActivation = true;
+      //Toolbox.changingScene = false;
     }
+
+    // IEnumerator _Load(string name)
+    // {
+    //   void CalculateProgress(AsyncOperation curJob, int _totalStages, ref float _prevProgress, ref float _curProgress)
+    //   {
+    //     _curProgress += curJob.progress / _totalStages - _prevProgress;
+    //     _prevProgress = curJob.progress / _totalStages;
+    //
+    //     _curProgress = Mathf.Clamp(_curProgress, 0f, 1f);
+    //     OnSceneLoading(_curProgress);
+    //   }
+    //
+    //   for (var i = 0; i < ProcessorCoroutines.coroutine_handlers.Count; i++)
+    //   {
+    //     ProcessorCoroutines.coroutine_handlers[i].StopAll();
+    //   }
+    //
+    //   if (ProcessorCoroutines.coroutine_handlers.Count > 1)
+    //   {
+    //     ProcessorCoroutines.coroutine_handlers.RemoveRange(1, ProcessorCoroutines.coroutine_handlers.Count - 1);
+    //   }
+    //
+    //   OnSceneClose();
+    //   ProcessorEntities.Clean();
+    //   Toolbox.changingScene = true;
+    //   Toolbox.Instance.ClearSessionData();
+    //
+    //   //Plus two for unload assets and load target scene
+    //   var totalStagesNeed = 0;
+    //   float curProgress = 0f, prevProgress = 0f;
+    //
+    //   AsyncOperation job = null;
+    //   var scenesToUnload = new List<string>();
+    //
+    //   //Add main scene
+    //   scenesToUnload.Add(SceneManager.GetActiveScene().name);
+    //   //Add additive scenes
+    //   scenesToUnload.AddRange(sceneDependsOn);
+    //   //Exclude scenes to keep
+    //   scenesToUnload.RemoveAll((scene) => scenesToKeep.Contains(scene));
+    //
+    //   totalStagesNeed = scenesToUnload.Count + 2;
+    //
+    //   //Do all work
+    //   for (var i = 0; i < totalStagesNeed; i++)
+    //   {
+    //     //Unload scenes
+    //     if (i < scenesToUnload.Count)
+    //     {
+    //       var key = scenesToUnload[i];
+    //       job = SceneManager.UnloadSceneAsync(scenes[key]);
+    //
+    //       //SceneManager.LoadScene("Scene Level 2", LoadSceneMode.Single);
+    //     }
+    //     //Cleaning
+    //     else if (i < totalStagesNeed - 1)
+    //     {
+    //       job = Resources.UnloadUnusedAssets();
+    //     }
+    //     //Load target scene
+    //     else if (i < totalStagesNeed)
+    //     {
+    //       scenes.Clear();
+    //       job = SceneManager.LoadSceneAsync(name, LoadSceneMode.Additive);
+    //     }
+    //
+    //     //Calculate progress
+    //     while (!job.isDone)
+    //     {
+    //       CalculateProgress(job, totalStagesNeed, ref prevProgress, ref curProgress);
+    //       yield return 0;
+    //     }
+    //
+    //     CalculateProgress(job, totalStagesNeed, ref prevProgress, ref curProgress);
+    //     prevProgress = 0f;
+    //   }
+    //
+    //   SceneManager.SetActiveScene(SceneManager.GetSceneByName(name));
+    //   job.allowSceneActivation = true;
+    //   Toolbox.changingScene = false;
+    // }
 
     public static void Add(int id)
     {
@@ -229,7 +330,7 @@ namespace Pixeye.Actors
 
     static IEnumerator _Add(int id)
     {
-      Toolbox.changingScene    =  true;
+      Toolbox.changingScene = true;
       SceneManager.sceneLoaded += OnAdditiveLoaded;
       var job = SceneManager.LoadSceneAsync(id, LoadSceneMode.Additive);
       while (!job.isDone)
@@ -243,7 +344,7 @@ namespace Pixeye.Actors
 
     static IEnumerator _Add(string id)
     {
-      Toolbox.changingScene    =  true;
+      Toolbox.changingScene = true;
       SceneManager.sceneLoaded += OnAdditiveLoaded;
       var job = SceneManager.LoadSceneAsync(id, LoadSceneMode.Additive);
       while (!job.isDone)
@@ -327,13 +428,25 @@ namespace Pixeye.Actors
     public static void To(int id)
     {
       var processing = Default;
-      routines.app.run(processing._Load(id));
+      string pathToScene = SceneUtility.GetScenePathByBuildIndex(id);
+      string sceneName = System.IO.Path.GetFileNameWithoutExtension(pathToScene);
+      routines.app.run(processing.coLoad(sceneName));
     }
 
-    public static void To(string name)
+    public static void To(string sceneName)
     {
       var processing = Default;
-      routines.app.run(processing._Load(name));
+      routines.app.run(processing.coLoad(sceneName));
+    }
+
+
+    IEnumerator coLoad(string sceneName)
+    {
+      var load = _Load(sceneName);
+      while (load.MoveNext())
+      {
+        yield return 0;
+      }
     }
   }
 }

@@ -1,36 +1,33 @@
 
 using Pixeye.Actors;
-
+ 
 ##NAMESPACE##
-{
-    
-       public struct ##NAME## 
-  	   {
-     	 
-       
+ {
+   public struct ##NAME##
+   {
+   }
+ 
+   #region HELPERS
+ 
+   static partial class Component
+   {
+     public const string ##NAME2## = "##NAMESPACE2##.##NAME##";
+     public static ref ##NAME## ##NAME##(in this ent entity) =>
+       ref Storage<##NAME##>.components[entity.id];
+   }
+ 
+   sealed class Storage##NAME## : Storage<##NAME##>
+   {
+     public override ##NAME## Create() => new ##NAME##();
+     // Use for cleaning components that were removed at the current frame.
+     public override void Dispose(indexes disposed)
+     {
+       foreach (var id in disposed)
+       {
+         ref var component = ref components[id];
        }
-    
-       #region HELPERS
-       static partial class Component
-        {
-            public const string ##NAME2## = "##NAMESPACE2##.##NAME##";
-            
-    		public static ref ##NAME## ##NAME##(in this ent entity) =>
-            ref Storage<##NAME##>.components[entity.id];
-        }
-        
-         sealed class Storage##NAME## : Storage<##NAME##>
-                {
-            	    public override ##NAME## Create() => new ##NAME##();
-            	      
-            	    // Use for cleaning components that were removed at the current frame.
-                    public override void Dispose(indexes disposed)
-                    {
-                        foreach (var id in disposed)
-                        {
-                        	ref var component = ref components[id];
-                        }
-                     }
-                 }
-        #endregion
-}
+     }
+   }
+ 
+   #endregion
+ }

@@ -169,8 +169,7 @@ namespace Pixeye.Actors
     void Update()
     {
       var delta = time.delta;
-     
-
+ 
       routines.Global.Tick(time.deltaUnscaled);
 
       if (Toolbox.changingScene) return;

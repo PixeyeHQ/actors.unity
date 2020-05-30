@@ -174,6 +174,7 @@ namespace Pixeye.Actors
     }
   }
 
+  [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
   public class ProcessorRoutine
   {
     ProcessorCoroutines Local;

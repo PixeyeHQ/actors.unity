@@ -25,8 +25,7 @@ namespace Pixeye.Actors
 
     public static List<IDisposable> disposables = new List<IDisposable>(64);
     public static Action OnDestroyAction = delegate { };
-
-
+ 
     /// <summary>
     /// <para>Creates an object to the toolbox by type.</para> 
     /// </summary>
