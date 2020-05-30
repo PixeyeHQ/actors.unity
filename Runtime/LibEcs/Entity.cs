@@ -53,8 +53,8 @@ namespace Pixeye.Actors
 
       Kernel.Settings.SizeGenerations = Kernel.Settings.SizeComponents / 32;
 
-      lengthTotal        = Kernel.Settings.SizeEntities;
-      Generations        = new int[Kernel.Settings.SizeEntities, Kernel.Settings.SizeGenerations];
+      lengthTotal = Kernel.Settings.SizeEntities;
+      Generations = new int[Kernel.Settings.SizeEntities, Kernel.Settings.SizeGenerations];
       GenerationsInstant = new int[Kernel.Settings.SizeEntities, Kernel.Settings.SizeGenerations];
 
 
@@ -75,10 +75,6 @@ namespace Pixeye.Actors
       }
 
       alive = new ents(Kernel.Settings.SizeEntities);
-
-#if UNITY_EDITOR
-      Toolbox.OnDestroyAction += Dispose;
-#endif
     }
 
     // Use for other libraries
@@ -117,7 +113,7 @@ namespace Pixeye.Actors
       entities[id].componentsAmount = 0;
 
       var ptrCache = &entities[id];
-      ptrCache->age      = age;
+      ptrCache->age = age;
       ptrCache->isNested = isNested;
       ptrCache->isPooled = isPooled;
       // todo: need to refactor in future
@@ -125,7 +121,7 @@ namespace Pixeye.Actors
       ptrCache->isAlive = true;
 
       ent e;
-      e.id  = id;
+      e.id = id;
       e.age = age;
       alive.Add(e);
     }
@@ -143,26 +139,26 @@ namespace Pixeye.Actors
       var tr = Transforms[entity.id];
       if (tr != null)
       {
-        var name             = tr.name;
-        var index            = tr.name.LastIndexOf(':');
+        var name = tr.name;
+        var index = tr.name.LastIndexOf(':');
         if (index > -1) name = tr.name.Remove(0, index + 1);
-        var id               = entity.id;
+        var id = entity.id;
 
         name = name.Trim();
         fstr.Clear();
         fstr.Append($"{id.ToString().PadLeft(4, '0')}: ");
 
-         
-       // {
-          fstr.Append("[ ");
-          for (var j = 0; j < entities[entity.id].componentsAmount; j++)
-          {
-            var storage = Storage.All[entities[entity.id].componentsIds[j]];
-            var lex     = j < entities[entity.id].componentsAmount - 1 ? " " : "";
-            fstr.Append($"{storage.GetComponentType().Name.Remove(0, 9)}{lex}");
-          }
 
-          fstr.Append(" ]: ");
+        // {
+        fstr.Append("[ ");
+        for (var j = 0; j < entities[entity.id].componentsAmount; j++)
+        {
+          var storage = Storage.All[entities[entity.id].componentsIds[j]];
+          var lex = j < entities[entity.id].componentsAmount - 1 ? " " : "";
+          fstr.Append($"{storage.GetComponentType().Name.Remove(0, 9)}{lex}");
+        }
+
+        fstr.Append(" ]: ");
         //}
 
         fstr.Append(name);
@@ -335,7 +331,6 @@ namespace Pixeye.Actors
       return ref val;
     }
 
-    
 
     /// <summary>
     /// Attach component to an entity and systems.
@@ -394,7 +389,8 @@ namespace Pixeye.Actors
       }
     }
 
-    static void Dispose()
+
+    internal static void Dispose()
     {
       for (var i = 0; i < lengthTotal; i++)
         Marshal.FreeHGlobal((IntPtr) entities[i].componentsIds);

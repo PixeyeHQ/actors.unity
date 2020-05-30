@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
+
 
 namespace Pixeye.Actors
 {
@@ -48,11 +48,10 @@ namespace Pixeye.Actors
     public static bool ChangingScene;
     public static bool ApplicationIsQuitting;
     public static bool IsQuittingOrChangingScene() => ApplicationIsQuitting || ChangingScene;
- 
+
     /// Always bigger than actual scene index by 1. This is because 0 index is reserved by framework. 
     //public static int ActiveSceneIndex => ActiveStarter.sceneIndex;
-
-    internal static Dictionary<int, object> objectStorage = new Dictionary<int, object>(5, new FastComparable());
+      internal static Dictionary<int, object> objectStorage = new Dictionary<int, object>(5, new FastComparable());
 
     internal static T Add<T>(Dictionary<int, object> objectStorage, int index, Type type = null) where T : new()
     {
@@ -101,16 +100,6 @@ namespace Pixeye.Actors
       objectStorage.TryGetValue(t.GetHashCode(), out var resolve);
       return resolve;
     }
-
-    // internal static void AwakeObject(object obj)
-    // {
-    //   if (obj is IKernel kernelObj)
-    //   {
-    //     ProcessorUpdate.AddKernel(obj);
-    //   }
-    //   else
-    //     ProcessorUpdate.Add(obj);
-    // }
 
     internal static void Remove(Dictionary<int, object> objectStorage, object obj)
     {
@@ -226,6 +215,13 @@ namespace Pixeye.Actors
       {
         time.Default.timeScale = timescale_cache;
       }
+    }
+
+    void OnApplicationQuit()
+    {
+#if UNITY_EDITOR
+      Entity.Dispose();
+#endif
     }
   }
 

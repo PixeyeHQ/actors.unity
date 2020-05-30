@@ -32,8 +32,7 @@ namespace Pixeye.Actors
 
     public static Transform Get(string id)
     {
-      Transform obj;
-      var haveFound = Default.sceneObjs.TryGetValue(id, out obj);
+      var haveFound = Default.sceneObjs.TryGetValue(id, out var obj);
       if (!haveFound)
       {
         var o = GameObject.Find(id);
@@ -47,8 +46,7 @@ namespace Pixeye.Actors
 
     public static Transform Get(ref string id)
     {
-      Transform obj;
-      var haveFound = Default.sceneObjs.TryGetValue(id, out obj);
+      var haveFound = Default.sceneObjs.TryGetValue(id, out var obj);
       if (!haveFound)
       {
         var o = GameObject.Find(id);
@@ -76,7 +74,7 @@ namespace Pixeye.Actors
         this.sceneDependsOn.Add(sceneDependsOn[i].Path);
       }
 
-      Toolbox.Instance.StartCoroutine(coSetup(starter));
+      Kernel.Instance.StartCoroutine(coSetup(starter));
     }
 
 
@@ -142,7 +140,7 @@ namespace Pixeye.Actors
       //   OnSceneLoading(_curProgress);
       // }
 
-      OnSceneClose();
+
       routines.Local.StopAll();
       ProcessorEntities.Clean();
       Kernel.ChangingScene = true;
@@ -414,6 +412,7 @@ namespace Pixeye.Actors
       var starter = StarterCore.Starters[scene.buildIndex];
       starter.ReleaseScene();
       KillActors(scene);
+      StarterCore. Starters.Remove(scene.buildIndex);
       var job = SceneManager.UnloadSceneAsync(scene.buildIndex);
       while (!job.isDone)
       {

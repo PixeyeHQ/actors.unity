@@ -17,7 +17,7 @@ namespace Pixeye.Actors
  
       ProcessorUpdate.AddProc(this, index);
       ProcessorGroups.Setup(this);
-      ProcessorSignals.Add(this);
+      ProcessorSignals.Add(this, index);
     }
 
     public void Dispose()

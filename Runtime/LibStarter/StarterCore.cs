@@ -48,7 +48,7 @@ namespace Pixeye.Actors
 
       OnAwake();
 
-      Toolbox.Instance.StartCoroutine(ProcessorScene.Default.coSetup(this));
+      Kernel.Instance.StartCoroutine(ProcessorScene.Default.coSetup(this));
     }
 
     private void RegisterAttributeComponents(IEnumerable<Type> enumerable)
@@ -66,33 +66,18 @@ namespace Pixeye.Actors
     }
 
 
-    public static IEnumerable<Type> GetAllSubclassOf(Type parent)
-    {
-      foreach (var a in AppDomain.CurrentDomain.GetAssemblies())
-        foreach (var t in a.GetTypes())
-        {
-          if (t.IsSubclassOf(parent))
-            yield return t;
-        }
-    }
-
-
     public void BindScene()
     {
       ProcessorScene.Default.OnSceneLoad = delegate { };
       ProcessorScene.Default.OnSceneClose = delegate { };
       ProcessorScene.Default.OnSceneClose += Dispose;
 
-
       for (var i = 0; i < nodes.Count; i++)
         nodes[i].Populate();
 
-
       Add<ProcessorObserver>();
 
-
       Setup();
-
 
       for (var i = 0; i < SceneManager.sceneCount; i++)
       {
@@ -119,7 +104,6 @@ namespace Pixeye.Actors
 
       initialized = true;
 
-
       Timer.Add(time.deltaFixed, PostSetup);
     }
 
@@ -131,22 +115,8 @@ namespace Pixeye.Actors
       return o;
     }
 
-    /// Adds an object to the scene by type. It is mainly used to add processing scripts. 
-    // protected T Add<T>(Type type = null) where T : new()
-    // {
-    //   var o = Kernel.Add<T>(objectStorage, type);
-    //   if (o is Processor proc)
-    //   {
-    //     proc.Set(gameObject.scene.buildIndex);
-    //   }
-    //   return o;
-    // }
-
-    //  protected T Add<T>(Type type = null) where T : new() => Kernel.Add<T>(objectStorage, type);
-
     /// This method will execute when the scene loaded. Use it to add your processors.
     protected abstract void Setup();
-
 
     protected virtual void PostSetup()
     {
@@ -160,15 +130,10 @@ namespace Pixeye.Actors
     /// This method will execute when the scene get removed. Use this method for reference cleanup.
     protected abstract void Dispose();
 
-    // /// This method will execute when the scene get removed. Use this method for reference cleanup.
-    // protected virtual void Dispose()
-    // {
-    // }
-
-
     internal void ReleaseScene()
     {
       ProcessorUpdate.Default.updates[sceneIndex].Dispose();
+      ProcessorSignals.Default.handlers[sceneIndex].Dispose();
       Dispose();
     }
 
@@ -216,6 +181,7 @@ namespace Pixeye.Actors
           for (var i = 0; i < diff; i++)
           {
             ProcessorUpdate.Default.updates.Add(new Updates());
+            ProcessorSignals.Default.handlers.Add(new SignalHandler());
           }
         }
       }
@@ -363,4 +329,14 @@ namespace Pixeye.Actors
 
 #endif
   }
+
+  // public static IEnumerable<Type> GetAllSubclassOf(Type parent)
+  // {
+  //   foreach (var a in AppDomain.CurrentDomain.GetAssemblies())
+  //     foreach (var t in a.GetTypes())
+  //     {
+  //       if (t.IsSubclassOf(parent))
+  //         yield return t;
+  //     }
+  // }
 }
