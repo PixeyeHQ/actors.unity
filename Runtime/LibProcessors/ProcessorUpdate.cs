@@ -172,7 +172,7 @@ namespace Pixeye.Actors
  
       routines.Global.Tick(time.deltaUnscaled);
 
-      if (Toolbox.changingScene) return;
+      if (Kernel.changingScene) return;
 
       for (var i = 0; i < timesLen; i++)
       {
@@ -201,7 +201,7 @@ namespace Pixeye.Actors
 
     void FixedUpdate()
     {
-      if (Toolbox.changingScene) return;
+      if (Kernel.changingScene) return;
       var delta = time.deltaFixed;
       for (var i = 0; i < countTicksFixed; i++)
       {
@@ -211,7 +211,7 @@ namespace Pixeye.Actors
 
     void LateUpdate()
     {
-      if (Toolbox.changingScene) return;
+      if (Kernel.changingScene) return;
       var delta = time.delta;
       for (var i = 0; i < countTicksLate; i++)
       {

@@ -79,7 +79,7 @@ namespace Pixeye.Actors
 
     public static void Remove(object obj)
     {
-      if (applicationIsQuitting) return;
+      if (Kernel.applicationIsQuitting) return;
       Instance.data.Remove(obj.GetType().GetHashCode());
     }
 
@@ -100,7 +100,7 @@ namespace Pixeye.Actors
 
     internal void ClearSessionData()
     {
-      if (applicationIsQuitting) return;
+      if (Kernel.applicationIsQuitting) return;
 
       var toWipe = new List<int>();
 
@@ -133,7 +133,7 @@ namespace Pixeye.Actors
 
     public static void DisposeObject(object obj)
     {
-      if (isQuittingOrChangingScene()) return;
+      if (Kernel.isQuittingOrChangingScene()) return;
 
       if (obj is IDisposable disposable)
       {

@@ -25,7 +25,7 @@ namespace Pixeye.Actors
 
     void OnDisable()
     {
-      if (Toolbox.isQuittingOrChangingScene()) return;
+      if (Kernel.isQuittingOrChangingScene()) return;
       if (target != null)
         foreach (var c in cacheFolds)
         {

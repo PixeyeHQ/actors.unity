@@ -27,7 +27,7 @@ namespace Pixeye.Actors
 
     public static void Execute()
     {
-      if (!Starter.initialized) return;
+      if (!StarterCore.initialized) return;
 
       for (var r = 0; r < 2; r++)
       {
@@ -347,7 +347,7 @@ namespace Pixeye.Actors
 
     internal static void Clean()
     {
-      if (Toolbox.applicationIsQuitting) return;
+      if (Kernel.applicationIsQuitting) return;
 
   
       EntityOperations.len        = 0;

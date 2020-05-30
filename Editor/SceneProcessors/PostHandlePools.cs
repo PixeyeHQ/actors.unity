@@ -27,7 +27,7 @@ namespace Pixeye.Actors
     {
       EditorApplication.update += Step;
       //started = false;
-      var starter = Object.FindObjectOfType<Starter>();
+      var starter = Object.FindObjectOfType<StarterCore>();
       if (starter == null) return;
       starter.ClearNodes();
     }
@@ -45,7 +45,7 @@ namespace Pixeye.Actors
 
     public static void CheckScene()
     {
-      var starter = Object.FindObjectOfType<Starter>();
+      var starter = Object.FindObjectOfType<StarterCore>();
       if (starter == null) return;
       starter.ClearNodes();
       var actors = Object.FindObjectsOfType<Actor>();
@@ -59,7 +59,7 @@ namespace Pixeye.Actors
       }
     }
 
-    public static void CheckPoolCache(GameObject gameObject, int pool, Starter starter)
+    public static void CheckPoolCache(GameObject gameObject, int pool, StarterCore starterCore)
     {
       GameObject prefab;
 #if UNITY_2018_3_OR_NEWER
@@ -68,10 +68,8 @@ namespace Pixeye.Actors
 #else
 			prefab = (GameObject) PrefabUtility.GetPrefabObject(gameObject);
 #endif
-
-      Debug.Log("ha");
       if (prefab == null) return;
-      starter.AddToNode(prefab, gameObject, pool);
+      starterCore.AddToNode(prefab, gameObject, pool);
     }
   }
 }
