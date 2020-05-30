@@ -53,7 +53,14 @@ namespace Pixeye.Actors
       Instance.data.TryGetValue(t.GetHashCode(), out var resolve);
       return resolve;
     }
-
+    /// <summary>
+    /// <para>Gets an object from the toolbox by type</para>
+    /// </summary>
+    public static T Get<T>()
+    {
+      var    hasValue = Instance.data.TryGetValue(typeof(T).GetHashCode(), out var resolve);
+      return hasValue ? (T) resolve : default(T);
+    }
     /// <summary>
     /// <para>Adds an object to the toolbox</para>
     /// </summary>
@@ -79,14 +86,7 @@ namespace Pixeye.Actors
       Instance.data.Remove(obj.GetType().GetHashCode());
     }
 
-    /// <summary>
-    /// <para>Gets an object from the toolbox by type</para>
-    /// </summary>
-    public static T Get<T>()
-    {
-      var    hasValue = Instance.data.TryGetValue(typeof(T).GetHashCode(), out var resolve);
-      return hasValue ? (T) resolve : default(T);
-    }
+   
 
      
 

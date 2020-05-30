@@ -33,7 +33,11 @@ namespace Pixeye.Actors
     public static float scale
     {
       get => Default.timeScale;
-      set => Default.timeScale = value;
+      set
+      {
+        Default.timeScale = value; 
+        Debug.Log("HULA");
+      }
     }
 
     /// <summary>
@@ -53,8 +57,8 @@ namespace Pixeye.Actors
     {
       ProcessorUpdate.times.Add(this);
       ProcessorUpdate.timesLen++;
-      deltaTimeFixed    = 1 / fps;
-      deltaTime         = deltaTimeFixed;
+      deltaTimeFixed = 1 / fps;
+      deltaTime = deltaTimeFixed;
       deltaTimeUnscaled = deltaTimeFixed;
     }
 
@@ -62,13 +66,13 @@ namespace Pixeye.Actors
     public void Tick()
     {
       deltaTimeUnscaled = UnityEngine.Time.deltaTime;
-     
+
       if (fpslimit == true)
       {
         deltaTimeUnscaled = Mathf.Clamp(deltaTimeUnscaled, 0, 1 / fps);
       }
 
-      deltaTime      = deltaTimeUnscaled * timeScale;
+      deltaTime = deltaTimeUnscaled * timeScale;
       deltaTimeFixed = 1 / fps * timeScale;
     }
   }

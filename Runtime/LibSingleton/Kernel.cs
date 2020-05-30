@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -68,6 +69,18 @@ namespace Pixeye.Actors
       return created;
     }
 
+    internal static T Get<T>(Dictionary<int, object> objectStorage)
+    {
+      var hasValue = objectStorage.TryGetValue(typeof(T).GetHashCode(), out var resolve);
+      return hasValue ? (T) resolve : default;
+    }
+
+    internal static object Get(Dictionary<int, object> objectStorage, Type t)
+    {
+      objectStorage.TryGetValue(t.GetHashCode(), out var resolve);
+      return resolve;
+    }
+
     internal static void AwakeObject(object obj)
     {
       if (obj is IAwake awakeObj) awakeObj.OnAwake();
@@ -85,6 +98,20 @@ namespace Pixeye.Actors
     }
 
     public static T Add<T>(Type type = null) where T : new() => Add<T>(objectStorage, type);
+
+    ///Gets object
+    public static object Get(Type t)
+    {
+      objectStorage.TryGetValue(t.GetHashCode(), out var resolve);
+      return resolve;
+    }
+
+    ///Gets object
+    public static T Get<T>()
+    {
+      var hasValue = objectStorage.TryGetValue(typeof(T).GetHashCode(), out var resolve);
+      return hasValue ? (T) resolve : default(T);
+    }
 
     public static void Remove(object obj) => Remove(objectStorage, obj);
 
@@ -163,6 +190,23 @@ namespace Pixeye.Actors
     public static SettingsEngine Settings = new SettingsEngine();
 
     public static int GetTicksCount() => ProcessorUpdate.Default.GetTicksCount();
+
+    internal float timescale_cache = 1;
+
+    IEnumerator OnApplicationFocus(bool hasFocus)
+    {
+      yield return new WaitForSeconds(0.01f);
+      if (Settings.FocusLostPause == false) yield break;
+      if (!hasFocus)
+      {
+        timescale_cache = time.Default.timeScale;
+        time.Default.timeScale = 0;
+      }
+      else
+      {
+        time.Default.timeScale = timescale_cache;
+      }
+    }
   }
 
   public class groups

@@ -21,6 +21,7 @@ namespace Pixeye.Actors
     {
       updates.Add(new Updates());
       Default = this;
+      gameObject.name = "Actors Updates";
     }
 
     internal int GetTicksCount()
@@ -261,7 +262,6 @@ namespace Pixeye.Actors
       for (var i = 0; i < countTicks; i++)
       {
         ticks[i].Tick(delta);
-        Debug.Log(ticks[i]);
       }
 
       ProcessorEntities.Execute();
@@ -278,7 +278,6 @@ namespace Pixeye.Actors
       for (var i = 0; i < countTicksFixed; i++)
       {
         ticksFixed[i].TickFixed(delta);
-        Debug.Log(ticksFixed[i]);
       }
     }
 
@@ -287,7 +286,6 @@ namespace Pixeye.Actors
       for (var i = 0; i < countTicksLate; i++)
       {
         ticksLate[i].TickLate(delta);
-        Debug.Log(ticksLate[i]);
       }
     }
 

@@ -290,22 +290,5 @@ namespace Pixeye.Actors
     internal void CleanScene()
     {
     }
-
-
-    internal float timescale_cache;
-
-    IEnumerator OnApplicationFocus(bool hasFocus)
-    {
-      yield return new WaitForSeconds(0.01f);
-      if (!hasFocus)
-      {
-        timescale_cache = time.Default.timeScale;
-        time.Default.timeScale = 0;
-      }
-      else
-      {
-        time.Default.timeScale = timescale_cache;
-      }
-    }
   }
 }
