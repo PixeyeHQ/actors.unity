@@ -143,7 +143,7 @@ namespace Pixeye.Actors
       //
       // Instance.StopAllCoroutines();
       ProcessorTimer.Dispose();
- 
+
       Box.Default.Dispose();
       Pool.Dispose();
       Storage.DisposeSelf();
@@ -228,6 +228,8 @@ namespace Pixeye.Actors
       Entity.Dispose();
 #endif
     }
+
+    
   }
 
   struct LogType

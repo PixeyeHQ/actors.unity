@@ -26,10 +26,10 @@ namespace Pixeye.Actors
     internal static Starter ActiveStarter;
     internal static Dictionary<int, Starter> Starters = new Dictionary<int, Starter>();
     internal static Scene ActiveScene => ActiveStarter.gameObject.scene;
-    internal static int ActiveSceneIndex => ActiveStarter.sceneIndex;
+    internal static scn ActiveLayer => ActiveStarter.layer;
 
     /// Always bigger than actual scene index by 1. This is because 0 index is reserved by framework. 
-    internal int sceneIndex => gameObject.scene.buildIndex + 1;
+    internal scn layer { get; set; }
 
     internal ents entities = new ents();
 
@@ -42,6 +42,7 @@ namespace Pixeye.Actors
 
     void Awake()
     {
+      layer = new scn(gameObject.scene.buildIndex);
       BootStrap();
 
       OnAwake();
@@ -107,7 +108,7 @@ namespace Pixeye.Actors
     protected T Add<T>(Type type = null) where T : Processor, new()
     {
       var o = new T();
-      o.Set(sceneIndex);
+      o.Set(layer.id);
       return o;
     }
 
@@ -128,9 +129,9 @@ namespace Pixeye.Actors
 
     internal void ReleaseScene()
     {
-      ProcessorUpdate.Default.updates[sceneIndex].Dispose();
-      ProcessorSignals.Default.handlers[sceneIndex].Dispose();
-      ProcessorTimer.timers[sceneIndex].Dispose();
+      ProcessorUpdate.Default.updates[layer.id].Dispose();
+      ProcessorSignals.Default.handlers[layer.id].Dispose();
+      ProcessorTimer.timers[layer.id].Dispose();
 
       foreach (var entity in entities)
       {
@@ -190,14 +191,14 @@ namespace Pixeye.Actors
       }
 
 
-      if (!Starters.ContainsKey(sceneIndex))
-        Starters.Add(sceneIndex, this);
+      if (!Starters.ContainsKey(layer.id))
+        Starters.Add(layer.id, this);
 
       void UpdateIndexes()
       {
-        if (ProcessorUpdate.Default.updates.Count <= sceneIndex)
+        if (ProcessorUpdate.Default.updates.Count <= layer.id)
         {
-          var diff = sceneIndex - ProcessorUpdate.Default.updates.Count + 1;
+          var diff = layer.id - ProcessorUpdate.Default.updates.Count + 1;
 
           for (var i = 0; i < diff; i++)
           {
@@ -354,13 +355,43 @@ namespace Pixeye.Actors
 #endif
   }
 
-  // public static IEnumerable<Type> GetAllSubclassOf(Type parent)
-  // {
-  //   foreach (var a in AppDomain.CurrentDomain.GetAssemblies())
-  //     foreach (var t in a.GetTypes())
-  //     {
-  //       if (t.IsSubclassOf(parent))
-  //         yield return t;
-  //     }
-  // }
+  internal static class HelperStarter
+  {
+    internal static List<int> FindValidNodes(this List<PoolNode> list, int id)
+    {
+      var l = new List<int>();
+      for (int i = 0; i < list.Count; i++)
+      {
+        if (list[i].id == id)
+          l.Add(i);
+      }
+
+      return l;
+    }
+
+    internal static int FindValidNode(this List<PoolNode> list, int id, int pool)
+    {
+      for (int i = 0; i < list.Count; i++)
+      {
+        var l = list[i];
+        if (l.id == id && l.pool == pool)
+          return i;
+      }
+
+      return -1;
+    }
+
+    internal static int FindInstanceID<T>(this List<T> list, T target) where T : UnityEngine.Object
+    {
+      int targetID = target.GetInstanceID();
+
+      for (int i = 0; i < list.Count; i++)
+      {
+        if (list[i].GetInstanceID() == targetID)
+          return i;
+      }
+
+      return -1;
+    }
+  }
 }

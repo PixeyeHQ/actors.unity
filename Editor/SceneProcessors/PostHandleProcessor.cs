@@ -26,7 +26,7 @@ namespace Pixeye.Actors
     [MenuItem("Assets/Create/Actors/ECS Processor", false, MENU_ITEM_PRIORITY)]
     public static void CreateSample()
     {
-      var path = HelperFramework.GetPathLibrary();
+      var path = HelperEditor.GetPathLibrary();
 
       if (path == string.Empty)
         path = PATH_TO_TEMPLATE;

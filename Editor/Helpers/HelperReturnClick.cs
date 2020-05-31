@@ -10,26 +10,24 @@ using UnityEngine;
 
 namespace Pixeye.Actors
 {
-	[InitializeOnLoad]
-	public class HelperReturnClick
-	{
-
-		static HelperReturnClick()
-		{
-			#if UNITY_2019_1_OR_NEWER
-			SceneView.duringSceneGui += SceneGUI;
-			#else 
+  [InitializeOnLoad]
+  public class HelperReturnClick
+  {
+    static HelperReturnClick()
+    {
+#if UNITY_2019_1_OR_NEWER
+      SceneView.duringSceneGui += SceneGUI;
+#else 
       SceneView.onSceneGUIDelegate += SceneGUI;
-			#endif
-		}
+#endif
+    }
 
-		static void SceneGUI(SceneView sceneView)
-		{
-			if (!Event.current.alt) return;
-			if (Event.current.button != 1) return;
-			var pos = SceneView.currentDrawingSceneView.camera.ScreenToWorldPoint(Event.current.mousePosition);
-			Debug.Log("Click position is: <b>" + pos + "</b>");
-		}
-
-	}
+    static void SceneGUI(SceneView sceneView)
+    {
+      if (!Event.current.alt) return;
+      if (Event.current.button != 1) return;
+      var pos = SceneView.currentDrawingSceneView.camera.ScreenToWorldPoint(Event.current.mousePosition);
+      Debug.Log("Click position is: <b>" + pos + "</b>");
+    }
+  }
 }

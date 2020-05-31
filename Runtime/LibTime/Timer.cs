@@ -24,7 +24,7 @@ namespace Pixeye.Actors
       t = finishTime;
       action = a;
       pointer = -1;
-      sceneIndex = Starter.ActiveSceneIndex;
+      sceneIndex = Starter.ActiveLayer.id;
     }
 
     public Timer(float finishTime, Action a, int sceneIndex)

@@ -230,13 +230,26 @@ namespace Pixeye.Actors
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Actor Create(int layer, string prefabID, Vector3 position = default, bool pooled = false)
+    public static Actor Create(scn layer, string prefabID, Vector3 position = default, bool pooled = false)
     {
-      SceneManager.SetActiveScene(SceneManager.GetSceneByBuildIndex(layer - 1));
+      SceneManager.SetActiveScene(layer.scene);
       var tr = pooled ? Obj.Spawn(Pool.Entities, prefabID, position) : Obj.Spawn(prefabID, position);
       var actor = tr.AddGetActor();
       actor.isPooled = pooled;
-      actor.Launch();
+      actor.Launch(layer.id);
+      SceneManager.SetActiveScene(Starter.ActiveScene);
+      return actor;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Actor Create(string sceneName, string prefabID, Vector3 position = default, bool pooled = false)
+    {
+      var layer = Starter.Starters[SceneManager.GetSceneByName(sceneName).buildIndex+1].layer;
+      SceneManager.SetActiveScene(layer.scene);
+      var tr = pooled ? Obj.Spawn(Pool.Entities, prefabID, position) : Obj.Spawn(prefabID, position);
+      var actor = tr.AddGetActor();
+      actor.isPooled = pooled;
+      actor.Launch(layer.id);
       SceneManager.SetActiveScene(Starter.ActiveScene);
       return actor;
     }

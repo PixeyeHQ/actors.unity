@@ -284,7 +284,7 @@ namespace Pixeye.Actors
  
       var starter = Starter.Starters[index];
       starter.ReleaseScene();
-      KillActors(scene);
+      //KillActors(scene);
       Starter.Starters.Remove(index);
       var job = SceneManager.UnloadSceneAsync(index-1);
       Kernel.ChangingScene = true;

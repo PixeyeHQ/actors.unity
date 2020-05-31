@@ -13,7 +13,7 @@ namespace Pixeye.Actors
   {
     internal static ProcessorTimer Default;
     internal static List<StorageTimers> timers = new List<StorageTimers>();
-    
+
     public void Tick(float delta)
     {
       for (int i = 0; i < timers.Count; i++)
@@ -25,7 +25,7 @@ namespace Pixeye.Actors
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static void RemoveAt(int index)
     {
-      RemoveAt(index, Starter.ActiveSceneIndex);
+      RemoveAt(index, Starter.ActiveLayer.id);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -43,13 +43,13 @@ namespace Pixeye.Actors
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal void SetElement(int index, ref Timer arg)
     {
-      timers[Starter.ActiveSceneIndex].SetElement(index, ref arg);
+      timers[Starter.ActiveLayer.id].SetElement(index, ref arg);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static ref Timer Add(float t, Action action)
     {
-      return ref Add(t, action, Starter.ActiveSceneIndex);
+      return ref Add(t, action, Starter.ActiveLayer.id);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -61,7 +61,7 @@ namespace Pixeye.Actors
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal int Restart(float t, Action action)
     {
-      return Restart(t, action, Starter.ActiveSceneIndex);
+      return Restart(t, action, Starter.ActiveLayer.id);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

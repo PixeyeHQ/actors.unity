@@ -14,9 +14,11 @@ namespace Pixeye.Actors
 
   public static class Obj
   {
-    /// <summary>
+    
+    //public static int Get
+    
+
     /// Initialize every actor or monocache on childs of the selected gameobject
-    /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void InitChilds(GameObject obj, InitMode mode = InitMode.All)
     {

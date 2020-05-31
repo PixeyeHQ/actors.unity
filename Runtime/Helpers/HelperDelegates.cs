@@ -3,9 +3,9 @@
 
 namespace Pixeye.Actors
 {
-  public delegate bool EntityCallback(ent entity);
+  public delegate bool EntityFunction(ent entity);
 
-  public delegate bool EntityCallbackUpdated(ent entity, float delta);
+  public delegate bool EntityFunctionUpdated(ent entity, float delta);
 
   public delegate void EntityAction(ent entity);
 

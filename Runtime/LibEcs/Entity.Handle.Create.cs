@@ -31,28 +31,28 @@ namespace Pixeye.Actors
       EntityOperations.Set(entity, -1, EntityOperations.Action.Activate);
     }
 
-    public static ent Create(int sceneIndex)
+    public static ent Create(scn layer)
     {
-      Create(sceneIndex, out var entity);
+      Create(layer.id, out var entity);
       return entity;
     }
 
     public static ent Create()
     {
-      Create(Starter.ActiveSceneIndex, out var entity);
+      Create(Starter.ActiveLayer.id, out var entity);
       return entity;
     }
 
-    public static ent Create(int sceneIndex, ModelComposer model)
+    public static ent Create(int layerIndex, ModelComposer model)
     {
-      Create(sceneIndex, out var entity);
+      Create(layerIndex, out var entity);
       model(entity);
       return entity;
     }
 
     public static ent Create(ModelComposer model)
     {
-      Create(Starter.ActiveSceneIndex, out var entity);
+      Create(Starter.ActiveLayer.id, out var entity);
       model(entity);
       return entity;
     }
@@ -308,7 +308,7 @@ namespace Pixeye.Actors
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static void Create(int sceneIndex, out ent entity)
+    internal static void Create(int layerIndex, out ent entity)
     {
       int id;
       byte age = 0;
@@ -329,7 +329,7 @@ namespace Pixeye.Actors
       entity.age = age;
       Initialize(id, age);
       EntityOperations.Set(entity, -1, EntityOperations.Action.Activate);
-      Starter.Starters[sceneIndex].entities.Add(entity);
+      Starter.Starters[layerIndex].entities.Add(entity);
     }
   }
 }
