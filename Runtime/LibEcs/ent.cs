@@ -42,12 +42,12 @@ namespace Pixeye.Actors
     public bool exist
     {
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
-      get => id > 0 && Entity.entities[id].isAlive &&  Entity.entities[id].age == age;
+      get => id > 0 && Entity.entities[id].isAlive && Entity.entities[id].age == age;
     }
 
     public ent(int value)
     {
-      id  = value;
+      id = value;
       age = 0;
     }
 
@@ -76,7 +76,6 @@ namespace Pixeye.Actors
       Entity.entities[id].CleanMask(id);
       EntityOperations.Set(this, 0, EntityOperations.Action.Kill);
       Entity.entities[id].isAlive = false;
-    
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -129,7 +128,7 @@ namespace Pixeye.Actors
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Has<T, Y>()
     {
-      var mask  = Storage<T>.ComponentMask;
+      var mask = Storage<T>.ComponentMask;
       var mask2 = Storage<Y>.ComponentMask;
 
       return (Entity.GenerationsInstant[id, Storage<T>.Generation] & mask) == mask && (Entity.GenerationsInstant[id, Storage<Y>.Generation] & mask2) == mask2;
@@ -139,7 +138,7 @@ namespace Pixeye.Actors
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Has<T, Y, U>()
     {
-      var mask  = Storage<T>.ComponentMask;
+      var mask = Storage<T>.ComponentMask;
       var mask2 = Storage<Y>.ComponentMask;
       var mask3 = Storage<U>.ComponentMask;
 
@@ -151,7 +150,7 @@ namespace Pixeye.Actors
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Has<T, Y, U, I>()
     {
-      var mask  = Storage<T>.ComponentMask;
+      var mask = Storage<T>.ComponentMask;
       var mask2 = Storage<Y>.ComponentMask;
       var mask3 = Storage<U>.ComponentMask;
       var mask4 = Storage<I>.ComponentMask;
@@ -164,7 +163,7 @@ namespace Pixeye.Actors
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Has<T, Y, U, I, O>()
     {
-      var mask  = Storage<T>.ComponentMask;
+      var mask = Storage<T>.ComponentMask;
       var mask2 = Storage<Y>.ComponentMask;
       var mask3 = Storage<U>.ComponentMask;
       var mask4 = Storage<I>.ComponentMask;
@@ -172,6 +171,7 @@ namespace Pixeye.Actors
 
       return (Entity.GenerationsInstant[id, Storage<T>.Generation] & mask) == mask && (Entity.GenerationsInstant[id, Storage<Y>.Generation] & mask2) == mask2 && (Entity.GenerationsInstant[id, Storage<U>.Generation] & mask3) == mask3 && (Entity.GenerationsInstant[id, Storage<I>.Generation] & mask4) == mask4 && (Entity.GenerationsInstant[id, Storage<O>.Generation] & mask5) == mask5;
     }
+
 #if !ACTORS_COMPONENTS_STRUCTS
     /// <summary>
     /// <para>Safely gets the component by type from the entity.</para>

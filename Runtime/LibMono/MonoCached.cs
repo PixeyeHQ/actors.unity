@@ -11,14 +11,14 @@ namespace Pixeye.Actors
   {
     void Awake()
     {
-      if (!StarterCore.initialized || Kernel.ChangingScene) return;
+      if (!Starter.initialized || Kernel.ChangingScene) return;
       Setup();
     }
 
 
     void OnEnable()
     {
-      if (!StarterCore.initialized || Kernel.ChangingScene) return;
+      if (!Starter.initialized || Kernel.ChangingScene) return;
       HandleEnable();
     }
 

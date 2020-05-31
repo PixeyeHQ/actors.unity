@@ -6,6 +6,7 @@ using System;
 using System.Runtime.CompilerServices;
 using Unity.IL2CPP.CompilerServices;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 #if ODIN_INSPECTOR
 using Sirenix.OdinInspector;
@@ -44,9 +45,9 @@ namespace Pixeye.Actors
     // Launch methods
     //===============================//
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Launch()
+    public void Launch(int layer)
     {
-      int  id;
+      int id;
       byte age = 0;
 
       if (ent.entStack.length > 0)
@@ -61,7 +62,7 @@ namespace Pixeye.Actors
       else
         id = ent.lastID++;
 
-      entity.id  = id;
+      entity.id = id;
       entity.age = age;
 
 
@@ -72,7 +73,48 @@ namespace Pixeye.Actors
 
       Actors.Entity.Initialize(id, age, isPooled);
       Actors.Entity.Transforms[id] = transform;
+      Starter.Starters[layer].entities.Add(entity);
+      if (buildFrom != null)
+      {
+        buildFrom.ExecuteOnStart(entity, this);
+        Setup();
+      }
+      else
+      {
+        Setup();
+        EntityOperations.Set(entity, -1, EntityOperations.Action.Activate);
+      }
+    }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Launch()
+    {
+      int id;
+      byte age = 0;
+
+      if (ent.entStack.length > 0)
+      {
+        ref var pop = ref ent.entStack.source[--ent.entStack.length];
+        id = pop.id;
+        unchecked
+        {
+          age = (byte) (pop.age);
+        }
+      }
+      else
+        id = ent.lastID++;
+
+      entity.id = id;
+      entity.age = age;
+
+
+#if UNITY_EDITOR
+      _entity = id;
+#endif
+
+
+      Actors.Entity.Initialize(id, age, isPooled);
+      Actors.Entity.Transforms[id] = transform;
 
       if (buildFrom != null)
       {
@@ -89,7 +131,7 @@ namespace Pixeye.Actors
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Launch(ModelComposer model)
     {
-      int  id;
+      int id;
       byte age = 0;
 
       if (ent.entStack.length > 0)
@@ -104,7 +146,7 @@ namespace Pixeye.Actors
       else
         id = ent.lastID++;
 
-      entity.id  = id;
+      entity.id = id;
       entity.age = age;
 
 #if UNITY_EDITOR
@@ -134,7 +176,7 @@ namespace Pixeye.Actors
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Actor Create(GameObject prefab, Vector3 position = default, bool pooled = false)
     {
-      var tr    = pooled ? Obj.Spawn(Pool.Entities, prefab, position) : Obj.Spawn(prefab, position);
+      var tr = pooled ? Obj.Spawn(Pool.Entities, prefab, position) : Obj.Spawn(prefab, position);
       var actor = tr.AddGetActor();
 
       actor.isPooled = pooled;
@@ -146,7 +188,7 @@ namespace Pixeye.Actors
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Actor Create(GameObject prefab, Transform parent, Vector3 position = default, bool pooled = false)
     {
-      var tr    = pooled ? Obj.Spawn(Pool.Entities, prefab, parent, position) : Obj.Spawn(prefab, parent, position);
+      var tr = pooled ? Obj.Spawn(Pool.Entities, prefab, parent, position) : Obj.Spawn(prefab, parent, position);
       var actor = tr.AddGetActor();
 
       actor.isPooled = pooled;
@@ -158,7 +200,7 @@ namespace Pixeye.Actors
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Actor Create(GameObject prefab, ModelComposer model, Vector3 position = default, bool pooled = false)
     {
-      var tr    = pooled ? Obj.Spawn(Pool.Entities, prefab, position) : Obj.Spawn(prefab, position);
+      var tr = pooled ? Obj.Spawn(Pool.Entities, prefab, position) : Obj.Spawn(prefab, position);
       var actor = tr.AddGetActor();
       actor.isPooled = pooled;
       actor.Launch(model);
@@ -168,7 +210,7 @@ namespace Pixeye.Actors
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Actor Create(string prefabID, Vector3 position = default, bool pooled = false)
     {
-      var tr    = pooled ? Obj.Spawn(Pool.Entities, prefabID, position) : Obj.Spawn(prefabID, position);
+      var tr = pooled ? Obj.Spawn(Pool.Entities, prefabID, position) : Obj.Spawn(prefabID, position);
       var actor = tr.AddGetActor();
 
       actor.isPooled = pooled;
@@ -180,10 +222,22 @@ namespace Pixeye.Actors
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Actor Create(string prefabID, ModelComposer model, Vector3 position = default, bool pooled = false)
     {
-      var tr    = pooled ? Obj.Spawn(Pool.Entities, prefabID, position) : Obj.Spawn(prefabID, position);
+      var tr = pooled ? Obj.Spawn(Pool.Entities, prefabID, position) : Obj.Spawn(prefabID, position);
       var actor = tr.AddGetActor();
       actor.isPooled = pooled;
       actor.Launch(model);
+      return actor;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Actor Create(int layer, string prefabID, Vector3 position = default, bool pooled = false)
+    {
+      SceneManager.SetActiveScene(SceneManager.GetSceneByBuildIndex(layer - 1));
+      var tr = pooled ? Obj.Spawn(Pool.Entities, prefabID, position) : Obj.Spawn(prefabID, position);
+      var actor = tr.AddGetActor();
+      actor.isPooled = pooled;
+      actor.Launch();
+      SceneManager.SetActiveScene(Starter.ActiveScene);
       return actor;
     }
   }

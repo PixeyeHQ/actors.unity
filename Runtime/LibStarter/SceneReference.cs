@@ -6,23 +6,21 @@ using Object = UnityEngine.Object;
 
 namespace Pixeye.Actors
 {
-	[System.Serializable]
-	public class SceneReference
-	{
+  [System.Serializable]
+  public class SceneReference
+  {
+    [SerializeField]
+    private Object sceneAsset;
 
-		[SerializeField]
-		private Object sceneAsset;
-		[SerializeField]
-		private string sceneName = "";
+    [SerializeField]
+    private string sceneName = "";
 
-		public string Path => sceneName;
+    public string Path => sceneName;
 
-		// makes it work with the existing Unity methods (LoadLevel/LoadScene)
-		public static implicit operator string(SceneReference sceneReference)
-		{
-			return sceneReference.Path;
-		}
-
-	}
+    // makes it work with the existing Unity methods (LoadLevel/LoadScene)
+    public static implicit operator string(SceneReference sceneReference)
+    {
+      return sceneReference.Path;
+    }
+  }
 }
- 

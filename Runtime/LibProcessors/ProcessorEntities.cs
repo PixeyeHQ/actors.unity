@@ -27,14 +27,14 @@ namespace Pixeye.Actors
 
     public static void Execute()
     {
-      if (!StarterCore.initialized) return;
+      if (!Starter.initialized) return;
 
       for (var r = 0; r < 2; r++)
       {
         for (var i = 0; i < EntityOperations.len; i++)
         {
           ref var operation = ref EntityOperations.operations[i];
-          var     entityID  = operation.entity.id;
+          var entityID = operation.entity.id;
 
 
           switch (operation.action)
@@ -42,9 +42,9 @@ namespace Pixeye.Actors
             case EntityOperations.Action.Add:
             {
               var componentID = operation.arg;
-              var generation  = Storage.Generations[componentID];
-              var mask        = Storage.Masks[componentID];
-              var storage     = Storage.All[componentID];
+              var generation = Storage.Generations[componentID];
+              var mask = Storage.Masks[componentID];
+              var storage = Storage.All[componentID];
 
               Entity.Generations[entityID, generation] |= mask;
 
@@ -72,8 +72,8 @@ namespace Pixeye.Actors
               for (var j = 0; j < entityCache.componentsAmount; j++)
               {
                 var componentID = entityCache.componentsIds[j];
-                var generation  = Storage.Generations[componentID];
-                var mask        = Storage.Masks[componentID];
+                var generation = Storage.Generations[componentID];
+                var mask = Storage.Masks[componentID];
 
                 Entity.Generations[entityID, generation] &= ~mask;
                 Storage.All[entityCache.componentsIds[j]].toDispose.Add(entityID);
@@ -97,7 +97,7 @@ namespace Pixeye.Actors
                 }
               }
 
-              groupsCheckedLen             = 0;
+              groupsCheckedLen = 0;
               entityCache.componentsAmount = 0;
 
               if (!Entity.entities[entityID].isNested && Entity.Transforms.Length > entityID && Entity.Transforms[entityID] != null)
@@ -117,7 +117,7 @@ namespace Pixeye.Actors
 
               unchecked
               {
-                operation.entity.age          += 1;
+                operation.entity.age += 1;
                 Entity.entities[entityID].age += 1;
               }
 
@@ -132,8 +132,8 @@ namespace Pixeye.Actors
               if (!Entity.entities[entityID].isAlive) continue;
 
               var generation = Storage.Generations[operation.arg];
-              var mask       = Storage.Masks[operation.arg];
-              var storage    = Storage.All[operation.arg];
+              var mask = Storage.Masks[operation.arg];
+              var storage = Storage.All[operation.arg];
 
 
 #if UNITY_EDITOR
@@ -223,12 +223,12 @@ namespace Pixeye.Actors
 
               unchecked
               {
-                operation.entity.age          += 1;
+                operation.entity.age += 1;
                 Entity.entities[entityID].age += 1;
               }
 
               ent.entStack.source[ent.entStack.length++] = operation.entity;
-              Entity.entities[entityID].isAlive          = false;
+              Entity.entities[entityID].isAlive = false;
               break;
             }
 
@@ -242,9 +242,9 @@ namespace Pixeye.Actors
 
               for (var l = 0; l < groups.length; l++)
               {
-                var group      = groups.Elements[l];
+                var group = groups.Elements[l];
                 var canBeAdded = group.composition.Check(entityID);
-                var inGroup    = group.length == 0 ? -1 : HelperArray.BinarySearch(ref group.entities, entityID, 0, group.length - 1);
+                var inGroup = group.length == 0 ? -1 : HelperArray.BinarySearch(ref group.entities, entityID, 0, group.length - 1);
 
                 if (inGroup == -1)
                 {
@@ -267,9 +267,9 @@ namespace Pixeye.Actors
               for (var j = 0; j < entityCache.componentsAmount; j++)
               {
                 var componentID = entityCache.componentsIds[j];
-                var storage     = Storage.All[componentID];
-                var generation  = Storage.Generations[componentID];
-                var mask        = Storage.Masks[componentID];
+                var storage = Storage.All[componentID];
+                var generation = Storage.Generations[componentID];
+                var mask = Storage.Masks[componentID];
 
 
 #if UNITY_EDITOR
@@ -328,7 +328,7 @@ namespace Pixeye.Actors
           {
             var nextGroup = groups.All.Elements[ii];
             nextGroup.removed.length = 0;
-            nextGroup.added.length   = 0;
+            nextGroup.added.length = 0;
           }
 
 #endif
@@ -349,33 +349,34 @@ namespace Pixeye.Actors
     {
       if (Kernel.ApplicationIsQuitting) return;
 
-  
-      EntityOperations.len        = 0;
-      Kernel.Processors.length = 0;
 
-      foreach (var entity in Entity.alive)
-      {
-        ref var entityCache = ref Actors.Entity.entities[entity.id];
-        ref var tagCache    = ref Actors.Entity.Tags[entity.id];
-
-        tagCache.length = 0;
-
-        for (var i = 0; i < entityCache.componentsAmount; i++)
-          Storage.All[entityCache.componentsIds[i]].toDispose.Add(entity.id);
-
-        for (var ii = 0; ii < Kernel.Settings.SizeGenerations; ii++)
-        {
-          Actors.Entity.Generations[entity.id, ii]        = 0;
-          Actors.Entity.GenerationsInstant[entity.id, ii] = 0;
-        }
-
-        entityCache.isAlive          = false;
-        entityCache.componentsAmount = 0;
-      }
-
-      Entity.alive.length = 0;
-      ent.entStack.length = 0;
-      ent.lastID          = 0;
+      // EntityOperations.len = 0;
+      // Kernel.Processors.length = 0;
+      //
+      // foreach (var entity in Entity.alive)
+      // {
+      //   ref var entityCache = ref Actors.Entity.entities[entity.id];
+      //   ref var tagCache = ref Actors.Entity.Tags[entity.id];
+      //
+      //   tagCache.length = 0;
+      //
+      //   for (var i = 0; i < entityCache.componentsAmount; i++)
+      //     Storage.All[entityCache.componentsIds[i]].toDispose.Add(entity.id);
+      //
+      //   for (var ii = 0; ii < Kernel.Settings.SizeGenerations; ii++)
+      //   {
+      //     Actors.Entity.Generations[entity.id, ii] = 0;
+      //     Actors.Entity.GenerationsInstant[entity.id, ii] = 0;
+      //   }
+      //
+      //   entityCache.isAlive = false;
+      //   entityCache.componentsAmount = 0;
+      // }
+      //
+      // Entity.alive.length = 0;
+      // ent.entStack.length = 0;
+      // ent.lastID = 0;
+      
     }
   }
 }

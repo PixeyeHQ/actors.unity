@@ -29,13 +29,13 @@ namespace Pixeye.Actors
 
     internal static void DisposeSelf()
     {
-      //	GroupInt
+      //GroupInt
 
       for (int i = 0; i < lastID; i++)
       {
         All[i].Dispose(All[i].toDispose);
         All[i].toDispose.length = 0;
-        All[i].groups.length = 0;
+        //All[i].groups.length = 0;
       }
     }
 

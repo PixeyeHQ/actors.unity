@@ -58,6 +58,7 @@ namespace Pixeye.Actors
       var hash = type == null ? typeof(T).GetHashCode() : type.GetHashCode();
       if (objectStorage.TryGetValue(hash, out var o))
       {
+        ProcessorUpdate.Add(o);
         //AwakeObject(o);
         return (T) o;
       }
@@ -65,6 +66,7 @@ namespace Pixeye.Actors
       var proc = typeof(T).IsSubclassOf(typeof(Processor));
       if (!proc)
       {
+        ProcessorUpdate.Add(created);
         //AwakeObject(created);
       }
       objectStorage.Add(hash, created);
@@ -76,6 +78,7 @@ namespace Pixeye.Actors
       var hash = type == null ? typeof(T).GetHashCode() : type.GetHashCode();
       if (objectStorage.TryGetValue(hash, out var o))
       {
+        ProcessorUpdate.Add(o);
         //AwakeObject(o);
         return (T) o;
       }
@@ -83,6 +86,7 @@ namespace Pixeye.Actors
       var proc = typeof(T).IsSubclassOf(typeof(Processor));
       if (!proc)
       {
+        ProcessorUpdate.Add(created);
         //AwakeObject(created);
       }
       objectStorage.Add(hash, created);
@@ -126,30 +130,31 @@ namespace Pixeye.Actors
 
     internal static void ClearSessionData()
     {
-      if (ApplicationIsQuitting) return;
-      var toWipe = new List<int>();
-      foreach (var pair in objectStorage)
-      {
-        if (!(pair.Value is IKernel))
-          toWipe.Add(pair.Key);
-        if (!(pair.Value is IDisposable needToBeCleaned)) continue;
-        needToBeCleaned.Dispose();
-      }
-
       Instance.StopAllCoroutines();
-      ProcessorTimer.Default.Dispose();
-
+      // if (ApplicationIsQuitting) return;
+      // var toWipe = new List<int>();
+      // foreach (var pair in objectStorage)
+      // {
+      //   if (!(pair.Value is IKernel))
+      //     toWipe.Add(pair.Key);
+      //   if (!(pair.Value is IDisposable needToBeCleaned)) continue;
+      //   needToBeCleaned.Dispose();
+      // }
+      //
+      // Instance.StopAllCoroutines();
+      ProcessorTimer.Dispose();
+ 
       Box.Default.Dispose();
       Pool.Dispose();
       Storage.DisposeSelf();
       Cleanup();
       ProcessorScene.Default.Dispose();
-      ProcessorUpdate.Default.Dispose();
-
-      foreach (var t in toWipe)
-      {
-        objectStorage.Remove(t);
-      }
+      //ProcessorUpdate.Default.Dispose();
+      //
+      // foreach (var t in toWipe)
+      // {
+      //   objectStorage.Remove(t);
+      // }
     }
 
     public static class Processors
@@ -223,21 +228,6 @@ namespace Pixeye.Actors
       Entity.Dispose();
 #endif
     }
-  }
-
-  public class groups
-  {
-    public GroupCore this[int index] => globals[index];
-
-    public static bool has(int index)
-    {
-      return globals.Length > index && globals[index] != null;
-    }
-
-    public static GroupCore[] globals = new GroupCore[32];
-    internal static CacheGroup All = new CacheGroup();
-    internal static FamilyGroupTags ByTag = new FamilyGroupTags();
-    internal static FamilyGroupTags ByType = new FamilyGroupTags();
   }
 
   struct LogType

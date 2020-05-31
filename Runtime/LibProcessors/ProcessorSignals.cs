@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Pixeye.Actors
 {
@@ -13,10 +14,7 @@ namespace Pixeye.Actors
 
     public static void Send<T>(in T val)
     {
-      for (int i = 0; i < Default.handlers.Count; i++)
-      {
-        Default.handlers[i].Dispatch(val);
-      }
+      Send(val, Starter.ActiveScene.buildIndex);
     }
 
     public static void Send<T>(in T val, int index)
@@ -24,18 +22,29 @@ namespace Pixeye.Actors
       Default.handlers[index].Dispatch(val);
     }
 
-    public static void Add(object obj, int index = 0)
+    public static void Add(object obj, int index)
     {
       var processor = Default;
       processor.handlers[index].Add(obj);
     }
 
-    public static void Remove(object obj, int index = 0)
+    public static void Remove(object obj, int index)
     {
+      // if (index == -1) index = StarterCore.ActiveScene.buildIndex;
       var processor = Default;
       processor.handlers[index].Remove(obj);
     }
- 
+
+    public static void Add(object obj)
+    {
+      Add(obj, Starter.ActiveScene.buildIndex);
+    }
+
+    public static void Remove(object obj)
+    {
+      Remove(obj, Starter.ActiveScene.buildIndex);
+    }
+
     public void Dispose()
     {
       var processor = Default;
@@ -46,7 +55,7 @@ namespace Pixeye.Actors
 
   internal class SignalHandler
   {
-    internal readonly Dictionary<int, List<IReceive>> signals = new Dictionary<int, List<IReceive>>(new FastComparable());
+    internal Dictionary<int, List<IReceive>> signals = new Dictionary<int, List<IReceive>>(new FastComparable());
 
     internal void Dispatch<T>(in T val)
     {
@@ -80,10 +89,14 @@ namespace Pixeye.Actors
     {
       var interfaces = obj.GetType().GetInterfaces();
       var receive = obj as IReceive;
+
       foreach (var type in interfaces)
       {
         if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IReceive<>))
+        {
           Add(receive, type.GetGenericArguments()[0]);
+          Debug.Log("HF");
+        }
       }
     }
 

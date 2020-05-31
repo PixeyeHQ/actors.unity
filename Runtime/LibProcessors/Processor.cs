@@ -4,6 +4,8 @@
 using System;
 using UnityEngine;
 
+//using UnityEngine;
+
 namespace Pixeye.Actors
 {
   public abstract class Processor : IDisposable
@@ -14,10 +16,10 @@ namespace Pixeye.Actors
         Array.Resize(ref Kernel.Processors.storage, Kernel.Processors.length << 1);
 
       Kernel.Processors.storage[Kernel.Processors.length++] = this;
- 
-      ProcessorUpdate.AddProc(this, index);
-      ProcessorGroups.Setup(this);
+
       ProcessorSignals.Add(this, index);
+      ProcessorUpdate.AddProc(this, index);
+      ProcessorGroups.Add(this, index);
     }
 
     public void Dispose()
@@ -26,7 +28,6 @@ namespace Pixeye.Actors
       ProcessorUpdate.RemoveProc(this);
       OnDispose();
     }
-
 
     //===============================//
     // Events

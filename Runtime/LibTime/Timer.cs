@@ -10,62 +10,65 @@ using UnityEngine;
 
 namespace Pixeye.Actors
 {
-	[StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Unicode)]
-	public struct Timer
-	{
-		public Action action;
-		public float t;
-		internal int pointer;
-	 
+  [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Unicode)]
+  public struct Timer
+  {
+    public Action action;
+    public float t;
+    internal int pointer;
+    internal int sceneIndex;
 
-		/// <summary>
-		/// Create a new timer. Timers a great for adding delayed actions.
-		/// </summary>
-		/// <param name="finishTime"></param>
-		/// <param name="action"></param>
-		public Timer(float finishTime, Action a)
-		{
-		  t = finishTime;
-			action = a;
-			pointer = -1;
-		}
+    /// Create a new timer. Timers a great for adding delayed actions.
+    public Timer(float finishTime, Action a)
+    {
+      t = finishTime;
+      action = a;
+      pointer = -1;
+      sceneIndex = Starter.ActiveSceneIndex;
+    }
 
-		/// <summary>
-		/// Create a new timer and pass it to the processor. Timers a great for adding delayed actions.
-		/// </summary>
-		/// <param name="finishTime"></param>
-		/// <param name="action"></param>
-		/// <returns>Timer</returns>
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static ref Timer Add(float finishTime, Action action)
-		{
-			return ref ProcessorTimer.Default.Add(finishTime, action);
-		}
+    public Timer(float finishTime, Action a, int sceneIndex)
+    {
+      t = finishTime;
+      action = a;
+      pointer = -1;
+      this.sceneIndex = sceneIndex;
+    }
 
-		public void Stop()
-		{
-			#if UNITY_EDITOR
+    /// Create a new timer and pass it to the processor. Timers a great for adding delayed actions.
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static ref Timer Add(float finishTime, Action action, int sceneIndex)
+    {
+      return ref ProcessorTimer.Add(finishTime, action, sceneIndex);
+    }
 
-			if (pointer == -1 || pointer > ProcessorTimer.Default.length)
-			{
-				Debug.LogError("Can't stop the timer that is not in the system.");
-				return;
-			}
+    /// Create a new timer and pass it to the processor. Timers a great for adding delayed actions.
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static ref Timer Add(float finishTime, Action action)
+    {
+      return ref ProcessorTimer.Add(finishTime, action);
+    }
 
-			#endif
+    public void Stop()
+    {
+#if UNITY_EDITOR
 
-			ProcessorTimer.Default.RemoveAt(pointer);
-			pointer = -1;
-		}
+      if (pointer == -1 || pointer > ProcessorTimer.GetLength(sceneIndex))
+      {
+        Debug.LogError("Can't stop the timer that is not in the system.");
+        return;
+      }
 
-		/// <summary>
-		/// Pass timer to the processor
-		/// </summary>
-		public void Restart()
-		{
-			pointer = ProcessorTimer.Default.Restart(t, action);
-		}
+#endif
 
-	}
+      ProcessorTimer.RemoveAt(pointer, sceneIndex);
+      pointer = -1;
+    }
 
+    /// Pass timer to the processor
+    public void Restart()
+    {
+      pointer = ProcessorTimer.Restart(t, action, sceneIndex);
+    }
+  }
 }

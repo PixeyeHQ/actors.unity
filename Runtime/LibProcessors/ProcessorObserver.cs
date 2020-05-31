@@ -2,13 +2,15 @@
 // Contacts : Pix - ask@pixeye.games
 
 
+using UnityEngine;
+
 namespace Pixeye.Actors
 {
 #if ACTORS_EVENTS_MANUAL
   [Events(Op.Add | Op.Remove)]
 #endif
 
-  sealed class ProcessorObserver : Processor<ComponentObserver>, ITick
+  sealed class ProcessorObserver : Processor<ComponentObserver>, ITick, IKernel
   {
     public override void HandleEvents()
     {
@@ -29,8 +31,10 @@ namespace Pixeye.Actors
 
     public void Tick(float delta)
     {
+ 
       for (var i = 0; i < source.length; i++)
       {
+        Debug.Log(source.entities[i].exist + " OBS");
         ref var cObserver = ref source.entities[i].ComponentObserver();
         for (var j = 0; j < cObserver.length; j++)
           cObserver.wrappers[j].Check();

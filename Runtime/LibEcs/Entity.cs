@@ -116,10 +116,11 @@ namespace Pixeye.Actors
       ptrCache->age = age;
       ptrCache->isNested = isNested;
       ptrCache->isPooled = isPooled;
-      // todo: need to refactor in future
+ 
       ptrCache->isDirty = true;
       ptrCache->isAlive = true;
 
+      
       ent e;
       e.id = id;
       e.age = age;

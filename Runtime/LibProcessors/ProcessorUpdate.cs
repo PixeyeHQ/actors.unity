@@ -19,7 +19,6 @@ namespace Pixeye.Actors
 
     void Awake()
     {
-      updates.Add(new Updates());
       Default = this;
       gameObject.name = "Actors Updates";
     }
@@ -60,8 +59,11 @@ namespace Pixeye.Actors
 
       routines.Global.Tick(time.deltaUnscaled);
 
-      if (Kernel.ChangingScene) return;
-
+      if (Kernel.ChangingScene)
+      {
+        updatesKernel.Update(delta);
+        return;
+      }
 
       for (var i = 0; i < timesLen; i++)
       {

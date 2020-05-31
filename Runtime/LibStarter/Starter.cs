@@ -17,29 +17,27 @@ using UnityEngine.SceneManagement;
 
 namespace Pixeye.Actors
 {
-  /// <summary>
-  /// <para>A scene point of entry. The developer defines here scene dependencies and processing that will work on the scene.</para> 
-  /// </summary>
-  public abstract class StarterCore : MonoBehaviour
+  /// A scene point of entry. The developer defines here scene dependencies and processing that will work on the scene. 
+  public abstract class Starter : MonoBehaviour
   {
     public static bool initialized;
 
 
-    internal static StarterCore ActiveStarter;
-    internal static Dictionary<int, StarterCore> Starters = new Dictionary<int, StarterCore>();
+    internal static Starter ActiveStarter;
+    internal static Dictionary<int, Starter> Starters = new Dictionary<int, Starter>();
     internal static Scene ActiveScene => ActiveStarter.gameObject.scene;
-
+    internal static int ActiveSceneIndex => ActiveStarter.sceneIndex;
 
     /// Always bigger than actual scene index by 1. This is because 0 index is reserved by framework. 
     internal int sceneIndex => gameObject.scene.buildIndex + 1;
 
-    internal Updates Update;
+    internal ents entities = new ents();
 
     [HideInInspector]
     public List<PoolNode> nodes = new List<PoolNode>();
 
 
-    Dictionary<int, object> objectStorage = new Dictionary<int, object>(5, new FastComparable());
+    //Dictionary<int, object> objectStorage = new Dictionary<int, object>(5, new FastComparable());
 
 
     void Awake()
@@ -74,8 +72,6 @@ namespace Pixeye.Actors
 
       for (var i = 0; i < nodes.Count; i++)
         nodes[i].Populate();
-
-      Add<ProcessorObserver>();
 
       Setup();
 
@@ -134,23 +130,44 @@ namespace Pixeye.Actors
     {
       ProcessorUpdate.Default.updates[sceneIndex].Dispose();
       ProcessorSignals.Default.handlers[sceneIndex].Dispose();
+      ProcessorTimer.timers[sceneIndex].Dispose();
+
+      foreach (var entity in entities)
+      {
+        entity.Release();
+      }
+
+
+      entities.length = 0;
+
       Dispose();
     }
 
     void BootStrap()
     {
-      Update = new Updates();
-
       if (ProcessorUpdate.Default == null)
       {
         ProcessorScene.Default.next_main_scene = gameObject.scene.name;
 
+
+        ActiveStarter = this;
+
         // zero entity
-        Entity.Create();
+        Entity.CreateFirst();
+
         LoadTypes();
-        LoadPlugins();
+
         ProcessorUpdate.Create();
         routines.Init();
+
+        ProcessorUpdate.Default.updates.Add(new Updates());
+        ProcessorSignals.Default.handlers.Add(new SignalHandler());
+        ProcessorTimer.timers.Add(new StorageTimers());
+        var o = new ProcessorObserver();
+        o.Set(0);
+
+        LoadPlugins();
+        UpdateIndexes();
       }
 
 
@@ -158,7 +175,6 @@ namespace Pixeye.Actors
         routines.run(CoWaitForSceneLoading());
       else
       {
-        Starters.Add(gameObject.scene.buildIndex, this);
         UpdateIndexes();
       }
 
@@ -173,15 +189,23 @@ namespace Pixeye.Actors
         UpdateIndexes();
       }
 
+
+      if (!Starters.ContainsKey(sceneIndex))
+        Starters.Add(sceneIndex, this);
+
       void UpdateIndexes()
       {
         if (ProcessorUpdate.Default.updates.Count <= sceneIndex)
         {
           var diff = sceneIndex - ProcessorUpdate.Default.updates.Count + 1;
+
           for (var i = 0; i < diff; i++)
           {
             ProcessorUpdate.Default.updates.Add(new Updates());
             ProcessorSignals.Default.handlers.Add(new SignalHandler());
+            ProcessorTimer.Default = new ProcessorTimer();
+            ProcessorUpdate.AddKernel(ProcessorTimer.Default);
+            ProcessorTimer.timers.Add(new StorageTimers());
           }
         }
       }

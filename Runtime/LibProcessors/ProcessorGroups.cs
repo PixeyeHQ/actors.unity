@@ -11,7 +11,12 @@ namespace Pixeye.Actors
   [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
   sealed class ProcessorGroups
   {
-    public static void Setup(object b)
+    public static void Add(object b)
+    {
+      Add(b,Starter.ActiveSceneIndex);
+    }
+
+    public static void Add(object b, int index)
     {
       var type         = b.GetType();
       var objectFields = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);

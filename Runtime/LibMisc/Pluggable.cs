@@ -6,8 +6,8 @@ using UnityEngine;
 
 namespace Pixeye.Actors
 {
-	public abstract class Pluggable : ScriptableObject
-	{
-		public abstract void Plug();
-	}
+  public abstract class Pluggable : ScriptableObject
+  {
+    public abstract void Plug();
+  }
 }
