@@ -40,11 +40,7 @@ namespace Pixeye.Actors
     // Initialize 
     //===============================//
 
-#if UNITY_EDITOR
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-#else
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSplashScreen)]
-#endif
+ 
     internal static void Start()
     {
       var t = Resources.Load<TextAsset>("SettingsFramework");
@@ -90,6 +86,7 @@ namespace Pixeye.Actors
       if (id >= lengthTotal)
       {
         var l = id << 1;
+        Debug.Log(Generations);
         HelperArray.ResizeInt(ref Generations, l, Kernel.Settings.SizeGenerations);
         HelperArray.ResizeInt(ref GenerationsInstant, l, Kernel.Settings.SizeGenerations);
         Array.Resize(ref Transforms, l);
@@ -116,11 +113,11 @@ namespace Pixeye.Actors
       ptrCache->age = age;
       ptrCache->isNested = isNested;
       ptrCache->isPooled = isPooled;
- 
+
       ptrCache->isDirty = true;
       ptrCache->isAlive = true;
 
-      
+
       ent e;
       e.id = id;
       e.age = age;

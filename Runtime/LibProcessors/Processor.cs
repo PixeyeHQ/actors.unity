@@ -18,14 +18,14 @@ namespace Pixeye.Actors
       Kernel.Processors.storage[Kernel.Processors.length++] = this;
 
       ProcessorSignals.Add(this, index);
-      ProcessorUpdate.AddProc(this, index);
+      ProcessorUpdateOld.AddProc(this, index);
       ProcessorGroups.Add(this, index);
     }
 
     public void Dispose()
     {
       ProcessorSignals.Remove(this);
-      ProcessorUpdate.RemoveProc(this);
+      ProcessorUpdateOld.RemoveProc(this);
       OnDispose();
     }
 

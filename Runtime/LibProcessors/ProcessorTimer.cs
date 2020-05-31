@@ -25,7 +25,7 @@ namespace Pixeye.Actors
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static void RemoveAt(int index)
     {
-      RemoveAt(index, Starter.ActiveLayer.id);
+      //  RemoveAt(index, Starter.ActiveLayer.id);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -43,14 +43,15 @@ namespace Pixeye.Actors
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal void SetElement(int index, ref Timer arg)
     {
-      timers[Starter.ActiveLayer.id].SetElement(index, ref arg);
+      // timers[Starter.ActiveLayer.id].SetElement(index, ref arg);
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static ref Timer Add(float t, Action action)
-    {
-      return ref Add(t, action, Starter.ActiveLayer.id);
-    }
+    // [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    // internal static ref Timer Add(float t, Action action)
+    // {
+    //   return default;
+    //   // return ref Add(t, action, Starter.ActiveLayer.id);
+    // }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static ref Timer Add(float t, Action action, int sceneIndex)
@@ -58,11 +59,11 @@ namespace Pixeye.Actors
       return ref timers[sceneIndex].Add(t, action, sceneIndex);
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal int Restart(float t, Action action)
-    {
-      return Restart(t, action, Starter.ActiveLayer.id);
-    }
+    // [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    // internal int Restart(float t, Action action)
+    // {
+    //   return Restart(t, action, Starter.ActiveLayer.id);
+    // }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static int Restart(float t, Action action, int sceneIndex)

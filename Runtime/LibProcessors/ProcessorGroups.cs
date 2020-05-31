@@ -13,7 +13,7 @@ namespace Pixeye.Actors
   {
     public static void Add(object b)
     {
-      Add(b,Starter.ActiveLayer.id);
+     // Add(b,Starter.ActiveLayer.id);
     }
 
     public static void Add(object b, int index)

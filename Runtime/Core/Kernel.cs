@@ -2,47 +2,30 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 
 namespace Pixeye.Actors
 {
   public class Kernel : MonoBehaviour
   {
-    static Kernel instanceLocal;
+    internal static Kernel Instance;
 
-    public static Kernel Instance
-    {
-      get
-      {
-        if (ApplicationIsQuitting)
-        {
-          Debug.LogWarning("[Kernel] Instance '" + typeof(Kernel) +
-                           "' already destroyed on application quit." +
-                           " Won't create again - returning null.");
-          return null;
-        }
-
-        if (instanceLocal != null) return instanceLocal;
-        instanceLocal = (Kernel) FindObjectOfType(typeof(Kernel));
-        if (FindObjectsOfType(typeof(Kernel)).Length > 1)
-        {
-          Debug.LogError("[Kernel] Something went really wrong " +
-                         " - there should never be more than 1 singleton!" +
-                         " Reopening the scene might fix it.");
-          return instanceLocal;
-        }
-
-        if (instanceLocal != null) return instanceLocal;
-        var singleton = new GameObject();
-        instanceLocal = singleton.AddComponent<Kernel>();
-        singleton.name = "Actors Kernel";
-        DontDestroyOnLoad(singleton);
-        return instanceLocal;
-      }
-    }
-
+#if UNITY_EDITOR
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-    static void SetKernel() => Instance.gameObject.SetActive(true);
+#else
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSplashScreen)]
+#endif
+    static void SetKernel()
+    {
+      var scene = SceneManager.CreateScene("Actors Framework", new CreateSceneParameters(LocalPhysicsMode.None));
+      var lastActiveScene = SceneManager.GetActiveScene();
+      SceneManager.SetActiveScene(scene);
+      var objKernel = new GameObject("Actors Kernel");
+      var kernel = objKernel.AddComponent<Kernel>();
+      var layer = objKernel.AddComponent<LayerApp>();
+      Instance = kernel;
+    }
 
 
     public static bool ChangingScene;
@@ -58,7 +41,7 @@ namespace Pixeye.Actors
       var hash = type == null ? typeof(T).GetHashCode() : type.GetHashCode();
       if (objectStorage.TryGetValue(hash, out var o))
       {
-        ProcessorUpdate.Add(o);
+        ProcessorUpdateOld.Add(o);
         //AwakeObject(o);
         return (T) o;
       }
@@ -66,7 +49,7 @@ namespace Pixeye.Actors
       var proc = typeof(T).IsSubclassOf(typeof(Processor));
       if (!proc)
       {
-        ProcessorUpdate.Add(created);
+        ProcessorUpdateOld.Add(created);
         //AwakeObject(created);
       }
       objectStorage.Add(hash, created);
@@ -78,7 +61,7 @@ namespace Pixeye.Actors
       var hash = type == null ? typeof(T).GetHashCode() : type.GetHashCode();
       if (objectStorage.TryGetValue(hash, out var o))
       {
-        ProcessorUpdate.Add(o);
+        ProcessorUpdateOld.Add(o);
         //AwakeObject(o);
         return (T) o;
       }
@@ -86,7 +69,7 @@ namespace Pixeye.Actors
       var proc = typeof(T).IsSubclassOf(typeof(Processor));
       if (!proc)
       {
-        ProcessorUpdate.Add(created);
+        ProcessorUpdateOld.Add(created);
         //AwakeObject(created);
       }
       objectStorage.Add(hash, created);
@@ -148,7 +131,7 @@ namespace Pixeye.Actors
       Pool.Dispose();
       Storage.DisposeSelf();
       Cleanup();
-      ProcessorScene.Default.Dispose();
+      // ProcessorScene.Default.Dispose();
       //ProcessorUpdate.Default.Dispose();
       //
       // foreach (var t in toWipe)
@@ -203,7 +186,7 @@ namespace Pixeye.Actors
 
     public static SettingsEngine Settings = new SettingsEngine();
 
-    public static int GetTicksCount() => ProcessorUpdate.Default.GetTicksCount();
+    public static int GetTicksCount() => ProcessorUpdateOld.Default.GetTicksCount();
 
     internal float timescale_cache = 1;
 
@@ -228,8 +211,6 @@ namespace Pixeye.Actors
       Entity.Dispose();
 #endif
     }
-
-    
   }
 
   struct LogType

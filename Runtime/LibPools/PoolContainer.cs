@@ -3,6 +3,8 @@ using Unity.IL2CPP.CompilerServices;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
+//todo: ACTORS REFACTORING: POOL TIMERS 50/63
+
 namespace Pixeye.Actors
 {
   [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
@@ -47,7 +49,7 @@ namespace Pixeye.Actors
       var hasValue = cachedObjects.TryGetValue(key, out stack);
       if (!hasValue) cachedObjects.Add(key, new Stack<GameObject>(amount));
 
-      Timer.Add(time.delta * timeRate, Pop);
+      //Timer.Add(time.delta * timeRate, Pop);
 
       void Pop()
       {
@@ -60,7 +62,7 @@ namespace Pixeye.Actors
 
         if (amount > 0)
         {
-          Timer.Add(time.delta * timeRate, () => PopulateWith(prefab, amount, amountPerTick, timeRate));
+          //  Timer.Add(time.delta * timeRate, () => PopulateWith(prefab, amount, amountPerTick, timeRate));
         }
       }
 

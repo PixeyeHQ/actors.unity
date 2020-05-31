@@ -55,8 +55,8 @@ namespace Pixeye.Actors
 
     public time()
     {
-      ProcessorUpdate.times.Add(this);
-      ProcessorUpdate.timesLen++;
+      ProcessorUpdateOld.times.Add(this);
+      ProcessorUpdateOld.timesLen++;
       deltaTimeFixed = 1 / fps;
       deltaTime = deltaTimeFixed;
       deltaTimeUnscaled = deltaTimeFixed;

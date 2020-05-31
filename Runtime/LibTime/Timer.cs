@@ -18,14 +18,14 @@ namespace Pixeye.Actors
     internal int pointer;
     internal int sceneIndex;
 
-    /// Create a new timer. Timers a great for adding delayed actions.
-    public Timer(float finishTime, Action a)
-    {
-      t = finishTime;
-      action = a;
-      pointer = -1;
-      sceneIndex = Starter.ActiveLayer.id;
-    }
+    // /// Create a new timer. Timers a great for adding delayed actions.
+    // public Timer(float finishTime, Action a)
+    // {
+    //   t = finishTime;
+    //   action = a;
+    //   pointer = -1;
+    //   sceneIndex = Starter.ActiveLayer.id;
+    // }
 
     public Timer(float finishTime, Action a, int sceneIndex)
     {
@@ -43,11 +43,11 @@ namespace Pixeye.Actors
     }
 
     /// Create a new timer and pass it to the processor. Timers a great for adding delayed actions.
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ref Timer Add(float finishTime, Action action)
-    {
-      return ref ProcessorTimer.Add(finishTime, action);
-    }
+    // [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    // public static ref Timer Add(float finishTime, Action action)
+    // {
+    //   return ref ProcessorTimer.Add(finishTime, action);
+    // }
 
     public void Stop()
     {

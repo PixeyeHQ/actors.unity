@@ -360,56 +360,5 @@ namespace Pixeye.Actors
   }
 
 
-  /// <summary>
-  /// A handle to a (potentially running) coroutine.
-  /// </summary>
-  public struct coroutine
-  {
-    /// <summary>
-    /// Reference to the routine's runner.
-    /// </summary>
-    public ProcessorCoroutines processorCoroutines;
-
-    /// <summary>
-    /// Reference to the routine's enumerator.
-    /// </summary>
-    public IEnumerator enumerator;
-
-
-    /// <summary>
-    /// Construct a coroutine. Never call this manually, only use return values from Coroutines.Run().
-    /// </summary>
-    /// <param name="processorCoroutines">The routine's runner.</param>
-    /// <param name="enumerator">The routine's enumerator.</param>
-    public coroutine(ProcessorCoroutines processorCoroutines, IEnumerator enumerator)
-    {
-      this.processorCoroutines = processorCoroutines;
-      this.enumerator = enumerator;
-    }
-
-    /// <summary>
-    /// Stop this coroutine if it is running.
-    /// </summary>
-    /// <returns>True if the coroutine was stopped.</returns>
-    public bool stop()
-    {
-      return isRunning && processorCoroutines.Stop(enumerator);
-    }
-
-    /// <summary>
-    /// A routine to wait until this coroutine has finished running.
-    /// </summary>
-    /// <returns>The wait enumerator.</returns>
-    public IEnumerator wait()
-    {
-      if (enumerator != null)
-        while (processorCoroutines.IsRunning(enumerator))
-          yield return null;
-    }
-
-    /// <summary>
-    /// True if the enumerator is currently running.
-    /// </summary>
-    public bool isRunning => enumerator != null && processorCoroutines.IsRunning(enumerator);
-  }
+   
 }

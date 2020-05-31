@@ -14,7 +14,7 @@ namespace Pixeye.Actors
 
     public static void Send<T>(in T val)
     {
-      Send(val, Starter.ActiveScene.buildIndex);
+      //Send(val, Starter.ActiveScene.buildIndex);
     }
 
     public static void Send<T>(in T val, int index)
@@ -37,12 +37,12 @@ namespace Pixeye.Actors
 
     public static void Add(object obj)
     {
-      Add(obj, Starter.ActiveScene.buildIndex);
+  //    Add(obj, Starter.ActiveScene.buildIndex);
     }
 
     public static void Remove(object obj)
     {
-      Remove(obj, Starter.ActiveScene.buildIndex);
+     // Remove(obj, Starter.ActiveScene.buildIndex);
     }
 
     public void Dispose()

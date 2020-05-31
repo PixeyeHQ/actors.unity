@@ -39,9 +39,15 @@ namespace Pixeye.Actors
 
     public static ent Create()
     {
-      Create(Starter.ActiveLayer.id, out var entity);
-      return entity;
+      //Create(layer.id, out var entity);
+      return default;
     }
+
+    // public static ent Create()
+    // {
+    // //  Create(Starter.ActiveLayer.id, out var entity);
+    //   return entity;
+    // }
 
     public static ent Create(int layerIndex, ModelComposer model)
     {
@@ -50,12 +56,12 @@ namespace Pixeye.Actors
       return entity;
     }
 
-    public static ent Create(ModelComposer model)
-    {
-      Create(Starter.ActiveLayer.id, out var entity);
-      model(entity);
-      return entity;
-    }
+    // public static ent Create(ModelComposer model)
+    // {
+    // //  Create(Starter.ActiveLayer.id, out var entity);
+    //   model(entity);
+    //   return entity;
+    // }
 
     public static ent Create(string prefabID, Vector3 position = default, bool pooled = false)
     {
@@ -329,7 +335,7 @@ namespace Pixeye.Actors
       entity.age = age;
       Initialize(id, age);
       EntityOperations.Set(entity, -1, EntityOperations.Action.Activate);
-      Starter.Starters[layerIndex].entities.Add(entity);
+      // Starter.Starters[layerIndex].entities.Add(entity);
     }
   }
 }

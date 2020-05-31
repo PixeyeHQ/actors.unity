@@ -27,7 +27,7 @@ namespace Pixeye.Actors
 
     public static void Execute()
     {
-      if (!Starter.initialized) return;
+      if (!Kernel.Instance) return;
 
       for (var r = 0; r < 2; r++)
       {

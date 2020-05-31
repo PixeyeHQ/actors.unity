@@ -73,7 +73,7 @@ namespace Pixeye.Actors
 
       Actors.Entity.Initialize(id, age, isPooled);
       Actors.Entity.Transforms[id] = transform;
-      Starter.Starters[layer].entities.Add(entity);
+  //    Starter.Starters[layer].entities.Add(entity);
       if (buildFrom != null)
       {
         buildFrom.ExecuteOnStart(entity, this);
@@ -229,29 +229,29 @@ namespace Pixeye.Actors
       return actor;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Actor Create(scn layer, string prefabID, Vector3 position = default, bool pooled = false)
-    {
-      SceneManager.SetActiveScene(layer.scene);
-      var tr = pooled ? Obj.Spawn(Pool.Entities, prefabID, position) : Obj.Spawn(prefabID, position);
-      var actor = tr.AddGetActor();
-      actor.isPooled = pooled;
-      actor.Launch(layer.id);
-      SceneManager.SetActiveScene(Starter.ActiveScene);
-      return actor;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Actor Create(string sceneName, string prefabID, Vector3 position = default, bool pooled = false)
-    {
-      var layer = Starter.Starters[SceneManager.GetSceneByName(sceneName).buildIndex+1].layer;
-      SceneManager.SetActiveScene(layer.scene);
-      var tr = pooled ? Obj.Spawn(Pool.Entities, prefabID, position) : Obj.Spawn(prefabID, position);
-      var actor = tr.AddGetActor();
-      actor.isPooled = pooled;
-      actor.Launch(layer.id);
-      SceneManager.SetActiveScene(Starter.ActiveScene);
-      return actor;
-    }
+    // [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    // public static Actor Create(scn layer, string prefabID, Vector3 position = default, bool pooled = false)
+    // {
+    //   SceneManager.SetActiveScene(layer.scene);
+    //   var tr = pooled ? Obj.Spawn(Pool.Entities, prefabID, position) : Obj.Spawn(prefabID, position);
+    //   var actor = tr.AddGetActor();
+    //   actor.isPooled = pooled;
+    //   actor.Launch(layer.id);
+    //   SceneManager.SetActiveScene(Starter.ActiveScene);
+    //   return actor;
+    // }
+    //
+    // [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    // public static Actor Create(string sceneName, string prefabID, Vector3 position = default, bool pooled = false)
+    // {
+    //   var layer = Starter.Starters[SceneManager.GetSceneByName(sceneName).buildIndex+1].layer;
+    //   SceneManager.SetActiveScene(layer.scene);
+    //   var tr = pooled ? Obj.Spawn(Pool.Entities, prefabID, position) : Obj.Spawn(prefabID, position);
+    //   var actor = tr.AddGetActor();
+    //   actor.isPooled = pooled;
+    //   actor.Launch(layer.id);
+    //   SceneManager.SetActiveScene(Starter.ActiveScene);
+    //   return actor;
+    // }
   }
 }
