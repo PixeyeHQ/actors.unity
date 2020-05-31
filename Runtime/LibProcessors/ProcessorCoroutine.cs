@@ -5,23 +5,168 @@ using Unity.IL2CPP.CompilerServices;
 namespace Pixeye.Actors
 {
   [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
-  public class ProcessorCoroutine : ITick, IDisposable
+  public sealed class ProcessorCoroutine : ITick, IDisposable
   {
-    public void Tick(float delta)
+    internal bool timescaled = false;
+    internal float period = -1;
+
+    IEnumerator[] running = new IEnumerator[36];
+    internal float[] delays = new float[36];
+
+    internal int currentIndex;
+    int length;
+
+    internal RoutineCall Run(float delay, IEnumerator routine)
     {
+      if (length == running.Length)
+      {
+        Array.Resize(ref running, length << 1);
+        Array.Resize(ref delays, length << 1);
+      }
+
+      running[length] = routine;
+
+      delays[length++] = delay;
+
+
+      return new RoutineCall(this, routine);
+    }
+
+    internal RoutineCall Run(IEnumerator routine)
+    {
+      if (length == running.Length)
+      {
+        Array.Resize(ref running, length << 1);
+        Array.Resize(ref delays, length << 1);
+      }
+
+      running[length] = routine;
+
+      delays[length++] = 0;
+
+      return new RoutineCall(this, routine);
+    }
+
+    internal bool Stop(IEnumerator routine)
+    {
+      var i = 0;
+
+      for (; i < length; i++)
+      {
+        if (routine == running[i]) break;
+      }
+
+      if (i < 0)
+        return false;
+
+      running[i] = null;
+      delays[i]  = 0f;
+      return true;
+    }
+
+    internal bool Stop(RoutineCall routineCall)
+    {
+      return routineCall.Stop();
+    }
+
+    internal void StopAll()
+    {
+      length = 0;
+    }
+
+    internal bool IsRunning(IEnumerator routine)
+    {
+      for (var i = 0; i < length; i++)
+      {
+        if (routine == running[i]) return true;
+      }
+
+      return false;
+    }
+
+    internal bool IsRunning(RoutineCall routineCall)
+    {
+      return routineCall.IsRunning;
+    }
+
+    internal float accum;
+
+    public void Tick(float dt)
+    {
+      if (timescaled == false)
+      {
+        dt = time.Default.deltaTimeUnscaled;
+      }
+
+      if (period > -1)
+      {
+        accum += dt;
+        if (accum >= period)
+        {
+          for (var i = length - 1; i >= 0; i--)
+          {
+            if (delays[i] > 0f)
+              delays[i] -= accum;
+
+            else if (running[i] == null || !MoveNext(running[i], i))
+            {
+              if (i < --length)
+              {
+                Array.Copy(running, i + 1, running, i, length - i);
+                Array.Copy(delays, i + 1, delays, i, length - i);
+              }
+            }
+          }
+
+          accum -= period;
+        }
+      }
+      else
+      {
+        for (var i = length - 1; i >= 0; i--)
+        {
+          if (delays[i] > 0f)
+            delays[i] -= dt;
+
+          else if (running[i] == null || !MoveNext(running[i], i))
+          {
+            if (i < --length)
+            {
+              Array.Copy(running, i + 1, running, i, length - i);
+              Array.Copy(delays, i + 1, delays, i, length - i);
+            }
+          }
+        }
+      }
+    }
+
+    bool MoveNext(IEnumerator routine, int index)
+    {
+      currentIndex = index;
+      if (routine.Current is IEnumerator current)
+      {
+        if (MoveNext(current, index))
+          return true;
+
+        delays[index] = 0f;
+      }
+
+
+      return routine.MoveNext();
     }
 
     public void Dispose()
     {
+      StopAll();
     }
   }
 
 
   /// A handle to a (potentially running) coroutine.
-  public struct coroutine
+  public struct RoutineCall
   {
     /// Reference to the routine's runner.
-    public ProcessorCoroutines processorCoroutines;
+    internal ProcessorCoroutine processorCoroutines;
 
 
     /// Reference to the routine's enumerator.
@@ -29,22 +174,22 @@ namespace Pixeye.Actors
 
 
     /// Construct a coroutine. Never call this manually, only use return values from Coroutines.Run().
-    public coroutine(ProcessorCoroutines processorCoroutines, IEnumerator enumerator)
+    internal RoutineCall(ProcessorCoroutine processorCoroutines, IEnumerator enumerator)
     {
       this.processorCoroutines = processorCoroutines;
-      this.enumerator = enumerator;
+      this.enumerator          = enumerator;
     }
 
 
     /// Stop this coroutine if it is running.
-    public bool stop()
+    public bool Stop()
     {
-      return isRunning && processorCoroutines.Stop(enumerator);
+      return IsRunning && processorCoroutines.Stop(enumerator);
     }
 
 
     /// A routine to wait until this coroutine has finished running.
-    public IEnumerator wait()
+    public IEnumerator Wait()
     {
       if (enumerator != null)
         while (processorCoroutines.IsRunning(enumerator))
@@ -53,6 +198,6 @@ namespace Pixeye.Actors
 
 
     /// True if the enumerator is currently running.
-    public bool isRunning => enumerator != null && processorCoroutines.IsRunning(enumerator);
+    public bool IsRunning => enumerator != null && processorCoroutines.IsRunning(enumerator);
   }
 }

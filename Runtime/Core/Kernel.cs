@@ -10,18 +10,20 @@ namespace Pixeye.Actors
   public class Kernel : MonoBehaviour
   {
     internal static Kernel Instance;
+    internal static readonly string KernelSceneName = "Actors Framework";
+    internal static List<StarterCore> Layers = new List<StarterCore>();
 
 #if UNITY_EDITOR
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
 #else
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSplashScreen)]
 #endif
-    static void SetKernel()
+    static void Bootstrap()
     {
-      var scene = SceneManager.CreateScene("Actors Framework", new CreateSceneParameters(LocalPhysicsMode.None));
-      var lastActiveScene = SceneManager.GetActiveScene();
-      SceneManager.SetActiveScene(scene);
-      var objKernel = new GameObject("Actors Kernel");
+      var scene = SceneManager.CreateScene(KernelSceneName, new CreateSceneParameters(LocalPhysicsMode.None));
+      var objKernel = new GameObject("Actors Setup");
+      SceneManager.MoveGameObjectToScene(objKernel, scene);
+      MainScene.NextActiveSceneName = SceneManager.GetActiveScene().name;
       var kernel = objKernel.AddComponent<Kernel>();
       var layer = objKernel.AddComponent<LayerApp>();
       Instance = kernel;
@@ -36,25 +38,6 @@ namespace Pixeye.Actors
     //public static int ActiveSceneIndex => ActiveStarter.sceneIndex;
       internal static Dictionary<int, object> objectStorage = new Dictionary<int, object>(5, new FastComparable());
 
-    internal static T Add<T>(Dictionary<int, object> objectStorage, int index, Type type = null) where T : new()
-    {
-      var hash = type == null ? typeof(T).GetHashCode() : type.GetHashCode();
-      if (objectStorage.TryGetValue(hash, out var o))
-      {
-        ProcessorUpdateOld.Add(o);
-        //AwakeObject(o);
-        return (T) o;
-      }
-      var created = new T();
-      var proc = typeof(T).IsSubclassOf(typeof(Processor));
-      if (!proc)
-      {
-        ProcessorUpdateOld.Add(created);
-        //AwakeObject(created);
-      }
-      objectStorage.Add(hash, created);
-      return created;
-    }
 
     internal static T Add<T>(Dictionary<int, object> objectStorage, Type type = null) where T : new()
     {
@@ -76,69 +59,6 @@ namespace Pixeye.Actors
       return created;
     }
 
-    internal static T Get<T>(Dictionary<int, object> objectStorage)
-    {
-      var hasValue = objectStorage.TryGetValue(typeof(T).GetHashCode(), out var resolve);
-      return hasValue ? (T) resolve : default;
-    }
-
-    internal static object Get(Dictionary<int, object> objectStorage, Type t)
-    {
-      objectStorage.TryGetValue(t.GetHashCode(), out var resolve);
-      return resolve;
-    }
-
-    internal static void Remove(Dictionary<int, object> objectStorage, object obj)
-    {
-      objectStorage.Remove(obj.GetType().GetHashCode());
-    }
-
-    public static T Add<T>(Type type = null) where T : new() => Add<T>(objectStorage, type);
-
-    ///Gets object
-    public static object Get(Type t)
-    {
-      objectStorage.TryGetValue(t.GetHashCode(), out var resolve);
-      return resolve;
-    }
-
-    ///Gets object
-    public static T Get<T>()
-    {
-      var hasValue = objectStorage.TryGetValue(typeof(T).GetHashCode(), out var resolve);
-      return hasValue ? (T) resolve : default(T);
-    }
-
-    public static void Remove(object obj) => Remove(objectStorage, obj);
-
-    internal static void ClearSessionData()
-    {
-      Instance.StopAllCoroutines();
-      // if (ApplicationIsQuitting) return;
-      // var toWipe = new List<int>();
-      // foreach (var pair in objectStorage)
-      // {
-      //   if (!(pair.Value is IKernel))
-      //     toWipe.Add(pair.Key);
-      //   if (!(pair.Value is IDisposable needToBeCleaned)) continue;
-      //   needToBeCleaned.Dispose();
-      // }
-      //
-      // Instance.StopAllCoroutines();
-      ProcessorTimer.Dispose();
-
-      Box.Default.Dispose();
-      Pool.Dispose();
-      Storage.DisposeSelf();
-      Cleanup();
-      // ProcessorScene.Default.Dispose();
-      //ProcessorUpdate.Default.Dispose();
-      //
-      // foreach (var t in toWipe)
-      // {
-      //   objectStorage.Remove(t);
-      // }
-    }
 
     public static class Processors
     {

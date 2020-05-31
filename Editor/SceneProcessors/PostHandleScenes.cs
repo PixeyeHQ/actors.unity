@@ -27,11 +27,12 @@ public class PostHandleScenes : EndNameEditAction
     ProjectWindowUtil.StartNameEditingIfProjectWindowExists(0, CreateInstance<PostHandleScenes>(), name, scriptIcon, path);
   }
 
+
   public override void Action(int instanceId, string pathName, string resourceFile)
   {
+    ProcEditorSceneObserve.name = pathName;
     NewSceneSetup setup = NewSceneSetup.EmptyScene;
     var scene = EditorSceneManager.NewScene(setup);
-
     EditorSceneManager.SaveScene(scene, pathName);
   }
 }
@@ -39,6 +40,8 @@ public class PostHandleScenes : EndNameEditAction
 [InitializeOnLoad]
 public static class ProcEditorSceneObserve
 {
+  internal static string name;
+
   static ProcEditorSceneObserve()
   {
     EditorSceneManager.newSceneCreated += SceneCreating;
@@ -49,16 +52,21 @@ public static class ProcEditorSceneObserve
     if (Camera.main != null)
     {
       var camGO = Camera.main.gameObject;
-      GameObject.DestroyImmediate(camGO.gameObject);
+      Object.DestroyImmediate(camGO.gameObject);
     }
 
     var light = GameObject.Find("Directional Light");
     if (light != null)
     {
-      GameObject.DestroyImmediate(light.gameObject);
+      Object.DestroyImmediate(light.gameObject);
     }
 
-    new GameObject("Scene Setup");
+    var chunks = name.Split('/');
+    var n = chunks[chunks.Length - 1];
+    n = n.Split('.')[0];
+    n = n.Replace("Scene", "");
+ 
+    var gameObject = new GameObject(n + " Setup");
     var o = new GameObject("---Dynamic-----------------------------------------------------------------------------------------------------");
     o.SetActive(false);
 

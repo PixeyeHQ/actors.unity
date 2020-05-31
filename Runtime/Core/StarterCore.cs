@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -7,10 +8,12 @@ namespace Pixeye.Actors
 {
   public abstract class StarterCore : MonoBehaviour
   {
+     
     internal static StarterCore ActiveLayer; // current main scene;
     internal Scene Scene => gameObject.scene;
 
     internal ProcessorUpdate processorUpdate;
+    internal ProcessorCoroutine processorCoroutine;
     internal Dictionary<int, object> objects = new Dictionary<int, object>();
 
     internal void Release()
@@ -18,7 +21,7 @@ namespace Pixeye.Actors
       OnLayerDestroy();
 
       processorUpdate.Dispose();
-
+      
       foreach (var obj in objects)
       {
         if (obj.Value is IDisposable wiped)
@@ -34,18 +37,8 @@ namespace Pixeye.Actors
     /// Clean *your* custom scene stuff from here.
     protected abstract void OnLayerDestroy();
 
-    protected U Add<U>() where U : new()
-    {
-      var obj = new U();
-      processorUpdate.Add(obj);
-      objects.Add(typeof(U).GetHashCode(), obj);
-      return obj;
-    }
+    
 
-    public U Get<U>() where U : class
-    {
-      return objects[typeof(U).GetHashCode()] as U;
-    }
 
     void Update()
     {

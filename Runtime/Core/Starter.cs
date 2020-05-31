@@ -20,7 +20,7 @@ namespace Pixeye.Actors
   /// A scene point of entry. The developer defines here scene dependencies and processing that will work on the scene. 
   public abstract class Starter<T> : StarterCore
   {
-    internal static Starter<T> layerObject;
+    internal static Starter<T> layer;
 
     void Awake()
     {
@@ -31,16 +31,119 @@ namespace Pixeye.Actors
     public static void Entity()
     {
     }
- 
+
 
     void Bootstrap()
     {
-      layerObject = this;
+      #region Update Layers
+
+      var buildIndex = gameObject.scene.buildIndex;
+      if (buildIndex != -1)
+      {
+        if (Kernel.Layers.Count <= buildIndex)
+        {
+          var size = buildIndex - Kernel.Layers.Count + 1;
+          for (int i = 0; i < size; i++)
+          {
+            Kernel.Layers.Add(null);
+          }
+        }
+
+        Kernel.Layers[buildIndex] = this;
+      }
+
+      layer = this;
+
+      #endregion
+
+      #region Update Services
+
       processorUpdate = new ProcessorUpdate();
       processorUpdate.Add(this);
+      processorCoroutine = Add<ProcessorCoroutine>();
 
-      Add<ProcessorCoroutine>();
+      #endregion
+
+      #region Update Active Layer
+
+      if (gameObject.scene.name != Kernel.KernelSceneName)
+        if (MainScene.NextActiveSceneName != null && MainScene.NextActiveSceneName == gameObject.scene.name)
+        {
+          MainScene.NextActiveSceneName = default;
+          ActiveLayer                   = this;
+          Run(CoWaitForSceneLoad());
+
+          IEnumerator CoWaitForSceneLoad()
+          {
+            while (!gameObject.scene.isLoaded)
+              yield return 0;
+
+            SceneManager.SetActiveScene(gameObject.scene);
+          }
+        }
+
+      #endregion
     }
+
+    #region Services
+
+    public static U Add<U>() where U : new()
+    {
+      var obj = new U();
+      layer.processorUpdate.Add(obj);
+      layer.objects.Add(typeof(U).GetHashCode(), obj);
+      return obj;
+    }
+
+    public static U Get<U>() where U : class
+    {
+      return layer.objects[typeof(U).GetHashCode()] as U;
+    }
+
+    #endregion
+
+    #region Coroutines
+
+    /// Run coroutine on the top of this layer.
+    public static RoutineCall Run(IEnumerator routine)
+    {
+      return layer.processorCoroutine.Run(routine);
+    }
+
+    /// Run coroutine on the top of this layer.
+    public static RoutineCall Run(float delay, IEnumerator routine)
+    {
+      return layer.processorCoroutine.Run(delay, routine);
+    }
+
+    /// Stop coroutine on the top of this layer.
+    public static bool Stop(IEnumerator routine)
+    {
+      return layer.processorCoroutine.Stop(routine);
+    }
+
+    public static IEnumerator WaitFrame => null;
+
+    public static IEnumerator Wait(float t)
+    {
+      layer.processorCoroutine.delays[layer.processorCoroutine.currentIndex] = t;
+      return null;
+    }
+
+    public static RoutineCall WaitFor(float t, Action action)
+    {
+      var routine = Run(CoDelay());
+
+      IEnumerator CoDelay()
+      {
+        yield return Wait(t);
+        action();
+      }
+
+      return routine;
+    }
+
+    #endregion
 
 //     public static bool initialized;
 //

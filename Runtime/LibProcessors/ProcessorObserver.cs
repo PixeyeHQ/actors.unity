@@ -29,7 +29,7 @@ namespace Pixeye.Actors
       }
     }
 
-    public void Tick(float delta)
+    public void Tick(float dt)
     {
  
       for (var i = 0; i < source.length; i++)

@@ -24,8 +24,8 @@ namespace Pixeye.Actors
 
     public void Dispose()
     {
-      ProcessorSignals.Remove(this);
-      ProcessorUpdateOld.RemoveProc(this);
+      // ProcessorSignals.Remove(this);
+      // ProcessorUpdateOld.RemoveProc(this);
       OnDispose();
     }
 

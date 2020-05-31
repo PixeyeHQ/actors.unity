@@ -57,7 +57,7 @@ namespace Pixeye.Actors
     {
       var delta = time.delta;
 
-      routines.Global.Tick(time.deltaUnscaled);
+      //routines.Global.Tick(time.deltaUnscaled);
 
       if (Kernel.ChangingScene)
       {
@@ -79,10 +79,10 @@ namespace Pixeye.Actors
       }
 
 
-      for (var i = 0; i < ProcessorCoroutines.coroutine_handlers.Count; i++)
-      {
-        ProcessorCoroutines.coroutine_handlers[i].Tick(delta);
-      }
+      // for (var i = 0; i < ProcessorCoroutines.coroutine_handlers.Count; i++)
+      // {
+      //   ProcessorCoroutines.coroutine_handlers[i].Tick(delta);
+      // }
     }
 
     void FixedUpdate()
