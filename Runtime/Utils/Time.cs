@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Pixeye.Actors
 {
-  public class time : IKernel
+  public class time
   {
     public const float fps = 60;
     public static bool fpslimit = false;
@@ -35,7 +35,7 @@ namespace Pixeye.Actors
       get => Default.timeScale;
       set
       {
-        Default.timeScale = value; 
+        Default.timeScale = value;
         Debug.Log("HULA");
       }
     }
@@ -55,10 +55,10 @@ namespace Pixeye.Actors
 
     public time()
     {
-      ProcessorUpdateOld.times.Add(this);
-      ProcessorUpdateOld.timesLen++;
-      deltaTimeFixed = 1 / fps;
-      deltaTime = deltaTimeFixed;
+      //ProcessorUpdateOld.times.Add(this);
+      //ProcessorUpdateOld.timesLen++;
+      deltaTimeFixed    = 1 / fps;
+      deltaTime         = deltaTimeFixed;
       deltaTimeUnscaled = deltaTimeFixed;
     }
 
@@ -72,7 +72,7 @@ namespace Pixeye.Actors
         deltaTimeUnscaled = Mathf.Clamp(deltaTimeUnscaled, 0, 1 / fps);
       }
 
-      deltaTime = deltaTimeUnscaled * timeScale;
+      deltaTime      = deltaTimeUnscaled * timeScale;
       deltaTimeFixed = 1 / fps * timeScale;
     }
   }

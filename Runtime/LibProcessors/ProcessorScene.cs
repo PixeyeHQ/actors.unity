@@ -9,7 +9,7 @@ using UnityEngine.SceneManagement;
 
 namespace Pixeye.Actors
 {
-  public sealed class ProcessorScene : IKernel
+  public sealed class ProcessorScene
   {
     // public static ProcessorScene Default = new ProcessorScene();
     //

@@ -10,14 +10,14 @@ namespace Pixeye.Actors
 {
   /// Caches / return assets that Developer takes from the Resources folder.
   /// Box cleans cache when scene reloads.
-  public class Box : IKernel, IDisposable
+  public class Box : IDisposable
   {
     /// Caches / return assets that Developer takes from the Resources folder.
     /// Box cleans cache when scene reloads.
     public static Box Default = new Box();
 
     public static readonly string path = "/{0}";
- 
+
     internal Dictionary<int, Object> items = new Dictionary<int, Object>(20, FastComparable.Default);
     readonly Dictionary<int, string> itemsPaths = new Dictionary<int, string>(20, FastComparable.Default);
 
@@ -53,7 +53,7 @@ namespace Pixeye.Actors
 
     public static T Get<T>(string id) where T : Object
     {
-      var key = id.GetHashCode();
+      var key      = id.GetHashCode();
       var hasValue = Default.items.TryGetValue(key, out var obj);
       if (hasValue == false)
       {

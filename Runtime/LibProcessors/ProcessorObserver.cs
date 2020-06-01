@@ -10,7 +10,7 @@ namespace Pixeye.Actors
   [Events(Op.Add | Op.Remove)]
 #endif
 
-  sealed class ProcessorObserver : Processor<ComponentObserver>, ITick, IKernel
+  sealed class ProcessorObserver : Processor<ComponentObserver>, ITick
   {
     public override void HandleEvents()
     {
@@ -31,7 +31,6 @@ namespace Pixeye.Actors
 
     public void Tick(float dt)
     {
- 
       for (var i = 0; i < source.length; i++)
       {
         Debug.Log(source.entities[i].exist + " OBS");

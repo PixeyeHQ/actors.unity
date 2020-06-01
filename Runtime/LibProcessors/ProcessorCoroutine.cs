@@ -161,6 +161,16 @@ namespace Pixeye.Actors
     }
   }
 
+  public class WaitFrame : IEnumerator
+  {
+    public object Current => null;
+
+    public bool MoveNext() => true;
+
+    public void Reset()
+    {
+    }
+  }
 
   /// A handle to a (potentially running) coroutine.
   public struct RoutineCall

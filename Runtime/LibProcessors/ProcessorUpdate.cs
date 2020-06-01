@@ -1,129 +1,12 @@
 //  Project  : ACTORS
 //  Contacts : Pixeye - ask@pixeye.games
 
-using System;
+
 using System.Collections.Generic;
-using UnityEngine;
+
 
 namespace Pixeye.Actors
 {
-  internal sealed class ProcessorUpdateOld : MonoBehaviour, IDisposable, IKernel
-  {
-    internal static ProcessorUpdateOld Default;
-
-    internal static List<time> times = new List<time>();
-    internal static int timesLen = 0;
-
-    internal List<ProcessorUpdate> updates = new List<ProcessorUpdate>();
-    internal static readonly ProcessorUpdate ProcessorUpdateKernel = new ProcessorUpdate();
-
-    void Awake()
-    {
-      Default = this;
-      gameObject.name = "Actors Updates";
-    }
-
-    internal int GetTicksCount()
-    {
-      int total = 0;
-      foreach (var storage in updates)
-      {
-        total += storage.GetTicksCount;
-      }
-
-      total += ProcessorUpdateKernel.GetTicksCount;
-
-      return total;
-    }
-
-    public static void AddTick(object updateble, int index = 0) => Default.updates[index].AddTick(updateble);
-    public static void RemoveTick(object updateble, int index = 0) => Default.updates[index].RemoveTick(updateble);
-
-    public static void AddTickFixed(object updateble, int index = 0) => Default.updates[index].AddTickFixed(updateble);
-    public static void RemoveTickFixed(object updateble, int index = 0) => Default.updates[index].RemoveTickFixed(updateble);
-
-    public static void AddTickLate(object updateble, int index = 0) => Default.updates[index].AddTickLate(updateble);
-    public static void RemoveTickLate(object updateble, int index = 0) => Default.updates[index].RemoveTickLate(updateble);
-
-    public static void AddProc(object updateble, int index = 0) => Default.updates[index].AddProc(updateble);
-    public static void RemoveProc(object updateble, int index = 0) => Default.updates[index].RemoveProc(updateble);
-
-    public static void Add(object updateble, int index = 0) => Default.updates[index].Add(updateble);
-    public static void Remove(object updateble, int index = 0) => Default.updates[index].Remove(updateble);
-
-    public static void AddKernel(object updateble) => ProcessorUpdateKernel.Add(updateble);
-
-    void Update()
-    {
-      var delta = time.delta;
-
-      //routines.Global.Tick(time.deltaUnscaled);
-
-      if (Kernel.ChangingScene)
-      {
-        ProcessorUpdateKernel.Update(delta);
-        return;
-      }
-
-      for (var i = 0; i < timesLen; i++)
-      {
-        times[i].Tick();
-      }
-
-
-      ProcessorUpdateKernel.Update(delta);
-
-      for (int i = 0; i < updates.Count; i++)
-      {
-        updates[i].Update(delta);
-      }
-
-
-      // for (var i = 0; i < ProcessorCoroutines.coroutine_handlers.Count; i++)
-      // {
-      //   ProcessorCoroutines.coroutine_handlers[i].Tick(delta);
-      // }
-    }
-
-    void FixedUpdate()
-    {
-      if (Kernel.ChangingScene) return;
-      var delta = time.deltaFixed;
-
-      for (int i = 0; i < updates.Count; i++)
-      {
-        updates[i].FixedUpdate(delta);
-      }
-    }
-
-    void LateUpdate()
-    {
-      if (Kernel.ChangingScene) return;
-      var delta = time.delta;
-
-      for (int i = 0; i < updates.Count; i++)
-      {
-        updates[i].LateUpdate(delta);
-      }
-    }
-
-
-    public void Dispose()
-    {
-      // for (int i = 0; i < updates.Count; i++)
-      // {
-      //   updates[i].Dispose();
-      // }
-    }
-
-    public static void Create()
-    {
-      var obj = new GameObject("ActorsUpdate");
-      DontDestroyOnLoad(obj);
-      Default = obj.AddComponent<ProcessorUpdateOld>();
-    }
-  }
-
   internal class ProcessorUpdate
   {
     internal readonly List<ITick> ticks = new List<ITick>(128);
@@ -238,7 +121,7 @@ namespace Pixeye.Actors
 
     internal void Update(float delta)
     {
-      var countTicks = ticks.Count;
+      var countTicks     = ticks.Count;
       var countTicksProc = ticksProc.Count;
 
       for (var i = 0; i < countTicks; i++)

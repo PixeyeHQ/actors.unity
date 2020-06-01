@@ -44,7 +44,7 @@ namespace Pixeye.Actors
       var hash = type == null ? typeof(T).GetHashCode() : type.GetHashCode();
       if (objectStorage.TryGetValue(hash, out var o))
       {
-        ProcessorUpdateOld.Add(o);
+        //ProcessorUpdateOld.Add(o);
         //AwakeObject(o);
         return (T) o;
       }
@@ -52,7 +52,7 @@ namespace Pixeye.Actors
       var proc = typeof(T).IsSubclassOf(typeof(Processor));
       if (!proc)
       {
-        ProcessorUpdateOld.Add(created);
+        //ProcessorUpdateOld.Add(created);
         //AwakeObject(created);
       }
       objectStorage.Add(hash, created);
@@ -106,7 +106,7 @@ namespace Pixeye.Actors
 
     public static SettingsEngine Settings = new SettingsEngine();
 
-    public static int GetTicksCount() => ProcessorUpdateOld.Default.GetTicksCount();
+    public static int GetTicksCount() => 0; //ProcessorUpdateOld.Default.GetTicksCount();
 
     internal float timescale_cache = 1;
 

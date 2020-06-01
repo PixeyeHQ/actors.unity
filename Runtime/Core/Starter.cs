@@ -9,10 +9,6 @@ using Sirenix.OdinInspector;
 #endif
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace Pixeye.Actors
@@ -31,7 +27,6 @@ namespace Pixeye.Actors
     public static void Entity()
     {
     }
-
 
     void Bootstrap()
     {
@@ -60,7 +55,9 @@ namespace Pixeye.Actors
 
       processorUpdate = new ProcessorUpdate();
       processorUpdate.Add(this);
+
       processorCoroutine = Add<ProcessorCoroutine>();
+      processorSignals   = Add<ProcessorSignals>();
 
       #endregion
 
@@ -141,6 +138,25 @@ namespace Pixeye.Actors
       }
 
       return routine;
+    }
+
+    #endregion
+
+    #region Signals
+
+    public static void AddSignal(object obj)
+    {
+      layer.processorSignals.Add(obj);
+    }
+
+    public static void RemoveSignal(object obj)
+    {
+      layer.processorSignals.Remove(obj);
+    }
+
+    public static void SendSignal<U>(in U signal)
+    {
+      layer.processorSignals.Dispatch(signal);
     }
 
     #endregion
