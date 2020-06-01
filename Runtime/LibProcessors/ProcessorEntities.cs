@@ -46,7 +46,7 @@ namespace Pixeye.Actors
               var mask = Storage.Masks[componentID];
               var storage = Storage.All[componentID];
 
-              Entity.Generations[entityID, generation] |= mask;
+              EntityImplOld.Generations[entityID, generation] |= mask;
 
               for (var l = 0; l < storage.groups.length; l++)
               {
@@ -57,7 +57,7 @@ namespace Pixeye.Actors
               }
 
 #if ACTORS_DEBUG
-              Entity.RenameGameobject(operation.entity);
+              EntityImplOld.RenameGameobject(operation.entity);
 #endif
             }
               break;
@@ -65,7 +65,7 @@ namespace Pixeye.Actors
 
             case EntityOperations.Action.Kill:
             {
-              ref var entityCache = ref Entity.entities[entityID];
+              ref var entityCache = ref EntityImplOld.entities[entityID];
 
 
               groupsCheckedLen = 0;
@@ -75,7 +75,7 @@ namespace Pixeye.Actors
                 var generation = Storage.Generations[componentID];
                 var mask = Storage.Masks[componentID];
 
-                Entity.Generations[entityID, generation] &= ~mask;
+                EntityImplOld.Generations[entityID, generation] &= ~mask;
                 Storage.All[entityCache.componentsIds[j]].toDispose.Add(entityID);
 
                 var storage = Storage.All[componentID];
@@ -100,25 +100,25 @@ namespace Pixeye.Actors
               groupsCheckedLen = 0;
               entityCache.componentsAmount = 0;
 
-              if (!Entity.entities[entityID].isNested && Entity.Transforms.Length > entityID && Entity.Transforms[entityID] != null)
+              if (!EntityImplOld.entities[entityID].isNested && EntityImplOld.Transforms.Length > entityID && EntityImplOld.Transforms[entityID] != null)
               {
-                Entity.Transforms[entityID].gameObject.Release(Entity.entities[entityID].isPooled ? Pool.Entities : 0);
-                Entity.Transforms[entityID] = null;
+                EntityImplOld.Transforms[entityID].gameObject.Release(EntityImplOld.entities[entityID].isPooled ? Pool.Entities : 0);
+                EntityImplOld.Transforms[entityID] = null;
               }
 #if !ACTORS_TAGS_0
-              Entity.Tags[entityID].Clear();
+              EntityImplOld.Tags[entityID].Clear();
 #endif
 
 
               if (ent.entStack.length >= ent.entStack.source.Length)
                 Array.Resize(ref ent.entStack.source, ent.entStack.length << 1);
 
-              Entity.alive.Remove(operation.entity);
+              EntityImplOld.alive.Remove(operation.entity);
 
               unchecked
               {
                 operation.entity.age += 1;
-                Entity.entities[entityID].age += 1;
+                EntityImplOld.entities[entityID].age += 1;
               }
 
               ent.entStack.source[ent.entStack.length++] = operation.entity;
@@ -129,7 +129,7 @@ namespace Pixeye.Actors
             case EntityOperations.Action.Remove:
             {
               // important check
-              if (!Entity.entities[entityID].isAlive) continue;
+              if (!EntityImplOld.entities[entityID].isAlive) continue;
 
               var generation = Storage.Generations[operation.arg];
               var mask = Storage.Masks[operation.arg];
@@ -137,7 +137,7 @@ namespace Pixeye.Actors
 
 
 #if UNITY_EDITOR
-              if (Entity.entities[entityID].componentsAmount == 0)
+              if (EntityImplOld.entities[entityID].componentsAmount == 0)
               {
                 Kernel.Debugger.Log(LogType.REMOVE_NON_EXISTANT, entityID, storage.GetComponentType().Name);
                 continue;
@@ -145,9 +145,9 @@ namespace Pixeye.Actors
 #endif
 
 
-              Entity.Generations[entityID, generation] &= ~mask;
+              EntityImplOld.Generations[entityID, generation] &= ~mask;
 
-              ref var components = ref Entity.entities[entityID];
+              ref var components = ref EntityImplOld.entities[entityID];
 
 
               //===============================//
@@ -171,7 +171,7 @@ namespace Pixeye.Actors
               }
 
 #if ACTORS_DEBUG
-              Entity.RenameGameobject(operation.entity);
+              EntityImplOld.RenameGameobject(operation.entity);
 #endif
 
 
@@ -204,18 +204,18 @@ namespace Pixeye.Actors
             {
               //if (operation.entity.exist) continue;
 
-              if (!Entity.entities[entityID].isNested && Entity.Transforms.Length > entityID && Entity.Transforms[entityID] != null)
+              if (!EntityImplOld.entities[entityID].isNested && EntityImplOld.Transforms.Length > entityID && EntityImplOld.Transforms[entityID] != null)
               {
-                Entity.Transforms[entityID].gameObject.Release(Entity.entities[entityID].isPooled ? Pool.Entities : 0);
-                Entity.Transforms[entityID] = null;
+                EntityImplOld.Transforms[entityID].gameObject.Release(EntityImplOld.entities[entityID].isPooled ? Pool.Entities : 0);
+                EntityImplOld.Transforms[entityID] = null;
               }
 #if !ACTORS_TAGS_0
-              Entity.Tags[entityID].Clear();
+              EntityImplOld.Tags[entityID].Clear();
 #endif
 
               //Entity.Count--;
 
-              Entity.alive.Remove(operation.entity);
+              EntityImplOld.alive.Remove(operation.entity);
 
               if (ent.entStack.length >= ent.entStack.source.Length)
                 Array.Resize(ref ent.entStack.source, ent.entStack.length << 1);
@@ -224,19 +224,19 @@ namespace Pixeye.Actors
               unchecked
               {
                 operation.entity.age += 1;
-                Entity.entities[entityID].age += 1;
+                EntityImplOld.entities[entityID].age += 1;
               }
 
               ent.entStack.source[ent.entStack.length++] = operation.entity;
-              Entity.entities[entityID].isAlive = false;
+              EntityImplOld.entities[entityID].isAlive = false;
               break;
             }
 
             case EntityOperations.Action.ChangeTag:
             {
               // check if dead 
-              if (Entity.entities[entityID].componentsAmount == 0) continue;
-              if (!Entity.entities[entityID].isAlive) continue;
+              if (EntityImplOld.entities[entityID].componentsAmount == 0) continue;
+              if (!EntityImplOld.entities[entityID].isAlive) continue;
 
               var groups = Actors.groups.ByTag.cache[operation.arg];
 
@@ -262,7 +262,7 @@ namespace Pixeye.Actors
 
             case EntityOperations.Action.Activate:
             {
-              ref var entityCache = ref Entity.entities[entityID];
+              ref var entityCache = ref EntityImplOld.entities[entityID];
 
               for (var j = 0; j < entityCache.componentsAmount; j++)
               {
@@ -273,7 +273,7 @@ namespace Pixeye.Actors
 
 
 #if UNITY_EDITOR
-                if ((Entity.Generations[entityID, generation] & mask) == mask)
+                if ((EntityImplOld.Generations[entityID, generation] & mask) == mask)
                 {
                   Debug.Log($"{operation.entity.transform}");
                   Kernel.Debugger.Log(LogType.ALREADY_HAVE, entityID, storage.GetComponentType().Name);
@@ -282,11 +282,11 @@ namespace Pixeye.Actors
 #endif
 
 
-                Entity.Generations[entityID, Storage.Generations[componentID]] |= Storage.Masks[componentID];
+                EntityImplOld.Generations[entityID, Storage.Generations[componentID]] |= Storage.Masks[componentID];
 
 
 #if ACTORS_DEBUG
-                Entity.RenameGameobject(operation.entity);
+                EntityImplOld.RenameGameobject(operation.entity);
 #endif
 
                 for (var l = 0; l < storage.groups.length; l++)
@@ -296,7 +296,7 @@ namespace Pixeye.Actors
                   group.Insert(operation.entity);
                 }
 
-                Entity.entities[entityID].isDirty = false;
+                EntityImplOld.entities[entityID].isDirty = false;
               }
 
               break;

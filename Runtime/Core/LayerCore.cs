@@ -15,11 +15,12 @@ namespace Pixeye.Actors
     internal ProcessorCoroutine processorCoroutine;
     internal ProcessorSignals processorSignals;
     internal ProcessorEcs processorEcs;
-    
+
+    internal EntityImpl Entity;
+
     internal Dictionary<int, object> objects = new Dictionary<int, object>();
 
-    
-    
+
     internal void Release()
     {
       OnLayerDestroy();

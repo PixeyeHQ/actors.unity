@@ -113,7 +113,7 @@ namespace Pixeye.Actors
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public T TryGet(int entityID)
     {
-      return (Entity.GenerationsInstant[entityID, Generation] & ComponentMask) == ComponentMask ? components[entityID] : default;
+      return (EntityImplOld.GenerationsInstant[entityID, Generation] & ComponentMask) == ComponentMask ? components[entityID] : default;
     }
 #endif
   }

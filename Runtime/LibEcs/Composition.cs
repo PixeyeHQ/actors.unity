@@ -86,7 +86,7 @@ namespace Pixeye.Actors
     internal bool CanProceed(int entityID)
     {
       for (var ll = 0; ll < ids.Length; ll++)
-        if ((Entity.Generations[entityID, generations[ll]] & ids[ll]) != ids[ll])
+        if ((EntityImplOld.Generations[entityID, generations[ll]] & ids[ll]) != ids[ll])
           return false;
 
       return true;
@@ -95,7 +95,7 @@ namespace Pixeye.Actors
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal bool IncludeTags(int entityID)
     {
-      ref var tags = ref Entity.Tags[entityID];
+      ref var tags = ref EntityImplOld.Tags[entityID];
       int     len  = tags.length;
 
       if (len == 0) return false;
@@ -117,7 +117,7 @@ namespace Pixeye.Actors
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal bool ExcludeTags(int entityID)
     {
-      ref var tags = ref Entity.Tags[entityID];
+      ref var tags = ref EntityImplOld.Tags[entityID];
       int     len  = tags.length;
       if (len == 0) return true;
 
@@ -137,7 +137,7 @@ namespace Pixeye.Actors
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal bool ExcludeTypes(int entityID)
     {
-      ref var components = ref Entity.entities[entityID];
+      ref var components = ref EntityImplOld.entities[entityID];
 
       for (int i = 0; i < components.componentsAmount; i++)
       {

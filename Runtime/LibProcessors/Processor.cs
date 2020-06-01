@@ -10,35 +10,18 @@ namespace Pixeye.Actors
 {
   public abstract class Processor : IDisposable, IRequireActorsLayer
   {
-    internal void Set(int index)
-    {
-      if (Kernel.Processors.length == Kernel.Processors.storage.Length)
-        Array.Resize(ref Kernel.Processors.storage, Kernel.Processors.length << 1);
-
-      Kernel.Processors.storage[Kernel.Processors.length++] = this;
-
-      //ProcessorSignals.Add(this, index);
-      //ProcessorUpdateOld.AddProc(this, index);
-      ProcessorGroups.Add(this);
-    }
+    public EntityImpl Entity;
 
     void IRequireActorsLayer.Launch(LayerCore layer)
     {
       layer.processorUpdate.AddProc(this);
       layer.processorSignals.Add(this);
       layer.processorEcs.Add(this);
+
+      Entity = layer.Entity;
     }
 
-    public void Dispose()
-    {
-      // ProcessorSignals.Remove(this);
-      // ProcessorUpdateOld.RemoveProc(this);
-      OnDispose();
-    }
-
-    //===============================//
-    // Events
-    //===============================//
+    public void Dispose() => OnDispose();
 
     public virtual void HandleEvents()
     {

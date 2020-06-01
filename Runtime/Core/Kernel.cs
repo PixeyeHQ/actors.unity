@@ -59,8 +59,7 @@ namespace Pixeye.Actors
         Activator.CreateInstance(constructedStorage);
       }
     }
-
-
+ 
     public static class Processors
     {
       internal static Processor[] storage = new Processor[64];
@@ -109,8 +108,7 @@ namespace Pixeye.Actors
         }
       }
     }
-
-
+ 
     internal float timescale_cache = 1;
 
     IEnumerator OnApplicationFocus(bool hasFocus)
@@ -131,7 +129,7 @@ namespace Pixeye.Actors
     void OnApplicationQuit()
     {
 #if UNITY_EDITOR
-      Entity.Dispose();
+      EntityImplOld.Dispose();
 #endif
     }
   }

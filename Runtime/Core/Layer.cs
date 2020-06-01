@@ -49,6 +49,8 @@ namespace Pixeye.Actors
 
       #region Update Services
 
+      Entity = new EntityImpl(layer);
+
       processorUpdate = new ProcessorUpdate();
       processorUpdate.Add(this);
 
@@ -77,10 +79,6 @@ namespace Pixeye.Actors
         }
 
       #endregion
-    }
-
-    public static void Entity()
-    {
     }
 
 

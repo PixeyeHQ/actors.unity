@@ -54,7 +54,7 @@ namespace Pixeye.Actors
       {
         var generation = Storage.Generations[componentsIds[i]];
         var mask = Storage.Masks[componentsIds[i]];
-        Entity.GenerationsInstant[id, generation] &= ~mask;
+        EntityImplOld.GenerationsInstant[id, generation] &= ~mask;
       }
     }
   

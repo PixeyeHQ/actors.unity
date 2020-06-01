@@ -67,8 +67,8 @@ namespace Pixeye.Actors
 #endif
 
 
-      Actors.Entity.Initialize(id, age, isPooled);
-      Actors.Entity.Transforms[id] = transform;
+      Actors.EntityImplOld.Initialize(id, age, isPooled);
+      Actors.EntityImplOld.Transforms[id] = transform;
       //    Starter.Starters[layer].entities.Add(entity);
       if (buildFrom != null)
       {
@@ -109,8 +109,8 @@ namespace Pixeye.Actors
 #endif
 
 
-      Actors.Entity.Initialize(id, age, isPooled);
-      Actors.Entity.Transforms[id] = transform;
+      Actors.EntityImplOld.Initialize(id, age, isPooled);
+      Actors.EntityImplOld.Transforms[id] = transform;
 
       if (buildFrom != null)
       {
@@ -149,8 +149,8 @@ namespace Pixeye.Actors
       _entity = id;
 #endif
 
-      Actors.Entity.Initialize(id, age, isPooled);
-      Actors.Entity.Transforms[id] = transform;
+      Actors.EntityImplOld.Initialize(id, age, isPooled);
+      Actors.EntityImplOld.Transforms[id] = transform;
       model(entity);
       Setup();
       EntityOperations.Set(entity, -1, EntityOperations.Action.Activate);

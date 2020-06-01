@@ -84,7 +84,7 @@ namespace Pixeye.Actors
       var cObserver = default(ComponentObserver);
       if (!e.exist)
       {
-        e = Entity.Create();
+        e = EntityImplOld.Create();
         cObserver = e.Set<ComponentObserver>();
       }
       else
@@ -124,7 +124,7 @@ namespace Pixeye.Actors
 			w.comparer = Comparers.storage[typeof(TProp).GetHashCode()]  as IEqualityComparer<TProp>;
 #endif
 
-      var e = Entity.Create();
+      var e = EntityImplOld.Create();
       ref var cObserver = ref e.Set<ComponentObserver>();
 
 #if ACTORS_COMPONENTS_STRUCTS

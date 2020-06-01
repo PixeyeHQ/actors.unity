@@ -12,7 +12,7 @@ using UnityEngine;
 namespace Pixeye.Actors
 {
   [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
-  public static unsafe partial class Entity
+  public static unsafe partial class EntityImplOld
   {
     public const bool Pooled = true;
 
