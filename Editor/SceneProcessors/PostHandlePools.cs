@@ -59,7 +59,7 @@ namespace Pixeye.Actors
       }
     }
 
-    public static void CheckPoolCache(GameObject gameObject, int pool, StarterCore starter)
+    public static void CheckPoolCache(GameObject gameObject, int pool, LayerCore layer)
     {
       GameObject prefab;
 #if UNITY_2018_3_OR_NEWER

@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Pixeye.Actors
 {
-  public class LayerApp : Starter<LayerApp>, ITick
+  public class LayerApp : Layer<LayerApp>, ITick
   {
     internal static List<AsyncOperation> LoadJobs = new List<AsyncOperation>();
     public static Action<float> OnSceneLoading = delegate { };

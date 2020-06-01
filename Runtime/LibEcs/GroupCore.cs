@@ -496,7 +496,7 @@ namespace Pixeye.Actors
     {
       var gr = base.Initialize(composition);
 
-      Storage<T>.Instance.groups.Add(this);
+       Storage<T>.Instance.groups.Add(this);
 
       var len = 1;
 

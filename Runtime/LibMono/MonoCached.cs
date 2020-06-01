@@ -1,4 +1,3 @@
-
 #if ODIN_INSPECTOR
 using Sirenix.OdinInspector;
 #endif
@@ -7,8 +6,10 @@ using UnityEngine;
 
 namespace Pixeye.Actors
 {
-  public abstract class MonoCached : MonoBehaviour, IRequireStarter
+  public abstract class MonoCached : MonoBehaviour, IRequireActorsLayer
   {
+    LayerCore layer;
+
     void Awake()
     {
       if (!Kernel.Instance || Kernel.ChangingScene) return;
@@ -34,6 +35,10 @@ namespace Pixeye.Actors
       HandleEnable();
     }
 
+    void IRequireActorsLayer.Launch(LayerCore layer)
+    {
+      this.layer = layer;
+    }
 
     protected virtual void HandleEnable()
     {

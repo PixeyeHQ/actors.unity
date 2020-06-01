@@ -11,14 +11,10 @@ namespace Pixeye.Actors
   [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
   sealed class ProcessorGroups
   {
-    public static void Add(object b)
+    
+    public static void Add(object obj)
     {
-     // Add(b,Starter.ActiveLayer.id);
-    }
-
-    public static void Add(object b, int index)
-    {
-      var type         = b.GetType();
+      var type         = obj.GetType();
       var objectFields = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
       var length       = objectFields.Length;
 
@@ -71,8 +67,8 @@ namespace Pixeye.Actors
 
           composition.hash = HashCode.OfEach(myFieldInfo.FieldType.GetGenericArguments()).AndEach(composition.includeTags).And(17).AndEach(composition.excludeTags).And(31).AndEach(excludeCompFilter);
 
-          var group = SetupGroup(myFieldInfo.FieldType, composition, myFieldInfo.GetValue(b));
-          myFieldInfo.SetValue(b, group);
+          var group = SetupGroup(myFieldInfo.FieldType, composition, myFieldInfo.GetValue(obj));
+          myFieldInfo.SetValue(obj, group);
 
           if (bindAttribute != null)
           {

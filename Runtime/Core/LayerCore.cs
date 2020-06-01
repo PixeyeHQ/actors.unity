@@ -6,16 +6,20 @@ using UnityEngine.SceneManagement;
 
 namespace Pixeye.Actors
 {
-  public abstract class StarterCore : MonoBehaviour
+  public abstract class LayerCore : MonoBehaviour
   {
-    internal static StarterCore ActiveLayer; // current main scene;
+    internal static LayerCore ActiveLayer; // current main scene;
     internal Scene Scene => gameObject.scene;
 
     internal ProcessorUpdate processorUpdate;
     internal ProcessorCoroutine processorCoroutine;
     internal ProcessorSignals processorSignals;
+    internal ProcessorEcs processorEcs;
+    
     internal Dictionary<int, object> objects = new Dictionary<int, object>();
 
+    
+    
     internal void Release()
     {
       OnLayerDestroy();

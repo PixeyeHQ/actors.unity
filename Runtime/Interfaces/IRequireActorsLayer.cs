@@ -3,8 +3,8 @@
 
 namespace Pixeye.Actors
 {
-	public interface IRequireStarter
-	{
-		  void Launch();
-	}
+  internal interface IRequireActorsLayer
+  {
+    void Launch(LayerCore layer);
+  }
 }

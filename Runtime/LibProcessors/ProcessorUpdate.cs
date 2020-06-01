@@ -11,10 +11,11 @@ namespace Pixeye.Actors
   {
     internal readonly List<ITick> ticks = new List<ITick>(128);
     internal readonly List<ITick> ticksProc = new List<ITick>(64);
+    internal readonly List<ITickFixed> ticksFixedProc = new List<ITickFixed>(64);
+    internal readonly List<ITickLate> ticksLateProc = new List<ITickLate>(64);
     internal readonly List<ITickFixed> ticksFixed = new List<ITickFixed>();
     internal readonly List<ITickLate> ticksLate = new List<ITickLate>();
-
-
+ 
     internal int GetTicksCount => ticks.Count + ticksProc.Count + ticksFixed.Count + ticksLate.Count;
 
     internal void AddTick(object updateble)
@@ -62,12 +63,12 @@ namespace Pixeye.Actors
 
       if (updateble is ITickFixed tickableFixed)
       {
-        ticksFixed.Add(tickableFixed);
+        ticksFixedProc.Add(tickableFixed);
       }
 
       if (updateble is ITickLate tickableLate)
       {
-        ticksLate.Add(tickableLate);
+        ticksLateProc.Add(tickableLate);
       }
     }
 
@@ -77,11 +78,11 @@ namespace Pixeye.Actors
       {
       }
 
-      if (ticksFixed.Remove(updateble as ITickFixed))
+      if (ticksFixedProc.Remove(updateble as ITickFixed))
       {
       }
 
-      if (ticksLate.Remove(updateble as ITickLate))
+      if (ticksLateProc.Remove(updateble as ITickLate))
       {
       }
     }
@@ -141,20 +142,33 @@ namespace Pixeye.Actors
     internal void FixedUpdate(float delta)
     {
       var countTicksFixed = ticksFixed.Count;
+      var countTicksProc  = ticksFixedProc.Count;
 
       for (var i = 0; i < countTicksFixed; i++)
       {
         ticksFixed[i].TickFixed(delta);
+      }
+
+      for (var i = 0; i < countTicksProc; i++)
+      {
+        ticksFixedProc[i].TickFixed(delta);
+        ProcessorEntities.Execute();
       }
     }
 
     internal void LateUpdate(float delta)
     {
       var countTicksLate = ticksLate.Count;
-
+      var countTicksProc = ticksFixedProc.Count;
       for (var i = 0; i < countTicksLate; i++)
       {
         ticksLate[i].TickLate(delta);
+      }
+
+      for (var i = 0; i < countTicksProc; i++)
+      {
+        ticksLateProc[i].TickLate(delta);
+        ProcessorEntities.Execute();
       }
     }
 
@@ -164,6 +178,8 @@ namespace Pixeye.Actors
       ticksFixed.Clear();
       ticksLate.Clear();
       ticksProc.Clear();
+      ticksFixedProc.Clear();
+      ticksLateProc.Clear();
     }
   }
 }

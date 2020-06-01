@@ -31,9 +31,10 @@ namespace Pixeye.Actors
 
         foreach (var o in oo)
         {
-          if (o is IRequireStarter req)
+          ///TODO: IRequireActorsLayer
+          if (o is IRequireActorsLayer req)
           {
-            req.Launch();
+            req.Launch(null);
             o.enabled = true;
           }
         }
@@ -60,9 +61,10 @@ namespace Pixeye.Actors
       var oo = obj.GetComponents<MonoBehaviour>();
       foreach (var o in oo)
       {
-        if (o is IRequireStarter req)
+        if (o is IRequireActorsLayer req)
         {
-          req.Launch();
+          ///TODO: IRequireActorsLayer
+          req.Launch(null);
           o.enabled = true;
         }
       }

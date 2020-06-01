@@ -6,74 +6,68 @@ using UnityEngine;
 
 namespace Pixeye.Actors
 {
-	public static class Pool
-	{
-		[TagField(categoryName = "Pool")]
-		public const int None = -1;
+  public static class Pool
+  {
+    [TagField(categoryName = "Pool")] public const int None = -1;
 
-		[TagField(categoryName = "Pool")]
-		public const int Entities = 1;
+    [TagField(categoryName = "Pool")] public const int Entities = 1;
 
-		[TagField(categoryName = "Pool")]
-		public const int UI = 2;
+    [TagField(categoryName = "Pool")] public const int UI = 2;
 
-		[TagField(categoryName = "Pool")]
-		public const int Audio = 3;
+    [TagField(categoryName = "Pool")] public const int Audio = 3;
 
 
-		internal static Dictionary<int, PoolContainer> pools = new Dictionary<int, PoolContainer>(4, new FastComparable());
+    internal static Dictionary<int, PoolContainer> pools = new Dictionary<int, PoolContainer>(4, new FastComparable());
 
-		static Pool()
-		{
-			Add(Entities);
-			Add(Audio);
-			Add(UI);
-		}
+    static Pool()
+    {
+      Add(Entities);
+      Add(Audio);
+      Add(UI);
+    }
 
-		private static void Add(int id)
-		{
-			PoolContainer pool;
-			pool = new PoolContainer();
-			pools.Add(id, pool);
-		}
+    private static void Add(int id)
+    {
+      PoolContainer pool;
+      pool = new PoolContainer();
+      pools.Add(id, pool);
+    }
 
-		internal static void Despawn(int poolID, GameObject obj)
-		{
-			pools[poolID].Despawn(obj);
-		}
+    internal static void Despawn(int poolID, GameObject obj)
+    {
+      pools[poolID].Despawn(obj);
+    }
 
-		internal static void Dispose()
-		{
-			foreach (var kvp in pools)
-			{
-				if (kvp.Value.globalPool) continue;
-				kvp.Value.Dispose();
-			}
-		}
-		
-	}
+    internal static void Dispose()
+    {
+      foreach (var kvp in pools)
+      {
+        if (kvp.Value.globalPool) continue;
+        kvp.Value.Dispose();
+      }
+    }
+  }
 
-	[System.Serializable]
-	public class PoolNode
-	{
-		public int id;
-		[TagFilter(typeof(Pool))]
-		public int pool = Pool.None;
+  [System.Serializable]
+  public class PoolNode
+  {
+    public int id;
+    [TagFilter(typeof(Pool))] public int pool = Pool.None;
 
-		public GameObject prefab;
-		public List<GameObject> createdObjs = new List<GameObject>();
+    public GameObject prefab;
+    public List<GameObject> createdObjs = new List<GameObject>();
 
 
-		public void Populate()
-		{
-			if (pool == Pool.None) return;
-			var poolStash = Pool.pools[pool];
-			poolStash.RegisterObject(prefab);
+    public void Populate()
+    {
+      if (pool == Pool.None) return;
+      var poolStash = Pool.pools[pool];
+      poolStash.RegisterObject(prefab);
 
-			for (var i = 0; i < createdObjs.Count; i++)
-			{
-				poolStash.AddToPool(createdObjs[i], prefab);
-			}
-		}
-	}
+      for (var i = 0; i < createdObjs.Count; i++)
+      {
+        poolStash.AddToPool(createdObjs[i], prefab);
+      }
+    }
+  }
 }

@@ -14,18 +14,14 @@ using UnityEngine.SceneManagement;
 namespace Pixeye.Actors
 {
   /// A scene point of entry. The developer defines here scene dependencies and processing that will work on the scene. 
-  public abstract class Starter<T> : StarterCore
+  public abstract class Layer<T> : LayerCore
   {
-    internal static Starter<T> layer;
+    internal static Layer<T> layer;
 
     void Awake()
     {
       Bootstrap(); // Setup actors logic for a scene.
       Setup(); // Entry point for developers.
-    }
-
-    public static void Entity()
-    {
     }
 
     void Bootstrap()
@@ -58,6 +54,7 @@ namespace Pixeye.Actors
 
       processorCoroutine = Add<ProcessorCoroutine>();
       processorSignals   = Add<ProcessorSignals>();
+      processorEcs       = Add<ProcessorEcs>();
 
       #endregion
 
@@ -82,19 +79,25 @@ namespace Pixeye.Actors
       #endregion
     }
 
+    public static void Entity()
+    {
+    }
+
+
     #region Services
 
-    public static U Add<U>() where U : new()
+    public static Y Add<Y>() where Y : new()
     {
-      var obj = new U();
-      layer.processorUpdate.Add(obj);
-      layer.objects.Add(typeof(U).GetHashCode(), obj);
+      var obj = new Y();
+      if (obj is IRequireActorsLayer member)
+        member.Launch(layer);
+      layer.objects.Add(typeof(Y).GetHashCode(), obj);
       return obj;
     }
 
-    public static U Get<U>() where U : class
+    public static Y Get<Y>() where Y : class
     {
-      return layer.objects[typeof(U).GetHashCode()] as U;
+      return layer.objects[typeof(Y).GetHashCode()] as Y;
     }
 
     #endregion
@@ -154,7 +157,7 @@ namespace Pixeye.Actors
       layer.processorSignals.Remove(obj);
     }
 
-    public static void SendSignal<U>(in U signal)
+    public static void SendSignal<Y>(in Y signal)
     {
       layer.processorSignals.Dispatch(signal);
     }

@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace Pixeye.Actors
 {
-  public abstract class Processor : IDisposable
+  public abstract class Processor : IDisposable, IRequireActorsLayer
   {
     internal void Set(int index)
     {
@@ -19,7 +19,14 @@ namespace Pixeye.Actors
 
       //ProcessorSignals.Add(this, index);
       //ProcessorUpdateOld.AddProc(this, index);
-      ProcessorGroups.Add(this, index);
+      ProcessorGroups.Add(this);
+    }
+
+    void IRequireActorsLayer.Launch(LayerCore layer)
+    {
+      layer.processorUpdate.AddProc(this);
+      layer.processorSignals.Add(this);
+      layer.processorEcs.Add(this);
     }
 
     public void Dispose()

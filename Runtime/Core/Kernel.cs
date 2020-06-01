@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -9,9 +11,15 @@ namespace Pixeye.Actors
 {
   public class Kernel : MonoBehaviour
   {
+    public static bool ChangingScene;
+    public static bool ApplicationIsQuitting;
+    public static bool IsQuittingOrChangingScene() => ApplicationIsQuitting || ChangingScene;
+    public static SettingsEngine Settings = new SettingsEngine();
+    public static int GetTicksCount => 0;
+
     internal static Kernel Instance;
-    internal static readonly string KernelSceneName = "Actors Framework";
-    internal static List<StarterCore> Layers = new List<StarterCore>();
+    internal const string KernelSceneName = "Actors Framework";
+    internal static List<LayerCore> Layers = new List<LayerCore>();
 
 #if UNITY_EDITOR
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
@@ -20,43 +28,36 @@ namespace Pixeye.Actors
 #endif
     static void Bootstrap()
     {
-      var scene = SceneManager.CreateScene(KernelSceneName, new CreateSceneParameters(LocalPhysicsMode.None));
+      var scene     = SceneManager.CreateScene(KernelSceneName, new CreateSceneParameters(LocalPhysicsMode.None));
       var objKernel = new GameObject("Actors Setup");
       SceneManager.MoveGameObjectToScene(objKernel, scene);
       MainScene.NextActiveSceneName = SceneManager.GetActiveScene().name;
       var kernel = objKernel.AddComponent<Kernel>();
-      var layer = objKernel.AddComponent<LayerApp>();
+      var layer  = objKernel.AddComponent<LayerApp>();
       Instance = kernel;
     }
 
-
-    public static bool ChangingScene;
-    public static bool ApplicationIsQuitting;
-    public static bool IsQuittingOrChangingScene() => ApplicationIsQuitting || ChangingScene;
-
-    /// Always bigger than actual scene index by 1. This is because 0 index is reserved by framework. 
-    //public static int ActiveSceneIndex => ActiveStarter.sceneIndex;
-      internal static Dictionary<int, object> objectStorage = new Dictionary<int, object>(5, new FastComparable());
-
-
-    internal static T Add<T>(Dictionary<int, object> objectStorage, Type type = null) where T : new()
+    void Awake()
     {
-      var hash = type == null ? typeof(T).GetHashCode() : type.GetHashCode();
-      if (objectStorage.TryGetValue(hash, out var o))
+      UpdateTypes();
+    }
+
+    void UpdateTypes()
+    {
+      var types    = AppDomain.CurrentDomain.GetAssemblies().SelectMany(t => t.GetTypes());
+      var storages = types.Where(t => t.IsSubclassOf(typeof(Storage)) && !t.ContainsGenericParameters);
+      foreach (var item in storages)
       {
-        //ProcessorUpdateOld.Add(o);
-        //AwakeObject(o);
-        return (T) o;
+        Activator.CreateInstance(item);
       }
-      var created = new T();
-      var proc = typeof(T).IsSubclassOf(typeof(Processor));
-      if (!proc)
+
+      // this is for people who prefere to make components without any helpers.
+      foreach (var type in types.Where(t => t.IsDefined(typeof(ActorsComponent), false)))
       {
-        //ProcessorUpdateOld.Add(created);
-        //AwakeObject(created);
+        var genericStorage     = typeof(Storage<>);
+        var constructedStorage = genericStorage.MakeGenericType(type);
+        Activator.CreateInstance(constructedStorage);
       }
-      objectStorage.Add(hash, created);
-      return created;
     }
 
 
@@ -83,30 +84,32 @@ namespace Pixeye.Actors
         switch (logID)
         {
           case LogType.NOT_ACTIVE:
-            Debug.LogError($"Entity <b>{contenxt[0]}</b> is not active. You should not add components to an inactive entity. <b> {contenxt[1]}</b> ");
+            Debug.LogError(
+              $"Entity <b>{contenxt[0]}</b> is not active. You should not add components to an inactive entity. <b> {contenxt[1]}</b> ");
             break;
           case LogType.ALREADY_HAVE:
             Debug.LogError($"Entity <b>{contenxt[0]}</b> already have this component: <b>{contenxt[1]}</b> ");
             break;
           case LogType.REMOVE_NON_EXISTANT:
-            Debug.LogError($"Entity <b>{contenxt[0]}</b> is deleted. You can't remove a component from a deleted entity. <b>{contenxt[1]}</b> ");
+            Debug.LogError(
+              $"Entity <b>{contenxt[0]}</b> is deleted. You can't remove a component from a deleted entity. <b>{contenxt[1]}</b> ");
             break;
           case LogType.NULL_ENTITY:
-            Debug.LogError($"Entity <b>{contenxt[0]}</b> is null. Use <color=#ff0000ff>Entity.Create</color> to register a new entity first. <b>{contenxt[1]}</b> ");
+            Debug.LogError(
+              $"Entity <b>{contenxt[0]}</b> is null. Use <color=#ff0000ff>Entity.Create</color> to register a new entity first. <b>{contenxt[1]}</b> ");
             break;
           case LogType.TAGS_LIMIT_REACHED:
-            Debug.LogError($"Entity <b>{contenxt[0]}</b> has reached tag capacity. Go to Tools->Actors->Tags->Size to increase cap. Current cap: <b>{contenxt[1]}</b> ");
+            Debug.LogError(
+              $"Entity <b>{contenxt[0]}</b> has reached tag capacity. Go to Tools->Actors->Tags->Size to increase cap. Current cap: <b>{contenxt[1]}</b> ");
             break;
           case LogType.DESTROYED:
-            Debug.LogError($"You are trying to release already destroyed entity with ID <b>{contenxt[0]}</b>, <b>{contenxt[1]}</b>");
+            Debug.LogError(
+              $"You are trying to release already destroyed entity with ID <b>{contenxt[0]}</b>, <b>{contenxt[1]}</b>");
             break;
         }
       }
     }
 
-    public static SettingsEngine Settings = new SettingsEngine();
-
-    public static int GetTicksCount() => 0; //ProcessorUpdateOld.Default.GetTicksCount();
 
     internal float timescale_cache = 1;
 
@@ -116,7 +119,7 @@ namespace Pixeye.Actors
       if (Settings.PauseOnFocusLost == false) yield break;
       if (!hasFocus)
       {
-        timescale_cache = time.Default.timeScale;
+        timescale_cache        = time.Default.timeScale;
         time.Default.timeScale = 0;
       }
       else

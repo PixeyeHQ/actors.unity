@@ -4,7 +4,7 @@
 
 namespace Pixeye.Actors
 {
-	public interface ITag
-	{
-	}
+  public interface ITag
+  {
+  }
 }

@@ -1,0 +1,27 @@
+using System;
+
+namespace Pixeye.Actors
+{
+  public unsafe struct PoolMem
+  {
+    public int ElementSize;
+    public int Length;
+    public void* Memory;
+
+    public PoolMem(int length, int elementSize)
+    {
+      Memory      = (void*) UnmanagedMemory.Alloc(length);
+      Length      = length;
+      ElementSize = elementSize;
+    }
+
+    public void* this[int index] => (byte*) Memory + ElementSize * index;
+
+    public void Destroy()
+    {
+      UnmanagedMemory.Free((IntPtr) Memory);
+      Memory = null;
+      Length = 0;
+    }
+  }
+}
