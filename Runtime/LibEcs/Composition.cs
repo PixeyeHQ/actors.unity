@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Unity.IL2CPP.CompilerServices;
 
@@ -13,13 +14,13 @@ namespace Pixeye.Actors
   [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
   public unsafe class Composition : IEquatable<Composition>
   {
-    public int[] generations = new int[0];
-    public int[] ids = new int[0];
+    internal int[] generations = new int[0];
+    internal int[] ids = new int[0];
 
     internal int[] includeTags = new int[0];
     internal int[] excludeTags = new int[0];
 
-    public bool[] includeComponents = new bool[Kernel.Settings.SizeComponents];
+    internal bool[] includeComponents = new bool[Kernel.Settings.SizeComponents];
     internal bool[] excludeComponents = new bool[Kernel.Settings.SizeComponents];
 
     internal HashCode hash;
@@ -57,29 +58,38 @@ namespace Pixeye.Actors
       }
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+
     internal bool Check(int entityID)
     {
-      #if ACTORS_TAGS_CHECKS && !ACTORS_TAGS_0
-      return CanProceed(entityID) && !ExcludeTypes(entityID) && (includeTags.Length == 0 || IncludeTags(entityID)) & (excludeTags.Length == 0 || ExcludeTags(entityID));
-      #else
-			for (int ll = 0; ll < ids.Length; ll++)
-				if ((Entity.Generations[entityID, generations[ll]] & ids[ll]) != ids[ll])
-				{
-					return false;
-				}
+      return false;
+    }
 
-			ref var components = ref Entity.entities[entityID];
 
-			for (int i = 0; i < components.componentsAmount; i++)
-			{
-				if (excludeComponents[components.componentsIds[i]])
-				{
-					return false;
-				}
-			}
-			return true;
-      #endif
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal bool CheckThatWork(int entityID)
+    {
+#if ACTORS_TAGS_CHECKS && !ACTORS_TAGS_0
+      return CanProceed(entityID) && !ExcludeTypes(entityID) && (includeTags.Length == 0 || IncludeTags(entityID)) &
+        (excludeTags.Length == 0 || ExcludeTags(entityID));
+#else
+      for (int ll = 0; ll < ids.Length; ll++)
+        if ((Entity.Generations[entityID, generations[ll]] & ids[ll]) != ids[ll])
+        {
+          return false;
+        }
+
+      ref var components = ref Entity.entities[entityID];
+
+      for (int i = 0; i < components.componentsAmount; i++)
+      {
+        if (excludeComponents[components.componentsIds[i]])
+        {
+          return false;
+        }
+      }
+
+      return true;
+#endif
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -91,7 +101,7 @@ namespace Pixeye.Actors
 
       return true;
     }
-    #if !ACTORS_TAGS_0
+#if !ACTORS_TAGS_0
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal bool IncludeTags(int entityID)
     {
@@ -133,7 +143,7 @@ namespace Pixeye.Actors
 
       return true;
     }
-    #endif
+#endif
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal bool ExcludeTypes(int entityID)
     {

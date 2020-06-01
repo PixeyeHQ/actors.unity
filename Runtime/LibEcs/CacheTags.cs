@@ -410,7 +410,7 @@ namespace Pixeye.Actors
     internal static void Add(GroupCore groupCore)
     {
       CacheGroup container;
-      var        composition = groupCore.Composition;
+      var        composition = groupCore.composition;
       foreach (var tagID in composition.includeTags)
       {
         if (groups.ByTag.TryGetValue(tagID, out container))

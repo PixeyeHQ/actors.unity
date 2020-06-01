@@ -63,42 +63,42 @@ namespace Pixeye.Actors
     //===============================//
     // Naming
     //===============================//
-    static readonly FastString fstr = new FastString(500);
+    //static readonly FastString fstr = new FastString(500);
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void RenameGameobject(this ent entity)
-    {
-      if (!Kernel.Settings.DebugNames) return;
-      var tr = Transforms[entity.id];
-      if (tr != null)
-      {
-        var name = tr.name;
-        var index = tr.name.LastIndexOf(':');
-        if (index > -1) name = tr.name.Remove(0, index + 1);
-        var id = entity.id;
-
-        name = name.Trim();
-        fstr.Clear();
-        fstr.Append($"{id.ToString().PadLeft(4, '0')}: ");
-
-
-        // {
-        fstr.Append("[ ");
-        for (var j = 0; j < entities[entity.id].componentsAmount; j++)
-        {
-          var storage = Storage.All[entities[entity.id].componentsIds[j]];
-          var lex = j < entities[entity.id].componentsAmount - 1 ? " " : "";
-          fstr.Append($"{storage.GetComponentType().Name.Remove(0, 9)}{lex}");
-        }
-
-        fstr.Append(" ]: ");
-        //}
-
-        fstr.Append((string) name);
-
-        tr.name = fstr.ToString();
-      }
-    }
+    // [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    // public static void RenameGameobject(this ent entity)
+    // {
+    //   if (!Kernel.Settings.DebugNames) return;
+    //   var tr = Transforms[entity.id];
+    //   if (tr != null)
+    //   {
+    //     var name = tr.name;
+    //     var index = tr.name.LastIndexOf(':');
+    //     if (index > -1) name = tr.name.Remove(0, index + 1);
+    //     var id = entity.id;
+    //
+    //     name = name.Trim();
+    //     fstr.Clear();
+    //     fstr.Append($"{id.ToString().PadLeft(4, '0')}: ");
+    //
+    //
+    //     // {
+    //     fstr.Append("[ ");
+    //     for (var j = 0; j < entities[entity.id].componentsAmount; j++)
+    //     {
+    //       var storage = Storage.All[entities[entity.id].componentsIds[j]];
+    //       var lex = j < entities[entity.id].componentsAmount - 1 ? " " : "";
+    //       fstr.Append($"{storage.GetComponentType().Name.Remove(0, 9)}{lex}");
+    //     }
+    //
+    //     fstr.Append(" ]: ");
+    //     //}
+    //
+    //     fstr.Append((string) name);
+    //
+    //     tr.name = fstr.ToString();
+    //   }
+    // }
 
 
     //===============================//
@@ -112,7 +112,7 @@ namespace Pixeye.Actors
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ref T Set<T>(in this ent entity)
+    public static ref T SetOld<T>(in this ent entity)
     {
       var id = entity.id;
 

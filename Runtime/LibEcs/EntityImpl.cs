@@ -22,5 +22,9 @@ namespace Pixeye.Actors
       processorEcs.SetOperation(entity, -1, ProcessorEcs.Action.Activate);
       return entity;
     }
+    
+    
+    
+    
   }
 }

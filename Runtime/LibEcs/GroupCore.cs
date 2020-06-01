@@ -22,7 +22,7 @@ namespace Pixeye.Actors
 
     public int GetHashCode(GroupCore obj)
     {
-      return obj.Composition.hash;
+      return obj.composition.hash;
     }
   }
 
@@ -54,7 +54,7 @@ namespace Pixeye.Actors
 #endif
 
 
-    protected internal Composition Composition;
+    protected internal Composition composition;
 
     internal int id;
 
@@ -97,12 +97,12 @@ namespace Pixeye.Actors
 
     internal virtual GroupCore Initialize(Composition composition)
     {
-      this.Composition = composition;
+      this.composition = composition;
 #if !ACTORS_TAGS_0
       HelperTags.Add(this);
 #endif
 
-      this.Composition.SetupExcludeTypes(this);
+      this.composition.SetupExcludeTypes(this);
       return this;
     }
 

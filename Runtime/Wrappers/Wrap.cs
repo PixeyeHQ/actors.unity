@@ -85,7 +85,7 @@ namespace Pixeye.Actors
       if (!e.exist)
       {
         e = EntityImplOld.Create();
-        cObserver = e.Set<ComponentObserver>();
+        cObserver = e.SetOld<ComponentObserver>();
       }
       else
       {
@@ -125,7 +125,7 @@ namespace Pixeye.Actors
 #endif
 
       var e = EntityImplOld.Create();
-      ref var cObserver = ref e.Set<ComponentObserver>();
+      ref var cObserver = ref e.SetOld<ComponentObserver>();
 
 #if ACTORS_COMPONENTS_STRUCTS
 			if (cObserver.wrappers == null)

@@ -99,7 +99,7 @@ namespace Pixeye.Actors
     {
       foreach (var groupNext in groups)
       {
-        if (groupNext.Composition.hash.value == composition.hash.value)
+        if (groupNext.composition.hash.value == composition.hash.value)
         {
           return groupNext;
         }

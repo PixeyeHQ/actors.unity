@@ -1,14 +1,17 @@
-﻿using System.Runtime.InteropServices;
+﻿using System;
+using System.Runtime.InteropServices;
 using UnityEngine;
 
 
 namespace Pixeye.Actors
 {
   [StructLayout(LayoutKind.Sequential)]
-  public struct EntityMeta
+  public unsafe struct EntityMeta
   {
     const int size = sizeof(ushort);
 
+    public byte groupsLength;
+    public byte componentsLength;
     public byte componentsAmount;
     public byte groupsAmount;
     public byte age;
@@ -18,15 +21,43 @@ namespace Pixeye.Actors
     public bool isAlive;
     public ent parent;
     public CacheTags tags;
-    public PoolMem signature;
-    public PoolMem signatureGroups;
+    public ushort* signature;
+    public ushort* signatureGroups;
 
     public void Initialize()
     {
-      signature.Alloc(6, size);
-      signatureGroups.Alloc(6, size);
+      componentsLength = 6;
+      groupsLength     = 6;
+
+      signature       = (ushort*) Marshal.AllocHGlobal(componentsLength * sizeof(ushort));
+      signatureGroups = (ushort*) Marshal.AllocHGlobal(groupsLength * sizeof(ushort));
+
       groupsAmount     = 0;
       componentsAmount = 0;
+    }
+
+    public void AddComponent(int type)
+    {
+      if (componentsLength == componentsAmount)
+      {
+        componentsLength = (byte) (componentsAmount << 1); // not safe
+        signature = (ushort*) Marshal.ReAllocHGlobal((IntPtr) signature, (IntPtr) (componentsLength * sizeof(ushort)));
+      }
+
+      signature[componentsAmount++] = (ushort) type;
+      
+      
+      
+    }
+
+    public void CleanMask(int id)
+    {
+      for (int i = componentsAmount - 1; i >= 0; i--)
+      {
+        var generation = Storage.Generations[signature[i]];
+        var mask       = Storage.Masks[signature[i]];
+        ProcessorEcs.EntitiesManaged[id].generations[generation] &= ~mask;
+      }
     }
   }
 

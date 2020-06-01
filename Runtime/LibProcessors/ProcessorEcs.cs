@@ -33,6 +33,9 @@ namespace Pixeye.Actors
         Entities.Get<EntityMeta>(i)->Initialize();
         EntitiesManaged[i].Initialize();
       }
+      
+      //Create(out var entity);
+      
     }
 
     internal void Create(out ent entity, bool isPooled = false, bool isNested = false)

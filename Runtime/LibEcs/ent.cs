@@ -19,7 +19,8 @@ namespace Pixeye.Actors
 
     internal static ents entStack = new ents(Kernel.Settings.SizeEntities);
     internal static int size = sizeof(ent);
-    internal static int lastID;
+    internal static int lastID = 1;
+
 
     //===============================//
     // Groups
@@ -36,7 +37,7 @@ namespace Pixeye.Actors
     public ref readonly Transform transform
     {
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
-      get => ref EntityImplOld.Transforms[id];
+      get => ref ProcessorEcs.EntitiesManaged[id].transform;
     }
 
     public bool exist
@@ -47,7 +48,7 @@ namespace Pixeye.Actors
 
     public ent(int value)
     {
-      id = value;
+      id  = value;
       age = 0;
     }
 
@@ -117,32 +118,39 @@ namespace Pixeye.Actors
     // Utils
     //===============================//
 
+    internal ref EntityManagedMeta managed => ref ProcessorEcs.EntitiesManaged[id];
+    internal EntityMeta* meta => ProcessorEcs.Entities.Get<EntityMeta>(id);
+
     [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Has<T>()
     {
-      return (EntityImplOld.GenerationsInstant[id, Storage<T>.Generation] & Storage<T>.ComponentMask) == Storage<T>.ComponentMask;
+      return (managed.generationsInstant[Storage<T>.Generation] & Storage<T>.ComponentMask) ==
+             Storage<T>.ComponentMask;
     }
 
     [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Has<T, Y>()
     {
-      var mask = Storage<T>.ComponentMask;
+      var mask  = Storage<T>.ComponentMask;
       var mask2 = Storage<Y>.ComponentMask;
 
-      return (EntityImplOld.GenerationsInstant[id, Storage<T>.Generation] & mask) == mask && (EntityImplOld.GenerationsInstant[id, Storage<Y>.Generation] & mask2) == mask2;
+      return (EntityImplOld.GenerationsInstant[id, Storage<T>.Generation] & mask) == mask &&
+             (EntityImplOld.GenerationsInstant[id, Storage<Y>.Generation] & mask2) == mask2;
     }
 
     [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Has<T, Y, U>()
     {
-      var mask = Storage<T>.ComponentMask;
+      var mask  = Storage<T>.ComponentMask;
       var mask2 = Storage<Y>.ComponentMask;
       var mask3 = Storage<U>.ComponentMask;
 
-      return (EntityImplOld.GenerationsInstant[id, Storage<T>.Generation] & mask) == mask && (EntityImplOld.GenerationsInstant[id, Storage<Y>.Generation] & mask2) == mask2 && (EntityImplOld.GenerationsInstant[id, Storage<U>.Generation] & mask3) == mask3;
+      return (EntityImplOld.GenerationsInstant[id, Storage<T>.Generation] & mask) == mask &&
+             (EntityImplOld.GenerationsInstant[id, Storage<Y>.Generation] & mask2) == mask2 &&
+             (EntityImplOld.GenerationsInstant[id, Storage<U>.Generation] & mask3) == mask3;
     }
 
 
@@ -150,12 +158,15 @@ namespace Pixeye.Actors
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Has<T, Y, U, I>()
     {
-      var mask = Storage<T>.ComponentMask;
+      var mask  = Storage<T>.ComponentMask;
       var mask2 = Storage<Y>.ComponentMask;
       var mask3 = Storage<U>.ComponentMask;
       var mask4 = Storage<I>.ComponentMask;
 
-      return (EntityImplOld.GenerationsInstant[id, Storage<T>.Generation] & mask) == mask && (EntityImplOld.GenerationsInstant[id, Storage<Y>.Generation] & mask2) == mask2 && (EntityImplOld.GenerationsInstant[id, Storage<U>.Generation] & mask3) == mask3 && (EntityImplOld.GenerationsInstant[id, Storage<I>.Generation] & mask4) == mask4;
+      return (EntityImplOld.GenerationsInstant[id, Storage<T>.Generation] & mask) == mask &&
+             (EntityImplOld.GenerationsInstant[id, Storage<Y>.Generation] & mask2) == mask2 &&
+             (EntityImplOld.GenerationsInstant[id, Storage<U>.Generation] & mask3) == mask3 &&
+             (EntityImplOld.GenerationsInstant[id, Storage<I>.Generation] & mask4) == mask4;
     }
 
 
@@ -163,13 +174,17 @@ namespace Pixeye.Actors
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Has<T, Y, U, I, O>()
     {
-      var mask = Storage<T>.ComponentMask;
+      var mask  = Storage<T>.ComponentMask;
       var mask2 = Storage<Y>.ComponentMask;
       var mask3 = Storage<U>.ComponentMask;
       var mask4 = Storage<I>.ComponentMask;
       var mask5 = Storage<O>.ComponentMask;
 
-      return (EntityImplOld.GenerationsInstant[id, Storage<T>.Generation] & mask) == mask && (EntityImplOld.GenerationsInstant[id, Storage<Y>.Generation] & mask2) == mask2 && (EntityImplOld.GenerationsInstant[id, Storage<U>.Generation] & mask3) == mask3 && (EntityImplOld.GenerationsInstant[id, Storage<I>.Generation] & mask4) == mask4 && (EntityImplOld.GenerationsInstant[id, Storage<O>.Generation] & mask5) == mask5;
+      return (EntityImplOld.GenerationsInstant[id, Storage<T>.Generation] & mask) == mask &&
+             (EntityImplOld.GenerationsInstant[id, Storage<Y>.Generation] & mask2) == mask2 &&
+             (EntityImplOld.GenerationsInstant[id, Storage<U>.Generation] & mask3) == mask3 &&
+             (EntityImplOld.GenerationsInstant[id, Storage<I>.Generation] & mask4) == mask4 &&
+             (EntityImplOld.GenerationsInstant[id, Storage<O>.Generation] & mask5) == mask5;
     }
 
 #if !ACTORS_COMPONENTS_STRUCTS
@@ -184,7 +199,10 @@ namespace Pixeye.Actors
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Get<T>(out T arg0)
     {
-      return (arg0 = (EntityImplOld.GenerationsInstant[id, Storage<T>.Generation] & Storage<T>.ComponentMask) == Storage<T>.ComponentMask ? Storage<T>.components[id] : default) != null;
+      return (arg0 = (EntityImplOld.GenerationsInstant[id, Storage<T>.Generation] & Storage<T>.ComponentMask) ==
+                     Storage<T>.ComponentMask
+        ? Storage<T>.components[id]
+        : default) != null;
     }
 
     /// <summary>
