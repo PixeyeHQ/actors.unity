@@ -469,7 +469,7 @@ namespace Pixeye.Actors
 #if ACTORS_TAGS_CHECKS
       var indexGroup = groups.ByTag.TryGetValue(tagID);
       if (indexGroup == -1) return;
-      ProcessorEcs.Set(entity, indexGroup, ProcessorEcs.Action.ChangeTag);
+      ProcessorEcs.SetOld(entity, indexGroup, ProcessorEcs.Action.ChangeTag);
 #endif
     }
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using UnityEngine;
 
 namespace Pixeye.Actors
 {
@@ -16,21 +17,383 @@ namespace Pixeye.Actors
       Activate
     }
 
-    public static int len;
-
-    internal static EntityOperation[] operations = new EntityOperation[Kernel.Settings.SizeEntities];
+    internal int operationsLength;
+    internal EntityOperation[] operations = new EntityOperation[Kernel.Settings.SizeEntities];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static void Set(in ent entity, int arg, ProcessorEcs.Action action)
+    internal void SetOperation(in ent entity, int arg, Action action)
     {
-      if (len == operations.Length)
-        Array.Resize(ref operations, len << 1);
+      if (operationsLength == operations.Length)
+        Array.Resize(ref operations, operationsLength << 1);
 
-      ref var operation = ref operations[len++];
+      ref var operation = ref operations[operationsLength++];
       operation.entity = entity;
       operation.arg    = arg;
       operation.action = action;
     }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal static void SetOld(in ent entity, int arg, Action action)
+    {
+    }
+
+    static readonly GroupCore[] groupsCheckedOld = new GroupCore[Kernel.Settings.SizeGroups];
+    static int groupsCheckedLenOld;
+
+    static bool AlreadyCheckedOld(GroupCore group)
+    {
+      for (var i = 0; i < groupsCheckedLenOld; i++)
+        if (groupsCheckedOld[i].id == group.id)
+          return true;
+
+      return false;
+    }
+
+
+    public void Execute()
+    {
+      for (var i = 0; i < operationsLength; i++)
+      {
+        ref var operation = ref operations[i];
+        switch (operation.action)
+        {
+          case Action.Activate:
+          {
+            Debug.Log("TEST");
+          }
+            break;
+        }
+      }
+
+      operationsLength = 0;
+    }
+
+    // public void Execute()
+    //     {
+    //       if (!Kernel.Instance) return;
+    //
+    //       for (var r = 0; r < 2; r++)
+    //       {
+    //         for (var i = 0; i < ProcessorEcs.len; i++)
+    //         {
+    //           ref var operation = ref ProcessorEcs.operations[i];
+    //           var     entityID  = operation.entity.id;
+    //
+    //
+    //           switch (operation.action)
+    //           {
+    //             case ProcessorEcs.Action.Add:
+    //             {
+    //               var componentID = operation.arg;
+    //               var generation  = Storage.Generations[componentID];
+    //               var mask        = Storage.Masks[componentID];
+    //               var storage     = Storage.All[componentID];
+    //
+    //               EntityImplOld.Generations[entityID, generation] |= mask;
+    //
+    //               for (var l = 0; l < storage.groups.length; l++)
+    //               {
+    //                 var group = storage.groups.Elements[l];
+    //                 if (!group.Composition.Check(entityID))
+    //                   group.TryRemove(entityID);
+    //                 else group.Insert(operation.entity);
+    //               }
+    //
+    // #if ACTORS_DEBUG
+    //               EntityImplOld.RenameGameobject(operation.entity);
+    // #endif
+    //             }
+    //               break;
+    //
+    //
+    //             case ProcessorEcs.Action.Kill:
+    //             {
+    //               ref var entityCache = ref entities[entityID];
+    //
+    //
+    //               groupsCheckedLen = 0;
+    //               for (var j = 0; j < entityCache.componentsAmount; j++)
+    //               {
+    //                 var componentID = entityCache.componentsIds[j];
+    //                 var generation  = Storage.Generations[componentID];
+    //                 var mask        = Storage.Masks[componentID];
+    //
+    //                 EntityImplOld.Generations[entityID, generation] &= ~mask;
+    //                 Storage.All[entityCache.componentsIds[j]].toDispose.Add(entityID);
+    //
+    //                 var storage = Storage.All[componentID];
+    //
+    //
+    //                 for (var l = 0; l < storage.groups.length; l++)
+    //                 {
+    //                   var group = storage.groups.Elements[l];
+    //
+    //                   if (!AlreadyChecked(group))
+    //                   {
+    //                     if (group.Composition.OverlapComponents(entityCache))
+    //                     {
+    //                       group.TryRemove(entityID);
+    //
+    //                       groupsChecked[groupsCheckedLen++] = group;
+    //                     }
+    //                   }
+    //                 }
+    //               }
+    //
+    //               groupsCheckedLen             = 0;
+    //               entityCache.componentsAmount = 0;
+    //
+    //               if (!EntityImplOld.entities[entityID].isNested && EntityImplOld.Transforms.Length > entityID &&
+    //                   EntityImplOld.Transforms[entityID] != null)
+    //               {
+    //                 EntityImplOld.Transforms[entityID].gameObject
+    //                   .Release(EntityImplOld.entities[entityID].isPooled ? Pool.Entities : 0);
+    //                 EntityImplOld.Transforms[entityID] = null;
+    //               }
+    // #if !ACTORS_TAGS_0
+    //               EntityImplOld.Tags[entityID].Clear();
+    // #endif
+    //
+    //
+    //               if (ent.entStack.length >= ent.entStack.source.Length)
+    //                 Array.Resize(ref ent.entStack.source, ent.entStack.length << 1);
+    //
+    //               EntityImplOld.alive.Remove(operation.entity);
+    //
+    //               unchecked
+    //               {
+    //                 operation.entity.age                 += 1;
+    //                 EntityImplOld.entities[entityID].age += 1;
+    //               }
+    //
+    //               ent.entStack.source[ent.entStack.length++] = operation.entity;
+    //
+    //               break;
+    //             }
+    //
+    //             case ProcessorEcs.Action.Remove:
+    //             {
+    //               // important check
+    //               if (!EntityImplOld.entities[entityID].isAlive) continue;
+    //
+    //               var generation = Storage.Generations[operation.arg];
+    //               var mask       = Storage.Masks[operation.arg];
+    //               var storage    = Storage.All[operation.arg];
+    //
+    //
+    // #if UNITY_EDITOR
+    //               if (EntityImplOld.entities[entityID].componentsAmount == 0)
+    //               {
+    //                 Kernel.Debugger.Log(LogType.REMOVE_NON_EXISTANT, entityID, storage.GetComponentType().Name);
+    //                 continue;
+    //               }
+    // #endif
+    //
+    //
+    //               EntityImplOld.Generations[entityID, generation] &= ~mask;
+    //
+    //               ref var components = ref EntityImplOld.entities[entityID];
+    //
+    //
+    //               //===============================//
+    //               // Remove Component
+    //               //===============================//
+    //               var typeConverted = (ushort) operation.arg;
+    //
+    //               for (var tRemoveIndex = 0; tRemoveIndex < components.componentsAmount; tRemoveIndex++)
+    //               {
+    //                 if (components.componentsIds[tRemoveIndex] == typeConverted)
+    //                 {
+    //                   Storage.All[typeConverted].toDispose.Add(entityID);
+    //
+    //                   for (var j = tRemoveIndex; j < components.componentsAmount - 1; ++j)
+    //                     components.componentsIds[j] = components.componentsIds[j + 1];
+    //
+    //                   components.componentsAmount--;
+    //
+    //                   break;
+    //                 }
+    //               }
+    //
+    // #if ACTORS_DEBUG
+    //               EntityImplOld.RenameGameobject(operation.entity);
+    // #endif
+    //
+    //
+    //               for (var l = 0; l < storage.groups.length; l++)
+    //               {
+    //                 var group = storage.groups.Elements[l];
+    //
+    //                 if (!group.Composition.Check(entityID))
+    //                 {
+    //                   group.TryRemove(entityID);
+    //                 }
+    //                 else
+    //                 {
+    //                   var inGroup = group.length == 0
+    //                     ? -1
+    //                     : HelperArray.BinarySearch(ref group.entities, entityID, 0, group.length - 1);
+    //                   if (inGroup == -1)
+    //                     group.Insert(operation.entity);
+    //                 }
+    //               }
+    //
+    //
+    //               if (components.componentsAmount == 0)
+    //               {
+    //                 ProcessorEcs.Set(operation.entity, 0, ProcessorEcs.Action.Empty);
+    //               }
+    //
+    //               break;
+    //             }
+    //
+    //             case ProcessorEcs.Action.Empty:
+    //             {
+    //               //if (operation.entity.exist) continue;
+    //
+    //               if (!EntityImplOld.entities[entityID].isNested && EntityImplOld.Transforms.Length > entityID &&
+    //                   EntityImplOld.Transforms[entityID] != null)
+    //               {
+    //                 EntityImplOld.Transforms[entityID].gameObject
+    //                   .Release(EntityImplOld.entities[entityID].isPooled ? Pool.Entities : 0);
+    //                 EntityImplOld.Transforms[entityID] = null;
+    //               }
+    // #if !ACTORS_TAGS_0
+    //               EntityImplOld.Tags[entityID].Clear();
+    // #endif
+    //
+    //               //Entity.Count--;
+    //
+    //               EntityImplOld.alive.Remove(operation.entity);
+    //
+    //               if (ent.entStack.length >= ent.entStack.source.Length)
+    //                 Array.Resize(ref ent.entStack.source, ent.entStack.length << 1);
+    //
+    //
+    //               unchecked
+    //               {
+    //                 operation.entity.age                 += 1;
+    //                 EntityImplOld.entities[entityID].age += 1;
+    //               }
+    //
+    //               ent.entStack.source[ent.entStack.length++] = operation.entity;
+    //               EntityImplOld.entities[entityID].isAlive   = false;
+    //               break;
+    //             }
+    //
+    //             case ProcessorEcs.Action.ChangeTag:
+    //             {
+    //               // check if dead 
+    //               if (EntityImplOld.entities[entityID].componentsAmount == 0) continue;
+    //               if (!EntityImplOld.entities[entityID].isAlive) continue;
+    //
+    //               var groups = Actors.groups.ByTag.cache[operation.arg];
+    //
+    //               for (var l = 0; l < groups.length; l++)
+    //               {
+    //                 var group      = groups.Elements[l];
+    //                 var canBeAdded = group.Composition.Check(entityID);
+    //                 var inGroup = group.length == 0
+    //                   ? -1
+    //                   : HelperArray.BinarySearch(ref group.entities, entityID, 0, group.length - 1);
+    //
+    //                 if (inGroup == -1)
+    //                 {
+    //                   if (!canBeAdded) continue;
+    //                   group.Insert(operation.entity);
+    //                 }
+    //                 else if (!canBeAdded)
+    //                 {
+    //                   group.Remove(inGroup);
+    //                 }
+    //               }
+    //
+    //               break;
+    //             }
+    //
+    //             case ProcessorEcs.Action.Activate:
+    //             {
+    //               ref var entityCache = ref EntityImplOld.entities[entityID];
+    //
+    //               for (var j = 0; j < entityCache.componentsAmount; j++)
+    //               {
+    //                 var componentID = entityCache.componentsIds[j];
+    //                 var storage     = Storage.All[componentID];
+    //                 var generation  = Storage.Generations[componentID];
+    //                 var mask        = Storage.Masks[componentID];
+    //
+    //
+    // #if UNITY_EDITOR
+    //                 if ((EntityImplOld.Generations[entityID, generation] & mask) == mask)
+    //                 {
+    //                   Debug.Log($"{operation.entity.transform}");
+    //                   Kernel.Debugger.Log(LogType.ALREADY_HAVE, entityID, storage.GetComponentType().Name);
+    //                   continue;
+    //                 }
+    // #endif
+    //
+    //
+    //                 EntityImplOld.Generations[entityID, Storage.Generations[componentID]] |= Storage.Masks[componentID];
+    //
+    //
+    // #if ACTORS_DEBUG
+    //                 EntityImplOld.RenameGameobject(operation.entity);
+    // #endif
+    //
+    //                 for (var l = 0; l < storage.groups.length; l++)
+    //                 {
+    //                   var group = storage.groups.Elements[l];
+    //                   if (!group.Composition.Check(entityID)) continue;
+    //                   group.Insert(operation.entity);
+    //                 }
+    //
+    //                 EntityImplOld.entities[entityID].isDirty = false;
+    //               }
+    //
+    //               break;
+    //             }
+    //           }
+    //         }
+    //
+    //         if (ProcessorEcs.len > 0)
+    //         {
+    //           ProcessorEcs.len = 0;
+    //
+    //           for (var i = 0; i < Kernel.Processors.length; i++)
+    //             Kernel.Processors.storage[i].HandleEvents();
+    //
+    // #if ACTORS_EVENTS_MANUAL
+    //           for (var ii = 0; ii < groups.All.length; ii++)
+    //           {
+    //             var nextGroup = groups.All.Elements[ii];
+    //
+    //             if (nextGroup.hasEventRemove)
+    //               nextGroup.removed.length = 0;
+    //
+    //
+    //             if (nextGroup.hasEventAdd)
+    //               nextGroup.added.length = 0;
+    //           }
+    // #else
+    //           for (int ii = 0; ii < groups.All.length; ii++)
+    //           {
+    //             var nextGroup = groups.All.Elements[ii];
+    //             nextGroup.removed.length = 0;
+    //             nextGroup.added.length   = 0;
+    //           }
+    //
+    // #endif
+    //
+    //
+    //           for (var i = 0; i < Storage.lastID; i++)
+    //           {
+    //             var st = Storage.All[i];
+    //             st.Dispose(st.toDispose);
+    //             st.toDispose.length = 0;
+    //           }
+    //         }
+    //       }
+    //     }
   }
 
   [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Unicode)]

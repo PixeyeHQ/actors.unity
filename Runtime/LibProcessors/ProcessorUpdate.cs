@@ -15,7 +15,9 @@ namespace Pixeye.Actors
     internal readonly List<ITickLate> ticksLateProc = new List<ITickLate>(64);
     internal readonly List<ITickFixed> ticksFixed = new List<ITickFixed>();
     internal readonly List<ITickLate> ticksLate = new List<ITickLate>();
- 
+
+    internal ProcessorEcs processorEcs;
+
     internal int GetTicksCount => ticks.Count + ticksProc.Count + ticksFixed.Count + ticksLate.Count;
 
     internal void AddTick(object updateble)
@@ -130,12 +132,12 @@ namespace Pixeye.Actors
         ticks[i].Tick(delta);
       }
 
-      ProcessorEntities.Execute();
+      processorEcs.Execute();
 
       for (var i = 0; i < countTicksProc; i++)
       {
         ticksProc[i].Tick(delta);
-        ProcessorEntities.Execute();
+        processorEcs.Execute();
       }
     }
 
@@ -152,7 +154,7 @@ namespace Pixeye.Actors
       for (var i = 0; i < countTicksProc; i++)
       {
         ticksFixedProc[i].TickFixed(delta);
-        ProcessorEntities.Execute();
+        processorEcs.Execute();
       }
     }
 
@@ -168,7 +170,7 @@ namespace Pixeye.Actors
       for (var i = 0; i < countTicksProc; i++)
       {
         ticksLateProc[i].TickLate(delta);
-        ProcessorEntities.Execute();
+        processorEcs.Execute();
       }
     }
 

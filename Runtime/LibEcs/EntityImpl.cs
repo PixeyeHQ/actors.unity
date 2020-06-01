@@ -7,19 +7,19 @@ namespace Pixeye.Actors
   [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
   public partial class EntityImpl : IRequireActorsLayer
   {
-    public LayerCore layer;
+    //    public LayerCore layer;
+    internal ProcessorEcs processorEcs;
 
     public void Launch(LayerCore layer)
     {
-      this.layer = layer;
+      processorEcs = layer.processorEcs;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public ent Create()
     {
-      ProcessorEcs.Create(out var entity, layer);
-
-      //EntityOperations.Set(entity, -1, EntityOperations.Action.Activate);
+      processorEcs.Create(out var entity);
+      processorEcs.SetOperation(entity, -1, ProcessorEcs.Action.Activate);
       return entity;
     }
   }

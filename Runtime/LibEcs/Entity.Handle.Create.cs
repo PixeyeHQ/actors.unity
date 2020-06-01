@@ -29,7 +29,7 @@ namespace Pixeye.Actors
       entity.id = id;
       entity.age = age;
       Create(entity);
-      ProcessorEcs.Set(entity, -1, ProcessorEcs.Action.Activate);
+      ProcessorEcs.SetOld(entity, -1, ProcessorEcs.Action.Activate);
     }
 
     public static ent Create(scn layer)
@@ -88,7 +88,7 @@ namespace Pixeye.Actors
       Create(entity, pooled);
       Transforms[id] = pooled ? Obj.Spawn(Pool.Entities, prefabID, position) : Obj.Spawn(prefabID, position);
 
-      ProcessorEcs.Set(entity, -1, ProcessorEcs.Action.Activate);
+      ProcessorEcs.SetOld(entity, -1, ProcessorEcs.Action.Activate);
       return entity;
     }
 
@@ -117,7 +117,7 @@ namespace Pixeye.Actors
       Transforms[id] = pooled ? Obj.Spawn(Pool.Entities, prefabID, position) : Obj.Spawn(prefabID, position);
       model(entity);
 
-      ProcessorEcs.Set(entity, -1, ProcessorEcs.Action.Activate);
+      ProcessorEcs.SetOld(entity, -1, ProcessorEcs.Action.Activate);
 
       return entity;
     }
@@ -143,7 +143,7 @@ namespace Pixeye.Actors
       entity.age = age;
       Create(entity, pooled);
       Transforms[id] = pooled ? Obj.Spawn(1, prefabID, parent, position) : Obj.Spawn(prefabID, parent, position);
-      ProcessorEcs.Set(in entity, -1, ProcessorEcs.Action.Activate);
+      ProcessorEcs.SetOld(in entity, -1, ProcessorEcs.Action.Activate);
       return entity;
     }
 
@@ -168,7 +168,7 @@ namespace Pixeye.Actors
       entity.age = age;
       Create(entity, pooled);
       Transforms[id] = pooled ? Obj.Spawn(1, prefab, parent, position) : Obj.Spawn(prefab, parent, position);
-      ProcessorEcs.Set(in entity, -1, ProcessorEcs.Action.Activate);
+      ProcessorEcs.SetOld(in entity, -1, ProcessorEcs.Action.Activate);
       return entity;
     }
 
@@ -198,7 +198,7 @@ namespace Pixeye.Actors
       Create(entity, pooled);
       Transforms[id] = pooled ? Obj.Spawn(Pool.Entities, prefab, position) : Obj.Spawn(prefab, position);
 
-      ProcessorEcs.Set(entity, -1, ProcessorEcs.Action.Activate);
+      ProcessorEcs.SetOld(entity, -1, ProcessorEcs.Action.Activate);
       return entity;
     }
 
@@ -227,7 +227,7 @@ namespace Pixeye.Actors
       Create(entity, pooled);
       Transforms[id] = pooled ? Obj.Spawn(Pool.Entities, prefab, position) : Obj.Spawn(prefab, position);
       model(entity);
-      ProcessorEcs.Set(entity, -1, ProcessorEcs.Action.Activate);
+      ProcessorEcs.SetOld(entity, -1, ProcessorEcs.Action.Activate);
       return entity;
     }
 
@@ -255,7 +255,7 @@ namespace Pixeye.Actors
       Create(entity);
       Transforms[id] = prefab.transform;
       model(entity);
-      ProcessorEcs.Set(entity, -1, ProcessorEcs.Action.Activate);
+      ProcessorEcs.SetOld(entity, -1, ProcessorEcs.Action.Activate);
       return entity;
     }
 
@@ -282,7 +282,7 @@ namespace Pixeye.Actors
 
       Create(entity);
       Transforms[id] = obj.transform;
-      ProcessorEcs.Set(entity, -1, ProcessorEcs.Action.Activate);
+      ProcessorEcs.SetOld(entity, -1, ProcessorEcs.Action.Activate);
       return entity;
     }
 
@@ -310,7 +310,7 @@ namespace Pixeye.Actors
       Create(entity);
 
       Transforms[id] = GameObject.Find(name).transform;
-      ProcessorEcs.Set(entity, -1, ProcessorEcs.Action.Activate);
+      ProcessorEcs.SetOld(entity, -1, ProcessorEcs.Action.Activate);
       return entity;
     }
 
@@ -335,7 +335,7 @@ namespace Pixeye.Actors
       entity.id = id;
       entity.age = age;
       Create(entity);
-      ProcessorEcs.Set(entity, -1, ProcessorEcs.Action.Activate);
+      ProcessorEcs.SetOld(entity, -1, ProcessorEcs.Action.Activate);
       // Starter.Starters[layerIndex].entities.Add(entity);
     }
 

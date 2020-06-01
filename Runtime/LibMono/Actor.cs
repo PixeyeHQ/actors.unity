@@ -78,7 +78,7 @@ namespace Pixeye.Actors
       else
       {
         Setup();
-        ProcessorEcs.Set(entity, -1, ProcessorEcs.Action.Activate);
+        ProcessorEcs.SetOld(entity, -1, ProcessorEcs.Action.Activate);
       }
     }
 
@@ -120,7 +120,7 @@ namespace Pixeye.Actors
       else
       {
         Setup();
-        ProcessorEcs.Set(entity, -1, ProcessorEcs.Action.Activate);
+        ProcessorEcs.SetOld(entity, -1, ProcessorEcs.Action.Activate);
       }
     }
 
@@ -153,7 +153,7 @@ namespace Pixeye.Actors
       Actors.EntityImplOld.Transforms[id] = transform;
       model(entity);
       Setup();
-      ProcessorEcs.Set(entity, -1, ProcessorEcs.Action.Activate);
+      ProcessorEcs.SetOld(entity, -1, ProcessorEcs.Action.Activate);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

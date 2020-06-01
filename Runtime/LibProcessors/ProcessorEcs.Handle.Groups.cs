@@ -5,6 +5,8 @@ namespace Pixeye.Actors
 {
   internal partial class ProcessorEcs
   {
+    static int groupNextID;
+
     #region BindGroups
 
     public void Add(object obj)
@@ -110,13 +112,11 @@ namespace Pixeye.Actors
       GroupCore CreateGroup()
       {
         var gr = (Activator.CreateInstance(groupType, true) as GroupCore).Initialize(composition);
-        gr.id = groups.Count;
+        gr.id = groupNextID++;
         return gr;
       }
     }
 
     #endregion
-
-   
   }
 }

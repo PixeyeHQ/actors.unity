@@ -170,7 +170,7 @@ namespace Pixeye.Actors
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static void Deploy(in this ent entity)
     {
-      ProcessorEcs.Set(entity, -1, ProcessorEcs.Action.Activate);
+      ProcessorEcs.SetOld(entity, -1, ProcessorEcs.Action.Activate);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -200,7 +200,7 @@ namespace Pixeye.Actors
 
         if (!entities[id].isDirty)
         {
-          ProcessorEcs.Set(entity, Storage<T>.componentId, ProcessorEcs.Action.Add);
+          ProcessorEcs.SetOld(entity, Storage<T>.componentId, ProcessorEcs.Action.Add);
         }
       }
 
@@ -258,7 +258,7 @@ namespace Pixeye.Actors
 
       if (!entities[id].isDirty)
       {
-        ProcessorEcs.Set(entity, Storage<T>.componentId, ProcessorEcs.Action.Add);
+        ProcessorEcs.SetOld(entity, Storage<T>.componentId, ProcessorEcs.Action.Add);
       }
 
       return ref val;
@@ -300,7 +300,7 @@ namespace Pixeye.Actors
 
       if (!entities[id].isDirty)
       {
-        ProcessorEcs.Set(entity, Storage<T>.componentId, ProcessorEcs.Action.Add);
+        ProcessorEcs.SetOld(entity, Storage<T>.componentId, ProcessorEcs.Action.Add);
       }
     }
 
@@ -318,7 +318,7 @@ namespace Pixeye.Actors
       if ((GenerationsInstant[id, Storage<T>.Generation] & Storage<T>.ComponentMask) == Storage<T>.ComponentMask)
       {
         GenerationsInstant[id, Storage<T>.Generation] &= ~Storage<T>.ComponentMask;
-        ProcessorEcs.Set(entity, Storage<T>.componentId, ProcessorEcs.Action.Remove);
+        ProcessorEcs.SetOld(entity, Storage<T>.componentId, ProcessorEcs.Action.Remove);
       }
     }
 

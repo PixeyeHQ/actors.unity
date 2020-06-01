@@ -19,14 +19,14 @@ namespace Pixeye.Actors
     internal virtual void Execute(in ent entity, Actor a = null)
     {
       helpers[GetInstanceID()](entity);
-      ProcessorEcs.Set(entity, -1, ProcessorEcs.Action.Activate);
+      ProcessorEcs.SetOld(entity, -1, ProcessorEcs.Action.Activate);
     }
 
     internal virtual void ExecuteOnStart(in ent entity, Actor a)
     {
       helpers[GetInstanceID()](entity);
       if (!a.isActiveAndEnabled) return;
-      ProcessorEcs.Set(entity, -1, ProcessorEcs.Action.Activate);
+      ProcessorEcs.SetOld(entity, -1, ProcessorEcs.Action.Activate);
     }
 
     protected virtual void OnEnable()
