@@ -31,15 +31,15 @@ namespace Pixeye.Actors
 
       for (var r = 0; r < 2; r++)
       {
-        for (var i = 0; i < EntityOperations.len; i++)
+        for (var i = 0; i < ProcessorEcs.len; i++)
         {
-          ref var operation = ref EntityOperations.operations[i];
+          ref var operation = ref ProcessorEcs.operations[i];
           var entityID = operation.entity.id;
 
 
           switch (operation.action)
           {
-            case EntityOperations.Action.Add:
+            case ProcessorEcs.Action.Add:
             {
               var componentID = operation.arg;
               var generation = Storage.Generations[componentID];
@@ -51,7 +51,7 @@ namespace Pixeye.Actors
               for (var l = 0; l < storage.groups.length; l++)
               {
                 var group = storage.groups.Elements[l];
-                if (!group.composition.Check(entityID))
+                if (!group.Composition.Check(entityID))
                   group.TryRemove(entityID);
                 else group.Insert(operation.entity);
               }
@@ -63,7 +63,7 @@ namespace Pixeye.Actors
               break;
 
 
-            case EntityOperations.Action.Kill:
+            case ProcessorEcs.Action.Kill:
             {
               ref var entityCache = ref EntityImplOld.entities[entityID];
 
@@ -87,7 +87,7 @@ namespace Pixeye.Actors
 
                   if (!AlreadyChecked(group))
                   {
-                    if (group.composition.OverlapComponents(entityCache))
+                    if (group.Composition.OverlapComponents(entityCache))
                     {
                       group.TryRemove(entityID);
 
@@ -126,7 +126,7 @@ namespace Pixeye.Actors
               break;
             }
 
-            case EntityOperations.Action.Remove:
+            case ProcessorEcs.Action.Remove:
             {
               // important check
               if (!EntityImplOld.entities[entityID].isAlive) continue;
@@ -179,7 +179,7 @@ namespace Pixeye.Actors
               {
                 var group = storage.groups.Elements[l];
 
-                if (!group.composition.Check(entityID))
+                if (!group.Composition.Check(entityID))
                 {
                   group.TryRemove(entityID);
                 }
@@ -194,13 +194,13 @@ namespace Pixeye.Actors
 
               if (components.componentsAmount == 0)
               {
-                EntityOperations.Set(operation.entity, 0, EntityOperations.Action.Empty);
+                ProcessorEcs.Set(operation.entity, 0, ProcessorEcs.Action.Empty);
               }
 
               break;
             }
 
-            case EntityOperations.Action.Empty:
+            case ProcessorEcs.Action.Empty:
             {
               //if (operation.entity.exist) continue;
 
@@ -232,7 +232,7 @@ namespace Pixeye.Actors
               break;
             }
 
-            case EntityOperations.Action.ChangeTag:
+            case ProcessorEcs.Action.ChangeTag:
             {
               // check if dead 
               if (EntityImplOld.entities[entityID].componentsAmount == 0) continue;
@@ -243,7 +243,7 @@ namespace Pixeye.Actors
               for (var l = 0; l < groups.length; l++)
               {
                 var group = groups.Elements[l];
-                var canBeAdded = group.composition.Check(entityID);
+                var canBeAdded = group.Composition.Check(entityID);
                 var inGroup = group.length == 0 ? -1 : HelperArray.BinarySearch(ref group.entities, entityID, 0, group.length - 1);
 
                 if (inGroup == -1)
@@ -260,7 +260,7 @@ namespace Pixeye.Actors
               break;
             }
 
-            case EntityOperations.Action.Activate:
+            case ProcessorEcs.Action.Activate:
             {
               ref var entityCache = ref EntityImplOld.entities[entityID];
 
@@ -292,7 +292,7 @@ namespace Pixeye.Actors
                 for (var l = 0; l < storage.groups.length; l++)
                 {
                   var group = storage.groups.Elements[l];
-                  if (!group.composition.Check(entityID)) continue;
+                  if (!group.Composition.Check(entityID)) continue;
                   group.Insert(operation.entity);
                 }
 
@@ -304,9 +304,9 @@ namespace Pixeye.Actors
           }
         }
 
-        if (EntityOperations.len > 0)
+        if (ProcessorEcs.len > 0)
         {
-          EntityOperations.len = 0;
+          ProcessorEcs.len = 0;
 
           for (var i = 0; i < Kernel.Processors.length; i++)
             Kernel.Processors.storage[i].HandleEvents();

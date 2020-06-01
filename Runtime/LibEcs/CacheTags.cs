@@ -35,8 +35,7 @@ namespace Pixeye.Actors
 
 
     public byte length;
-
-
+ 
     public void Clear()
     {
       for (var i = 0; i < Capacity; i++)
@@ -411,7 +410,7 @@ namespace Pixeye.Actors
     internal static void Add(GroupCore groupCore)
     {
       CacheGroup container;
-      var        composition = groupCore.composition;
+      var        composition = groupCore.Composition;
       foreach (var tagID in composition.includeTags)
       {
         if (groups.ByTag.TryGetValue(tagID, out container))
@@ -470,7 +469,7 @@ namespace Pixeye.Actors
 #if ACTORS_TAGS_CHECKS
       var indexGroup = groups.ByTag.TryGetValue(tagID);
       if (indexGroup == -1) return;
-      EntityOperations.Set(entity, indexGroup, EntityOperations.Action.ChangeTag);
+      ProcessorEcs.Set(entity, indexGroup, ProcessorEcs.Action.ChangeTag);
 #endif
     }
 

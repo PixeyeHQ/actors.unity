@@ -1,12 +1,15 @@
 ﻿using System.Runtime.CompilerServices;
+using Unity.IL2CPP.CompilerServices;
+
 
 namespace Pixeye.Actors
 {
-  public class EntityImpl
+  [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
+  public partial class EntityImpl : IRequireActorsLayer
   {
     public LayerCore layer;
 
-    public EntityImpl(LayerCore layer)
+    public void Launch(LayerCore layer)
     {
       this.layer = layer;
     }
@@ -14,50 +17,10 @@ namespace Pixeye.Actors
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public ent Create()
     {
-      int  id;
-      byte age = 0;
-      if (ent.entStack.length > 0)
-      {
-        ref var pop = ref ent.entStack.source[--ent.entStack.length];
-        id = pop.id;
-        unchecked
-        {
-          age = pop.age;
-        }
-      }
-      else id = ent.lastID++;
+      ProcessorEcs.Create(out var entity, layer);
 
-      ent entity;
-      entity.id  = id;
-      entity.age = age;
-      EntityImplOld.Initialize(id, age);
-      EntityOperations.Set(entity, -1, EntityOperations.Action.Activate);
+      //EntityOperations.Set(entity, -1, EntityOperations.Action.Activate);
       return entity;
     }
-
-    // [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    // internal static void Create(int layerIndex, out ent entity)
-    // {
-    //   int  id;
-    //   byte age = 0;
-    //
-    //   if (ent.entStack.length > 0)
-    //   {
-    //     ref var pop = ref ent.entStack.source[--ent.entStack.length];
-    //     id = pop.id;
-    //     unchecked
-    //     {
-    //       age = pop.age;
-    //     }
-    //   }
-    //   else
-    //     id = ent.lastID++;
-    //
-    //   entity.id  = id;
-    //   entity.age = age;
-    //   Initialize(id, age);
-    //   EntityOperations.Set(entity, -1, EntityOperations.Action.Activate);
-    //   // Starter.Starters[layerIndex].entities.Add(entity);
-    // }
   }
 }

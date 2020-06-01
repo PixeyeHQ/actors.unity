@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using Pixeye.Actors;
 using UnityEditor;
 using UnityEditor.ProjectWindowCallback;
@@ -31,7 +32,7 @@ public class PostHandleScenes : EndNameEditAction
   public override void Action(int instanceId, string pathName, string resourceFile)
   {
     ProcEditorSceneObserve.name = pathName;
-    NewSceneSetup setup = NewSceneSetup.EmptyScene;
+    const NewSceneSetup setup = NewSceneSetup.EmptyScene;
     var scene = EditorSceneManager.NewScene(setup);
     EditorSceneManager.SaveScene(scene, pathName);
   }
@@ -49,6 +50,7 @@ public static class ProcEditorSceneObserve
 
   public static void SceneCreating(Scene scene, NewSceneSetup setup, NewSceneMode mode)
   {
+    if (name == null) return; // fix for building build
     if (Camera.main != null)
     {
       var camGO = Camera.main.gameObject;
@@ -61,6 +63,7 @@ public static class ProcEditorSceneObserve
       Object.DestroyImmediate(light.gameObject);
     }
 
+   
     var chunks = name.Split('/');
     var n = chunks[chunks.Length - 1];
     n = n.Split('.')[0];
@@ -73,3 +76,4 @@ public static class ProcEditorSceneObserve
     Debug.Log("New scene created!");
   }
 }
+#endif

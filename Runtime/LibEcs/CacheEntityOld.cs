@@ -1,14 +1,10 @@
-//  Project : ecs
-// Contacts : Pix - ask@pixeye.games
-
-
 using System;
 using System.Runtime.InteropServices;
 
 namespace Pixeye.Actors
 {
   [StructLayout(LayoutKind.Sequential)]
-  public unsafe struct CacheEntity
+  public unsafe struct CacheEntityOld
   {
     public ushort* componentsIds;
     public byte age; // not cool. need to find way to change id directly in ents that released.
@@ -19,7 +15,7 @@ namespace Pixeye.Actors
     public bool isDirty;
     public bool isAlive;
 
-    public CacheEntity(int size)
+    public CacheEntityOld(int size)
     {
       componentsIds    = (ushort*) Marshal.AllocHGlobal(size * sizeof(ushort));
       length           = (byte) size;
@@ -53,10 +49,9 @@ namespace Pixeye.Actors
       for (int i = componentsAmount - 1; i >= 0; i--)
       {
         var generation = Storage.Generations[componentsIds[i]];
-        var mask = Storage.Masks[componentsIds[i]];
+        var mask       = Storage.Masks[componentsIds[i]];
         EntityImplOld.GenerationsInstant[id, generation] &= ~mask;
       }
     }
-  
   }
 }

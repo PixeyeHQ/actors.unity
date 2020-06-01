@@ -6,7 +6,7 @@ using System;
 namespace Pixeye.Actors
 {
   [Serializable]
-  public class SettingsEngine
+  public class SettingsActors
   {
     public int SizeEntities = 1024;
     public int SizeComponents = 128;

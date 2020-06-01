@@ -14,7 +14,7 @@ namespace Pixeye.Actors
     public static bool ChangingScene;
     public static bool ApplicationIsQuitting;
     public static bool IsQuittingOrChangingScene() => ApplicationIsQuitting || ChangingScene;
-    public static SettingsEngine Settings = new SettingsEngine();
+    public static SettingsActors Settings = new SettingsActors();
     public static int GetTicksCount => 0;
 
     internal static Kernel Instance;
@@ -28,13 +28,29 @@ namespace Pixeye.Actors
 #endif
     static void Bootstrap()
     {
-      var scene     = SceneManager.CreateScene(KernelSceneName, new CreateSceneParameters(LocalPhysicsMode.None));
-      var objKernel = new GameObject("Actors Setup");
-      SceneManager.MoveGameObjectToScene(objKernel, scene);
-      MainScene.NextActiveSceneName = SceneManager.GetActiveScene().name;
-      var kernel = objKernel.AddComponent<Kernel>();
-      var layer  = objKernel.AddComponent<LayerApp>();
-      Instance = kernel;
+      HandleSettings();
+      ProcessorEcs.Bootstrap();
+      HandleScenes();
+
+      void HandleSettings()
+      {
+        var t = Resources.Load<TextAsset>("SettingsFramework");
+        if (t != null)
+          JsonUtility.FromJsonOverwrite(t.text, Settings);
+
+        Settings.SizeGenerations = Settings.SizeComponents / 32;
+      }
+
+      void HandleScenes()
+      {
+        var scene     = SceneManager.CreateScene(KernelSceneName, new CreateSceneParameters(LocalPhysicsMode.None));
+        var objKernel = new GameObject("Actors Setup");
+        SceneManager.MoveGameObjectToScene(objKernel, scene);
+        MainScene.NextActiveSceneName = SceneManager.GetActiveScene().name;
+        var kernel = objKernel.AddComponent<Kernel>();
+        var layer  = objKernel.AddComponent<LayerApp>();
+        Instance = kernel;
+      }
     }
 
     void Awake()
@@ -59,7 +75,7 @@ namespace Pixeye.Actors
         Activator.CreateInstance(constructedStorage);
       }
     }
- 
+
     public static class Processors
     {
       internal static Processor[] storage = new Processor[64];
@@ -108,7 +124,7 @@ namespace Pixeye.Actors
         }
       }
     }
- 
+
     internal float timescale_cache = 1;
 
     IEnumerator OnApplicationFocus(bool hasFocus)

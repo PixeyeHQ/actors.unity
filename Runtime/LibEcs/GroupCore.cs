@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using Unity.IL2CPP.CompilerServices;
-using UnityEngine;
 
 
 namespace Pixeye.Actors
@@ -23,7 +22,7 @@ namespace Pixeye.Actors
 
     public int GetHashCode(GroupCore obj)
     {
-      return obj.composition.hash;
+      return obj.Composition.hash;
     }
   }
 
@@ -55,7 +54,7 @@ namespace Pixeye.Actors
 #endif
 
 
-    protected internal Composition composition;
+    protected internal Composition Composition;
 
     internal int id;
 
@@ -98,12 +97,12 @@ namespace Pixeye.Actors
 
     internal virtual GroupCore Initialize(Composition composition)
     {
-      this.composition = composition;
+      this.Composition = composition;
 #if !ACTORS_TAGS_0
       HelperTags.Add(this);
 #endif
 
-      this.composition.SetupExcludeTypes(this);
+      this.Composition.SetupExcludeTypes(this);
       return this;
     }
 
@@ -496,7 +495,7 @@ namespace Pixeye.Actors
     {
       var gr = base.Initialize(composition);
 
-       Storage<T>.Instance.groups.Add(this);
+      Storage<T>.Instance.groups.Add(this);
 
       var len = 1;
 
@@ -900,7 +899,7 @@ namespace Pixeye.Actors
       return gr;
     }
   }
-  
+
   public delegate void HandleSegmentGroup(SegmentGroup segment);
 
   public sealed class SegmentGroup
@@ -931,7 +930,7 @@ namespace Pixeye.Actors
       internal Enumerator(int from, int to)
       {
         position = from - 1;
-        length = to;
+        length   = to;
       }
 
       public int Current
@@ -962,5 +961,4 @@ namespace Pixeye.Actors
       }
     }
   }
-  
 }

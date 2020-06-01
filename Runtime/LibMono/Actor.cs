@@ -67,7 +67,7 @@ namespace Pixeye.Actors
 #endif
 
 
-      Actors.EntityImplOld.Initialize(id, age, isPooled);
+      Actors.EntityImplOld.Create(entity, isPooled);
       Actors.EntityImplOld.Transforms[id] = transform;
       //    Starter.Starters[layer].entities.Add(entity);
       if (buildFrom != null)
@@ -78,7 +78,7 @@ namespace Pixeye.Actors
       else
       {
         Setup();
-        EntityOperations.Set(entity, -1, EntityOperations.Action.Activate);
+        ProcessorEcs.Set(entity, -1, ProcessorEcs.Action.Activate);
       }
     }
 
@@ -109,7 +109,7 @@ namespace Pixeye.Actors
 #endif
 
 
-      Actors.EntityImplOld.Initialize(id, age, isPooled);
+      Actors.EntityImplOld.Create(entity, isPooled);
       Actors.EntityImplOld.Transforms[id] = transform;
 
       if (buildFrom != null)
@@ -120,7 +120,7 @@ namespace Pixeye.Actors
       else
       {
         Setup();
-        EntityOperations.Set(entity, -1, EntityOperations.Action.Activate);
+        ProcessorEcs.Set(entity, -1, ProcessorEcs.Action.Activate);
       }
     }
 
@@ -149,11 +149,11 @@ namespace Pixeye.Actors
       _entity = id;
 #endif
 
-      Actors.EntityImplOld.Initialize(id, age, isPooled);
+      Actors.EntityImplOld.Create(entity, isPooled);
       Actors.EntityImplOld.Transforms[id] = transform;
       model(entity);
       Setup();
-      EntityOperations.Set(entity, -1, EntityOperations.Action.Activate);
+      ProcessorEcs.Set(entity, -1, ProcessorEcs.Action.Activate);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

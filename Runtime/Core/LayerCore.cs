@@ -16,7 +16,7 @@ namespace Pixeye.Actors
     internal ProcessorSignals processorSignals;
     internal ProcessorEcs processorEcs;
 
-    internal EntityImpl Entity;
+    internal EntityImpl entityImpl;
 
     internal Dictionary<int, object> objects = new Dictionary<int, object>();
 

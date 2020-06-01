@@ -25,7 +25,7 @@ namespace Pixeye.Actors
     internal HashCode hash;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal bool OverlapComponents(in CacheEntity cache)
+    internal bool OverlapComponents(in CacheEntityOld cache)
     {
       int match = 0;
       for (int i = 0; i < cache.componentsAmount; i++)

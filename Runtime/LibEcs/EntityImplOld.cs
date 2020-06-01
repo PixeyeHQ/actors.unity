@@ -14,27 +14,7 @@ namespace Pixeye.Actors
   [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
   public static unsafe partial class EntityImplOld
   {
-    public const bool Pooled = true;
-
-#if !ACTORS_TAGS_0
-    static readonly int sizeBufferTags = UnsafeUtility.SizeOf<CacheTags>();
-#endif
-    static readonly int sizeEntityCache = UnsafeUtility.SizeOf<CacheEntity>();
-
-    public static Transform[] Transforms;
-
-#if !ACTORS_TAGS_0
-    public static CacheTags* Tags;
-#endif
-
-    public static CacheEntity* entities;
-
-    internal static int lengthTotal;
-    internal static int[,] Generations;
-    internal static int[,] GenerationsInstant;
-
-    public static ents alive;
-
+ 
 
     //===============================//
     // Initialize 
@@ -56,7 +36,7 @@ namespace Pixeye.Actors
 
       Transforms = new Transform[Kernel.Settings.SizeEntities];
 
-      entities = (CacheEntity*) UnmanagedMemory.Alloc(sizeEntityCache * Kernel.Settings.SizeEntities);
+      entities = (CacheEntityOld*) UnmanagedMemory.Alloc(sizeEntityCache * Kernel.Settings.SizeEntities);
 #if !ACTORS_TAGS_0
       Tags = (CacheTags*) UnmanagedMemory.Alloc(sizeBufferTags * Kernel.Settings.SizeEntities);
 #endif
@@ -67,7 +47,7 @@ namespace Pixeye.Actors
 #if !ACTORS_TAGS_0
         Tags[i] = new CacheTags();
 #endif
-        entities[i] = new CacheEntity(6);
+        entities[i] = new CacheEntityOld(6);
       }
 
       alive = new ents(Kernel.Settings.SizeEntities);
@@ -77,51 +57,6 @@ namespace Pixeye.Actors
     public static int GetLiveEntities()
     {
       return alive.length;
-    }
-
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static void Initialize(int id, byte age, bool isPooled = false, bool isNested = false)
-    {
-      if (id >= lengthTotal)
-      {
-        var l = id << 1;
-        Debug.Log(Generations);
-        HelperArray.ResizeInt(ref Generations, l, Kernel.Settings.SizeGenerations);
-        HelperArray.ResizeInt(ref GenerationsInstant, l, Kernel.Settings.SizeGenerations);
-        Array.Resize(ref Transforms, l);
-
-        entities = (CacheEntity*) UnmanagedMemory.ReAlloc(entities, sizeEntityCache * l);
-#if !ACTORS_TAGS_0
-        Tags = (CacheTags*) UnmanagedMemory.ReAlloc(Tags, sizeBufferTags * l);
-#endif
-
-        for (var i = lengthTotal; i < l; i++)
-        {
-#if !ACTORS_TAGS_0
-          Tags[i] = new CacheTags();
-#endif
-          entities[i] = new CacheEntity(5);
-        }
-
-        lengthTotal = l;
-      }
-
-      entities[id].componentsAmount = 0;
-
-      var ptrCache = &entities[id];
-      ptrCache->age = age;
-      ptrCache->isNested = isNested;
-      ptrCache->isPooled = isPooled;
-
-      ptrCache->isDirty = true;
-      ptrCache->isAlive = true;
-
-
-      ent e;
-      e.id = id;
-      e.age = age;
-      alive.Add(e);
     }
 
 
@@ -159,7 +94,7 @@ namespace Pixeye.Actors
         fstr.Append(" ]: ");
         //}
 
-        fstr.Append(name);
+        fstr.Append((string) name);
 
         tr.name = fstr.ToString();
       }
@@ -235,7 +170,7 @@ namespace Pixeye.Actors
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static void Deploy(in this ent entity)
     {
-      EntityOperations.Set(entity, -1, EntityOperations.Action.Activate);
+      ProcessorEcs.Set(entity, -1, ProcessorEcs.Action.Activate);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -265,7 +200,7 @@ namespace Pixeye.Actors
 
         if (!entities[id].isDirty)
         {
-          EntityOperations.Set(entity, Storage<T>.componentId, EntityOperations.Action.Add);
+          ProcessorEcs.Set(entity, Storage<T>.componentId, ProcessorEcs.Action.Add);
         }
       }
 
@@ -323,7 +258,7 @@ namespace Pixeye.Actors
 
       if (!entities[id].isDirty)
       {
-        EntityOperations.Set(entity, Storage<T>.componentId, EntityOperations.Action.Add);
+        ProcessorEcs.Set(entity, Storage<T>.componentId, ProcessorEcs.Action.Add);
       }
 
       return ref val;
@@ -365,7 +300,7 @@ namespace Pixeye.Actors
 
       if (!entities[id].isDirty)
       {
-        EntityOperations.Set(entity, Storage<T>.componentId, EntityOperations.Action.Add);
+        ProcessorEcs.Set(entity, Storage<T>.componentId, ProcessorEcs.Action.Add);
       }
     }
 
@@ -383,7 +318,7 @@ namespace Pixeye.Actors
       if ((GenerationsInstant[id, Storage<T>.Generation] & Storage<T>.ComponentMask) == Storage<T>.ComponentMask)
       {
         GenerationsInstant[id, Storage<T>.Generation] &= ~Storage<T>.ComponentMask;
-        EntityOperations.Set(entity, Storage<T>.componentId, EntityOperations.Action.Remove);
+        ProcessorEcs.Set(entity, Storage<T>.componentId, ProcessorEcs.Action.Remove);
       }
     }
 
@@ -395,5 +330,9 @@ namespace Pixeye.Actors
 
       UnmanagedMemory.Cleanup();
     }
+
+    public static readonly int sizeEntityCache = UnsafeUtility.SizeOf<CacheEntityOld>();
+    internal static int lengthTotal;
+    public static ents alive;
   }
 }

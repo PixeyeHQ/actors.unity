@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 
 namespace Pixeye.Actors
 {
@@ -8,14 +9,24 @@ namespace Pixeye.Actors
     public int Length;
     public void* Memory;
 
-    public PoolMem(int length, int elementSize)
+    public void Alloc(int length, int elementSize)
     {
-      Memory      = (void*) UnmanagedMemory.Alloc(length);
       Length      = length;
       ElementSize = elementSize;
+      Memory      = (void*) UnmanagedMemory.Alloc(Length * elementSize);
     }
 
-    public void* this[int index] => (byte*) Memory + ElementSize * index;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public T* Get<T>(int index) where T : unmanaged
+    {
+      return (T*) ((byte*) Memory + index * ElementSize);
+    }
+
+    public void Realloc(int length)
+    {
+      Memory = (void*) UnmanagedMemory.ReAlloc(Memory, length);
+      Length = length;
+    }
 
     public void Destroy()
     {

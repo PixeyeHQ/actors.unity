@@ -18,7 +18,7 @@ namespace Pixeye.Actors
       layer.processorSignals.Add(this);
       layer.processorEcs.Add(this);
 
-      Entity = layer.Entity;
+      Entity = layer.entityImpl;
     }
 
     public void Dispose() => OnDispose();

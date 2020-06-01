@@ -16,6 +16,7 @@ namespace Pixeye.Actors
   /// A scene point of entry. The developer defines here scene dependencies and processing that will work on the scene. 
   public abstract class Layer<T> : LayerCore
   {
+    public static EntityImpl Entity => layer.entityImpl;
     internal static Layer<T> layer;
 
     void Awake()
@@ -49,11 +50,10 @@ namespace Pixeye.Actors
 
       #region Update Services
 
-      Entity = new EntityImpl(layer);
-
       processorUpdate = new ProcessorUpdate();
       processorUpdate.Add(this);
 
+      entityImpl         = Add<EntityImpl>();
       processorCoroutine = Add<ProcessorCoroutine>();
       processorSignals   = Add<ProcessorSignals>();
       processorEcs       = Add<ProcessorEcs>();

@@ -74,7 +74,7 @@ namespace Pixeye.Actors
 
 
       EntityImplOld.entities[id].CleanMask(id);
-      EntityOperations.Set(this, 0, EntityOperations.Action.Kill);
+      ProcessorEcs.Set(this, 0, ProcessorEcs.Action.Kill);
       EntityImplOld.entities[id].isAlive = false;
     }
 
