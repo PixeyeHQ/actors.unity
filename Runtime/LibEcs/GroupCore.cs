@@ -95,7 +95,6 @@ namespace Pixeye.Actors
         hasEventRemove = true;
       }
     }
-
 #endif
 
     internal virtual GroupCore Initialize(Composition composition)

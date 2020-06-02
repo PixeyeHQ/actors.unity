@@ -84,17 +84,15 @@ namespace Pixeye.Actors
               DebugAlreadyHave(operation, generation, mask, storage);
 
               eManaged.generations[generation] |= mask;
-             
 
-           
 
               for (var l = 0; l < storage.groups.length; l++)
               {
                 var group = storage.groups.Elements[l];
                 if (group.composition.included.IsSubsetOf(ref eManaged)
-                    && !group.composition.excluded.Overlaps(ref eManaged))
-                  // && !group.composition.tagsExclude.Overlaps(eMeta)
-                  // && group.composition.tags.IsSubsetOf(eMeta))
+                    && !group.composition.excluded.Overlaps(ref eManaged)
+                    && group.composition.includedTags.IsSubsetOf(eMeta)
+                    && !group.composition.excludedTags.Overlaps(eMeta))
                   group.Insert(operation.entity);
               }
 
@@ -116,7 +114,9 @@ namespace Pixeye.Actors
               var group = storage.groups.Elements[l];
 
               if (group.composition.included.IsSubsetOf(ref eManaged)
-                 && !group.composition.excluded.Overlaps(ref eManaged))
+                  && !group.composition.excluded.Overlaps(ref eManaged)
+                  && group.composition.includedTags.IsSubsetOf(eMeta)
+                  && !group.composition.excludedTags.Overlaps(eMeta))
                 group.Insert(operation.entity);
               else group.TryRemove(entityID);
               //     && group.composition.tags.IsSubsetOf(eMeta)

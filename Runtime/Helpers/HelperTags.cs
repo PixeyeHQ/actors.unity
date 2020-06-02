@@ -20,7 +20,7 @@ namespace Pixeye.Actors
     {
       ref var entityTags = ref meta->tags;
       int     len        = entityTags.length;
- 
+
       for (int l = 0; l < tags.Length; l++)
       {
         var next = tags[l];
@@ -41,7 +41,6 @@ namespace Pixeye.Actors
       ref var entityTags = ref meta->tags;
       int     len        = tags.Length;
 
-      if (len == 0) return true;
       var match = 0;
       for (int l = 0; l < tags.Length; l++)
       {
@@ -161,7 +160,6 @@ namespace Pixeye.Actors
       ref var buffer = ref entity.meta->tags;
 
       int len = buffer.length;
-      Debug.Log(len);
       var tID = (ushort) tagID;
       for (var index = 0; index < len; index++)
       {
@@ -309,7 +307,7 @@ namespace Pixeye.Actors
     {
       CacheGroup container;
       var        composition = groupCore.composition;
-      foreach (var tagID in composition.tags)
+      foreach (var tagID in composition.includedTags)
       {
         if (groups.ByTag.TryGetValue(tagID, out container))
         {
@@ -326,7 +324,7 @@ namespace Pixeye.Actors
         }
       }
 
-      foreach (var tagID in composition.tagsExclude)
+      foreach (var tagID in composition.excludedTags)
       {
         if (groups.ByTag.TryGetValue(tagID, out container))
         {

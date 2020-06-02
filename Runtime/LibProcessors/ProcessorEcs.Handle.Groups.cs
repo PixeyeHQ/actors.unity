@@ -62,12 +62,12 @@ namespace Pixeye.Actors
         }
 
         var composition = new Composition();
-        composition.tagsExclude = excludeTagsFilter;
-        composition.tags = includeTagsFilter;
-        composition.AddTypesExclude(excludeCompFilter);
+        composition.excludedTags = excludeTagsFilter;
+        composition.includedTags = includeTagsFilter;
+        composition.GenerateExclude(excludeCompFilter);
 
         composition.hash = HashCode.OfEach(myFieldInfo.FieldType.GetGenericArguments())
-          .AndEach(composition.tags).And(17).AndEach(composition.tagsExclude).And(31)
+          .AndEach(composition.includedTags).And(17).AndEach(composition.excludedTags).And(31)
           .AndEach(excludeCompFilter);
 
         var group = SetupGroup(myFieldInfo.FieldType, composition, myFieldInfo.GetValue(obj), layer);

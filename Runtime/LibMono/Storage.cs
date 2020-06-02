@@ -16,7 +16,7 @@ namespace Pixeye.Actors
   [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
   public abstract class Storage
   {
-    internal static Dictionary<int, int> typeNames = new Dictionary<int, int>(FastComparable.Default);
+    internal static Dictionary<int, int> TypeNames = new Dictionary<int, int>(FastComparable.Default);
     internal static int lastID;
     internal static int[] Masks = new int[32];
     internal static int[] Generations = new int[32];
@@ -77,7 +77,8 @@ namespace Pixeye.Actors
       Generations[componentId] = Generation    = componentId / 32;
 
       // add componentID by type for exclude injection
-      typeNames.Add(typeof(T).GetHashCode(), componentId);
+      Debug.Log(typeof(T).GetHashCode());
+      TypeNames.Add(typeof(T).GetHashCode(), componentId);
     }
 
 

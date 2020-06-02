@@ -7,12 +7,12 @@ using Debug = UnityEngine.Debug;
 
 namespace Pixeye.Actors
 {
-	sealed public class debug
-	{
-		[Conditional("ACTORS_DEBUG")]
-		public static void log(object context)
-		{
-			Debug.Log(context);
-		}
-	}
+  sealed public class debug
+  {
+    [Conditional("ACTORS_DEBUG")]
+    public static void log(object context)
+    {
+      Debug.Log(context);
+    }
+  }
 }
