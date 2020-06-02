@@ -4,17 +4,27 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Reflection;
 using Unity.IL2CPP.CompilerServices;
-using UnityEngine;
-
 
 namespace Pixeye.Actors
 {
   [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
   public static unsafe class HelperTags
   {
+    [Conditional("ACTORS_DEBUG")]
+    internal static void DebugCheckLimits(int len, ent entity)
+    {
+      if (len == CacheTags.Capacity)
+      {
+        Kernel.Debugger.Log(LogType.TAGS_LIMIT_REACHED, entity, CacheTags.Capacity);
+        throw new ArgumentException();
+      }
+    }
+
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static bool Overlaps(this int[] tags, EntityMeta* meta)
     {
@@ -55,6 +65,59 @@ namespace Pixeye.Actors
       return match == tags.Length;
     }
 
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void Set(in this ent entity, int tagID)
+    {
+      ref var buffer = ref entity.meta->tags;
+
+      int len = buffer.length;
+      var tID = (ushort) tagID;
+      for (var index = 0; index < len; index++)
+      {
+        if (buffer.tags[index] == tID)
+        {
+          unchecked
+          {
+            buffer.size[index] += 1;
+          }
+
+          return;
+        }
+      }
+
+      DebugCheckLimits(len, entity);
+
+      buffer.SetElement(buffer.length, tagID);
+    }
+
+    public static void Add(in this ent entity, int tagID)
+    {
+      var     meta   = entity.meta;
+      ref var buffer = ref meta->tags;
+      int     len    = buffer.length;
+      var     tID    = (ushort) tagID;
+
+      for (var index = 0; index < len; index++)
+      {
+        if (buffer.tags[index] == tID)
+        {
+          unchecked
+          {
+            buffer.size[index] += 1;
+          }
+
+          return;
+        }
+      }
+
+      DebugCheckLimits(len, entity);
+
+      buffer.SetElement(buffer.length, tagID);
+
+      HandleChanges(entity, tagID);
+    }
+
     internal static void ClearAll()
     {
       for (var i = 0; i < EntityImplOld.lengthTotal; i++)
@@ -74,7 +137,7 @@ namespace Pixeye.Actors
         buffer.size[i] = 0;
         buffer.tags[i] = 0;
         buffer.length--;
-        HandleChange(entity, tID);
+        HandleChanges(entity, tID);
       }
     }
 
@@ -83,37 +146,6 @@ namespace Pixeye.Actors
       return Actors.EntityImplOld.Tags[entity.id].GetAmount(tagID);
     }
 
-    public static void Add(in this ent entity, int tagID)
-    {
-      ref var buffer = ref Actors.EntityImplOld.Tags[entity.id];
-      int     len    = buffer.length;
-      var     tID    = (ushort) tagID;
-
-      for (var index = 0; index < len; index++)
-      {
-        if (buffer.tags[index] == tID)
-        {
-          unchecked
-          {
-            buffer.size[index] += 1;
-          }
-
-          return;
-        }
-      }
-
-#if UNITY_EDITOR
-      if (len == CacheTags.Capacity)
-      {
-        Kernel.Debugger.Log(LogType.TAGS_LIMIT_REACHED, entity, CacheTags.Capacity);
-        return;
-      }
-#endif
-
-      buffer.SetElement(buffer.length, tagID);
-      if (!EntityImplOld.entities[entity.id].isDirty)
-        HandleChange(entity, tagID);
-    }
 
     public static void Add(in this ent entity, params int[] tagsID)
     {
@@ -150,41 +182,10 @@ namespace Pixeye.Actors
 #endif
 
         buffer.SetElement(buffer.length, tID);
-        HandleChange(entity, tID);
+        HandleChanges(entity, tID);
       }
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void Set(in this ent entity, int tagID)
-    {
-      ref var buffer = ref entity.meta->tags;
-
-      int len = buffer.length;
-      var tID = (ushort) tagID;
-      for (var index = 0; index < len; index++)
-      {
-        if (buffer.tags[index] == tID)
-        {
-          unchecked
-          {
-            buffer.size[index] += 1;
-          }
-
-          return;
-        }
-      }
-
-#if UNITY_EDITOR
-      if (len == CacheTags.Capacity)
-      {
-        Kernel.Debugger.Log(LogType.TAGS_LIMIT_REACHED, entity, CacheTags.Capacity);
-        return;
-      }
-#endif
-
-
-      buffer.SetElement(buffer.length, tagID);
-    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void Set(in this ent entity, params int[] tagsID)
@@ -237,7 +238,7 @@ namespace Pixeye.Actors
           if (--buffer.size[index] == 0)
           {
             buffer.RemoveAt(index);
-            HandleChange(entity, tagID);
+            HandleChanges(entity, tagID);
           }
 
           return;
@@ -259,7 +260,7 @@ namespace Pixeye.Actors
           {
             buffer.size[index] = 0;
             buffer.RemoveAt(index);
-            HandleChange(entity, tID);
+            HandleChanges(entity, tID);
             break;
           }
         }
@@ -278,7 +279,7 @@ namespace Pixeye.Actors
         {
           buffer.size[index] = 0;
           buffer.RemoveAt(index);
-          HandleChange(entity, tID);
+          HandleChanges(entity, tID);
           return;
         }
       }
@@ -303,13 +304,14 @@ namespace Pixeye.Actors
       return entity.meta->tags.HasAny(tagsID);
     }
 
-    internal static void Add(GroupCore groupCore)
+    internal static void RegisterGroup(GroupCore groupCore)
     {
       CacheGroup container;
       var        composition = groupCore.composition;
+      var        ecs         = groupCore.processorEcs;
       foreach (var tagID in composition.includedTags)
       {
-        if (groups.ByTag.TryGetValue(tagID, out container))
+        if (ecs.familyTags.TryGetValue(tagID, out container))
         {
           if (container.Contain(groupCore)) continue;
 
@@ -320,13 +322,13 @@ namespace Pixeye.Actors
           container = new CacheGroup();
 
           container.Add(groupCore);
-          groups.ByTag.Add(tagID, container);
+          ecs.familyTags.Add(tagID, container);
         }
       }
 
       foreach (var tagID in composition.excludedTags)
       {
-        if (groups.ByTag.TryGetValue(tagID, out container))
+        if (ecs.familyTags.TryGetValue(tagID, out container))
         {
           if (container.Contain(groupCore)) continue;
           container.Add(groupCore);
@@ -335,17 +337,16 @@ namespace Pixeye.Actors
         {
           container = new CacheGroup();
           container.Add(groupCore);
-          groups.ByTag.Add(tagID, container);
+          ecs.familyTags.Add(tagID, container);
         }
       }
 
       var index = -1;
-      foreach (var typeID in composition.excludeComponents)
-      {
-        index++;
-        if (!typeID) continue;
 
-        if (groups.ByType.TryGetValue(index, out container))
+      for (var i = 0; i < composition.excluded.Length; i++)
+      {
+        ref var signature = ref composition.excluded[i];
+        if (ecs.familyTypes.TryGetValue(signature.id, out container))
         {
           if (container.Contain(groupCore)) continue;
           container.Add(groupCore);
@@ -354,19 +355,20 @@ namespace Pixeye.Actors
         {
           container = new CacheGroup();
           container.Add(groupCore);
-          groups.ByType.Add(index, container);
+          ecs.familyTypes.Add(index, container);
         }
       }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static void HandleChange(in ent entity, int tagID)
+    [Conditional("ACTORS_TAGS_CHECKS")]
+    internal static void HandleChanges(ent entity, int tagID)
     {
-#if ACTORS_TAGS_CHECKS
-      var indexGroup = groups.ByTag.TryGetValue(tagID);
+      if (entity.meta->isDirty) return;
+      var ecs        = entity.managed.layer.processorEcs;
+      var indexGroup = ecs.familyTags.TryGetValue(tagID);
       if (indexGroup == -1) return;
-      ProcessorEcs.SetOld(entity, indexGroup, ProcessorEcs.Action.ChangeTag);
-#endif
+      ecs.SetOperation(entity, indexGroup, ProcessorEcs.Action.ChangeTag);
     }
 
 

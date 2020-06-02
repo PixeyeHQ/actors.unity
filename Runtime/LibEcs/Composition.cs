@@ -13,6 +13,7 @@ namespace Pixeye.Actors
   {
     public int generation;
     public int mask;
+    public int id;
   }
 
   [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
@@ -25,7 +26,7 @@ namespace Pixeye.Actors
     internal int[] excludedTags = new int[0];
 
     internal bool[] includeComponents = new bool[Kernel.Settings.SizeComponents];
-    internal bool[] excludeComponents = new bool[Kernel.Settings.SizeComponents];
+    // internal bool[] excludeComponents = new bool[Kernel.Settings.SizeComponents];
 
     internal HashCode hash;
 
@@ -53,17 +54,8 @@ namespace Pixeye.Actors
           var t = types[i];
           excluded[i].generation = Storage.Generations[t];
           excluded[i].mask       = Storage.Masks[t];
-          excludeComponents[t]   = true;
+          excluded[i].id         = t;
         }
-      }
-    }
-
-    internal void SetupExcludeTypes(GroupCore g)
-    {
-      for (int i = 0; i < Storage.lastID; i++)
-      {
-        var t = excludeComponents[i];
-        if (t) Storage.All[i].groups.Add(g);
       }
     }
 

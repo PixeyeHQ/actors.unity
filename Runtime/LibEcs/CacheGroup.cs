@@ -3,8 +3,6 @@
 
 using System;
 using Unity.IL2CPP.CompilerServices;
-using UnityEngine;
-
 
 namespace Pixeye.Actors
 {
@@ -16,7 +14,7 @@ namespace Pixeye.Actors
   }
 
   [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
-  sealed class FamilyGroupTags
+  sealed class FamilyGroup
   {
     internal CacheGroup[] cache = new CacheGroup[10];
     internal int[] tagsID = new int[10];
@@ -61,16 +59,16 @@ namespace Pixeye.Actors
         Array.Resize(ref tagsID, l);
       }
 
-      var pointer = len++;
+      var pointer   = len++;
       var indexLast = pointer;
-      var index = pointer - 1;
+      var index     = pointer - 1;
 
       if (index >= 0)
       {
         if (tagID < tagsID[index])
         {
           var startIndex = 0;
-          var endIndex = indexLast;
+          var endIndex   = indexLast;
 
           while (endIndex > startIndex)
           {
@@ -87,12 +85,12 @@ namespace Pixeye.Actors
             if (middleValue < tagID)
             {
               startIndex = middleIndex + 1;
-              pointer = startIndex;
+              pointer    = startIndex;
             }
             else
             {
               endIndex = middleIndex;
-              pointer = endIndex;
+              pointer  = endIndex;
             }
           }
         }
@@ -101,10 +99,10 @@ namespace Pixeye.Actors
       for (int i = indexLast; i >= pointer; i--)
       {
         tagsID[i + 1] = tagsID[i];
-        cache[i + 1] = cache[i];
+        cache[i + 1]  = cache[i];
       }
 
-      cache[pointer] = anotherGroupStorage;
+      cache[pointer]  = anotherGroupStorage;
       tagsID[pointer] = tagID;
     }
   }
@@ -145,7 +143,7 @@ namespace Pixeye.Actors
 
     public static GroupCore Add(this CacheGroup container, GroupCore group)
     {
-      ref var len = ref container.length;
+      ref var len     = ref container.length;
       ref var storage = ref container.Elements;
 
       if (len == storage.Length)

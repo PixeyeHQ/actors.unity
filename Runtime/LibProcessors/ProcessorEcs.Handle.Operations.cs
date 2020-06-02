@@ -73,22 +73,22 @@ namespace Pixeye.Actors
         {
           case Action.Activate:
           {
-            operation.entity.RenameGameobject();
             for (int j = 0; j < eMeta->componentsAmount; j++)
             {
               var componentID = eMeta->signature[j];
               var storage     = Storage.All[componentID];
               var generation  = Storage.Generations[componentID];
               var mask        = Storage.Masks[componentID];
+              var groups      = storage.groups[eManaged.layer.layerID];
 
               DebugAlreadyHave(operation, generation, mask, storage);
 
               eManaged.generations[generation] |= mask;
 
 
-              for (var l = 0; l < storage.groups.length; l++)
+              for (var l = 0; l < groups.length; l++)
               {
-                var group = storage.groups.Elements[l];
+                var group = groups.Elements[l];
                 if (group.composition.included.IsSubsetOf(ref eManaged)
                     && !group.composition.excluded.Overlaps(ref eManaged)
                     && group.composition.includedTags.IsSubsetOf(eMeta)
@@ -98,6 +98,8 @@ namespace Pixeye.Actors
 
               eMeta->isDirty = false;
             }
+
+            operation.entity.RenameGameobject();
           }
             break;
           case Action.Add:
@@ -106,12 +108,13 @@ namespace Pixeye.Actors
             var storage     = Storage.All[componentID];
             var generation  = Storage.Generations[componentID];
             var mask        = Storage.Masks[componentID];
+            var groups      = storage.groups[eManaged.layer.layerID];
 
             eManaged.generations[generation] |= mask;
 
-            for (var l = 0; l < storage.groups.length; l++)
+            for (var l = 0; l < groups.length; l++)
             {
-              var group = storage.groups.Elements[l];
+              var group = groups.Elements[l];
 
               if (group.composition.included.IsSubsetOf(ref eManaged)
                   && !group.composition.excluded.Overlaps(ref eManaged)
@@ -119,13 +122,41 @@ namespace Pixeye.Actors
                   && !group.composition.excludedTags.Overlaps(eMeta))
                 group.Insert(operation.entity);
               else group.TryRemove(entityID);
-              //     && group.composition.tags.IsSubsetOf(eMeta)
-              //     && !group.composition.tagsExclude.Overlaps(eMeta))
-              //   group.Insert(operation.entity);
-              // else group.TryRemove(entityID);
             }
 
             operation.entity.RenameGameobject();
+          }
+            break;
+          case Action.ChangeTag:
+          {
+            // check if dead 
+            if (eMeta->componentsAmount == 0 || !eMeta->isAlive) continue;
+
+            var groups = eManaged.layer.processorEcs.familyTags.cache[operation.arg];
+
+            for (var l = 0; l < groups.length; l++)
+            {
+              var group = groups.Elements[l];
+
+              var canBeAdded = group.composition.included.IsSubsetOf(ref eManaged)
+                               && !group.composition.excluded.Overlaps(ref eManaged)
+                               && group.composition.includedTags.IsSubsetOf(eMeta)
+                               && !group.composition.excludedTags.Overlaps(eMeta);
+
+              var inGroup = group.length == 0
+                ? -1
+                : HelperArray.BinarySearch(ref group.entities, entityID, 0, group.length - 1);
+
+              if (inGroup == -1)
+              {
+                if (!canBeAdded) continue;
+                group.Insert(operation.entity);
+              }
+              else if (!canBeAdded)
+              {
+                group.Remove(inGroup);
+              }
+            }
           }
             break;
         }

@@ -82,15 +82,15 @@ namespace Pixeye.Actors
       internal static int length;
     }
 
-    public static void Cleanup()
-    {
-      groups.All.Dispose();
-
-      for (int i = 0; i < groups.globals.Length; i++)
-      {
-        groups.globals[i] = null;
-      }
-    }
+    // public static void Cleanup()
+    // {
+    //   groups.All.Dispose();
+    //
+    //   for (int i = 0; i < groups.globals.Length; i++)
+    //   {
+    //     groups.globals[i] = null;
+    //   }
+    // }
 
     public static class Debugger
     {

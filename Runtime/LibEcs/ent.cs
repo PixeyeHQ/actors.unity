@@ -25,7 +25,7 @@ namespace Pixeye.Actors
     //===============================//
     // Groups
     //===============================//
-    public static readonly groups groups = new groups();
+    //public static readonly groups groups = new groups();
 
 
     //===============================//

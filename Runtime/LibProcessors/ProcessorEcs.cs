@@ -14,7 +14,7 @@ namespace Pixeye.Actors
     internal static PoolMem Entities;
     internal static EntityManagedMeta[] EntitiesManaged;
 
-    internal List<GroupCore> groups = new List<GroupCore>();
+     
     internal ents entities = new ents();
 
     LayerCore layer;

@@ -32,11 +32,7 @@ namespace Pixeye.Actors
       ProcessorEcs.SetOld(entity, -1, ProcessorEcs.Action.Activate);
     }
 
-    public static ent Create(scn layer)
-    {
-      Create(layer.id, out var entity);
-      return entity;
-    }
+    
 
     public static ent Create()
     {

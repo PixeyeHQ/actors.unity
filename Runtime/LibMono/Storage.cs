@@ -9,7 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Unity.IL2CPP.CompilerServices;
-using UnityEngine;
+
 
 namespace Pixeye.Actors
 {
@@ -22,7 +22,8 @@ namespace Pixeye.Actors
     internal static int[] Generations = new int[32];
     internal static Storage[] All = new Storage[32];
 
-    internal CacheGroup groups = new CacheGroup();
+
+    internal CacheGroup[] groups = new CacheGroup[64];
 
     internal indexes toDispose = new indexes(Kernel.Settings.SizeEntities);
 
@@ -62,6 +63,11 @@ namespace Pixeye.Actors
     {
       Instance = this;
 
+      for (var i = 0; i < groups.Length; i++)
+      {
+        groups[i] = new CacheGroup();
+      }
+
       if (lastID == All.Length)
       {
         var l = lastID << 1;
@@ -77,7 +83,7 @@ namespace Pixeye.Actors
       Generations[componentId] = Generation    = componentId / 32;
 
       // add componentID by type for exclude injection
-      Debug.Log(typeof(T).GetHashCode());
+
       TypeNames.Add(typeof(T).GetHashCode(), componentId);
     }
 

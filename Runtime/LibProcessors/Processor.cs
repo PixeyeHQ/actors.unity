@@ -2,9 +2,6 @@
 //  Contacts : Pixeye - ask@pixeye.games
 
 using System;
-using UnityEngine;
-
-//using UnityEngine;
 
 namespace Pixeye.Actors
 {

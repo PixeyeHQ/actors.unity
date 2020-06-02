@@ -66,22 +66,7 @@ namespace Pixeye.Actors
       return false;
     }
 
-    internal static bool Overlaps(this int[] ids, EntityManagedMeta managed)
-    {
-      for (var i = 0; i < ids.Length; i++)
-      {
-        var componentID = ids[i];
-        var mask        = Storage.Masks[componentID];
-        var generation  = Storage.Generations[componentID];
-        if ((managed.generations[generation] & mask) == mask)
-        {
-          return true;
-        }
-      }
-
-
-      return false;
-    }
+  
 
 
     // [MethodImpl(MethodImplOptions.AggressiveInlining)]

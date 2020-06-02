@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 
 namespace Pixeye.Actors
@@ -6,6 +7,9 @@ namespace Pixeye.Actors
   internal partial class ProcessorEcs
   {
     static int groupNextID;
+    internal List<GroupCore> groups = new List<GroupCore>();
+    internal FamilyGroup familyTags = new FamilyGroup();
+    internal FamilyGroup familyTypes = new FamilyGroup();
 
     #region BindGroups
 
@@ -20,9 +24,10 @@ namespace Pixeye.Actors
 #if ACTORS_EVENTS_MANUAL
       var groupEv = Attribute.GetCustomAttribute(type, typeof(EventsAttribute)) as EventsAttribute;
 #endif
-      var groupByProcAttribute      = Attribute.GetCustomAttribute(type, typeof(GroupByAttribute)) as GroupByAttribute;
-      var groupExcludeProcAttribute = Attribute.GetCustomAttribute(type, typeof(ExcludeByAttribute)) as ExcludeByAttribute;
-      var groupBindProcAttribute    = Attribute.GetCustomAttribute(type, typeof(BindAttribute)) as BindAttribute;
+      var groupByProcAttribute = Attribute.GetCustomAttribute(type, typeof(GroupByAttribute)) as GroupByAttribute;
+      var groupExcludeProcAttribute =
+        Attribute.GetCustomAttribute(type, typeof(ExcludeByAttribute)) as ExcludeByAttribute;
+      var groupBindProcAttribute = Attribute.GetCustomAttribute(type, typeof(BindAttribute)) as BindAttribute;
 
 
       for (var i = 0; i < length; i++)
@@ -106,14 +111,12 @@ namespace Pixeye.Actors
       }
 
       var group = CreateGroup();
-      group.layer        = layer;
-      group.processorEcs = layer.processorEcs;
       groups.Add(group);
       return group;
 
       GroupCore CreateGroup()
       {
-        var gr = (Activator.CreateInstance(groupType, true) as GroupCore).Initialize(composition);
+        var gr = (Activator.CreateInstance(groupType, true) as GroupCore).Initialize(composition, layer);
         gr.id = groupNextID++;
         return gr;
       }
