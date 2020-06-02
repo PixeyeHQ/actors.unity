@@ -38,7 +38,7 @@ namespace Pixeye.Actors
       
     }
 
-    internal void Create(out ent entity, bool isPooled = false, bool isNested = false)
+    internal void Create(LayerCore layer, out ent entity, bool isPooled = false, bool isNested = false)
     {
       if (ent.entStack.length > 0)
       {
@@ -69,7 +69,9 @@ namespace Pixeye.Actors
       }
 
       var ptr = Entities.Get<EntityMeta>(entity.id);
-      //ref var managed = ref EntitiesManaged[entity.id];
+      ref var managed = ref EntitiesManaged[entity.id];
+
+      managed.layer = layer;
 
       ptr->age      = entity.age;
       ptr->isNested = isNested;

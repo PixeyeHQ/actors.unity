@@ -63,53 +63,71 @@ namespace Pixeye.Actors
 
     public void Execute()
     {
-  
       for (var i = 0; i < operationsLength; i++)
       {
         ref var operation = ref operations[i];
         var     entityID  = operation.entity.id;
+        var     eMeta     = Entities.Get<EntityMeta>(entityID); // POINTER
+        ref var eManaged  = ref EntitiesManaged[entityID];
         switch (operation.action)
         {
           case Action.Activate:
           {
-            var     meta    = Entities.Get<EntityMeta>(entityID);
-            ref var managed = ref EntitiesManaged[entityID];
-
             operation.entity.RenameGameobject();
-
-            for (int j = 0; j < meta->componentsAmount; j++)
+            for (int j = 0; j < eMeta->componentsAmount; j++)
             {
-              var componentID = meta->signature[j];
+              var componentID = eMeta->signature[j];
               var storage     = Storage.All[componentID];
               var generation  = Storage.Generations[componentID];
               var mask        = Storage.Masks[componentID];
 
               DebugAlreadyHave(operation, generation, mask, storage);
 
-              managed.generations[generation] |= mask;
+              eManaged.generations[generation] |= mask;
+             
+
+           
 
               for (var l = 0; l < storage.groups.length; l++)
               {
                 var group = storage.groups.Elements[l];
-                if (group.composition.ids.IsSubsetOf(managed))
-                {
-                  //Debug.Log("HAHA");
-                }
-                else
-                {
-                  //Debug.Log("HEHE");
-                }
-
-                //if (!group.composition.CheckThatWork(entityID)) continue;
-                //group.Insert(operation.entity);
+                if (group.composition.included.IsSubsetOf(ref eManaged)
+                    && !group.composition.excluded.Overlaps(ref eManaged))
+                  // && !group.composition.tagsExclude.Overlaps(eMeta)
+                  // && group.composition.tags.IsSubsetOf(eMeta))
+                  group.Insert(operation.entity);
               }
 
-              meta->isDirty = false;
+              eMeta->isDirty = false;
+            }
+          }
+            break;
+          case Action.Add:
+          {
+            var componentID = operation.arg;
+            var storage     = Storage.All[componentID];
+            var generation  = Storage.Generations[componentID];
+            var mask        = Storage.Masks[componentID];
+
+            eManaged.generations[generation] |= mask;
+
+            for (var l = 0; l < storage.groups.length; l++)
+            {
+              var group = storage.groups.Elements[l];
+
+              if (group.composition.included.IsSubsetOf(ref eManaged)
+                 && !group.composition.excluded.Overlaps(ref eManaged))
+                group.Insert(operation.entity);
+              else group.TryRemove(entityID);
+              //     && group.composition.tags.IsSubsetOf(eMeta)
+              //     && !group.composition.tagsExclude.Overlaps(eMeta))
+              //   group.Insert(operation.entity);
+              // else group.TryRemove(entityID);
             }
 
-
-            break;
+            operation.entity.RenameGameobject();
           }
+            break;
         }
       }
 

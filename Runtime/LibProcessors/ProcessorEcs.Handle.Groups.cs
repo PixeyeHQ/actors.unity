@@ -9,7 +9,7 @@ namespace Pixeye.Actors
 
     #region BindGroups
 
-    public void Add(object obj)
+    public void Add(object obj, LayerCore layer)
     {
       var type = obj.GetType();
       var objectFields =
@@ -21,7 +21,7 @@ namespace Pixeye.Actors
       var groupEv = Attribute.GetCustomAttribute(type, typeof(EventsAttribute)) as EventsAttribute;
 #endif
       var groupByProcAttribute      = Attribute.GetCustomAttribute(type, typeof(GroupByAttribute)) as GroupByAttribute;
-      var groupExcludeProcAttribute = Attribute.GetCustomAttribute(type, typeof(ExcludeAttribute)) as ExcludeAttribute;
+      var groupExcludeProcAttribute = Attribute.GetCustomAttribute(type, typeof(ExcludeByAttribute)) as ExcludeByAttribute;
       var groupBindProcAttribute    = Attribute.GetCustomAttribute(type, typeof(BindAttribute)) as BindAttribute;
 
 
@@ -46,7 +46,7 @@ namespace Pixeye.Actors
           : Attribute.GetCustomAttribute(myFieldInfo, typeof(GroupByAttribute)) as GroupByAttribute;
         var groupExcludeAttribute = inner != null
           ? groupExcludeProcAttribute
-          : Attribute.GetCustomAttribute(myFieldInfo, typeof(ExcludeAttribute)) as ExcludeAttribute;
+          : Attribute.GetCustomAttribute(myFieldInfo, typeof(ExcludeByAttribute)) as ExcludeByAttribute;
         var bindAttribute = inner != null
           ? groupBindProcAttribute
           : Attribute.GetCustomAttribute(myFieldInfo, typeof(BindAttribute)) as BindAttribute;
@@ -62,15 +62,15 @@ namespace Pixeye.Actors
         }
 
         var composition = new Composition();
-        composition.excludeTags = excludeTagsFilter;
-        composition.includeTags = includeTagsFilter;
+        composition.tagsExclude = excludeTagsFilter;
+        composition.tags = includeTagsFilter;
         composition.AddTypesExclude(excludeCompFilter);
 
         composition.hash = HashCode.OfEach(myFieldInfo.FieldType.GetGenericArguments())
-          .AndEach(composition.includeTags).And(17).AndEach(composition.excludeTags).And(31)
+          .AndEach(composition.tags).And(17).AndEach(composition.tagsExclude).And(31)
           .AndEach(excludeCompFilter);
 
-        var group = SetupGroup(myFieldInfo.FieldType, composition, myFieldInfo.GetValue(obj));
+        var group = SetupGroup(myFieldInfo.FieldType, composition, myFieldInfo.GetValue(obj), layer);
         myFieldInfo.SetValue(obj, group);
 
         ///TODO: ACTORS: BINDATTR
@@ -95,17 +95,19 @@ namespace Pixeye.Actors
       }
     }
 
-    GroupCore SetupGroup(Type groupType, Composition composition, object fieldObj)
+    GroupCore SetupGroup(Type groupType, Composition composition, object fieldObj, LayerCore layer)
     {
       foreach (var groupNext in groups)
       {
-        if (groupNext.composition.hash.value == composition.hash.value)
+        if (groupNext.composition.hash.value == composition.hash.value && groupNext.layer == layer)
         {
           return groupNext;
         }
       }
 
       var group = CreateGroup();
+      group.layer        = layer;
+      group.processorEcs = layer.processorEcs;
       groups.Add(group);
       return group;
 

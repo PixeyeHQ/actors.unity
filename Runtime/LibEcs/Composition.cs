@@ -7,18 +7,29 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Unity.IL2CPP.CompilerServices;
+using Debug = UnityEngine.Debug;
 
 
 namespace Pixeye.Actors
 {
+  public struct ComponentMask
+  {
+    public int generation;
+    public int mask;
+  }
+
   [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
   public unsafe class Composition : IEquatable<Composition>
   {
-    internal int[] generations = new int[0];
-    internal int[] ids = new int[0];
+    internal ComponentMask[] included = new ComponentMask[0];
+    internal ComponentMask[] excluded = new ComponentMask[0];
 
-    internal int[] includeTags = new int[0];
-    internal int[] excludeTags = new int[0];
+    internal int[] generations = new int[0];
+    internal int[] componentsMask = new int[0];
+    internal int[] componentsExclude = new int[0];
+
+    internal int[] tags = new int[0];
+    internal int[] tagsExclude = new int[0];
 
     internal bool[] includeComponents = new bool[Kernel.Settings.SizeComponents];
     internal bool[] excludeComponents = new bool[Kernel.Settings.SizeComponents];
@@ -35,18 +46,25 @@ namespace Pixeye.Actors
           match++;
       }
 
-      return ids.Length == match;
+      return componentsMask.Length == match;
     }
 
     internal void AddTypesExclude(int[] types)
     {
       if (types != null)
+      {
+        excluded = new ComponentMask[types.Length];
+
         for (int i = 0; i < types.Length; i++)
         {
           var t = Storage.typeNames[types[i]];
-
-          excludeComponents[t] = true;
+     
+          excluded[i].generation = Storage.Generations[t];
+          excluded[i].mask       = Storage.Masks[t];
+          excludeComponents[t]   = true;
+          //componentsExclude[i]   = t;
         }
+      }
     }
 
     internal void SetupExcludeTypes(GroupCore g)
@@ -59,44 +77,46 @@ namespace Pixeye.Actors
     }
 
 
-    internal bool Check(int entityID)
-    {
-      return false;
-    }
+    // internal bool Check(int entityID)
+    // {
+    //   
+    //   return false;
+    // }
 
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal bool CheckThatWork(int entityID)
     {
-#if ACTORS_TAGS_CHECKS && !ACTORS_TAGS_0
-      return CanProceed(entityID) && !ExcludeTypes(entityID) && (includeTags.Length == 0 || IncludeTags(entityID)) &
-        (excludeTags.Length == 0 || ExcludeTags(entityID));
-#else
-      for (int ll = 0; ll < ids.Length; ll++)
-        if ((Entity.Generations[entityID, generations[ll]] & ids[ll]) != ids[ll])
-        {
-          return false;
-        }
+      // #if ACTORS_TAGS_CHECKS && !ACTORS_TAGS_0
+      //       return CanProceed(entityID) && !ExcludeTypes(entityID) && (tags.Length == 0 || IncludeTags(entityID)) &
+      //         (tagsExclude.Length == 0 || ExcludeTags(entityID));
+      // #else
 
-      ref var components = ref Entity.entities[entityID];
-
-      for (int i = 0; i < components.componentsAmount; i++)
-      {
-        if (excludeComponents[components.componentsIds[i]])
-        {
-          return false;
-        }
-      }
+      // for (int ll = 0; ll < ids.Length; ll++)
+      //         if ((Entity.Generations[entityID, generations[ll]] & ids[ll]) != ids[ll])
+      //         {
+      //           return false;
+      //         }
+      //
+      //       ref var components = ref Entity.entities[entityID];
+      //
+      //       for (int i = 0; i < components.componentsAmount; i++)
+      //       {
+      //         if (excludeComponents[components.componentsIds[i]])
+      //         {
+      //           return false;
+      //         }
+      //       }
 
       return true;
-#endif
+      //#endif
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal bool CanProceed(int entityID)
     {
-      for (var ll = 0; ll < ids.Length; ll++)
-        if ((EntityImplOld.Generations[entityID, generations[ll]] & ids[ll]) != ids[ll])
+      for (var ll = 0; ll < componentsMask.Length; ll++)
+        if ((EntityImplOld.Generations[entityID, generations[ll]] & componentsMask[ll]) != componentsMask[ll])
           return false;
 
       return true;
@@ -111,9 +131,9 @@ namespace Pixeye.Actors
       if (len == 0) return false;
       var match = 0;
 
-      for (int l = 0; l < includeTags.Length; l++)
+      for (int l = 0; l < this.tags.Length; l++)
       {
-        var tagToInclude = includeTags[l];
+        var tagToInclude = this.tags[l];
         for (int i = 0; i < len; i++)
         {
           ref var tag = ref tags.GetElementByRef(i);
@@ -121,7 +141,7 @@ namespace Pixeye.Actors
         }
       }
 
-      return match == includeTags.Length;
+      return match == this.tags.Length;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -131,9 +151,9 @@ namespace Pixeye.Actors
       int     len  = tags.length;
       if (len == 0) return true;
 
-      for (int l = 0; l < excludeTags.Length; l++)
+      for (int l = 0; l < tagsExclude.Length; l++)
       {
-        var tagToExclude = excludeTags[l];
+        var tagToExclude = tagsExclude[l];
         for (int i = 0; i < len; i++)
         {
           ref var tag = ref tags.GetElementByRef(i);
@@ -144,21 +164,7 @@ namespace Pixeye.Actors
       return true;
     }
 #endif
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal bool ExcludeTypes(int entityID)
-    {
-      ref var components = ref EntityImplOld.entities[entityID];
 
-      for (int i = 0; i < components.componentsAmount; i++)
-      {
-        if (excludeComponents[components.componentsIds[i]])
-        {
-          return true;
-        }
-      }
-
-      return false;
-    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Equals(Composition other)

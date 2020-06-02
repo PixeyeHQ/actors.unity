@@ -14,6 +14,26 @@ namespace Pixeye.Actors
       throw new ArgumentException();
     }
 
+    [Conditional("ACTORS_DEBUG")]
+    static void DebugCheckAdd<T>(ent entity)
+    {
+#if UNITY_EDITOR
+
+      if (!entity.exist)
+      {
+        Kernel.Debugger.Log(LogType.NOT_ACTIVE, entity, typeof(T).Name);
+        throw new ArgumentException();
+      }
+
+      if ((entity.managed.generationsInstant[Storage<T>.Generation] & Storage<T>.ComponentMask) ==
+          Storage<T>.ComponentMask)
+      {
+        Kernel.Debugger.Log(LogType.ALREADY_HAVE, entity, typeof(T).Name);
+        throw new ArgumentException();
+      }
+#endif
+    }
+
 
     /// Used in Models and Actors for setting up components to Storage. Doesn't send the component to systems.
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -33,6 +53,35 @@ namespace Pixeye.Actors
       if (val == null)
         val = Storage<T>.Instance.Create();
 #endif
+      return ref val;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static ref T Add<T>(in this ent entity)
+    {
+      var id = entity.id;
+
+      if (id >= Storage<T>.components.Length)
+        Array.Resize(ref Storage<T>.components, id << 1);
+
+      ref var val = ref Storage<T>.components[id];
+
+#if !ACTORS_COMPONENTS_STRUCTS
+      if (val == null)
+        val = Storage<T>.Instance.Create();
+#endif
+
+      DebugCheckAdd<T>(entity);
+
+      // in this ent entity
+      entity.meta->AddComponent(Storage<T>.componentId);
+      entity.managed.generationsInstant[Storage<T>.Generation] |= Storage<T>.ComponentMask;
+
+      if (!entity.meta->isDirty)
+      {
+        entity.managed.layer.processorEcs.SetOperation(entity, Storage<T>.componentId, ProcessorEcs.Action.Add);
+      }
+
       return ref val;
     }
 

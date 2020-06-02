@@ -34,6 +34,8 @@ namespace Pixeye.Actors
 
       groupsAmount     = 0;
       componentsAmount = 0;
+      
+      tags = new CacheTags();
     }
 
     public void AddComponent(int type)
@@ -45,9 +47,6 @@ namespace Pixeye.Actors
       }
 
       signature[componentsAmount++] = (ushort) type;
-      
-      
-      
     }
 
     public void CleanMask(int id)
@@ -63,6 +62,7 @@ namespace Pixeye.Actors
 
   public struct EntityManagedMeta
   {
+    internal LayerCore layer;
     internal Transform transform;
     internal int[] generations;
     internal int[] generationsInstant;

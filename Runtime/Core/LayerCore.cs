@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -8,6 +7,7 @@ namespace Pixeye.Actors
 {
   public abstract class LayerCore : MonoBehaviour
   {
+    //internal static int LayerNextID;
     internal static LayerCore ActiveLayer; // current main scene;
     internal Scene Scene => gameObject.scene;
 
@@ -17,6 +17,7 @@ namespace Pixeye.Actors
     internal ProcessorEcs processorEcs;
 
     internal EntityImpl entityImpl;
+    //internal int id = LayerNextID++;
 
     internal Dictionary<int, object> objects = new Dictionary<int, object>();
 

@@ -221,7 +221,7 @@ namespace Pixeye.Actors
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ref T Add<T>(in this ent entity)
+    public static ref T AddOld<T>(in this ent entity)
     {
       var id = entity.id;
 
@@ -272,7 +272,7 @@ namespace Pixeye.Actors
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void Add<T>(in this ent entity, T component)
+    public static void AddOld<T>(in this ent entity, T component)
     {
       var id = entity.id;
 

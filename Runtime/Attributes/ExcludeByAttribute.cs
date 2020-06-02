@@ -6,18 +6,18 @@ using System.Collections.Generic;
 
 namespace Pixeye.Actors
 {
-	public class ExcludeAttribute : Attribute
+	public class ExcludeByAttribute : Attribute
 	{
 		public int[] filter = new int[0];
 		public int[] filterType = new int[0];
 
 
-		public ExcludeAttribute(params int[] filter)
+		public ExcludeByAttribute(params int[] filter)
 		{
 			this.filter = filter;
 		}
 
-		public ExcludeAttribute(params object[] args)
+		public ExcludeByAttribute(params object[] args)
 		{
 			var f     = new List<int>();
 			var fType = new List<int>();
@@ -36,7 +36,7 @@ namespace Pixeye.Actors
 			filter     = f.ToArray();
 		}
 
-		public ExcludeAttribute(params string[] args)
+		public ExcludeByAttribute(params string[] args)
 		{
 			var fType = new List<int>();
 			for (int i = 0; i < args.Length; i++)

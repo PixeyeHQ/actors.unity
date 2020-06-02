@@ -137,7 +137,7 @@ namespace Pixeye.Actors
       for (var i = 0; i < countTicksProc; i++)
       {
         ticksProc[i].Tick(delta);
-        processorEcs.Execute();
+        //processorEcs.Execute();
       }
     }
 
@@ -154,7 +154,7 @@ namespace Pixeye.Actors
       for (var i = 0; i < countTicksProc; i++)
       {
         ticksFixedProc[i].TickFixed(delta);
-        processorEcs.Execute();
+        //processorEcs.Execute();
       }
     }
 
@@ -170,7 +170,7 @@ namespace Pixeye.Actors
       for (var i = 0; i < countTicksProc; i++)
       {
         ticksLateProc[i].TickLate(delta);
-        processorEcs.Execute();
+        //processorEcs.Execute();
       }
     }
 

@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using Debug = UnityEngine.Debug;
 
 namespace Pixeye.Actors
 {
@@ -43,18 +44,62 @@ namespace Pixeye.Actors
     }
 
 
-    internal static bool IsSubsetOf(this int[] mask, EntityManagedMeta managed)
+    internal static bool IsSubsetOf(this ComponentMask[] signature, ref EntityManagedMeta managed)
     {
-      for (var i = 0; i < mask.Length; i++)
+      for (var i = 0; i < signature.Length; i++)
       {
-        var componentID = mask[i];
-        var generation  = Storage.Generations[componentID];
-        if ((managed.generations[generation] & mask[i]) != mask[i])
+        if ((managed.generations[signature[i].generation] & signature[i].mask) != signature[i].mask)
           return false;
       }
 
       return true;
     }
+
+    internal static bool Overlaps(this ComponentMask[] signature, ref EntityManagedMeta managed)
+    {
+      for (var i = 0; i < signature.Length; i++)
+      {
+        if ((managed.generations[signature[i].generation] & signature[i].mask) == signature[i].mask)
+          return true;
+      }
+
+      return false;
+    }
+
+    internal static bool Overlaps(this int[] ids, EntityManagedMeta managed)
+    {
+      for (var i = 0; i < ids.Length; i++)
+      {
+        var componentID = ids[i];
+        var mask        = Storage.Masks[componentID];
+        var generation  = Storage.Generations[componentID];
+        if ((managed.generations[generation] & mask) == mask)
+        {
+          return true;
+        }
+      }
+
+
+      return false;
+    }
+
+
+    // [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    // internal bool ExcludeTypes(int entityID)
+    // {
+    //   ref var components = ref EntityImplOld.entities[entityID];
+    //
+    //   for (int i = 0; i < components.componentsAmount; i++)
+    //   {
+    //     if (excludeComponents[components.componentsIds[i]])
+    //     {
+    //       return true;
+    //     }
+    //   }
+    //
+    //   return false;
+    // }
+
 
     // [MethodImpl(MethodImplOptions.AggressiveInlining)]
     // internal bool CanProceed(int entityID)

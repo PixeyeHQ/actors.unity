@@ -16,7 +16,7 @@ namespace Pixeye.Actors
     {
       layer.processorUpdate.AddProc(this);
       layer.processorSignals.Add(this);
-      layer.processorEcs.Add(this);
+      layer.processorEcs.Add(this, layer);
 
       Entity = layer.entityImpl;
     }

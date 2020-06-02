@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Unity.IL2CPP.CompilerServices;
+using UnityEngine;
 
 namespace Pixeye.Actors
 {
@@ -69,11 +70,11 @@ namespace Pixeye.Actors
         Array.Resize(ref Generations, l);
       }
 
-      componentId = lastID++;
+      componentId      = lastID++;
       All[componentId] = this;
 
-      Masks[componentId] = ComponentMask = 1 << (componentId % 32);
-      Generations[componentId] = Generation = componentId / 32;
+      Masks[componentId]       = ComponentMask = 1 << (componentId % 32);
+      Generations[componentId] = Generation    = componentId / 32;
 
       // add componentID by type for exclude injection
       typeNames.Add(typeof(T).GetHashCode(), componentId);
@@ -113,7 +114,9 @@ namespace Pixeye.Actors
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public T TryGet(int entityID)
     {
-      return (EntityImplOld.GenerationsInstant[entityID, Generation] & ComponentMask) == ComponentMask ? components[entityID] : default;
+      return (ProcessorEcs.EntitiesManaged[entityID].generationsInstant[Generation] & ComponentMask) == ComponentMask
+        ? components[entityID]
+        : default;
     }
 #endif
   }
