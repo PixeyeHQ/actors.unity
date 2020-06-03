@@ -3,87 +3,483 @@
 
 using System;
 
+
 namespace Pixeye.Actors
 {
-  public abstract class Processor : IDisposable, IRequireActorsLayer
+  internal interface IReceiveEcsEvent
   {
-    public EntityImpl Entity;
+    void Receive();
+  }
 
-    void IRequireActorsLayer.Launch(LayerCore layer)
+  public abstract class Processor : IDisposable, IRequireActorsLayer, ITick, IReceiveEcsEvent
+  {
+    internal static int NextID;
+    internal int id;
+    public ImplEntity Entity;
+    public LayerCore Layer;
+    protected ImplEcs Ecs;
+
+    void IRequireActorsLayer.Bootstrap(LayerCore layer)
     {
-      layer.processorUpdate.AddProc(this);
-      layer.processorSignals.Add(this);
-      layer.processorEcs.Add(this, layer);
+      Layer = layer;
+      id    = NextID++;
 
-      Entity = layer.entityImpl;
+      layer.processorUpdate.AddProc(this);
+      layer.processorEcs.Add(this);
+      layer.processorSignals.Add(this);
+
+      Entity = layer.implEntity;
+      Ecs    = layer.implEcs;
+
+
+      OnLaunch();
     }
 
     public void Dispose() => OnDispose();
 
-    public virtual void HandleEvents()
+    internal virtual void OnLaunch()
+    {
+    }
+
+    public virtual void HandleEcsEvents()
     {
     }
 
     protected virtual void OnDispose()
     {
     }
+
+    public ref T Send<T>() where T : struct
+    {
+      var     q = SignalsEcs<T>.layers[Layer.id];
+      ref var e = ref q.elements.Add();
+      e.firstReceiver = -1;
+      return ref e.signal;
+    }
+
+    void ITick.Tick(float dt)
+    {
+    }
+
+    void IReceiveEcsEvent.Receive()
+    {
+    }
   }
 
   #region PROCESSORS
 
-  public abstract class Processor<T> : Processor
+  public class SignalsEcs<T>
   {
-    [InnerGroupAttribute] public Group<T> source = default;
+    internal static SignalsEcs<T>[] layers = new SignalsEcs<T>[64];
+
+    internal BufferCircular<Element> elements = new BufferCircular<Element>(4);
+    internal bool lockSignal; // prevents breaking ordering.
+
+    internal bool Handle(int id)
+    {
+      if (elements.length == 0) return false;
+      if (lockSignal)
+      {
+        lockSignal = false;
+        return false;
+      }
+
+      ref var element = ref elements.Peek();
+      if (element.firstReceiver == id)
+      {
+        lockSignal = true;
+        elements.Dequeue();
+        return false;
+      }
+
+      if (element.firstReceiver == -1)
+      {
+        element.firstReceiver = id;
+      }
+
+      return true;
+    }
+
+    public struct Element
+    {
+      public T signal;
+      internal int firstReceiver;
+    }
   }
 
-  public abstract class Processor<T, Y> : Processor
+  public abstract class Processor<T> : Processor, IReceiveEcsEvent
   {
-    [InnerGroupAttribute] public Group<T, Y> source = default;
+    internal static SignalsEcs<T> signalsT = new SignalsEcs<T>();
+
+    internal sealed override void OnLaunch() => SignalsEcs<T>.layers[Layer.id] = signalsT;
+
+    void IReceiveEcsEvent.Receive()
+    {
+      if (signalsT.Handle(id))
+      {
+        var stopSignal = false;
+        ReceiveEcs(ref signalsT.elements.Peek().signal, ref stopSignal);
+        if (stopSignal) signalsT.elements.Dequeue();
+      }
+    }
+
+    public abstract void ReceiveEcs(ref T signal, ref bool stopSignal);
   }
 
-  public abstract class Processor<T, Y, U> : Processor
+  public abstract class Processore<T, Y> : Processor, IReceiveEcsEvent
   {
-    [InnerGroupAttribute] public Group<T, Y, U> source = default;
+    internal SignalsEcs<T> signalsT = new SignalsEcs<T>();
+    internal SignalsEcs<Y> signalsY = new SignalsEcs<Y>();
+
+
+    internal override void OnLaunch()
+    {
+      SignalsEcs<T>.layers[Layer.id] = signalsT;
+      SignalsEcs<Y>.layers[Layer.id] = signalsY;
+    }
+
+    void IReceiveEcsEvent.Receive()
+    {
+      if (signalsT.Handle(id))
+      {
+        var stopSignal = false;
+        ReceiveEcs(ref signalsT.elements.Peek().signal, ref stopSignal);
+        if (stopSignal) signalsT.elements.Dequeue();
+      }
+
+      if (signalsY.Handle(id))
+      {
+        var stopSignal = false;
+        ReceiveEcs(ref signalsY.elements.Peek().signal, ref stopSignal);
+        if (stopSignal) signalsY.elements.Dequeue();
+      }
+    }
+
+    public abstract void ReceiveEcs(ref T signal, ref bool stopSignal);
+    public abstract void ReceiveEcs(ref Y signal, ref bool stopSignal);
   }
 
-  public abstract class Processor<T, Y, U, I> : Processor
+  public abstract class Processor<T, Y, U> : Processor, IReceiveEcsEvent
   {
-    [InnerGroupAttribute] public Group<T, Y, U, I> source = default;
+    internal SignalsEcs<T> signalsT = new SignalsEcs<T>();
+    internal SignalsEcs<Y> signalsY = new SignalsEcs<Y>();
+    internal SignalsEcs<U> signalsU = new SignalsEcs<U>();
+
+    internal override void OnLaunch()
+    {
+      SignalsEcs<T>.layers[Layer.id] = signalsT;
+      SignalsEcs<Y>.layers[Layer.id] = signalsY;
+      SignalsEcs<U>.layers[Layer.id] = signalsU;
+    }
+
+    void IReceiveEcsEvent.Receive()
+    {
+      if (signalsT.Handle(id))
+      {
+        var stopSignal = false;
+        ReceiveEcs(ref signalsT.elements.Peek().signal, ref stopSignal);
+        if (stopSignal) signalsT.elements.Dequeue();
+      }
+
+      if (signalsY.Handle(id))
+      {
+        var stopSignal = false;
+        ReceiveEcs(ref signalsY.elements.Peek().signal, ref stopSignal);
+        if (stopSignal) signalsY.elements.Dequeue();
+      }
+
+      if (signalsU.Handle(id))
+      {
+        var stopSignal = false;
+        ReceiveEcs(ref signalsU.elements.Peek().signal, ref stopSignal);
+        if (stopSignal) signalsU.elements.Dequeue();
+      }
+    }
+
+    public abstract void ReceiveEcs(ref T signal, ref bool stopSignal);
+    public abstract void ReceiveEcs(ref Y signal, ref bool stopSignal);
+    public abstract void ReceiveEcs(ref U signal, ref bool stopSignal);
   }
 
-  public abstract class Processor<T, Y, U, I, O> : Processor
+  public abstract class Processor<T, Y, U, I> : Processor, IReceiveEcsEvent
   {
-    [InnerGroupAttribute] public Group<T, Y, U, I, O> source = default;
+    internal SignalsEcs<T> signalsT = new SignalsEcs<T>();
+    internal SignalsEcs<Y> signalsY = new SignalsEcs<Y>();
+    internal SignalsEcs<U> signalsU = new SignalsEcs<U>();
+    internal SignalsEcs<I> signalsI = new SignalsEcs<I>();
+
+    internal override void OnLaunch()
+    {
+      SignalsEcs<T>.layers[Layer.id] = signalsT;
+      SignalsEcs<Y>.layers[Layer.id] = signalsY;
+      SignalsEcs<U>.layers[Layer.id] = signalsU;
+      SignalsEcs<I>.layers[Layer.id] = signalsI;
+    }
+
+    void IReceiveEcsEvent.Receive()
+    {
+      if (signalsT.Handle(id))
+      {
+        var stopSignal = false;
+        ReceiveEcs(ref signalsT.elements.Peek().signal, ref stopSignal);
+        if (stopSignal) signalsT.elements.Dequeue();
+      }
+
+      if (signalsY.Handle(id))
+      {
+        var stopSignal = false;
+        ReceiveEcs(ref signalsY.elements.Peek().signal, ref stopSignal);
+        if (stopSignal) signalsY.elements.Dequeue();
+      }
+
+      if (signalsU.Handle(id))
+      {
+        var stopSignal = false;
+        ReceiveEcs(ref signalsU.elements.Peek().signal, ref stopSignal);
+        if (stopSignal) signalsU.elements.Dequeue();
+      }
+
+      if (signalsI.Handle(id))
+      {
+        var stopSignal = false;
+        ReceiveEcs(ref signalsI.elements.Peek().signal, ref stopSignal);
+        if (stopSignal) signalsI.elements.Dequeue();
+      }
+    }
+
+    public abstract void ReceiveEcs(ref T signal, ref bool stopSignal);
+    public abstract void ReceiveEcs(ref Y signal, ref bool stopSignal);
+    public abstract void ReceiveEcs(ref U signal, ref bool stopSignal);
+    public abstract void ReceiveEcs(ref I signal, ref bool stopSignal);
   }
 
-  public abstract class Processor<T, Y, U, I, O, P> : Processor
+  public abstract class Processor<T, Y, U, I, O> : Processor, IReceiveEcsEvent
   {
-    [InnerGroupAttribute] public Group<T, Y, U, I, O, P> source = default;
+    internal SignalsEcs<T> signalsT = new SignalsEcs<T>();
+    internal SignalsEcs<Y> signalsY = new SignalsEcs<Y>();
+    internal SignalsEcs<U> signalsU = new SignalsEcs<U>();
+    internal SignalsEcs<I> signalsI = new SignalsEcs<I>();
+    internal SignalsEcs<O> signalsO = new SignalsEcs<O>();
+
+    internal override void OnLaunch()
+    {
+      SignalsEcs<T>.layers[Layer.id] = signalsT;
+      SignalsEcs<Y>.layers[Layer.id] = signalsY;
+      SignalsEcs<U>.layers[Layer.id] = signalsU;
+      SignalsEcs<I>.layers[Layer.id] = signalsI;
+      SignalsEcs<O>.layers[Layer.id] = signalsO;
+    }
+
+    void IReceiveEcsEvent.Receive()
+    {
+      if (signalsT.Handle(id))
+      {
+        var stopSignal = false;
+        ReceiveEcs(ref signalsT.elements.Peek().signal, ref stopSignal);
+        if (stopSignal) signalsT.elements.Dequeue();
+      }
+
+      if (signalsY.Handle(id))
+      {
+        var stopSignal = false;
+        ReceiveEcs(ref signalsY.elements.Peek().signal, ref stopSignal);
+        if (stopSignal) signalsY.elements.Dequeue();
+      }
+
+      if (signalsU.Handle(id))
+      {
+        var stopSignal = false;
+        ReceiveEcs(ref signalsU.elements.Peek().signal, ref stopSignal);
+        if (stopSignal) signalsU.elements.Dequeue();
+      }
+
+      if (signalsI.Handle(id))
+      {
+        var stopSignal = false;
+        ReceiveEcs(ref signalsI.elements.Peek().signal, ref stopSignal);
+        if (stopSignal) signalsI.elements.Dequeue();
+      }
+
+      if (signalsO.Handle(id))
+      {
+        var stopSignal = false;
+        ReceiveEcs(ref signalsO.elements.Peek().signal, ref stopSignal);
+        if (stopSignal) signalsO.elements.Dequeue();
+      }
+    }
+
+    public abstract void ReceiveEcs(ref T signal, ref bool stopSignal);
+    public abstract void ReceiveEcs(ref Y signal, ref bool stopSignal);
+    public abstract void ReceiveEcs(ref U signal, ref bool stopSignal);
+    public abstract void ReceiveEcs(ref I signal, ref bool stopSignal);
+    public abstract void ReceiveEcs(ref O signal, ref bool stopSignal);
   }
 
-  public abstract class Processor<T, Y, U, I, O, P, A> : Processor
+  public abstract class Processor<T, Y, U, I, O, P> : Processor, IReceiveEcsEvent
   {
-    [InnerGroupAttribute] public Group<T, Y, U, I, O, P, A> source = default;
+    internal SignalsEcs<T> signalsT = new SignalsEcs<T>();
+    internal SignalsEcs<Y> signalsY = new SignalsEcs<Y>();
+    internal SignalsEcs<U> signalsU = new SignalsEcs<U>();
+    internal SignalsEcs<I> signalsI = new SignalsEcs<I>();
+    internal SignalsEcs<O> signalsO = new SignalsEcs<O>();
+    internal SignalsEcs<P> signalsP = new SignalsEcs<P>();
+
+    internal override void OnLaunch()
+    {
+      SignalsEcs<T>.layers[Layer.id] = signalsT;
+      SignalsEcs<Y>.layers[Layer.id] = signalsY;
+      SignalsEcs<U>.layers[Layer.id] = signalsU;
+      SignalsEcs<I>.layers[Layer.id] = signalsI;
+      SignalsEcs<O>.layers[Layer.id] = signalsO;
+      SignalsEcs<P>.layers[Layer.id] = signalsP;
+    }
+
+    void IReceiveEcsEvent.Receive()
+    {
+      if (signalsT.Handle(id))
+      {
+        var stopSignal = false;
+        ReceiveEcs(ref signalsT.elements.Peek().signal, ref stopSignal);
+        if (stopSignal) signalsT.elements.Dequeue();
+      }
+
+      if (signalsY.Handle(id))
+      {
+        var stopSignal = false;
+        ReceiveEcs(ref signalsY.elements.Peek().signal, ref stopSignal);
+        if (stopSignal) signalsY.elements.Dequeue();
+      }
+
+      if (signalsU.Handle(id))
+      {
+        var stopSignal = false;
+        ReceiveEcs(ref signalsU.elements.Peek().signal, ref stopSignal);
+        if (stopSignal) signalsU.elements.Dequeue();
+      }
+
+      if (signalsI.Handle(id))
+      {
+        var stopSignal = false;
+        ReceiveEcs(ref signalsI.elements.Peek().signal, ref stopSignal);
+        if (stopSignal) signalsI.elements.Dequeue();
+      }
+
+      if (signalsO.Handle(id))
+      {
+        var stopSignal = false;
+        ReceiveEcs(ref signalsO.elements.Peek().signal, ref stopSignal);
+        if (stopSignal) signalsO.elements.Dequeue();
+      }
+
+      if (signalsP.Handle(id))
+      {
+        var stopSignal = false;
+        ReceiveEcs(ref signalsP.elements.Peek().signal, ref stopSignal);
+        if (stopSignal) signalsP.elements.Dequeue();
+      }
+    }
+
+    public abstract void ReceiveEcs(ref T signal, ref bool stopSignal);
+    public abstract void ReceiveEcs(ref Y signal, ref bool stopSignal);
+    public abstract void ReceiveEcs(ref U signal, ref bool stopSignal);
+    public abstract void ReceiveEcs(ref I signal, ref bool stopSignal);
+    public abstract void ReceiveEcs(ref O signal, ref bool stopSignal);
+    public abstract void ReceiveEcs(ref P signal, ref bool stopSignal);
   }
 
-  public abstract class Processor<T, Y, U, I, O, P, A, S> : Processor
+  public abstract class Processor<T, Y, U, I, O, P, A> : Processor, IReceiveEcsEvent
   {
-    [InnerGroupAttribute] public Group<T, Y, U, I, O, P, A, S> source = default;
-  }
+    internal SignalsEcs<T> signalsT = new SignalsEcs<T>();
+    internal SignalsEcs<Y> signalsY = new SignalsEcs<Y>();
+    internal SignalsEcs<U> signalsU = new SignalsEcs<U>();
+    internal SignalsEcs<I> signalsI = new SignalsEcs<I>();
+    internal SignalsEcs<O> signalsO = new SignalsEcs<O>();
+    internal SignalsEcs<P> signalsP = new SignalsEcs<P>();
+    internal SignalsEcs<A> signalsA = new SignalsEcs<A>();
 
-  public abstract class Processor<T, Y, U, I, O, P, A, S, D> : Processor
-  {
-    [InnerGroupAttribute] public Group<T, Y, U, I, O, P, A, S, D> source = default;
-  }
+    internal override void OnLaunch()
+    {
+      SignalsEcs<T>.layers[Layer.id] = signalsT;
+      SignalsEcs<Y>.layers[Layer.id] = signalsY;
+      SignalsEcs<U>.layers[Layer.id] = signalsU;
+      SignalsEcs<I>.layers[Layer.id] = signalsI;
+      SignalsEcs<O>.layers[Layer.id] = signalsO;
+      SignalsEcs<P>.layers[Layer.id] = signalsP;
+      SignalsEcs<A>.layers[Layer.id] = signalsA;
+    }
 
-  public abstract class Processor<T, Y, U, I, O, P, A, S, D, F> : Processor
-  {
-    [InnerGroupAttribute] public Group<T, Y, U, I, O, P, A, S, D, F> source = default;
+    void IReceiveEcsEvent.Receive()
+    {
+      if (signalsT.Handle(id))
+      {
+        var stopSignal = false;
+        ReceiveEcs(ref signalsT.elements.Peek().signal, ref stopSignal);
+        if (stopSignal) signalsT.elements.Dequeue();
+      }
+
+      if (signalsY.Handle(id))
+      {
+        var stopSignal = false;
+        ReceiveEcs(ref signalsY.elements.Peek().signal, ref stopSignal);
+        if (stopSignal) signalsY.elements.Dequeue();
+      }
+
+      if (signalsU.Handle(id))
+      {
+        var stopSignal = false;
+        ReceiveEcs(ref signalsU.elements.Peek().signal, ref stopSignal);
+        if (stopSignal) signalsU.elements.Dequeue();
+      }
+
+      if (signalsI.Handle(id))
+      {
+        var stopSignal = false;
+        ReceiveEcs(ref signalsI.elements.Peek().signal, ref stopSignal);
+        if (stopSignal) signalsI.elements.Dequeue();
+      }
+
+      if (signalsO.Handle(id))
+      {
+        var stopSignal = false;
+        ReceiveEcs(ref signalsO.elements.Peek().signal, ref stopSignal);
+        if (stopSignal) signalsO.elements.Dequeue();
+      }
+
+      if (signalsP.Handle(id))
+      {
+        var stopSignal = false;
+        ReceiveEcs(ref signalsP.elements.Peek().signal, ref stopSignal);
+        if (stopSignal) signalsP.elements.Dequeue();
+      }
+
+      if (signalsA.Handle(id))
+      {
+        var stopSignal = false;
+        ReceiveEcs(ref signalsA.elements.Peek().signal, ref stopSignal);
+        if (stopSignal) signalsA.elements.Dequeue();
+      }
+    }
+
+    public abstract void ReceiveEcs(ref T signal, ref bool stopSignal);
+    public abstract void ReceiveEcs(ref Y signal, ref bool stopSignal);
+    public abstract void ReceiveEcs(ref U signal, ref bool stopSignal);
+    public abstract void ReceiveEcs(ref I signal, ref bool stopSignal);
+    public abstract void ReceiveEcs(ref O signal, ref bool stopSignal);
+    public abstract void ReceiveEcs(ref P signal, ref bool stopSignal);
+    public abstract void ReceiveEcs(ref A signal, ref bool stopSignal);
   }
 
   #endregion
 
-  class InnerGroupAttribute : Attribute
+
+  internal class Dummy : ITick, IReceiveEcsEvent
   {
+    public void Tick(float dt)
+    {
+    }
+
+    public void Receive()
+    {
+    }
   }
 }

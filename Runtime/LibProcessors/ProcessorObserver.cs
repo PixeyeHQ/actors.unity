@@ -6,13 +6,14 @@ using UnityEngine;
 
 namespace Pixeye.Actors
 {
+  sealed class ProcessorObserver : Processor, ITick
+  {
 #if ACTORS_EVENTS_MANUAL
   [Events(Op.Add | Op.Remove)]
 #endif
+    public Group<ComponentObserver> source = default;
 
-  sealed class ProcessorObserver : Processor<ComponentObserver>, ITick
-  {
-    public override void HandleEvents()
+    public override void HandleEcsEvents()
     {
       foreach (var entity in source.removed)
       {
@@ -33,7 +34,6 @@ namespace Pixeye.Actors
     {
       for (var i = 0; i < source.length; i++)
       {
-        Debug.Log(source.entities[i].exist + " OBS");
         ref var cObserver = ref source.entities[i].ComponentObserver();
         for (var j = 0; j < cObserver.length; j++)
           cObserver.wrappers[j].Check();

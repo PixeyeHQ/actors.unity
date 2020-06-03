@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using UnityEngine;
 
@@ -10,51 +11,98 @@ namespace Pixeye.Actors
   {
     const int size = sizeof(ushort);
 
-    public byte groupsLength;
     public byte componentsLength;
     public byte componentsAmount;
+    public byte groupsLength;
     public byte groupsAmount;
+
     public byte age;
-    public bool isPooled;
-    public bool isNested;
     public bool isDirty; //dirty allows to set all components for a new entity in one init command
     public bool isAlive;
     public ent parent;
     public CacheTags tags;
-    public ushort* signature;
-    public ushort* signatureGroups;
+    public ushort* components;
+    public ushort* groups;
+
 
     public void Initialize()
     {
       componentsLength = 6;
       groupsLength     = 6;
 
-      signature       = (ushort*) Marshal.AllocHGlobal(componentsLength * sizeof(ushort));
-      signatureGroups = (ushort*) Marshal.AllocHGlobal(groupsLength * sizeof(ushort));
+      components = (ushort*) Marshal.AllocHGlobal(componentsLength * sizeof(ushort));
+      groups     = (ushort*) Marshal.AllocHGlobal(componentsLength * sizeof(ushort));
 
-      groupsAmount     = 0;
       componentsAmount = 0;
-      
+      groupsAmount     = 0;
+
       tags = new CacheTags();
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AddComponent(int type)
     {
       if (componentsLength == componentsAmount)
       {
         componentsLength = (byte) (componentsAmount << 1); // not safe
-        signature = (ushort*) Marshal.ReAllocHGlobal((IntPtr) signature, (IntPtr) (componentsLength * sizeof(ushort)));
+        components =
+          (ushort*) Marshal.ReAllocHGlobal((IntPtr) components, (IntPtr) (componentsLength * sizeof(ushort)));
       }
 
-      signature[componentsAmount++] = (ushort) type;
+      components[componentsAmount++] = (ushort) type;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void RemoveComponent(int type, int entityID)
+    {
+      for (var tRemoveIndex = 0; tRemoveIndex < componentsAmount; tRemoveIndex++)
+      {
+        if (components[tRemoveIndex] == type)
+        {
+          Storage.All[type].toDispose.Add(entityID);
+          for (var j = tRemoveIndex; j < componentsAmount - 1; ++j)
+            components[j] = components[j + 1];
+          componentsAmount--;
+          break;
+        }
+      }
+    }
+
+    public void AddGroup(int type)
+    {
+      if (groupsLength == groupsAmount)
+      {
+        groupsLength = (byte) (groupsAmount << 1); // not safe
+        groups =
+          (ushort*) Marshal.ReAllocHGlobal((IntPtr) groups, (IntPtr) (groupsLength * sizeof(ushort)));
+      }
+
+      groups[groupsAmount++] = (ushort) type;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void RemoveGroup(int type)
+    {
+      for (var tRemoveIndex = 0; tRemoveIndex < componentsAmount; tRemoveIndex++)
+      {
+        if (groups[tRemoveIndex] == type)
+        {
+          for (var j = tRemoveIndex; j < groupsAmount - 1; ++j)
+            groups[j] = groups[j + 1];
+          groupsAmount--;
+          break;
+        }
+      }
+    }
+
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void CleanMask(int id)
     {
       for (int i = componentsAmount - 1; i >= 0; i--)
       {
-        var generation = Storage.Generations[signature[i]];
-        var mask       = Storage.Masks[signature[i]];
+        var generation = Storage.Generations[components[i]];
+        var mask       = Storage.Masks[components[i]];
         ProcessorEcs.EntitiesManaged[id].generations[generation] &= ~mask;
       }
     }
@@ -62,6 +110,8 @@ namespace Pixeye.Actors
 
   public struct EntityManagedMeta
   {
+    public bool isPooled;
+    public bool isNested;
     internal LayerCore layer;
     internal Transform transform;
     internal int[] generations;

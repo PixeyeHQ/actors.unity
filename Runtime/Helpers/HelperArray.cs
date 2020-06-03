@@ -13,22 +13,22 @@ namespace Pixeye.Actors
     public static void ResizeInt(ref int[,] original, int newLength, int cols)
     {
       var newArray = new int[newLength, cols];
-      int minRows = Math.Min(newLength, original.GetLength(0));
-      int minCols = Math.Min(cols, original.GetLength(1));
+      int minRows  = Math.Min(newLength, original.GetLength(0));
+      int minCols  = Math.Min(cols, original.GetLength(1));
       for (int i = 0; i < minRows; i++)
-        for (int j = 0; j < minCols; j++)
-          newArray[i, j] = original[i, j];
+      for (int j = 0; j < minCols; j++)
+        newArray[i, j] = original[i, j];
       original = newArray;
     }
 
     public static void Resize<T>(ref T[,] original, int newLength, int cols)
     {
       var newArray = new T[newLength, cols];
-      int minRows = Math.Min(newLength, original.GetLength(0));
-      int minCols = Math.Min(cols, original.GetLength(1));
+      int minRows  = Math.Min(newLength, original.GetLength(0));
+      int minCols  = Math.Min(cols, original.GetLength(1));
       for (int i = 0; i < minRows; i++)
-        for (int j = 0; j < minCols; j++)
-          newArray[i, j] = original[i, j];
+      for (int j = 0; j < minCols; j++)
+        newArray[i, j] = original[i, j];
       original = newArray;
     }
 
@@ -44,7 +44,7 @@ namespace Pixeye.Actors
 
       original = newArray;
     }
-    
+
     public static void Resize<T>(ref T[][] original, int newLength)
     {
       var newArray = new T[newLength][];
@@ -76,7 +76,7 @@ namespace Pixeye.Actors
     public static T[] Slice<T>(this T[] source, string from, int end) where T : UnityEngine.Object
     {
       Predicate<T> predicate = s => s.name == from;
-      var start = -1;
+      var          start     = -1;
 
       for (int i = 0; i < source.Length; i++)
       {
@@ -166,6 +166,7 @@ namespace Pixeye.Actors
       {
         res[i] = source[i / times + start];
       }
+
       return res;
     }
 
@@ -197,6 +198,7 @@ namespace Pixeye.Actors
       {
         res[i] = source[(len - i) / times + start];
       }
+
       return res;
     }
 
@@ -227,6 +229,7 @@ namespace Pixeye.Actors
       {
         res[i] = source[i / times + start];
       }
+
       return res;
     }
 
@@ -239,7 +242,7 @@ namespace Pixeye.Actors
         var m = (left + right) / 2;
         if (entries[m] == value) return m;
         if (entries[m] < value) left = m + 1;
-        else right = m - 1;
+        else right                   = m - 1;
       }
 
       return -1;
@@ -254,12 +257,12 @@ namespace Pixeye.Actors
         var m = (left + right) / 2;
         if (entries[m].id == value) return m;
         if (entries[m].id < value) left = m + 1;
-        else right = m - 1;
+        else right                      = m - 1;
       }
 
       return -1;
     }
- 
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int BinarySearch(ref ent[] entries, int value, int left, int right)
     {
@@ -268,7 +271,7 @@ namespace Pixeye.Actors
         var m = (left + right) / 2;
         if (entries[m].id == value) return m;
         if (entries[m].id < value) left = m + 1;
-        else right = m - 1;
+        else right                      = m - 1;
       }
 
       return -1;
@@ -339,15 +342,15 @@ namespace Pixeye.Actors
         return false;
       }
     }
-    
+
     public static T[,] ResizeArray<T>(this T[,] original, in int rows, in int cols)
     {
       var newArray = new T[rows, cols];
-      int minRows = Math.Min(rows, original.GetLength(0));
-      int minCols = Math.Min(cols, original.GetLength(1));
+      int minRows  = Math.Min(rows, original.GetLength(0));
+      int minCols  = Math.Min(cols, original.GetLength(1));
       for (int i = 0; i < minRows; i++)
-        for (int j = 0; j < minCols; j++)
-          newArray[i, j] = original[i, j];
+      for (int j = 0; j < minCols; j++)
+        newArray[i, j] = original[i, j];
       return newArray;
     }
 
@@ -421,7 +424,7 @@ namespace Pixeye.Actors
       }
     }
 
-    public static void Insert<T>(ref T[] a, T val, int length, int indexLast)
+    public static void Insert<T>(T[] a, T val, int length, int indexLast)
     {
       Array.Copy(a, indexLast, a, indexLast + 1, length - indexLast - 1);
       a[indexLast] = val;
@@ -436,8 +439,8 @@ namespace Pixeye.Actors
 
         length++;
         Array.Copy(a, 0, a, 1, length - 1);
-        a[0] = id;
-        idLast = id;
+        a[0]      = id;
+        idLast    = id;
         indexLast = 0;
       }
       else if (id > a[length - 1])
@@ -445,8 +448,8 @@ namespace Pixeye.Actors
         if (length == a.Length)
           Array.Resize(ref a, (length << 1) + 1);
 
-        idLast = id;
-        indexLast = length;
+        idLast      = id;
+        indexLast   = length;
         a[length++] = id;
       }
       else
@@ -461,8 +464,8 @@ namespace Pixeye.Actors
           if (id < a[indexLast + 1])
           {
             Array.Copy(a, indexLast + 1, a, indexLast + 2, length - indexLast - 1);
-            idLast = id;
-            indexLast = indexLast + 1;
+            idLast       = id;
+            indexLast    = indexLast + 1;
             a[indexLast] = id;
           }
           else
@@ -473,8 +476,8 @@ namespace Pixeye.Actors
               if (id < a[indexNext])
               {
                 Array.Copy(a, indexNext, a, indexNext + 1, length - indexNext - 1);
-                idLast = id;
-                indexLast = indexNext;
+                idLast       = id;
+                indexLast    = indexNext;
                 a[indexLast] = id;
                 break;
               }
@@ -493,8 +496,8 @@ namespace Pixeye.Actors
           if (id > a[indexLast - 1])
           {
             Array.Copy(a, indexLast, a, indexLast + 1, length - indexLast - 1);
-            idLast = id;
-            indexLast = indexLast - 1;
+            idLast       = id;
+            indexLast    = indexLast - 1;
             a[indexLast] = id;
           }
           else
@@ -505,8 +508,8 @@ namespace Pixeye.Actors
               if (id > a[indexPrev])
               {
                 Array.Copy(a, indexPrev, a, indexPrev + 1, length - indexPrev - 1);
-                idLast = id;
-                indexLast = indexPrev;
+                idLast       = id;
+                indexLast    = indexPrev;
                 a[indexLast] = id;
                 break;
               }
@@ -521,7 +524,7 @@ namespace Pixeye.Actors
     public static void Add<T>(this T[] a, T element, ref int length) where T : class
     {
       int index = 0;
-      int len = a.Length;
+      int len   = a.Length;
       for (int i = 0; i < len; i++)
       {
         if (a[i] != null) index++;
@@ -552,7 +555,7 @@ namespace Pixeye.Actors
     {
       for (int i = 0; i < array.Length - 1; i++)
       {
-        int j = i + 1;
+        int j   = i + 1;
         int tmp = array[j];
         while (j > 0 && tmp < array[j - 1])
         {
@@ -600,7 +603,7 @@ namespace Pixeye.Actors
     {
       int tmp = array[right];
       array[right] = array[left];
-      array[left] = tmp;
+      array[left]  = tmp;
     }
 
     public static int SearchLinear(this int[] array, int value)
@@ -632,14 +635,13 @@ namespace Pixeye.Actors
         if (array[middleIndex] > value)
         {
           leftIndex = middleIndex + 1;
-          prev = middleIndex;
+          prev      = middleIndex;
           continue;
         }
 
         rightIndex = middleIndex - 1;
-        prev = middleIndex;
+        prev       = middleIndex;
       }
     }
-    
   }
 }

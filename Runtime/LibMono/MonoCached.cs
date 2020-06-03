@@ -35,7 +35,7 @@ namespace Pixeye.Actors
       HandleEnable();
     }
 
-    void IRequireActorsLayer.Launch(LayerCore layer)
+    void IRequireActorsLayer.Bootstrap(LayerCore layer)
     {
       this.layer = layer;
     }

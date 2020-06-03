@@ -19,8 +19,9 @@ namespace Pixeye.Actors
 
     internal static Kernel Instance;
     internal const string KernelSceneName = "Actors Framework";
-    internal static List<LayerCore> Layers = new List<LayerCore>();
-
+    internal static LayerCore[] Layers = new LayerCore[48];
+    internal static readonly List<LayerCore> LayersInUse = new List<LayerCore>();
+    
 #if UNITY_EDITOR
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
 #else
@@ -46,7 +47,7 @@ namespace Pixeye.Actors
         var scene     = SceneManager.CreateScene(KernelSceneName, new CreateSceneParameters(LocalPhysicsMode.None));
         var objKernel = new GameObject("Actors Setup");
         SceneManager.MoveGameObjectToScene(objKernel, scene);
-        MainScene.NextActiveSceneName = SceneManager.GetActiveScene().name;
+        ActiveScene.NextActiveSceneName = SceneManager.GetActiveScene().name;
         var kernel = objKernel.AddComponent<Kernel>();
         var layer  = objKernel.AddComponent<LayerApp>();
         Instance = kernel;
@@ -76,11 +77,6 @@ namespace Pixeye.Actors
       }
     }
 
-    public static class Processors
-    {
-      internal static Processor[] storage = new Processor[64];
-      internal static int length;
-    }
 
     // public static void Cleanup()
     // {

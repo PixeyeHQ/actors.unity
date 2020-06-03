@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 
 namespace Pixeye.Actors
 {
-  public partial class EntityImpl
+  public partial class ImplEntity
   {
   }
 }

@@ -38,18 +38,6 @@ namespace Pixeye.Actors
     {
     }
 
-    static readonly GroupCore[] groupsCheckedOld = new GroupCore[Kernel.Settings.SizeGroups];
-    static int groupsCheckedLenOld;
-
-    static bool AlreadyCheckedOld(GroupCore group)
-    {
-      for (var i = 0; i < groupsCheckedLenOld; i++)
-        if (groupsCheckedOld[i].id == group.id)
-          return true;
-
-      return false;
-    }
-
     [Conditional("ACTORS_DEBUG")]
     void DebugAlreadyHave(in EntityOperation operation, int generation, int mask, Storage storage)
     {
@@ -61,7 +49,11 @@ namespace Pixeye.Actors
       }
     }
 
-    public void Execute()
+    internal void SwapWorld(ent entity, LayerCore otherLayer)
+    {
+    }
+
+    internal void Execute()
     {
       for (var i = 0; i < operationsLength; i++)
       {
@@ -75,25 +67,27 @@ namespace Pixeye.Actors
           {
             for (int j = 0; j < eMeta->componentsAmount; j++)
             {
-              var componentID = eMeta->signature[j];
+              var componentID = eMeta->components[j];
               var storage     = Storage.All[componentID];
               var generation  = Storage.Generations[componentID];
               var mask        = Storage.Masks[componentID];
-              var groups      = storage.groups[eManaged.layer.layerID];
+              var groups      = storage.groups[eManaged.layer.id];
 
               DebugAlreadyHave(operation, generation, mask, storage);
 
               eManaged.generations[generation] |= mask;
 
-
               for (var l = 0; l < groups.length; l++)
               {
                 var group = groups.Elements[l];
-                if (group.composition.included.IsSubsetOf(ref eManaged)
+                if (group.composition.IsSubsetOf(eMeta) // @! maybe
                     && !group.composition.excluded.Overlaps(ref eManaged)
                     && group.composition.includedTags.IsSubsetOf(eMeta)
                     && !group.composition.excludedTags.Overlaps(eMeta))
+                {
                   group.Insert(operation.entity);
+                  eMeta->AddGroup(group.id);
+                }
               }
 
               eMeta->isDirty = false;
@@ -108,7 +102,7 @@ namespace Pixeye.Actors
             var storage     = Storage.All[componentID];
             var generation  = Storage.Generations[componentID];
             var mask        = Storage.Masks[componentID];
-            var groups      = storage.groups[eManaged.layer.layerID];
+            var groups      = storage.groups[eManaged.layer.id];
 
             eManaged.generations[generation] |= mask;
 
@@ -116,12 +110,20 @@ namespace Pixeye.Actors
             {
               var group = groups.Elements[l];
 
-              if (group.composition.included.IsSubsetOf(ref eManaged)
+              if (group.composition.IsSubsetOf(eMeta) // @! maybe
                   && !group.composition.excluded.Overlaps(ref eManaged)
                   && group.composition.includedTags.IsSubsetOf(eMeta)
                   && !group.composition.excludedTags.Overlaps(eMeta))
+              {
                 group.Insert(operation.entity);
-              else group.TryRemove(entityID);
+                eMeta->AddGroup(group.id);
+              }
+
+              else
+              {
+                if (group.TryRemove(entityID))
+                  eMeta->RemoveGroup(group.id);
+              }
             }
 
             operation.entity.RenameGameobject();
@@ -138,7 +140,7 @@ namespace Pixeye.Actors
             {
               var group = groups.Elements[l];
 
-              var canBeAdded = group.composition.included.IsSubsetOf(ref eManaged)
+              var canBeAdded = group.composition.IsSubsetOf(eMeta) //@! maybe
                                && !group.composition.excluded.Overlaps(ref eManaged)
                                && group.composition.includedTags.IsSubsetOf(eMeta)
                                && !group.composition.excludedTags.Overlaps(eMeta);
@@ -151,15 +153,148 @@ namespace Pixeye.Actors
               {
                 if (!canBeAdded) continue;
                 group.Insert(operation.entity);
+                eMeta->AddGroup(group.id);
               }
               else if (!canBeAdded)
               {
                 group.Remove(inGroup);
+                eMeta->RemoveGroup(group.id);
               }
             }
           }
             break;
+          case Action.Kill:
+          {
+            for (int j = 0; j < eMeta->groupsAmount; j++)
+            {
+              var group = Groups[eMeta->groups[j]];
+              group.Remove(entityID);
+            }
+
+            eMeta->groupsAmount = 0;
+
+            for (int j = 0; j < eMeta->componentsAmount; j++)
+            {
+              var componentID = eMeta->components[j];
+              var generation  = Storage.Generations[componentID];
+              var mask        = Storage.Masks[componentID];
+
+              eManaged.generations[generation] &= ~mask;
+              Storage.All[componentID].toDispose.Add(entityID);
+            }
+
+            eMeta->componentsAmount = 0;
+            if (!eManaged.isNested && eManaged.transform != null)
+            {
+              eManaged.transform.gameObject.Release(eManaged.isPooled ? Pool.Entities : 0);
+              eManaged.transform = null;
+            }
+#if !ACTORS_TAGS_0
+            eMeta->tags.Clear();
+#endif
+
+            entities.Remove(operation.entity);
+
+            unchecked
+            {
+              operation.entity.age += 1;
+            }
+
+            ent.Released.Add(operation.entity);
+          }
+            break;
         }
+        //for (var l = 0; l < groups.length; l++)
+        // {
+        // var group = groups.Elements[l];
+        //  if (!AlreadyChecked(group))
+        //  {
+        // if (group.composition.OverlapComponents(entityCache))
+        // {
+        //   
+        // }
+        //                   if (!AlreadyChecked(group))
+        //                   {
+        //                     if (group.Composition.OverlapComponents(entityCache))
+        //                     {
+        //                       group.TryRemove(entityID);
+        //
+        //                       groupsChecked[groupsCheckedLen++] = group;
+        //                     }
+        //                   }
+        //     }
+        //
+        //     if (group.composition.included.IsSubsetOf(ref eManaged)
+        //         && !group.composition.excluded.Overlaps(ref eManaged)
+        //         && group.composition.includedTags.IsSubsetOf(eMeta)
+        //         && !group.composition.excludedTags.Overlaps(eMeta))
+        //       group.Insert(operation.entity);
+        //   }
+        //
+        //   eMeta->isDirty = false;
+        // }
+
+        //               ref var entityCache = ref entities[entityID];
+        //
+        //
+        //               groupsCheckedLen = 0;
+        //               for (var j = 0; j < entityCache.componentsAmount; j++)
+        //               {
+        //                 var componentID = entityCache.componentsIds[j];
+        //                 var generation  = Storage.Generations[componentID];
+        //                 var mask        = Storage.Masks[componentID];
+        //
+        //                 EntityImplOld.Generations[entityID, generation] &= ~mask;
+        //                 Storage.All[entityCache.componentsIds[j]].toDispose.Add(entityID);
+        //
+        //                 var storage = Storage.All[componentID];
+        //
+        //
+        //                 for (var l = 0; l < storage.groups.length; l++)
+        //                 {
+        //                   var group = storage.groups.Elements[l];
+        //
+        //                   if (!AlreadyChecked(group))
+        //                   {
+        //                     if (group.Composition.OverlapComponents(entityCache))
+        //                     {
+        //                       group.TryRemove(entityID);
+        //
+        //                       groupsChecked[groupsCheckedLen++] = group;
+        //                     }
+        //                   }
+        //                 }
+        //               }
+        //
+        //               groupsCheckedLen             = 0;
+        //               entityCache.componentsAmount = 0;
+        //
+        //               if (!EntityImplOld.entities[entityID].isNested && EntityImplOld.Transforms.Length > entityID &&
+        //                   EntityImplOld.Transforms[entityID] != null)
+        //               {
+        //                 EntityImplOld.Transforms[entityID].gameObject
+        //                   .Release(EntityImplOld.entities[entityID].isPooled ? Pool.Entities : 0);
+        //                 EntityImplOld.Transforms[entityID] = null;
+        //               }
+        // #if !ACTORS_TAGS_0
+        //               EntityImplOld.Tags[entityID].Clear();
+        // #endif
+        //
+        //
+        //               if (ent.entStack.length >= ent.entStack.source.Length)
+        //                 Array.Resize(ref ent.entStack.source, ent.entStack.length << 1);
+        //
+        //               EntityImplOld.alive.Remove(operation.entity);
+        //
+        //               unchecked
+        //               {
+        //                 operation.entity.age                 += 1;
+        //                 EntityImplOld.entities[entityID].age += 1;
+        //               }
+        //
+        //               ent.entStack.source[ent.entStack.length++] = operation.entity;
+        //
+        //               break;
       }
 
       operationsLength = 0;

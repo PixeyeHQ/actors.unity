@@ -5,7 +5,7 @@ using Unity.IL2CPP.CompilerServices;
 namespace Pixeye.Actors
 {
   [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
-  public sealed class ProcessorCoroutine : ITick, IDisposable
+  public sealed class ProcessorCoroutine : ITick, IDisposable, IRequireActorsLayer
   {
     internal bool timescaled = false;
     internal float period = -1;
@@ -158,6 +158,11 @@ namespace Pixeye.Actors
     public void Dispose()
     {
       StopAll();
+    }
+
+    public void Bootstrap(LayerCore layer)
+    {
+      layer.processorUpdate.Add(this);
     }
   }
 

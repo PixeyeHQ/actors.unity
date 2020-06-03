@@ -30,6 +30,18 @@ namespace Pixeye.Actors
 
     internal HashCode hash;
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal bool IsSubsetOf(EntityMeta* meta)
+    {
+      int match = 0;
+      for (int i = 0; i < meta->componentsAmount; i++)
+      {
+        if (includeComponents[meta->components[i]])
+          match++;
+      }
+      return included.Length == match;
+    }
+    
     // [MethodImpl(MethodImplOptions.AggressiveInlining)]
     // internal bool OverlapComponents(in CacheEntityOld cache)
     // {

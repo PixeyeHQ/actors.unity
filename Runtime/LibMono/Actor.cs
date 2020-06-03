@@ -46,9 +46,9 @@ namespace Pixeye.Actors
       int  id;
       byte age = 0;
 
-      if (ent.entStack.length > 0)
+      if (ent.Released.length > 0)
       {
-        ref var pop = ref ent.entStack.source[--ent.entStack.length];
+        ref var pop = ref ent.Released.source[--ent.Released.length];
         id = pop.id;
         unchecked
         {
@@ -56,7 +56,7 @@ namespace Pixeye.Actors
         }
       }
       else
-        id = ent.lastID++;
+        id = ent.NextID++;
 
       entity.id  = id;
       entity.age = age;
@@ -88,9 +88,9 @@ namespace Pixeye.Actors
       int  id;
       byte age = 0;
 
-      if (ent.entStack.length > 0)
+      if (ent.Released.length > 0)
       {
-        ref var pop = ref ent.entStack.source[--ent.entStack.length];
+        ref var pop = ref ent.Released.source[--ent.Released.length];
         id = pop.id;
         unchecked
         {
@@ -98,7 +98,7 @@ namespace Pixeye.Actors
         }
       }
       else
-        id = ent.lastID++;
+        id = ent.NextID++;
 
       entity.id  = id;
       entity.age = age;
@@ -130,9 +130,9 @@ namespace Pixeye.Actors
       int  id;
       byte age = 0;
 
-      if (ent.entStack.length > 0)
+      if (ent.Released.length > 0)
       {
-        ref var pop = ref ent.entStack.source[--ent.entStack.length];
+        ref var pop = ref ent.Released.source[--ent.Released.length];
         id = pop.id;
         unchecked
         {
@@ -140,7 +140,7 @@ namespace Pixeye.Actors
         }
       }
       else
-        id = ent.lastID++;
+        id = ent.NextID++;
 
       entity.id  = id;
       entity.age = age;
@@ -157,7 +157,7 @@ namespace Pixeye.Actors
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    void IRequireActorsLayer.Launch(LayerCore layer)
+    void IRequireActorsLayer.Bootstrap(LayerCore layer)
     {
       this.layer = layer;
       if (!entity.exist)

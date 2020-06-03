@@ -29,7 +29,7 @@ namespace Pixeye.Actors
         var ptr = ProcessorEcs.Entities.Get<EntityMeta>(entity.id);
         for (var j = 0; j < ptr->componentsAmount; j++)
         {
-          var storage = Storage.All[ptr->signature[j]];
+          var storage = Storage.All[ptr->components[j]];
           var lex     = j < ptr->componentsAmount - 1 ? " " : "";
           fstr.Append($"{storage.GetComponentType().Name.Remove(0, 9)}{lex}");
         }
@@ -44,11 +44,26 @@ namespace Pixeye.Actors
     }
 
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal static bool IsSubsetOf(this bool[] signature, EntityMeta* meta)
+    {
+      int match = 0;
+      for (int i = 0; i < meta->componentsAmount; i++)
+      {
+        if (signature[meta->components[i]])
+          match++;
+      }
+
+      return meta->componentsAmount == match;
+    }
+
     internal static bool IsSubsetOf(this ComponentMask[] signature, ref EntityManagedMeta managed)
     {
+      ref var generations = ref managed.generations;
+
       for (var i = 0; i < signature.Length; i++)
       {
-        if ((managed.generations[signature[i].generation] & signature[i].mask) != signature[i].mask)
+        if ((generations[signature[i].generation] & signature[i].mask) != signature[i].mask)
           return false;
       }
 
@@ -65,8 +80,6 @@ namespace Pixeye.Actors
 
       return false;
     }
-
-  
 
 
     // [MethodImpl(MethodImplOptions.AggressiveInlining)]

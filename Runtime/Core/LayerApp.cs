@@ -9,14 +9,17 @@ namespace Pixeye.Actors
     internal static List<AsyncOperation> LoadJobs = new List<AsyncOperation>();
     public static Action<float> OnSceneLoading = delegate { };
 
-    protected override void Setup()
+   
+   protected override void Setup()
+   {
+      
+   }
+
+   protected override void OnLayerDestroy()
     {
     }
 
-    protected override void OnLayerDestroy()
-    {
-    }
-
+    
 
     public void Tick(float dt)
     {

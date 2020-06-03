@@ -34,7 +34,7 @@ namespace Pixeye.Actors
           ///TODO: IRequireActorsLayer
           if (o is IRequireActorsLayer req)
           {
-            req.Launch(null);
+            req.Bootstrap(null);
             o.enabled = true;
           }
         }
@@ -64,7 +64,7 @@ namespace Pixeye.Actors
         if (o is IRequireActorsLayer req)
         {
           ///TODO: IRequireActorsLayer
-          req.Launch(null);
+          req.Bootstrap(null);
           o.enabled = true;
         }
       }
@@ -206,8 +206,7 @@ namespace Pixeye.Actors
     public static Transform Spawn(int poolID, string prefabID, Vector3 startPosition = default, Quaternion startRotation = default)
     {
       var tr = Pool.pools[poolID].Spawn(Box.Get<GameObject>(prefabID), startPosition, startRotation).transform;
-
-
+ 
 #if UNITY_EDITOR
       tr.SetAsLastSibling();
 #endif

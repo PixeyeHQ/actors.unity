@@ -13,9 +13,9 @@ namespace Pixeye.Actors
       int id;
       byte age = 0;
 
-      if (ent.entStack.length > 0)
+      if (ent.Released.length > 0)
       {
-        ref var pop = ref ent.entStack.source[--ent.entStack.length];
+        ref var pop = ref ent.Released.source[--ent.Released.length];
         id = pop.id;
         unchecked
         {
@@ -23,7 +23,7 @@ namespace Pixeye.Actors
         }
       }
       else
-        id = ent.lastID++;
+        id = ent.NextID++;
 
       ent entity;
       entity.id = id;
@@ -65,9 +65,9 @@ namespace Pixeye.Actors
       int id;
       byte age = 0;
 
-      if (ent.entStack.length > 0)
+      if (ent.Released.length > 0)
       {
-        ref var pop = ref ent.entStack.source[--ent.entStack.length];
+        ref var pop = ref ent.Released.source[--ent.Released.length];
         id = pop.id;
         unchecked
         {
@@ -75,7 +75,7 @@ namespace Pixeye.Actors
         }
       }
       else
-        id = ent.lastID++;
+        id = ent.NextID++;
 
       ent entity;
       entity.id = id;
@@ -93,9 +93,9 @@ namespace Pixeye.Actors
       int id;
       byte age = 0;
 
-      if (ent.entStack.length > 0)
+      if (ent.Released.length > 0)
       {
-        ref var pop = ref ent.entStack.source[--ent.entStack.length];
+        ref var pop = ref ent.Released.source[--ent.Released.length];
         id = pop.id;
         unchecked
         {
@@ -103,7 +103,7 @@ namespace Pixeye.Actors
         }
       }
       else
-        id = ent.lastID++;
+        id = ent.NextID++;
 
       ent entity;
       entity.id = id;
@@ -122,9 +122,9 @@ namespace Pixeye.Actors
     {
       byte age = 0;
       int id;
-      if (ent.entStack.length > 0)
+      if (ent.Released.length > 0)
       {
-        ref var pop = ref ent.entStack.source[--ent.entStack.length];
+        ref var pop = ref ent.Released.source[--ent.Released.length];
         id = pop.id;
         unchecked
         {
@@ -132,7 +132,7 @@ namespace Pixeye.Actors
         }
       }
       else
-        id = ent.lastID++;
+        id = ent.NextID++;
 
       ent entity;
       entity.id = id;
@@ -147,9 +147,9 @@ namespace Pixeye.Actors
     {
       byte age = 0;
       int id;
-      if (ent.entStack.length > 0)
+      if (ent.Released.length > 0)
       {
-        ref var pop = ref ent.entStack.source[--ent.entStack.length];
+        ref var pop = ref ent.Released.source[--ent.Released.length];
         id = pop.id;
         unchecked
         {
@@ -157,7 +157,7 @@ namespace Pixeye.Actors
         }
       }
       else
-        id = ent.lastID++;
+        id = ent.NextID++;
 
       ent entity;
       entity.id = id;
@@ -173,9 +173,9 @@ namespace Pixeye.Actors
       int id;
       byte age = 0;
 
-      if (ent.entStack.length > 0)
+      if (ent.Released.length > 0)
       {
-        ref var pop = ref ent.entStack.source[--ent.entStack.length];
+        ref var pop = ref ent.Released.source[--ent.Released.length];
         id = pop.id;
         unchecked
         {
@@ -183,7 +183,7 @@ namespace Pixeye.Actors
         }
       }
       else
-        id = ent.lastID++;
+        id = ent.NextID++;
 
 
       ent entity;
@@ -203,9 +203,9 @@ namespace Pixeye.Actors
       int id;
       byte age = 0;
 
-      if (ent.entStack.length > 0)
+      if (ent.Released.length > 0)
       {
-        ref var pop = ref ent.entStack.source[--ent.entStack.length];
+        ref var pop = ref ent.Released.source[--ent.Released.length];
         id = pop.id;
         unchecked
         {
@@ -213,7 +213,7 @@ namespace Pixeye.Actors
         }
       }
       else
-        id = ent.lastID++;
+        id = ent.NextID++;
 
 
       ent entity;
@@ -232,9 +232,9 @@ namespace Pixeye.Actors
       int id;
       byte age = 0;
 
-      if (ent.entStack.length > 0)
+      if (ent.Released.length > 0)
       {
-        ref var pop = ref ent.entStack.source[--ent.entStack.length];
+        ref var pop = ref ent.Released.source[--ent.Released.length];
         id = pop.id;
         unchecked
         {
@@ -242,7 +242,7 @@ namespace Pixeye.Actors
         }
       }
       else
-        id = ent.lastID++;
+        id = ent.NextID++;
 
       ent entity;
       entity.id = id;
@@ -260,9 +260,9 @@ namespace Pixeye.Actors
       int id;
       byte age = 0;
 
-      if (ent.entStack.length > 0)
+      if (ent.Released.length > 0)
       {
-        ref var pop = ref ent.entStack.source[--ent.entStack.length];
+        ref var pop = ref ent.Released.source[--ent.Released.length];
         id = pop.id;
         unchecked
         {
@@ -270,7 +270,7 @@ namespace Pixeye.Actors
         }
       }
       else
-        id = ent.lastID++;
+        id = ent.NextID++;
 
       ent entity;
       entity.id = id;
@@ -287,9 +287,9 @@ namespace Pixeye.Actors
       int id;
       byte age = 0;
 
-      if (ent.entStack.length > 0)
+      if (ent.Released.length > 0)
       {
-        ref var pop = ref ent.entStack.source[--ent.entStack.length];
+        ref var pop = ref ent.Released.source[--ent.Released.length];
         id = pop.id;
         unchecked
         {
@@ -297,7 +297,7 @@ namespace Pixeye.Actors
         }
       }
       else
-        id = ent.lastID++;
+        id = ent.NextID++;
 
       ent entity;
       entity.id = id;
@@ -316,9 +316,9 @@ namespace Pixeye.Actors
       int id;
       byte age = 0;
 
-      if (ent.entStack.length > 0)
+      if (ent.Released.length > 0)
       {
-        ref var pop = ref ent.entStack.source[--ent.entStack.length];
+        ref var pop = ref ent.Released.source[--ent.Released.length];
         id = pop.id;
         unchecked
         {
@@ -326,7 +326,7 @@ namespace Pixeye.Actors
         }
       }
       else
-        id = ent.lastID++;
+        id = ent.NextID++;
 
       entity.id = id;
       entity.age = age;

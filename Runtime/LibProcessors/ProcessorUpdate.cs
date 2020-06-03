@@ -3,12 +3,13 @@
 
 
 using System.Collections.Generic;
-
+using UnityEngine;
 
 namespace Pixeye.Actors
 {
   internal class ProcessorUpdate
   {
+    internal readonly List<IReceiveEcsEvent> processors = new List<IReceiveEcsEvent>(64);
     internal readonly List<ITick> ticks = new List<ITick>(128);
     internal readonly List<ITick> ticksProc = new List<ITick>(64);
     internal readonly List<ITickFixed> ticksFixedProc = new List<ITickFixed>(64);
@@ -16,7 +17,7 @@ namespace Pixeye.Actors
     internal readonly List<ITickFixed> ticksFixed = new List<ITickFixed>();
     internal readonly List<ITickLate> ticksLate = new List<ITickLate>();
 
-    internal ProcessorEcs processorEcs;
+    internal LayerCore layer;
 
     internal int GetTicksCount => ticks.Count + ticksProc.Count + ticksFixed.Count + ticksLate.Count;
 
@@ -56,26 +57,30 @@ namespace Pixeye.Actors
       }
     }
 
-    internal void AddProc(object updateble)
+    internal void AddProc(Processor updateble)
     {
+      if (updateble is IReceiveEcsEvent receiver)
+      {
+        processors.Add(receiver);
+      }
+
       if (updateble is ITick tickable)
       {
         ticksProc.Add(tickable);
       }
+      else
+      {
+        ticksProc.Add(new Dummy());
+      }
 
       if (updateble is ITickFixed tickableFixed)
-      {
         ticksFixedProc.Add(tickableFixed);
-      }
-
-      if (updateble is ITickLate tickableLate)
-      {
-        ticksLateProc.Add(tickableLate);
-      }
+      else if (updateble is ITickLate tickableLate) ticksLateProc.Add(tickableLate);
     }
 
     internal void RemoveProc(object updateble)
     {
+      processors.Remove(updateble as IReceiveEcsEvent);
       if (ticksProc.Remove(updateble as ITick))
       {
       }
@@ -132,12 +137,14 @@ namespace Pixeye.Actors
         ticks[i].Tick(delta);
       }
 
-      processorEcs.Execute();
+      layer.processorEcs.Execute();
 
+      // dirty. we are using Dummy class for making all processors work here.
+      // this is need for receiving ecs events.
       for (var i = 0; i < countTicksProc; i++)
       {
+        processors[i].Receive();
         ticksProc[i].Tick(delta);
-        //processorEcs.Execute();
       }
     }
 

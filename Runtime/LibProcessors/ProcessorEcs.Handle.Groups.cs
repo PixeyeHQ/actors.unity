@@ -6,14 +6,14 @@ namespace Pixeye.Actors
 {
   internal partial class ProcessorEcs
   {
-    static int groupNextID;
-    internal List<GroupCore> groups = new List<GroupCore>();
+    static int GroupNextID;
+    internal static List<GroupCore> Groups = new List<GroupCore>();
     internal FamilyGroup familyTags = new FamilyGroup();
     internal FamilyGroup familyTypes = new FamilyGroup();
 
     #region BindGroups
 
-    public void Add(object obj, LayerCore layer)
+    public void Add(object obj)
     {
       var type = obj.GetType();
       var objectFields =
@@ -24,19 +24,11 @@ namespace Pixeye.Actors
 #if ACTORS_EVENTS_MANUAL
       var groupEv = Attribute.GetCustomAttribute(type, typeof(EventsAttribute)) as EventsAttribute;
 #endif
-      var groupByProcAttribute = Attribute.GetCustomAttribute(type, typeof(GroupByAttribute)) as GroupByAttribute;
-      var groupExcludeProcAttribute =
-        Attribute.GetCustomAttribute(type, typeof(ExcludeByAttribute)) as ExcludeByAttribute;
-      var groupBindProcAttribute = Attribute.GetCustomAttribute(type, typeof(BindAttribute)) as BindAttribute;
-
 
       for (var i = 0; i < length; i++)
       {
         var myFieldInfo = objectFields[i];
         if (!myFieldInfo.FieldType.IsSubclassOf(groupType)) continue;
-
-        // check if the group located inside of the base processor
-        var inner = Attribute.GetCustomAttribute(myFieldInfo, typeof(InnerGroupAttribute)) as InnerGroupAttribute;
 
 #if ACTORS_EVENTS_MANUAL
           // in case we are looking at the group of the derived processor we want to check it's events
@@ -45,16 +37,11 @@ namespace Pixeye.Actors
             groupEv = Attribute.GetCustomAttribute(myFieldInfo, typeof(EventsAttribute)) as EventsAttribute;
           }
 #endif
-        // if group is located inside of the base processor use processor filtering 
-        var groupByAttribute = inner != null
-          ? groupByProcAttribute
-          : Attribute.GetCustomAttribute(myFieldInfo, typeof(GroupByAttribute)) as GroupByAttribute;
-        var groupExcludeAttribute = inner != null
-          ? groupExcludeProcAttribute
-          : Attribute.GetCustomAttribute(myFieldInfo, typeof(ExcludeByAttribute)) as ExcludeByAttribute;
-        var bindAttribute = inner != null
-          ? groupBindProcAttribute
-          : Attribute.GetCustomAttribute(myFieldInfo, typeof(BindAttribute)) as BindAttribute;
+
+        var groupByAttribute = Attribute.GetCustomAttribute(myFieldInfo, typeof(GroupByAttribute)) as GroupByAttribute;
+        var groupExcludeAttribute =
+          Attribute.GetCustomAttribute(myFieldInfo, typeof(ExcludeByAttribute)) as ExcludeByAttribute;
+        var bindAttribute = Attribute.GetCustomAttribute(myFieldInfo, typeof(BindAttribute)) as BindAttribute;
 
         var includeTagsFilter = groupByAttribute != null ? groupByAttribute.filter : new int[0];
         var excludeTagsFilter = new int[0];
@@ -75,7 +62,7 @@ namespace Pixeye.Actors
           .AndEach(composition.includedTags).And(17).AndEach(composition.excludedTags).And(31)
           .AndEach(excludeCompFilter);
 
-        var group = SetupGroup(myFieldInfo.FieldType, composition, myFieldInfo.GetValue(obj), layer);
+        var group = SetupGroup(myFieldInfo.FieldType, composition, layer);
         myFieldInfo.SetValue(obj, group);
 
         ///TODO: ACTORS: BINDATTR
@@ -100,9 +87,9 @@ namespace Pixeye.Actors
       }
     }
 
-    GroupCore SetupGroup(Type groupType, Composition composition, object fieldObj, LayerCore layer)
+    GroupCore SetupGroup(Type groupType, Composition composition, LayerCore layer)
     {
-      foreach (var groupNext in groups)
+      foreach (var groupNext in Groups)
       {
         if (groupNext.composition.hash.value == composition.hash.value && groupNext.layer == layer)
         {
@@ -111,13 +98,13 @@ namespace Pixeye.Actors
       }
 
       var group = CreateGroup();
-      groups.Add(group);
+      Groups.Add(group);
       return group;
 
       GroupCore CreateGroup()
       {
         var gr = (Activator.CreateInstance(groupType, true) as GroupCore).Initialize(composition, layer);
-        gr.id = groupNextID++;
+        gr.id = GroupNextID++;
         return gr;
       }
     }

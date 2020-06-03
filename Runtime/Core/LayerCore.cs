@@ -16,17 +16,62 @@ namespace Pixeye.Actors
     internal ProcessorSignals processorSignals;
     internal ProcessorEcs processorEcs;
 
-    internal EntityImpl entityImpl;
-    internal int layerID = LayerNextID++;
+    internal ImplEntity implEntity;
+    internal ImplEcs implEcs;
+
+
+    internal int id = LayerNextID++;
+    internal bool isDirty = true;
 
     internal Dictionary<int, object> objects = new Dictionary<int, object>();
 
 
+    protected virtual void Awake()
+    {
+      Kernel.LayersInUse.Add(this);
+    }
+
+    #region Signals
+
+    public void Send<T>(in T signal)
+    {
+      processorSignals.Dispatch(signal);
+    }
+
+    public void AddSignal(object signal)
+    {
+      processorSignals.Add(signal);
+    }
+
+    public void RemoveSignal(object signal)
+    {
+      processorSignals.Remove(signal);
+    }
+
+    #endregion
+
+
+    // public void Send<T>(T obj)
+    // {
+    //   //self.processorSignals.Dispatch(obj);
+    // }
+    //
+    // public void AddSignal(object o)
+    // {
+    //   //self.processorSignals.Add(o);
+    // }
+    //
+    // public void RemoveSignal(object o)
+    // {
+    //   //self.processorSignals.Remove(o);
+    // }
+
+
     internal void Release()
     {
-      OnLayerDestroy();
-
+      Kernel.LayersInUse.Remove(this);
       processorUpdate.Dispose();
+      OnLayerDestroy();
 
       foreach (var obj in objects)
       {
@@ -37,6 +82,7 @@ namespace Pixeye.Actors
       }
     }
 
+
     /// Scene entry point, load your custom stuff from here.
     protected abstract void Setup();
 
@@ -46,6 +92,7 @@ namespace Pixeye.Actors
 
     void Update()
     {
+      if (isDirty) return;
       var delta = time.delta;
       processorUpdate.Update(delta);
     }
@@ -53,12 +100,14 @@ namespace Pixeye.Actors
 
     void FixedUpdate()
     {
+      if (isDirty) return;
       var delta = time.deltaFixed;
       processorUpdate.FixedUpdate(delta);
     }
 
     void LateUpdate()
     {
+      if (isDirty) return;
       var delta = time.delta;
       processorUpdate.LateUpdate(delta);
     }

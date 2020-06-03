@@ -3,10 +3,12 @@
 //     Date : 3/16/2019 
 
 
+using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Unity.IL2CPP.CompilerServices;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Pixeye.Actors
 {
@@ -17,10 +19,9 @@ namespace Pixeye.Actors
     // Released entities
     //===============================//
 
-    internal static ents entStack = new ents(Kernel.Settings.SizeEntities);
-    internal static int size = sizeof(ent);
-    internal static int lastID = 1;
-
+    internal static ents Released = new ents(Kernel.Settings.SizeEntities);
+    internal static int Size = sizeof(ent);
+    internal static int NextID = 1;
 
     //===============================//
     // Groups
@@ -82,6 +83,7 @@ namespace Pixeye.Actors
       ProcessorEcs.SetOld(this, 0, ProcessorEcs.Action.Kill);
       EntityImplOld.entities[id].isAlive = false;
     }
+
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Equals(ent other)
@@ -190,6 +192,22 @@ namespace Pixeye.Actors
              (managed.generationsInstant[Storage<T>.Generation] & mask4) == mask4 &&
              (managed.generationsInstant[Storage<T>.Generation] & mask5) == mask5;
     }
+
+    public void MoveTo<T>() where T : LayerCore
+    {
+      var nextLayer = Layer<T>.layer;
+
+#if UNITY_EDITOR
+      if (nextLayer == null)
+      {
+        Debug.Log("You are trying to send entity to a layer that doesn't exist in the game.");
+        throw new Exception();
+      }
+#endif
+      managed.layer.processorEcs.SwapWorld(this, nextLayer);
+      SceneManager.MoveGameObjectToScene(managed.transform.gameObject, nextLayer.gameObject.scene);
+    }
+
 
 #if !ACTORS_COMPONENTS_STRUCTS
     /// <summary>

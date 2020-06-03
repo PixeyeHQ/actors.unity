@@ -111,7 +111,7 @@ namespace Pixeye.Actors
       for (var i = 0; i < composition.excluded.Length; i++)
       {
         ref var m = ref composition.excluded[i];
-        Storage.All[m.id].groups[layer.layerID].Add(this);
+        Storage.All[m.id].groups[layer.id].Add(this);
       }
 
       return this;
@@ -132,10 +132,10 @@ namespace Pixeye.Actors
       {
         Array.Resize(ref entities, entity.id << 1);
 #if ACTORS_EVENTS_MANUAL
-				if (hasEventAdd)
-				Array.Resize(ref added.source, entity.id << 1);
-				if (hasEventRemove)
-				Array.Resize(ref removed.source, entity.id << 1);
+        if (hasEventAdd)
+          Array.Resize(ref added.source, entity.id << 1);
+        if (hasEventRemove)
+          Array.Resize(ref removed.source, entity.id << 1);
 #else
         Array.Resize(ref added.source, entity.id << 1);
         Array.Resize(ref removed.source, entity.id << 1);
@@ -145,10 +145,10 @@ namespace Pixeye.Actors
       {
         Array.Resize(ref entities, length << 1);
 #if ACTORS_EVENTS_MANUAL
-				if (hasEventAdd)
-				Array.Resize(ref added.source, length << 1);
-				if (hasEventRemove)
-				Array.Resize(ref removed.source, length << 1);
+        if (hasEventAdd)
+          Array.Resize(ref added.source, length << 1);
+        if (hasEventRemove)
+          Array.Resize(ref removed.source, length << 1);
 #else
         Array.Resize(ref added.source, length << 1);
         Array.Resize(ref removed.source, length << 1);
@@ -180,8 +180,8 @@ namespace Pixeye.Actors
         Array.Copy(entities, index, entities, index + 1, length - index);
         entities[index] = entity;
 #if ACTORS_EVENTS_MANUAL
-				if (hasEventAdd)
-					added.source[added.length++] = entity;
+        if (hasEventAdd)
+          added.source[added.length++] = entity;
 #else
         added.source[added.length++] = entity;
 #endif
@@ -190,8 +190,8 @@ namespace Pixeye.Actors
       {
         entities[right] = entity;
 #if ACTORS_EVENTS_MANUAL
-				if (hasEventAdd)
-					added.source[added.length++] = entity;
+        if (hasEventAdd)
+          added.source[added.length++] = entity;
 #else
         added.source[added.length++] = entity;
 #endif
@@ -205,22 +205,24 @@ namespace Pixeye.Actors
 
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void TryRemove(int entityID)
+    internal bool TryRemove(int entityID)
     {
-      if (length == 0) return;
+      if (length == 0) return false;
 
       var i = HelperArray.BinarySearch(ref entities, entityID, 0, length - 1);
-      if (i == -1) return;
+      if (i == -1) return false;
 
 #if ACTORS_EVENTS_MANUAL
-			if (hasEventRemove)
-				removed.source[removed.length++] = entities[i];
+      if (hasEventRemove)
+        removed.source[removed.length++] = entities[i];
 #else
       removed.source[removed.length++] = entities[i];
 #endif
 
       if (i < --length)
         Array.Copy(entities, i + 1, entities, i, length - i);
+
+      return true;
     }
 
 
@@ -231,8 +233,8 @@ namespace Pixeye.Actors
     internal void Remove(int i)
     {
 #if ACTORS_EVENTS_MANUAL
-			if (hasEventRemove)
-				removed.source[removed.length++] = entities[i];
+      if (hasEventRemove)
+        removed.source[removed.length++] = entities[i];
 #else
       removed.source[removed.length++] = entities[i];
 #endif
@@ -245,13 +247,11 @@ namespace Pixeye.Actors
     public virtual void Dispose()
     {
 #if ACTORS_EVENTS_MANUAL
-			hasEventAdd = false;
-			hasEventRemove = false;
-
-			added = default;
-			removed = default;
+      hasEventAdd = false;
+      hasEventRemove = false;
+      added = default;
+      removed = default;
 #else
-
       added   = new ents(Kernel.Settings.SizeEntities);
       removed = new ents(Kernel.Settings.SizeEntities);
 #endif
@@ -361,8 +361,8 @@ namespace Pixeye.Actors
     {
       if (length > 0)
       {
-        var entitiesNext      = 0;
-        var threadsInWork     = 0;
+        var entitiesNext = 0;
+        int threadsInWork;
         var entitiesPerThread = length / (threadsAmount + 1);
         if (entitiesPerThread > entitiesPerThreadMin)
         {
@@ -512,7 +512,7 @@ namespace Pixeye.Actors
     {
       var gr = base.Initialize(composition, layer);
 
-      Storage<T>.Instance.groups[layer.layerID].Add(this);
+      Storage<T>.Instance.groups[layer.id].Add(this);
 
       const int len = 1;
 
@@ -532,8 +532,8 @@ namespace Pixeye.Actors
     {
       var gr = base.Initialize(composition, layer);
 
-      Storage<T>.Instance.groups[layer.layerID].Add(this);
-      Storage<Y>.Instance.groups[layer.layerID].Add(this);
+      Storage<T>.Instance.groups[layer.id].Add(this);
+      Storage<Y>.Instance.groups[layer.id].Add(this);
 
       const int len = 2;
 
@@ -558,9 +558,9 @@ namespace Pixeye.Actors
     internal override GroupCore Initialize(Composition composition, LayerCore layer)
     {
       var gr = base.Initialize(composition, layer);
-      Storage<T>.Instance.groups[layer.layerID].Add(this);
-      Storage<Y>.Instance.groups[layer.layerID].Add(this);
-      Storage<U>.Instance.groups[layer.layerID].Add(this);
+      Storage<T>.Instance.groups[layer.id].Add(this);
+      Storage<Y>.Instance.groups[layer.id].Add(this);
+      Storage<U>.Instance.groups[layer.id].Add(this);
 
 
       const int len = 3;
@@ -594,10 +594,10 @@ namespace Pixeye.Actors
     internal override GroupCore Initialize(Composition composition, LayerCore layer)
     {
       var gr = base.Initialize(composition, layer);
-      Storage<T>.Instance.groups[layer.layerID].Add(this);
-      Storage<Y>.Instance.groups[layer.layerID].Add(this);
-      Storage<U>.Instance.groups[layer.layerID].Add(this);
-      Storage<I>.Instance.groups[layer.layerID].Add(this);
+      Storage<T>.Instance.groups[layer.id].Add(this);
+      Storage<Y>.Instance.groups[layer.id].Add(this);
+      Storage<U>.Instance.groups[layer.id].Add(this);
+      Storage<I>.Instance.groups[layer.id].Add(this);
 
 
       const int len = 4;
@@ -636,11 +636,11 @@ namespace Pixeye.Actors
     internal override GroupCore Initialize(Composition composition, LayerCore layer)
     {
       var gr = base.Initialize(composition, layer);
-      Storage<T>.Instance.groups[layer.layerID].Add(this);
-      Storage<Y>.Instance.groups[layer.layerID].Add(this);
-      Storage<U>.Instance.groups[layer.layerID].Add(this);
-      Storage<I>.Instance.groups[layer.layerID].Add(this);
-      Storage<O>.Instance.groups[layer.layerID].Add(this);
+      Storage<T>.Instance.groups[layer.id].Add(this);
+      Storage<Y>.Instance.groups[layer.id].Add(this);
+      Storage<U>.Instance.groups[layer.id].Add(this);
+      Storage<I>.Instance.groups[layer.id].Add(this);
+      Storage<O>.Instance.groups[layer.id].Add(this);
 
       const int len = 5;
 
@@ -681,12 +681,12 @@ namespace Pixeye.Actors
     internal override GroupCore Initialize(Composition composition, LayerCore layer)
     {
       var gr = base.Initialize(composition, layer);
-      Storage<T>.Instance.groups[layer.layerID].Add(this);
-      Storage<Y>.Instance.groups[layer.layerID].Add(this);
-      Storage<U>.Instance.groups[layer.layerID].Add(this);
-      Storage<I>.Instance.groups[layer.layerID].Add(this);
-      Storage<O>.Instance.groups[layer.layerID].Add(this);
-      Storage<P>.Instance.groups[layer.layerID].Add(this);
+      Storage<T>.Instance.groups[layer.id].Add(this);
+      Storage<Y>.Instance.groups[layer.id].Add(this);
+      Storage<U>.Instance.groups[layer.id].Add(this);
+      Storage<I>.Instance.groups[layer.id].Add(this);
+      Storage<O>.Instance.groups[layer.id].Add(this);
+      Storage<P>.Instance.groups[layer.id].Add(this);
 
       const int len = 6;
 
@@ -740,13 +740,13 @@ namespace Pixeye.Actors
     internal override GroupCore Initialize(Composition composition, LayerCore layer)
     {
       var gr = base.Initialize(composition, layer);
-      Storage<T>.Instance.groups[layer.layerID].Add(this);
-      Storage<Y>.Instance.groups[layer.layerID].Add(this);
-      Storage<U>.Instance.groups[layer.layerID].Add(this);
-      Storage<I>.Instance.groups[layer.layerID].Add(this);
-      Storage<O>.Instance.groups[layer.layerID].Add(this);
-      Storage<P>.Instance.groups[layer.layerID].Add(this);
-      Storage<A>.Instance.groups[layer.layerID].Add(this);
+      Storage<T>.Instance.groups[layer.id].Add(this);
+      Storage<Y>.Instance.groups[layer.id].Add(this);
+      Storage<U>.Instance.groups[layer.id].Add(this);
+      Storage<I>.Instance.groups[layer.id].Add(this);
+      Storage<O>.Instance.groups[layer.id].Add(this);
+      Storage<P>.Instance.groups[layer.id].Add(this);
+      Storage<A>.Instance.groups[layer.id].Add(this);
 
       const int len = 7;
 
@@ -808,14 +808,14 @@ namespace Pixeye.Actors
     internal override GroupCore Initialize(Composition composition, LayerCore layer)
     {
       var gr = base.Initialize(composition, layer);
-      Storage<T>.Instance.groups[layer.layerID].Add(this);
-      Storage<Y>.Instance.groups[layer.layerID].Add(this);
-      Storage<U>.Instance.groups[layer.layerID].Add(this);
-      Storage<I>.Instance.groups[layer.layerID].Add(this);
-      Storage<O>.Instance.groups[layer.layerID].Add(this);
-      Storage<P>.Instance.groups[layer.layerID].Add(this);
-      Storage<A>.Instance.groups[layer.layerID].Add(this);
-      Storage<S>.Instance.groups[layer.layerID].Add(this);
+      Storage<T>.Instance.groups[layer.id].Add(this);
+      Storage<Y>.Instance.groups[layer.id].Add(this);
+      Storage<U>.Instance.groups[layer.id].Add(this);
+      Storage<I>.Instance.groups[layer.id].Add(this);
+      Storage<O>.Instance.groups[layer.id].Add(this);
+      Storage<P>.Instance.groups[layer.id].Add(this);
+      Storage<A>.Instance.groups[layer.id].Add(this);
+      Storage<S>.Instance.groups[layer.id].Add(this);
 
       const int len = 8;
 
@@ -884,15 +884,15 @@ namespace Pixeye.Actors
     internal override GroupCore Initialize(Composition composition, LayerCore layer)
     {
       var gr = base.Initialize(composition, layer);
-      Storage<T>.Instance.groups[layer.layerID].Add(this);
-      Storage<Y>.Instance.groups[layer.layerID].Add(this);
-      Storage<U>.Instance.groups[layer.layerID].Add(this);
-      Storage<I>.Instance.groups[layer.layerID].Add(this);
-      Storage<O>.Instance.groups[layer.layerID].Add(this);
-      Storage<P>.Instance.groups[layer.layerID].Add(this);
-      Storage<A>.Instance.groups[layer.layerID].Add(this);
-      Storage<S>.Instance.groups[layer.layerID].Add(this);
-      Storage<D>.Instance.groups[layer.layerID].Add(this);
+      Storage<T>.Instance.groups[layer.id].Add(this);
+      Storage<Y>.Instance.groups[layer.id].Add(this);
+      Storage<U>.Instance.groups[layer.id].Add(this);
+      Storage<I>.Instance.groups[layer.id].Add(this);
+      Storage<O>.Instance.groups[layer.id].Add(this);
+      Storage<P>.Instance.groups[layer.id].Add(this);
+      Storage<A>.Instance.groups[layer.id].Add(this);
+      Storage<S>.Instance.groups[layer.id].Add(this);
+      Storage<D>.Instance.groups[layer.id].Add(this);
 
       const int len = 9;
 
@@ -967,16 +967,16 @@ namespace Pixeye.Actors
     internal override GroupCore Initialize(Composition composition, LayerCore layer)
     {
       var gr = base.Initialize(composition, layer);
-      Storage<T>.Instance.groups[layer.layerID].Add(this);
-      Storage<Y>.Instance.groups[layer.layerID].Add(this);
-      Storage<U>.Instance.groups[layer.layerID].Add(this);
-      Storage<I>.Instance.groups[layer.layerID].Add(this);
-      Storage<O>.Instance.groups[layer.layerID].Add(this);
-      Storage<P>.Instance.groups[layer.layerID].Add(this);
-      Storage<A>.Instance.groups[layer.layerID].Add(this);
-      Storage<S>.Instance.groups[layer.layerID].Add(this);
-      Storage<D>.Instance.groups[layer.layerID].Add(this);
-      Storage<F>.Instance.groups[layer.layerID].Add(this);
+      Storage<T>.Instance.groups[layer.id].Add(this);
+      Storage<Y>.Instance.groups[layer.id].Add(this);
+      Storage<U>.Instance.groups[layer.id].Add(this);
+      Storage<I>.Instance.groups[layer.id].Add(this);
+      Storage<O>.Instance.groups[layer.id].Add(this);
+      Storage<P>.Instance.groups[layer.id].Add(this);
+      Storage<A>.Instance.groups[layer.id].Add(this);
+      Storage<S>.Instance.groups[layer.id].Add(this);
+      Storage<D>.Instance.groups[layer.id].Add(this);
+      Storage<F>.Instance.groups[layer.id].Add(this);
 
       const int len = 10;
 
@@ -1105,4 +1105,5 @@ namespace Pixeye.Actors
       }
     }
   }
+  
 }

@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Pixeye.Actors
 {
@@ -18,13 +19,12 @@ namespace Pixeye.Actors
       for (int index = 0; index < count; ++index)
         (receiveList[index] as IReceive<T>).HandleSignal(in val);
     }
-    
+
     internal void Add(object obj)
     {
-      var interfaces = obj.GetType().GetInterfaces();
-      var receive    = obj as IReceive;
-
-      foreach (var type in interfaces)
+      var      interfaces = obj.GetType().GetInterfaces();
+      IReceive receive    = obj as IReceive;
+      foreach (Type type in interfaces)
       {
         if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IReceive<>))
         {

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace Pixeye.Actors
@@ -13,9 +14,16 @@ namespace Pixeye.Actors
     public static void Remove(int buildIndex)
     {
       if (Kernel.Layers[buildIndex] == null) return;
-      Kernel.Layers[buildIndex].Release();
-      LayerApp.LoadJobs.Add(SceneManager.UnloadSceneAsync(buildIndex));
-      LayerApp.LoadJobs.Add(Resources.UnloadUnusedAssets());
+
+      LayerApp.Run(CoRemove());
+
+      IEnumerator CoRemove()
+      {
+        Kernel.Layers[buildIndex].Release();
+        yield return LayerApp.WaitFrame;
+        LayerApp.LoadJobs.Add(SceneManager.UnloadSceneAsync(buildIndex));
+        LayerApp.LoadJobs.Add(Resources.UnloadUnusedAssets());
+      }
     }
 
     public static void Add(string sceneName)
@@ -27,9 +35,16 @@ namespace Pixeye.Actors
     {
       var buildIndex = SceneManager.GetSceneByName(sceneName).buildIndex;
       if (Kernel.Layers[buildIndex] == null) return;
-      Kernel.Layers[buildIndex].Release();
-      LayerApp.LoadJobs.Add(SceneManager.UnloadSceneAsync(sceneName));
-      LayerApp.LoadJobs.Add(Resources.UnloadUnusedAssets());
+
+      LayerApp.Run(CoRemove());
+
+      IEnumerator CoRemove()
+      {
+        Kernel.Layers[buildIndex].Release();
+        yield return LayerApp.WaitFrame;
+        LayerApp.LoadJobs.Add(SceneManager.UnloadSceneAsync(buildIndex));
+        LayerApp.LoadJobs.Add(Resources.UnloadUnusedAssets());
+      }
     }
   }
 }

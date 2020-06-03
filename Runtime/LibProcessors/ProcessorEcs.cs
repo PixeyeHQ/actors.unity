@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.IL2CPP.CompilerServices;
-using UnityEngine;
 
 
 namespace Pixeye.Actors
@@ -14,7 +12,6 @@ namespace Pixeye.Actors
     internal static PoolMem Entities;
     internal static EntityManagedMeta[] EntitiesManaged;
 
-     
     internal ents entities = new ents();
 
     LayerCore layer;
@@ -31,15 +28,14 @@ namespace Pixeye.Actors
         Entities.Get<EntityMeta>(i)->Initialize();
         EntitiesManaged[i].Initialize();
       }
-
-      //Create(out var entity);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal void Create(out ent entity, bool isPooled = false, bool isNested = false)
     {
-      if (ent.entStack.length > 0)
+      if (ent.Released.length > 0)
       {
-        ref var pop = ref ent.entStack.source[--ent.entStack.length];
+        ref var pop = ref ent.Released.source[--ent.Released.length];
         entity.id = pop.id;
         unchecked
         {
@@ -48,7 +44,7 @@ namespace Pixeye.Actors
       }
       else
       {
-        entity.id  = ent.lastID++;
+        entity.id  = ent.NextID++;
         entity.age = 0;
       }
 
@@ -68,16 +64,16 @@ namespace Pixeye.Actors
       var     ptr     = Entities.Get<EntityMeta>(entity.id);
       ref var managed = ref EntitiesManaged[entity.id];
 
-      managed.layer = layer;
+      managed.layer    = layer;
+      managed.isNested = isNested;
+      managed.isPooled = isPooled;
 
-      ptr->age      = entity.age;
-      ptr->isNested = isNested;
-      ptr->isPooled = isPooled;
-      ptr->isAlive  = true;
-      ptr->isDirty  = true;
+      ptr->age     = entity.age;
+      ptr->isAlive = true;
+      ptr->isDirty = true;
     }
 
-    public void Launch(LayerCore layer)
+    public void Bootstrap(LayerCore layer)
     {
       this.layer = layer;
     }
