@@ -189,19 +189,8 @@ namespace Pixeye.Actors
       allDefines[index] = "ACTORS_TAGS_6";
       PlayerSettings.SetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup, string.Join(";", allDefines.ToArray()));
     }
-
-
-    [MenuItem("Tools/Actors/Tags/Size/0 Tags", false, 0)]
-    public static void Set0()
-    {
-      DataFramework.sizeTags = 0;
-      var definesString = PlayerSettings.GetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup);
-      var allDefines = definesString.Split(';').ToList();
-
-      var index = allDefines.FindIndex(d => d.Contains("ACTORS_TAGS"));
-      allDefines[index] = "ACTORS_TAGS_0";
-      PlayerSettings.SetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup, string.Join(";", allDefines.ToArray()));
-    }
+ 
+     
 
 #if !ACTORS_DEBUG
     [MenuItem("Tools/Actors/Set Debug", false, 4)]

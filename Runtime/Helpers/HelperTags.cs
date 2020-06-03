@@ -14,6 +14,7 @@ namespace Pixeye.Actors
   [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
   public static unsafe class HelperTags
   {
+ 
     [Conditional("ACTORS_DEBUG")]
     internal static void DebugCheckLimits(int len, ent entity)
     {
@@ -117,6 +118,7 @@ namespace Pixeye.Actors
 
       HandleChanges(entity, tagID);
     }
+
 
     internal static void ClearAll()
     {
@@ -373,7 +375,7 @@ namespace Pixeye.Actors
 
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static Type GetTypeTag()
+    static Type GetTypeTag()
     {
       Type typeTag    = default;
       var  assemblies = AppDomain.CurrentDomain.GetAssemblies();
@@ -396,7 +398,7 @@ namespace Pixeye.Actors
 
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static object GetFieldId(this string fieldName, Type typeTag)
+    static object GetFieldId(this string fieldName, Type typeTag)
     {
       object value;
       var    info = typeTag.GetField(fieldName, BindingFlags.Public | BindingFlags.Static);
@@ -407,7 +409,7 @@ namespace Pixeye.Actors
 
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static List<string> GetMembersString()
+    static List<string> GetMembersString()
     {
       var typeTag     = GetTypeTag();
       var memberArray = typeTag.GetMembers();
@@ -444,5 +446,6 @@ namespace Pixeye.Actors
 
       return default;
     }
+ 
   }
 }

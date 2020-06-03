@@ -37,7 +37,7 @@ namespace Pixeye.Actors
       {
         str = "ACTORS_TAGS_6";
       }
-      else str = "ACTORS_TAGS_0";
+       
 
 
       if (index > -1)

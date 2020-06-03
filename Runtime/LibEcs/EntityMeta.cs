@@ -20,7 +20,9 @@ namespace Pixeye.Actors
     public bool isDirty; //dirty allows to set all components for a new entity in one init command
     public bool isAlive;
     public ent parent;
+ 
     public CacheTags tags;
+   
     public ushort* components;
     public ushort* groups;
 

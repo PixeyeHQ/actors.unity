@@ -106,9 +106,9 @@ namespace Pixeye.Actors
 //                 EntityImplOld.Transforms[entityID].gameObject.Release(EntityImplOld.entities[entityID].isPooled ? Pool.Entities : 0);
 //                 EntityImplOld.Transforms[entityID] = null;
 //               }
-// #if !ACTORS_TAGS_0
+//   
 //               EntityImplOld.Tags[entityID].Clear();
-// #endif
+//  
 //
 //
 //               if (ent.entStack.length >= ent.entStack.source.Length)
@@ -210,9 +210,9 @@ namespace Pixeye.Actors
 //                 EntityImplOld.Transforms[entityID].gameObject.Release(EntityImplOld.entities[entityID].isPooled ? Pool.Entities : 0);
 //                 EntityImplOld.Transforms[entityID] = null;
 //               }
-// #if !ACTORS_TAGS_0
+//  
 //               EntityImplOld.Tags[entityID].Clear();
-// #endif
+//  
 //
 //               //Entity.Count--;
 //

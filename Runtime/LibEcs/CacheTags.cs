@@ -6,12 +6,8 @@
 #undef ACTORS_TAGS_DEFAULT
 #endif
 
-#if! ACTORS_TAGS_0
-using System;
-using System.Runtime.CompilerServices;
+ 
 using System.Runtime.InteropServices;
-using UnityEngine;
-
 
 namespace Pixeye.Actors
 {
@@ -159,5 +155,3 @@ namespace Pixeye.Actors
     }
   }
 }
-
-#endif

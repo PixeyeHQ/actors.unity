@@ -37,16 +37,16 @@ namespace Pixeye.Actors
       Transforms = new Transform[Kernel.Settings.SizeEntities];
 
       entities = (CacheEntityOld*) UnmanagedMemory.Alloc(sizeEntityCache * Kernel.Settings.SizeEntities);
-#if !ACTORS_TAGS_0
+ 
       Tags = (CacheTags*) UnmanagedMemory.Alloc(sizeBufferTags * Kernel.Settings.SizeEntities);
-#endif
+ 
 
 
       for (var i = 0; i < Kernel.Settings.SizeEntities; i++)
       {
-#if !ACTORS_TAGS_0
+ 
         Tags[i] = new CacheTags();
-#endif
+ 
         entities[i] = new CacheEntityOld(6);
       }
 

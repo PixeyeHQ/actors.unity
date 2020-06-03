@@ -197,15 +197,21 @@ namespace Pixeye.Actors
     {
       var nextLayer = Layer<T>.layer;
 
-#if UNITY_EDITOR
+#if ACTORS_DEBUG
       if (nextLayer == null)
       {
-        Debug.Log("You are trying to send entity to a layer that doesn't exist in the game.");
+        Debug.Log($"Layer {typeof(T)} doesn't exist in the game.");
+        throw new Exception();
+      }
+
+      if (meta->parent.exist || managed.isNested)
+      {
+        Debug.Log(
+          $"You are trying to send nested entity. This is not allowed. Send parent [{meta->parent.id}] {managed.transform} instead.");
         throw new Exception();
       }
 #endif
-      managed.layer.processorEcs.SwapWorld(this, nextLayer);
-      SceneManager.MoveGameObjectToScene(managed.transform.gameObject, nextLayer.gameObject.scene);
+      managed.layer.processorEcs.SwapLayer(this, nextLayer);
     }
 
 

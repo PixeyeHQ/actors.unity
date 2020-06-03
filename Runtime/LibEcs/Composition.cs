@@ -9,7 +9,7 @@ using Unity.IL2CPP.CompilerServices;
 
 namespace Pixeye.Actors
 {
-  public struct ComponentMask
+  internal struct ComponentMask
   {
     public int generation;
     public int mask;
@@ -26,7 +26,6 @@ namespace Pixeye.Actors
     internal int[] excludedTags = new int[0];
 
     internal bool[] includeComponents = new bool[Kernel.Settings.SizeComponents];
-    // internal bool[] excludeComponents = new bool[Kernel.Settings.SizeComponents];
 
     internal HashCode hash;
 
@@ -39,21 +38,23 @@ namespace Pixeye.Actors
         if (includeComponents[meta->components[i]])
           match++;
       }
+
       return included.Length == match;
     }
-    
-    // [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    // internal bool OverlapComponents(in CacheEntityOld cache)
-    // {
-    //   int match = 0;
-    //   for (int i = 0; i < cache.componentsAmount; i++)
-    //   {
-    //     if (includeComponents[cache.componentsIds[i]])
-    //       match++;
-    //   }
-    //
-    //   return componentsMask.Length == match;
-    // }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal bool Check(EntityMeta* meta, ref EntityManagedMeta managed)
+    {
+#if ACTORS_TAGS_CHECKS
+      return IsSubsetOf(meta) // @! maybe
+             && !excluded.Overlaps(ref managed)
+             && includedTags.IsSubsetOf(meta)
+             && !excludedTags.Overlaps(meta);
+#else
+      return IsSubsetOf(meta) // @! maybe
+             && !excluded.Overlaps(ref managed);
+#endif
+    }
 
     internal void GenerateExclude(int[] types)
     {
@@ -71,57 +72,8 @@ namespace Pixeye.Actors
       }
     }
 
-
-#if !ACTORS_TAGS_0
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal bool IncludeTags(int entityID)
-    {
-      ref var tags = ref EntityImplOld.Tags[entityID];
-      int     len  = tags.length;
-
-      if (len == 0) return false;
-      var match = 0;
-
-      for (int l = 0; l < this.includedTags.Length; l++)
-      {
-        var tagToInclude = this.includedTags[l];
-        for (int i = 0; i < len; i++)
-        {
-          ref var tag = ref tags.GetElementByRef(i);
-          if (tag == tagToInclude) match++;
-        }
-      }
-
-      return match == this.includedTags.Length;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal bool ExcludeTags(int entityID)
-    {
-      ref var tags = ref EntityImplOld.Tags[entityID];
-      int     len  = tags.length;
-      if (len == 0) return true;
-
-      for (int l = 0; l < excludedTags.Length; l++)
-      {
-        var tagToExclude = excludedTags[l];
-        for (int i = 0; i < len; i++)
-        {
-          ref var tag = ref tags.GetElementByRef(i);
-          if (tag == tagToExclude) return false;
-        }
-      }
-
-      return true;
-    }
-#endif
-
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool Equals(Composition other)
-    {
-      return GetHashCode() == other.GetHashCode();
-    }
+    public bool Equals(Composition other) => GetHashCode() == other.GetHashCode();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override int GetHashCode() => hash;

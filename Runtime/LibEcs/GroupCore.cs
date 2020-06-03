@@ -104,9 +104,9 @@ namespace Pixeye.Actors
       this.composition = composition;
       processorEcs     = layer.processorEcs;
 
-#if !ACTORS_TAGS_0
+ 
       HelperTags.RegisterGroup(this);
-#endif
+ 
 
       for (var i = 0; i < composition.excluded.Length; i++)
       {
@@ -243,6 +243,14 @@ namespace Pixeye.Actors
         Array.Copy(entities, i + 1, entities, i, length - i);
     }
 
+    // [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    // internal void RemoveSilently(int i)
+    // {
+    //   if (i < --length)
+    //     Array.Copy(entities, i + 1, entities, i, length - i);
+    // }
+    
+ 
 
     public virtual void Dispose()
     {
