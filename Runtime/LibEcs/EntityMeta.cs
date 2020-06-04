@@ -20,9 +20,9 @@ namespace Pixeye.Actors
 
     public bool isDirty; //dirty allows to set all components for a new entity in one init command
     public bool isAlive;
-    public ent parent;
 
-    public CacheTags tags;
+
+    public EcsTags tags;
 
     public ushort* components;
     public ushort* groups;
@@ -39,7 +39,7 @@ namespace Pixeye.Actors
       componentsAmount = 0;
       groupsAmount     = 0;
 
-      tags = new CacheTags();
+      tags = new EcsTags();
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -102,7 +102,8 @@ namespace Pixeye.Actors
   public struct EntityManagedMeta
   {
     public bool isPooled;
-    public bool isNested;
+
+    // public bool isNested;
     internal LayerCore layer;
 
     internal Transform transform;
@@ -110,6 +111,7 @@ namespace Pixeye.Actors
     //internal int[] generations;
     internal int[] signature;
     internal ents childs;
+    public ent parent;
 
     public void Initialize()
     {

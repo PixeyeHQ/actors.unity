@@ -8,8 +8,7 @@ namespace Pixeye.Actors
   {
     internal static List<AsyncOperation> LoadJobs = new List<AsyncOperation>();
     public static Action<float> OnSceneLoading = delegate { };
-
-
+ 
     protected override void Setup()
     {
     }
@@ -34,7 +33,9 @@ namespace Pixeye.Actors
         var ratio = progress / LoadJobs.Count;
         OnSceneLoading(ratio);
         if (ratio == 1)
+        {
           LoadJobs.Clear();
+        }
       }
     }
   }

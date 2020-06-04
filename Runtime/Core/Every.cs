@@ -7,7 +7,16 @@
       public static void Send<T>(T obj) where T : struct
       {
         foreach (var layer in Kernel.LayersInUse)
-          layer.implEcs.Send(obj);
+          layer.Ecs.Send(obj);
+      }
+
+      public static int GetAliveAmount()
+      {
+        int amount = 0;
+        foreach (var layer in Kernel.LayersInUse)
+          amount += layer.processorEcs.entities.length;
+
+        return amount;
       }
     }
 

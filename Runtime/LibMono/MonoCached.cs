@@ -8,36 +8,38 @@ namespace Pixeye.Actors
 {
   public abstract class MonoCached : MonoBehaviour, IRequireActorsLayer
   {
-    LayerCore layer;
+    [HideInInspector] public LayerCore Layer;
+
+    public ImplObserver Observer => Layer.Observer;
+    public ImplActor Actor => Layer.Actor;
+    public ImplEntity Entity => Layer.Entity;
+    public ImplEcs Ecs => Layer.Ecs;
 
     void Awake()
     {
-      if (!Kernel.Instance || Kernel.ChangingScene) return;
+      if (!Kernel.Instance) return;
+      if (Kernel.ChangingScene[gameObject.scene.buildIndex]) return;
       Setup();
     }
 
-
     void OnEnable()
     {
-      if (!Kernel.Instance || Kernel.ChangingScene) return;
+      if (!Kernel.Instance) return;
+      if (Kernel.ChangingScene[gameObject.scene.buildIndex]) return;
       HandleEnable();
     }
 
     void OnDisable()
     {
+      if (Kernel.ApplicationIsQuitting) return;
       HandleDisable();
     }
 
-
-    public void Launch()
+    public virtual void Bootstrap(LayerCore layer)
     {
+      this.Layer = layer;
       Setup();
       HandleEnable();
-    }
-
-    void IRequireActorsLayer.Bootstrap(LayerCore layer)
-    {
-      this.layer = layer;
     }
 
     protected virtual void HandleEnable()
@@ -48,6 +50,7 @@ namespace Pixeye.Actors
     {
     }
 
+    /// Initialize here.
     protected virtual void Setup()
     {
     }

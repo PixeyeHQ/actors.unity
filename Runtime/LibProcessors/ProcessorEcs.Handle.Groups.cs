@@ -7,8 +7,10 @@ namespace Pixeye.Actors
   internal partial class ProcessorEcs
   {
     static int GroupNextID;
-
+    
     internal static List<GroupCore> Groups = new List<GroupCore>();
+    internal static GroupCore[] Bindings = new GroupCore[16];
+    
     internal FamilyGroup familyTags = new FamilyGroup();
     internal FamilyGroup familyTypes = new FamilyGroup();
 
@@ -66,16 +68,12 @@ namespace Pixeye.Actors
         var group = SetupGroup(myFieldInfo.FieldType, composition, layer);
         myFieldInfo.SetValue(obj, group);
 
-        ///TODO: ACTORS: BINDATTR
         if (bindAttribute != null)
         {
-          // if (bindAttribute != null)
-          // {
-          //   if (bindAttribute.id >= groups.globals.Length)
-          //     Array.Resize(ref groups.globals, bindAttribute.id + 5);
-          //
-          //   groups.globals[bindAttribute.id] = group;
-          // }
+          if (bindAttribute.id >= Bindings.Length)
+            Array.Resize<GroupCore>(ref Bindings, bindAttribute.id + 5);
+
+          Bindings[bindAttribute.id] = group;
         }
 
 

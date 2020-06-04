@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
+using System.Runtime.InteropServices;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -11,15 +11,29 @@ namespace Pixeye.Actors
 {
   public class Kernel : MonoBehaviour
   {
-    public static bool ChangingScene;
+    public static bool[] ChangingScene = new bool[128];
     public static bool ApplicationIsQuitting;
-    public static bool IsQuittingOrChangingScene() => ApplicationIsQuitting || ChangingScene;
-    public static SettingsActors Settings = new SettingsActors();
-    public static int GetTicksCount => 0;
+    public static bool IsQuittingOrChangingScene() => ApplicationIsQuitting;
+
+    public static int GetTicksCount
+    {
+      get
+      {
+        var amount = 0;
+        foreach (var layer in LayersInUse)
+        {
+          amount += layer.processorUpdate.GetTicksCount;
+        }
+
+        return amount;
+      }
+    }
+
+    internal static SettingsActors Settings = new SettingsActors();
 
     internal static Kernel Instance;
     internal const string KernelSceneName = "Actors Framework";
-    internal static LayerCore[] Layers = new LayerCore[48];
+    internal static LayerCore[] Layers = new LayerCore[128];
     internal static readonly List<LayerCore> LayersInUse = new List<LayerCore>();
 
 #if UNITY_EDITOR
@@ -48,7 +62,7 @@ namespace Pixeye.Actors
         var scene     = SceneManager.CreateScene(KernelSceneName, new CreateSceneParameters(LocalPhysicsMode.None));
         var objKernel = new GameObject("Actors Setup");
         SceneManager.MoveGameObjectToScene(objKernel, scene);
-        ActiveScene.NextActiveSceneName = SceneManager.GetActiveScene().name;
+        SceneMain.NextActiveSceneName = SceneManager.GetActiveScene().name;
         var kernel = objKernel.AddComponent<Kernel>();
         var layer  = objKernel.AddComponent<LayerApp>();
         Instance = kernel;
@@ -142,10 +156,23 @@ namespace Pixeye.Actors
     void OnApplicationQuit()
     {
 #if UNITY_EDITOR
-      EntityImplOld.Dispose();
+      Dispose();
 #endif
     }
+
+    internal static unsafe void Dispose()
+    {
+      for (int i = 0; i < ProcessorEcs.Entities.Length; i++)
+      {
+        var meta = ProcessorEcs.Entities.Get<EntityMeta>(i);
+        Marshal.FreeHGlobal((IntPtr) meta->components);
+        Marshal.FreeHGlobal((IntPtr) meta->groups);
+      }
+
+      UnmanagedMemory.Cleanup();
+    }
   }
+
 
   struct LogType
   {

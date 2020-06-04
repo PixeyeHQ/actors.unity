@@ -9,13 +9,12 @@ using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
-/// TODO: refactor this shit.
 namespace Pixeye.Actors
 {
   [CustomPropertyDrawer(typeof(TagFilterAttribute))]
   public class DrawerTags : PropertyDrawer
   {
-    private static SerializedProperty prop;
+    static SerializedProperty prop;
     static FieldInfo[] objectFields;
 
     public int currentIndex;

@@ -8,9 +8,9 @@ namespace Pixeye.Actors
     [Conditional("ACTORS_DEBUG")]
     internal static void DebugCheckLimits(int len, ent entity)
     {
-      if (len == CacheTags.Capacity)
+      if (len == EcsTags.Capacity)
       {
-        Kernel.Debugger.Log(LogType.TAGS_LIMIT_REACHED, entity, CacheTags.Capacity);
+        Kernel.Debugger.Log(LogType.TAGS_LIMIT_REACHED, entity, EcsTags.Capacity);
         throw new ArgumentException();
       }
     }

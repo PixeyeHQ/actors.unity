@@ -5,23 +5,20 @@ using UnityEngine;
 namespace Pixeye.Actors
 {
   [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
-  public partial class ImplEntity : IRequireActorsLayer
+  public  class ImplEntity : IRequireActorsLayer
   {
     internal ProcessorEcs processorEcs;
 
-    void IRequireActorsLayer.Bootstrap(LayerCore layer)
-    {
-      processorEcs = layer.processorEcs;
-    }
-    
-    
+    void IRequireActorsLayer.Bootstrap(LayerCore layer) => processorEcs = layer.processorEcs;
+
+
     public ent Create()
     {
       processorEcs.Create(out var entity);
       processorEcs.SetOperation(entity, -1, ProcessorEcs.Action.Activate);
       return entity;
     }
-
+    
     //===============================//
     // From string
     //===============================//
@@ -45,10 +42,21 @@ namespace Pixeye.Actors
 
     public ent Create(string prefabID, Transform parent, Vector3 position = default, bool pooled = false)
     {
-      processorEcs.Create(out var entity, pooled, true);
+      processorEcs.Create(out var entity, pooled);
       entity.managed.transform =
         pooled ? Obj.Spawn(Pool.Entities, prefabID, parent, position) : Obj.Spawn(prefabID, parent, position);
 
+      processorEcs.SetOperation(entity, -1, ProcessorEcs.Action.Activate);
+      return entity;
+    }
+
+    public ent Create(string prefabID, Transform parent, ModelComposer model, Vector3 position = default,
+      bool pooled = false)
+    {
+      processorEcs.Create(out var entity, pooled);
+      entity.managed.transform =
+        pooled ? Obj.Spawn(Pool.Entities, prefabID, parent, position) : Obj.Spawn(prefabID, parent, position);
+      model(entity);
       processorEcs.SetOperation(entity, -1, ProcessorEcs.Action.Activate);
       return entity;
     }
@@ -79,10 +87,21 @@ namespace Pixeye.Actors
 
     public ent Create(GameObject prefab, Transform parent, Vector3 position = default, bool pooled = false)
     {
-      processorEcs.Create(out var entity, pooled, true);
+      processorEcs.Create(out var entity, pooled);
       entity.managed.transform =
         pooled ? Obj.Spawn(Pool.Entities, prefab, parent, position) : Obj.Spawn(prefab, parent, position);
 
+      processorEcs.SetOperation(entity, -1, ProcessorEcs.Action.Activate);
+      return entity;
+    }
+
+    public ent Create(GameObject prefab, Transform parent, ModelComposer model, Vector3 position = default,
+      bool pooled = false)
+    {
+      processorEcs.Create(out var entity, pooled);
+      entity.managed.transform =
+        pooled ? Obj.Spawn(Pool.Entities, prefab, parent, position) : Obj.Spawn(prefab, parent, position);
+      model(entity);
       processorEcs.SetOperation(entity, -1, ProcessorEcs.Action.Activate);
       return entity;
     }
@@ -91,9 +110,29 @@ namespace Pixeye.Actors
     // For object
     //===============================//
 
+    internal ent CreateForActor(Actor actor, ScriptableBuild buildFrom, bool pooled)
+    {
+      processorEcs.Create(out var entity, pooled);
+      entity.managed.transform = actor.transform;
+      if (buildFrom != null)
+        buildFrom.ExecuteOnStart(entity, actor);
+      processorEcs.SetOperation(entity, -1, ProcessorEcs.Action.Activate);
+      return entity;
+    }
+
+    internal ent CreateForActor(Actor actor, ModelComposer model, bool pooled)
+    {
+      processorEcs.Create(out var entity, pooled);
+      entity.managed.transform = actor.transform;
+      model(entity);
+      processorEcs.SetOperation(entity, -1, ProcessorEcs.Action.Activate);
+      return entity;
+    }
+    
+    
     public ent CreateFor(GameObject go, ModelComposer model)
     {
-      processorEcs.Create(out var entity, false, true);
+      processorEcs.Create(out var entity, false);
       entity.managed.transform = go.transform;
       model(entity);
       processorEcs.SetOperation(entity, -1, ProcessorEcs.Action.Activate);
@@ -102,7 +141,7 @@ namespace Pixeye.Actors
 
     public ent CreateFor(GameObject go)
     {
-      processorEcs.Create(out var entity, false, true);
+      processorEcs.Create(out var entity, false);
       entity.managed.transform = go.transform;
       processorEcs.SetOperation(entity, -1, ProcessorEcs.Action.Activate);
       return entity;
@@ -110,7 +149,7 @@ namespace Pixeye.Actors
 
     public ent CreateFor(string name)
     {
-      processorEcs.Create(out var entity, false, true);
+      processorEcs.Create(out var entity, false);
       entity.managed.transform = GameObject.Find(name).transform;
       processorEcs.SetOperation(entity, -1, ProcessorEcs.Action.Activate);
       return entity;

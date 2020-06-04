@@ -124,47 +124,11 @@ namespace Pixeye.Actors
       return transform.GetComponent(t);
     }
 
-    public const bool Pooled = true;
+ 
     public static unsafe CacheEntityOld* entities;
-    internal static int[,] GenerationsInstant;
  
-    public static unsafe CacheTags* Tags;
+    public static unsafe EcsTags* Tags;
  
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static unsafe void Create(ent entity, bool isPooled = false, bool isNested = false)
-    {
-      if (entity.id >= EntityImplOld.lengthTotal)
-      {
-        var l = entity.id << 1;
-
-        HelperArray.ResizeInt(ref EntityImplOld.Generations, l, Kernel.Settings.SizeGenerations);
-        HelperArray.ResizeInt(ref EntityImplOld.GenerationsInstant, l, Kernel.Settings.SizeGenerations);
-        Array.Resize(ref EntityImplOld.Transforms, l);
-
- 
-        EntityImplOld.entities =
-          (CacheEntityOld*) UnmanagedMemory.ReAlloc(EntityImplOld.entities, EntityImplOld.sizeEntityCache * l);
-        EntityImplOld.Tags = (CacheTags*) UnmanagedMemory.ReAlloc(EntityImplOld.Tags, EntityImplOld.sizeBufferTags * l);
-        for (var i = EntityImplOld.lengthTotal; i < l; i++)
-        {
-          EntityImplOld.Tags[i]     = new CacheTags();
-          EntityImplOld.entities[i] = new CacheEntityOld(5);
-        }
- 
-        EntityImplOld.lengthTotal = l;
-      }
-
-      EntityImplOld.entities[entity.id].componentsAmount = 0;
-
-      var ptrCache = &EntityImplOld.entities[entity.id];
-      ptrCache->age      = entity.age;
-      ptrCache->isNested = isNested;
-      ptrCache->isPooled = isPooled;
-
-      ptrCache->isDirty = true;
-      ptrCache->isAlive = true;
-
-      EntityImplOld.alive.Add(entity);
-    }
+     
   }
 }

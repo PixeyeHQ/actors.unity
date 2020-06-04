@@ -4,10 +4,11 @@ using UnityEngine.SceneManagement;
 
 namespace Pixeye.Actors
 {
-  public static class SubScene
+  public static class SceneSub
   {
     public static void Add(int buildIndex)
     {
+      Kernel.ChangingScene[buildIndex] = true;
       LayerApp.LoadJobs.Add(SceneManager.LoadSceneAsync(buildIndex, LoadSceneMode.Additive));
     }
 
@@ -28,6 +29,7 @@ namespace Pixeye.Actors
 
     public static void Add(string sceneName)
     {
+      Kernel.ChangingScene[SceneManager.GetSceneByName(sceneName).buildIndex] = true;
       LayerApp.LoadJobs.Add(SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive));
     }
 

@@ -9,7 +9,5 @@ namespace Pixeye.Actors
   public static partial class EntityImplOld
   {
     public static Transform[] Transforms;
-    internal static int[,] Generations;
-    public static readonly int sizeBufferTags = UnsafeUtility.SizeOf<CacheTags>();
   }
 }

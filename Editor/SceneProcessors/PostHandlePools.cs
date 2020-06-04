@@ -4,6 +4,7 @@
 #if UNITY_EDITOR
 using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
+
 //TODO: ACTORS FRAMEWORK: STARTER
 namespace Pixeye.Actors
 {
@@ -31,8 +32,6 @@ namespace Pixeye.Actors
       // if (starter == null) return;
       // starter.ClearNodes();
     }
-
-    //	private static bool started = false;
 
     static void Step()
     {
@@ -67,7 +66,7 @@ namespace Pixeye.Actors
 
 #else //prefab = (GameObject) PrefabUtility.GetPrefabObject(gameObject);
 #endif
-   //   if (prefab == null) return;
+      //   if (prefab == null) return;
       //starter.AddToNode(prefab, gameObject, pool);
     }
   }

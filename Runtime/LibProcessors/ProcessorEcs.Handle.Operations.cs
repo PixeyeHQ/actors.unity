@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using UnityEngine.SceneManagement;
- 
+
 
 namespace Pixeye.Actors
 {
@@ -71,7 +72,7 @@ namespace Pixeye.Actors
       for (int j = 0; j < eMeta->componentsAmount; j++)
       {
         var componentID = eMeta->components[j];
-        var storage     = Storage.All[componentID];
+        var storage     = Actors.Storage.All[componentID];
         var groups      = storage.groups[eManaged.layer.id];
 
         for (var l = 0; l < groups.length; l++)
@@ -106,7 +107,7 @@ namespace Pixeye.Actors
             for (int j = 0; j < eMeta->componentsAmount; j++)
             {
               var componentID = eMeta->components[j];
-              var storage     = Storage.All[componentID];
+              var storage     = Actors.Storage.All[componentID];
               //var generation  = Storage.Generations[componentID];
               //var mask        = Storage.Masks[componentID];
               var groups = storage.groups[eManaged.layer.id];
@@ -133,7 +134,7 @@ namespace Pixeye.Actors
           case Action.Add:
           {
             var componentID = operation.arg;
-            var storage     = Storage.All[componentID];
+            var storage     = Actors.Storage.All[componentID];
             //var generation  = Storage.Generations[componentID];
             //var mask        = Storage.Masks[componentID];
             var groups = storage.groups[eManaged.layer.id];
@@ -213,8 +214,12 @@ namespace Pixeye.Actors
 
             eMeta->componentsAmount = 0;
 
+            foreach (var child in eManaged.childs)
+              child.Release();
 
-            if (!eManaged.isNested && eManaged.transform != null)
+            eManaged.childs.length = 0;
+
+            if (eManaged.transform != null)
             {
               eManaged.transform.gameObject.Release(eManaged.isPooled ? Pool.Entities : 0);
             }
@@ -236,7 +241,7 @@ namespace Pixeye.Actors
           {
             if (eMeta->componentsAmount == 0) continue;
             var componentID = operation.arg;
-            var storage     = Storage.All[componentID];
+            var storage     = Actors.Storage.All[componentID];
             //var generation  = Storage.Generations[componentID];
             //var mask        = Storage.Masks[componentID];
             var groups = storage.groups[eManaged.layer.id];
@@ -279,11 +284,16 @@ namespace Pixeye.Actors
             break;
           case Action.Empty:
           {
-            if (!eManaged.isNested && eManaged.transform != null)
+            if (eManaged.transform != null)
             {
               eManaged.transform.gameObject.Release(eManaged.isPooled ? Pool.Entities : 0);
             }
 
+            foreach (var child in eManaged.childs)
+              child.Release();
+
+            eManaged.childs.length = 0;
+            
             eMeta->tags.Clear();
             eMeta->isAlive = false;
             entities.Remove(operation.entity);
@@ -322,9 +332,9 @@ namespace Pixeye.Actors
           nextGroup.added.length   = 0;
         }
 #endif
-        for (var i = 0; i < Storage.lastID; i++)
+        for (var i = 0; i < Actors.Storage.lastID; i++)
         {
-          var storage = Storage.All[i];
+          var storage = Actors.Storage.All[i];
           storage.Dispose(storage.toDispose);
           storage.toDispose.length = 0;
         }

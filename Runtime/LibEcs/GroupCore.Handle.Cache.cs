@@ -1,7 +1,4 @@
-//  Project : ecs
-// Contacts : Pix - ask@pixeye.games
-
-using System;
+﻿using System;
 using Unity.IL2CPP.CompilerServices;
 
 namespace Pixeye.Actors
@@ -110,7 +107,7 @@ namespace Pixeye.Actors
   [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
   static class HelperCacheGroup
   {
-    public static bool Contain(this CacheGroup container, GroupCore groupCore)
+    internal static bool Contain(this CacheGroup container, GroupCore groupCore)
     {
       var len = container.length;
       for (int i = 0; i < len; i++)
@@ -122,7 +119,7 @@ namespace Pixeye.Actors
       return false;
     }
 
-    public static bool TryGetValue(this CacheGroup container, Type t, Composition composition, out GroupCore group)
+    internal static bool TryGetValue(this CacheGroup container, Type t, Composition composition, out GroupCore group)
     {
       var len = container.length;
       for (int i = 0; i < len; i++)
@@ -141,7 +138,7 @@ namespace Pixeye.Actors
       return false;
     }
 
-    public static GroupCore Add(this CacheGroup container, GroupCore group)
+    internal static GroupCore Add(this CacheGroup container, GroupCore group)
     {
       ref var len     = ref container.length;
       ref var storage = ref container.Elements;
@@ -156,7 +153,7 @@ namespace Pixeye.Actors
       return group;
     }
 
-    public static void Dispose(this CacheGroup container)
+    internal static void Dispose(this CacheGroup container)
     {
       for (int i = 0; i < container.length; i++)
         container.Elements[i].Dispose();

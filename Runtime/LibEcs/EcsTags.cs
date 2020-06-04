@@ -6,22 +6,22 @@
 #undef ACTORS_TAGS_DEFAULT
 #endif
 
- 
+
 using System.Runtime.InteropServices;
 
 namespace Pixeye.Actors
 {
   [StructLayout(LayoutKind.Sequential)]
-  public unsafe struct CacheTags
+  public unsafe struct EcsTags
   {
 #if ACTORS_TAGS_24 || ACTORS_TAGS_DEFAULT
     public const int Capacity = 24;
     public fixed ushort tags[Capacity];
     public fixed byte size[Capacity];
 #elif ACTORS_TAGS_12
-		public const int Capacity = 12;
-		public fixed ushort tags[Capacity];
-		public fixed byte size[Capacity];
+    public const int Capacity = 12;
+    public fixed ushort tags[Capacity];
+    public fixed byte size[Capacity];
 #elif ACTORS_TAGS_6
     public const int Capacity = 6;
     public fixed ushort tags[Capacity];

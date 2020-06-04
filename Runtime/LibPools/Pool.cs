@@ -26,7 +26,7 @@ namespace Pixeye.Actors
       Add(UI);
     }
 
-    private static void Add(int id)
+    static void Add(int id)
     {
       PoolContainer pool;
       pool = new PoolContainer();

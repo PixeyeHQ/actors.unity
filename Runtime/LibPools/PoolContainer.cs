@@ -1,9 +1,8 @@
+using System.Collections;
 using System.Collections.Generic;
 using Unity.IL2CPP.CompilerServices;
 using UnityEngine;
 using Object = UnityEngine.Object;
-
-//todo: ACTORS REFACTORING: POOL TIMERS 50/63
 
 namespace Pixeye.Actors
 {
@@ -13,23 +12,25 @@ namespace Pixeye.Actors
     public bool globalPool = false;
     private List<GameObject> activeObjs = new List<GameObject>(500);
 
-    private Dictionary<int, Stack<GameObject>> cachedObjects = new Dictionary<int, Stack<GameObject>>(500, new FastComparable());
+    private Dictionary<int, Stack<GameObject>> cachedObjects =
+      new Dictionary<int, Stack<GameObject>>(500, new FastComparable());
+
     private Dictionary<int, int> cachedIds = new Dictionary<int, int>(500, new FastComparable());
 
     public void RegisterObject(GameObject prefab)
     {
-      var key = prefab.GetInstanceID();
+      var               key = prefab.GetInstanceID();
       Stack<GameObject> stack;
-      var hasValue = cachedObjects.TryGetValue(key, out stack);
+      var               hasValue = cachedObjects.TryGetValue(key, out stack);
 
       if (!hasValue) cachedObjects.Add(key, new Stack<GameObject>());
     }
 
     public void Prepopulate(GameObject prefab, GameObject obj)
     {
-      var key = prefab.GetInstanceID();
+      var               key = prefab.GetInstanceID();
       Stack<GameObject> stack;
-      var hasValue = cachedObjects.TryGetValue(key, out stack);
+      var               hasValue = cachedObjects.TryGetValue(key, out stack);
       if (!hasValue) cachedObjects.Add(key, new Stack<GameObject>());
       else
       {
@@ -44,15 +45,18 @@ namespace Pixeye.Actors
 
     public PoolContainer PopulateWith(GameObject prefab, int amount, int amountPerTick = 10, int timeRate = 1)
     {
-      var key = prefab.GetInstanceID();
+      var               key = prefab.GetInstanceID();
       Stack<GameObject> stack;
-      var hasValue = cachedObjects.TryGetValue(key, out stack);
+      var               hasValue = cachedObjects.TryGetValue(key, out stack);
       if (!hasValue) cachedObjects.Add(key, new Stack<GameObject>(amount));
+      
+      LayerApp.Run(CoPop());
 
-      //Timer.Add(time.delta * timeRate, Pop);
-
-      void Pop()
+      IEnumerator CoPop()
       {
+        var delay = time.delta * timeRate;
+        yield return LayerApp.Wait(delay);
+
         for (var i = 0; i < amountPerTick; i++)
         {
           if (amount == 0) break;
@@ -62,7 +66,7 @@ namespace Pixeye.Actors
 
         if (amount > 0)
         {
-          //  Timer.Add(time.delta * timeRate, () => PopulateWith(prefab, amount, amountPerTick, timeRate));
+          PopulateWith(prefab, amount, amountPerTick, timeRate);
         }
       }
 
@@ -74,7 +78,7 @@ namespace Pixeye.Actors
       var key = prefab.GetInstanceID();
 
       Stack<GameObject> objs;
-      var stacked = cachedObjects.TryGetValue(key, out objs);
+      var               stacked = cachedObjects.TryGetValue(key, out objs);
 
       if (stacked && objs.Count > 0)
       {
@@ -107,11 +111,11 @@ namespace Pixeye.Actors
       var key = prefab.GetInstanceID();
 
       Stack<GameObject> objs;
-      var stacked = cachedObjects.TryGetValue(key, out objs);
+      var               stacked = cachedObjects.TryGetValue(key, out objs);
 
       if (stacked && objs.Count > 0)
       {
-        var obj = objs.Pop();
+        var obj       = objs.Pop();
         var transform = obj.transform;
         if (transform.parent != parent)
           transform.SetParent(parent);
@@ -139,11 +143,11 @@ namespace Pixeye.Actors
       var key = prefab.GetInstanceID();
 
       Stack<GameObject> objs;
-      var stacked = cachedObjects.TryGetValue(key, out objs);
+      var               stacked = cachedObjects.TryGetValue(key, out objs);
 
       if (stacked && objs.Count > 0)
       {
-        var obj = objs.Pop();
+        var obj       = objs.Pop();
         var transform = obj.transform;
         if (transform.parent != parent)
           transform.SetParent(parent);
@@ -160,7 +164,7 @@ namespace Pixeye.Actors
 
       if (parent != null)
       {
-        position = parent.TransformPoint(position);
+        position =  parent.TransformPoint(position);
         rotation *= parent.rotation;
       }
 

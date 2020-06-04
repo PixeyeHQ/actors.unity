@@ -33,7 +33,7 @@ namespace Pixeye.Actors
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void Create(out ent entity, bool isPooled = false, bool isNested = false)
+    internal void Create(out ent entity, bool isPooled = false)
     {
       if (ent.Released.length > 0)
       {
@@ -67,7 +67,6 @@ namespace Pixeye.Actors
       ref var managed = ref EntitiesManaged[entity.id];
 
       managed.layer    = layer;
-      managed.isNested = isNested;
       managed.isPooled = isPooled;
 
       ptr->age     = entity.age;
@@ -79,5 +78,7 @@ namespace Pixeye.Actors
     {
       this.layer = layer;
     }
+
+ 
   }
 }

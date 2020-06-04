@@ -16,17 +16,21 @@ namespace Pixeye.Actors
   /// A scene point of entry. The developer defines here scene dependencies and processing that will work on the scene. 
   public abstract class Layer<T> : LayerCore
   {
-    public static ImplEntity Entity => layer.implEntity;
-    public static ImplEcs Ecs => layer.implEcs;
-    public static ImplObserver Observer => layer.implObserver;
- 
-    internal static Layer<T> layer;
+    public static new ImplEntity Entity => LayerTyped.core.Entity;
+    public static new ImplEcs Ecs => LayerTyped.core.Ecs;
+    public static new ImplObserver Observer => LayerTyped.core.Observer;
+    public static new ImplActor Actor => LayerTyped.core.Actor;
+
+    internal static Layer<T> LayerTyped;
+    internal LayerCore core;
 
     protected sealed override void Awake()
     {
+      core = this;
       base.Awake();
       Bootstrap(); // Setup actors logic for a scene.
       Setup();     // Entry point for developers.
+      Kernel.ChangingScene[gameObject.scene.buildIndex] = false;
     }
 
     void Start()
@@ -44,7 +48,7 @@ namespace Pixeye.Actors
         Kernel.Layers[buildIndex] = this;
       }
 
-      layer = this;
+      LayerTyped = this;
 
       #endregion
 
@@ -55,24 +59,26 @@ namespace Pixeye.Actors
       processorUpdate = new ProcessorUpdate();
       processorUpdate.Add(this);
 
+
       processorCoroutine = Add<ProcessorCoroutine>();
       processorSignals   = Add<ProcessorSignals>();
       processorEcs       = Add<ProcessorEcs>();
-      implEntity         = Add<ImplEntity>();
-      implEcs            = Add<ImplEcs>();
+      core.Actor         = Add<ImplActor>();
+      core.Entity        = Add<ImplEntity>();
+      core.Ecs           = Add<ImplEcs>();
 
       Add<ProcessorObserver>();
 
-      processorUpdate.layer = layer;
+      processorUpdate.layer = LayerTyped;
 
       #endregion
 
       #region Update Active Layer
 
       if (gameObject.scene.name != Kernel.KernelSceneName)
-        if (ActiveScene.NextActiveSceneName != null && ActiveScene.NextActiveSceneName == gameObject.scene.name)
+        if (SceneMain.NextActiveSceneName != null && SceneMain.NextActiveSceneName == gameObject.scene.name)
         {
-          ActiveScene.NextActiveSceneName = default;
+          SceneMain.NextActiveSceneName = default;
           ActiveLayer                     = this;
           Run(CoWaitForSceneLoad());
 
@@ -95,14 +101,14 @@ namespace Pixeye.Actors
     {
       var obj = new Y();
       if (obj is IRequireActorsLayer member)
-        member.Bootstrap(layer);
-      layer.objects.Add(typeof(Y).GetHashCode(), obj);
+        member.Bootstrap(LayerTyped);
+      LayerTyped.objects.Add(typeof(Y).GetHashCode(), obj);
       return obj;
     }
 
     public static Y Get<Y>() where Y : class
     {
-      return layer.objects[typeof(Y).GetHashCode()] as Y;
+      return LayerTyped.objects[typeof(Y).GetHashCode()] as Y;
     }
 
     #endregion
@@ -112,26 +118,26 @@ namespace Pixeye.Actors
     /// Run coroutine on the top of this layer.
     public static RoutineCall Run(IEnumerator routine)
     {
-      return layer.processorCoroutine.Run(routine);
+      return LayerTyped.processorCoroutine.Run(routine);
     }
 
     /// Run coroutine on the top of this layer.
     public static RoutineCall Run(float delay, IEnumerator routine)
     {
-      return layer.processorCoroutine.Run(delay, routine);
+      return LayerTyped.processorCoroutine.Run(delay, routine);
     }
 
     /// Stop coroutine on the top of this layer.
     public static bool Stop(IEnumerator routine)
     {
-      return layer.processorCoroutine.Stop(routine);
+      return LayerTyped.processorCoroutine.Stop(routine);
     }
 
     public static IEnumerator WaitFrame => null;
 
     public static IEnumerator Wait(float t)
     {
-      layer.processorCoroutine.delays[layer.processorCoroutine.currentIndex] = t;
+      LayerTyped.processorCoroutine.delays[LayerTyped.processorCoroutine.currentIndex] = t;
       return null;
     }
 
@@ -152,9 +158,9 @@ namespace Pixeye.Actors
 
     #region Signals
 
-    public new static void Send<Y>(in Y signal) => layer.processorSignals.Dispatch(signal);
-    public new static void AddSignal(object signal) => layer.processorSignals.Add(signal);
-    public new static void RemoveSignal(object signal) => layer.processorSignals.Remove(signal);
+    public new static void Send<Y>(in Y signal) => LayerTyped.processorSignals.Dispatch(signal);
+    public new static void AddSignal(object signal) => LayerTyped.processorSignals.Add(signal);
+    public new static void RemoveSignal(object signal) => LayerTyped.processorSignals.Remove(signal);
 
     #endregion
   }

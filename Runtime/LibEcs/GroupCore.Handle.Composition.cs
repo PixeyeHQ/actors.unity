@@ -1,11 +1,6 @@
-//  Project  : ACTORS
-//  Contacts : Pixeye - ask@pixeye.games
-
-
-using System;
+﻿using System;
 using System.Runtime.CompilerServices;
 using Unity.IL2CPP.CompilerServices;
-
 
 namespace Pixeye.Actors
 {

@@ -178,9 +178,23 @@ namespace Pixeye.Actors
              (managed.signature[Storage<T>.Generation] & mask5) == mask5;
     }
 
+    public void SetParent(ent entity)
+    {
+      var _managed = managed;
+      _managed.parent = entity;
+      entity.managed.childs.Add(this);
+    }
+
+    public void Unparent()
+    {
+      var _managed = managed;
+      _managed.parent.managed.childs.Remove(this);
+      _managed.parent = default;
+    }
+
     public void MoveTo<T>() where T : LayerCore
     {
-      var nextLayer = Layer<T>.layer;
+      var nextLayer = Layer<T>.LayerTyped;
 
 #if ACTORS_DEBUG
       if (nextLayer == null)
@@ -189,10 +203,10 @@ namespace Pixeye.Actors
         throw new Exception();
       }
 
-      if (meta->parent.exist || managed.isNested)
+      if (managed.parent.exist)
       {
         Debug.Log(
-          $"You are trying to send nested entity. This is not allowed. Send parent [{meta->parent.id}] {managed.transform} instead.");
+          $"You are trying to send child entity. This is not allowed. Send parent [{managed.parent.id}] {managed.transform} instead.");
         throw new Exception();
       }
 #endif

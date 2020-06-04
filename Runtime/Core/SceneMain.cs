@@ -4,7 +4,7 @@ using UnityEngine.SceneManagement;
 
 namespace Pixeye.Actors
 {
-  public static class ActiveScene
+  public static class SceneMain
   {
     internal static string NextActiveSceneName;
 
@@ -14,6 +14,7 @@ namespace Pixeye.Actors
 
       IEnumerator CoChangeTo()
       {
+        Kernel.ChangingScene[buildIndex] = true;
         LayerCore.ActiveLayer.Release();
         yield return LayerApp.WaitFrame;
         LayerApp.LoadJobs.Add(SceneManager.UnloadSceneAsync(LayerCore.ActiveLayer.Scene));
@@ -23,19 +24,20 @@ namespace Pixeye.Actors
       }
     }
 
-    public static void ChangeTo(string name)
+    public static void ChangeTo(string sceneName)
     {
       LayerApp.Run(CoChangeTo());
 
       IEnumerator CoChangeTo()
       {
-        LayerCore.ActiveLayer.isDirty = true;
+        Kernel.ChangingScene[SceneManager.GetSceneByName(sceneName).buildIndex] = true;
+        LayerCore.ActiveLayer.isDirty                                           = true;
         yield return LayerApp.WaitFrame;
         LayerCore.ActiveLayer.Release();
         LayerApp.LoadJobs.Add(SceneManager.UnloadSceneAsync(LayerCore.ActiveLayer.Scene));
         LayerApp.LoadJobs.Add(Resources.UnloadUnusedAssets());
-        LayerApp.LoadJobs.Add(SceneManager.LoadSceneAsync(name, LoadSceneMode.Additive));
-        NextActiveSceneName = name;
+        LayerApp.LoadJobs.Add(SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive));
+        NextActiveSceneName = sceneName;
       }
     }
   }

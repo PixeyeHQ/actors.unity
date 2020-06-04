@@ -15,8 +15,10 @@ namespace Pixeye.Actors
   {
     internal static int NextID;
     internal int id;
-    public ImplEntity Entity;
     public LayerCore Layer;
+    protected ImplObserver Observer;
+    protected ImplActor Actor;
+    protected ImplEntity Entity;
     protected ImplEcs Ecs;
 
     void IRequireActorsLayer.Bootstrap(LayerCore layer)
@@ -29,9 +31,10 @@ namespace Pixeye.Actors
       layer.processorEcs.processors.Add(this);
       layer.processorSignals.Add(this);
 
-      Entity = layer.implEntity;
-      Ecs    = layer.implEcs;
-
+      Entity   = layer.Entity;
+      Ecs      = layer.Ecs;
+      Observer = layer.Observer;
+      Actor    = layer.Actor;
 
       OnLaunch();
     }

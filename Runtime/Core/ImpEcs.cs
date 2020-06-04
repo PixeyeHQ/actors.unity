@@ -9,6 +9,8 @@
       this.layer = layer;
     }
 
+    public ents Alive => layer.processorEcs.entities;
+
     public ref T Send<T>() where T : struct
     {
       var     q = SignalsEcs<T>.layers[layer.id];
@@ -16,8 +18,7 @@
       e.firstReceiver = -1;
       return ref e.signal;
     }
-
-
+    
     public void Send<T>(in T obj) where T : struct
     {
       if (SignalsEcs<T>.layers[layer.id] == null) return;
