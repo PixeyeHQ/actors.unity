@@ -21,7 +21,7 @@ namespace Pixeye.Actors
     internal const string KernelSceneName = "Actors Framework";
     internal static LayerCore[] Layers = new LayerCore[48];
     internal static readonly List<LayerCore> LayersInUse = new List<LayerCore>();
-    
+
 #if UNITY_EDITOR
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
 #else
@@ -30,6 +30,7 @@ namespace Pixeye.Actors
     static void Bootstrap()
     {
       HandleSettings();
+      Random.Bootstrap();
       ProcessorEcs.Bootstrap();
       HandleScenes();
 

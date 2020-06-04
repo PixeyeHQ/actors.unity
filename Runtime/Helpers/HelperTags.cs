@@ -15,16 +15,6 @@ namespace Pixeye.Actors
   public static unsafe class HelperTags
   {
  
-    [Conditional("ACTORS_DEBUG")]
-    internal static void DebugCheckLimits(int len, ent entity)
-    {
-      if (len == CacheTags.Capacity)
-      {
-        Kernel.Debugger.Log(LogType.TAGS_LIMIT_REACHED, entity, CacheTags.Capacity);
-        throw new ArgumentException();
-      }
-    }
-
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static bool Overlaps(this int[] tags, EntityMeta* meta)
@@ -66,82 +56,11 @@ namespace Pixeye.Actors
       return match == tags.Length;
     }
 
+ 
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void Set(in this ent entity, int tagID)
-    {
-      ref var buffer = ref entity.meta->tags;
+    
 
-      int len = buffer.length;
-      var tID = (ushort) tagID;
-      for (var index = 0; index < len; index++)
-      {
-        if (buffer.tags[index] == tID)
-        {
-          unchecked
-          {
-            buffer.size[index] += 1;
-          }
-
-          return;
-        }
-      }
-
-      DebugCheckLimits(len, entity);
-
-      buffer.SetElement(buffer.length, tagID);
-    }
-
-    public static void Add(in this ent entity, int tagID)
-    {
-      var     meta   = entity.meta;
-      ref var buffer = ref meta->tags;
-      int     len    = buffer.length;
-      var     tID    = (ushort) tagID;
-
-      for (var index = 0; index < len; index++)
-      {
-        if (buffer.tags[index] == tID)
-        {
-          unchecked
-          {
-            buffer.size[index] += 1;
-          }
-
-          return;
-        }
-      }
-
-      DebugCheckLimits(len, entity);
-
-      buffer.SetElement(buffer.length, tagID);
-
-      HandleChanges(entity, tagID);
-    }
-
-
-    internal static void ClearAll()
-    {
-      for (var i = 0; i < EntityImplOld.lengthTotal; i++)
-      {
-        EntityImplOld.Tags[i].length = 0;
-      }
-    }
-
-    public static void ClearTags(in this ent entity)
-    {
-      ref var buffer = ref Actors.EntityImplOld.Tags[entity.id];
-      var     len    = buffer.length;
-
-      for (var i = 0; i < len; i++)
-      {
-        var tID = (ushort) buffer.tags[i];
-        buffer.size[i] = 0;
-        buffer.tags[i] = 0;
-        buffer.length--;
-        HandleChanges(entity, tID);
-      }
-    }
+    
 
     public static int TagsAmount(in this ent entity, int tagID)
     {
@@ -149,143 +68,13 @@ namespace Pixeye.Actors
     }
 
 
-    public static void Add(in this ent entity, params int[] tagsID)
-    {
-      ref var buffer = ref Actors.EntityImplOld.Tags[entity.id];
-      int     len    = buffer.length;
+     
 
-      for (var i = 0; i < tagsID.Length; i++)
-      {
-        var tID        = (ushort) tagsID[i];
-        var allowToAdd = true;
+     
 
-        for (var index = 0; index < len; index++)
-        {
-          if (buffer.tags[index] == tID)
-          {
-            unchecked
-            {
-              buffer.size[index] += 1;
-            }
+    
 
-            allowToAdd = false;
-            break;
-          }
-        }
-
-        if (!allowToAdd) continue;
-
-#if UNITY_EDITOR
-        if (len == CacheTags.Capacity)
-        {
-          Kernel.Debugger.Log(LogType.TAGS_LIMIT_REACHED, entity, CacheTags.Capacity);
-          return;
-        }
-#endif
-
-        buffer.SetElement(buffer.length, tID);
-        HandleChanges(entity, tID);
-      }
-    }
-
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void Set(in this ent entity, params int[] tagsID)
-    {
-      ref var buffer = ref entity.meta->tags;
-
-      int len = buffer.length;
-
-      for (var i = 0; i < tagsID.Length; i++)
-      {
-        var tID        = (ushort) tagsID[i];
-        var allowToAdd = true;
-        for (var index = 0; index < len; index++)
-        {
-          if (buffer.tags[index] == tID)
-          {
-            unchecked
-            {
-              buffer.size[index] += 1;
-            }
-
-            allowToAdd = false;
-            break;
-          }
-        }
-
-        if (!allowToAdd) continue;
-
-#if UNITY_EDITOR
-        if (len == CacheTags.Capacity)
-        {
-          Kernel.Debugger.Log(LogType.TAGS_LIMIT_REACHED, entity, CacheTags.Capacity);
-          return;
-        }
-#endif
-
-        buffer.SetElement(buffer.length, tID);
-      }
-    }
-
-    public static void Remove(in this ent entity, int tagID)
-    {
-      ref var buffer = ref Actors.EntityImplOld.Tags[entity.id];
-      int     len    = buffer.length;
-
-      for (var index = 0; index < len; index++)
-      {
-        if (buffer.tags[index] == tagID)
-        {
-          if (--buffer.size[index] == 0)
-          {
-            buffer.RemoveAt(index);
-            HandleChanges(entity, tagID);
-          }
-
-          return;
-        }
-      }
-    }
-
-    public static void RemoveAll(in this ent entity, params int[] tagsID)
-    {
-      ref var buffer = ref Actors.EntityImplOld.Tags[entity.id];
-      var     len    = buffer.length;
-
-      for (var i = 0; i < tagsID.Length; i++)
-      {
-        var tID = (ushort) tagsID[i];
-        for (var index = 0; index < len; index++)
-        {
-          if (buffer.tags[index] == tID)
-          {
-            buffer.size[index] = 0;
-            buffer.RemoveAt(index);
-            HandleChanges(entity, tID);
-            break;
-          }
-        }
-      }
-    }
-
-    public static void RemoveAll(in this ent entity, int tagID)
-    {
-      ref var buffer = ref Actors.EntityImplOld.Tags[entity.id];
-      int     len    = buffer.length;
-      var     tID    = (ushort) tagID;
-
-      for (var index = 0; index < len; index++)
-      {
-        if (buffer.tags[index] == tID)
-        {
-          buffer.size[index] = 0;
-          buffer.RemoveAt(index);
-          HandleChanges(entity, tID);
-          return;
-        }
-      }
-    }
+     
 
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -362,16 +151,7 @@ namespace Pixeye.Actors
       }
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    [Conditional("ACTORS_TAGS_CHECKS")]
-    internal static void HandleChanges(ent entity, int tagID)
-    {
-      if (entity.meta->isDirty) return;
-      var ecs        = entity.managed.layer.processorEcs;
-      var indexGroup = ecs.familyTags.TryGetValue(tagID);
-      if (indexGroup == -1) return;
-      ecs.SetOperation(entity, indexGroup, ProcessorEcs.Action.ChangeTag);
-    }
+ 
 
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

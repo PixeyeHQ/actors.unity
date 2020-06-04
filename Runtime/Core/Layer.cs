@@ -17,10 +17,9 @@ namespace Pixeye.Actors
   public abstract class Layer<T> : LayerCore
   {
     public static ImplEntity Entity => layer.implEntity;
-
     public static ImplEcs Ecs => layer.implEcs;
-    //public static ImplSignals Signals => layer.implSignals;
-
+    public static ImplObserver Observer => layer.implObserver;
+ 
     internal static Layer<T> layer;
 
     protected sealed override void Awake()
@@ -61,6 +60,8 @@ namespace Pixeye.Actors
       processorEcs       = Add<ProcessorEcs>();
       implEntity         = Add<ImplEntity>();
       implEcs            = Add<ImplEcs>();
+
+      Add<ProcessorObserver>();
 
       processorUpdate.layer = layer;
 

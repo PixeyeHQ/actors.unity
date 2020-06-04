@@ -14,10 +14,6 @@ namespace Pixeye.Actors
 
   public static class Obj
   {
-    
-    //public static int Get
-    
-
     /// Initialize every actor or monocache on childs of the selected gameobject
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void InitChilds(GameObject obj, InitMode mode = InitMode.All)
@@ -70,13 +66,13 @@ namespace Pixeye.Actors
       }
     }
 
-
     //===============================//
     // By GameObject ID
     //===============================//
 
     // Default
-    public static Transform Spawn(GameObject prefab, Vector3 startPosition = default, Quaternion startRotation = default)
+    public static Transform Spawn(GameObject prefab, Vector3 startPosition = default,
+      Quaternion startRotation = default)
     {
       var tr = Object.Instantiate(prefab, startPosition, startRotation).transform;
 
@@ -86,9 +82,11 @@ namespace Pixeye.Actors
       return tr;
     }
 
-    public static Transform Spawn(GameObject prefab, Transform parent, Vector3 startPosition = default, Quaternion startRotation = default)
+    public static Transform Spawn(GameObject prefab, Transform parent, Vector3 startPosition = default,
+      Quaternion startRotation = default)
     {
-      var tr = Object.Instantiate(prefab, parent.TransformPoint(startPosition), startRotation * parent.rotation, parent).transform;
+      var tr = Object.Instantiate(prefab, parent.TransformPoint(startPosition), startRotation * parent.rotation, parent)
+        .transform;
 
 #if UNITY_EDITOR
       tr.SetAsLastSibling();
@@ -96,7 +94,8 @@ namespace Pixeye.Actors
       return tr;
     }
 
-    public static T Spawn<T>(GameObject prefab, Transform parent, Vector3 startPosition = default, Quaternion startRotation = default)
+    public static T Spawn<T>(GameObject prefab, Transform parent, Vector3 startPosition = default,
+      Quaternion startRotation = default)
     {
 #if UNITY_EDITOR
       var o = Spawn(prefab, parent, startPosition, startRotation).GetComponentInChildren<T>();
@@ -119,7 +118,8 @@ namespace Pixeye.Actors
     }
 
     //Pooled
-    public static Transform Spawn(int poolID, GameObject prefab, Transform parent, Vector3 startPosition = default, Quaternion startRotation = default)
+    public static Transform Spawn(int poolID, GameObject prefab, Transform parent, Vector3 startPosition = default,
+      Quaternion startRotation = default)
     {
       var tr = Pool.pools[poolID].Spawn(prefab, startPosition, startRotation, parent).transform;
 
@@ -129,17 +129,20 @@ namespace Pixeye.Actors
       return tr;
     }
 
-    public static T Spawn<T>(int poolID, GameObject prefab, Transform parent, Vector3 startPosition = default, Quaternion startRotation = default)
+    public static T Spawn<T>(int poolID, GameObject prefab, Transform parent, Vector3 startPosition = default,
+      Quaternion startRotation = default)
     {
       return Spawn(poolID, prefab, parent, startPosition, startRotation).GetComponentInChildren<T>();
     }
 
-    public static T Spawn<T>(int poolID, GameObject prefab, Vector3 startPosition = default, Quaternion startRotation = default)
+    public static T Spawn<T>(int poolID, GameObject prefab, Vector3 startPosition = default,
+      Quaternion startRotation = default)
     {
       return Spawn(poolID, prefab, startPosition, startRotation).GetComponentInChildren<T>();
     }
 
-    public static Transform Spawn(int poolID, GameObject prefab, Vector3 startPosition = default, Quaternion startRotation = default)
+    public static Transform Spawn(int poolID, GameObject prefab, Vector3 startPosition = default,
+      Quaternion startRotation = default)
     {
       var tr = Pool.pools[poolID].Spawn(prefab, startPosition, startRotation).transform;
 
@@ -167,9 +170,11 @@ namespace Pixeye.Actors
       return tr;
     }
 
-    public static Transform Spawn(string prefabID, Transform parent, Vector3 startPosition = default, Quaternion startRotation = default)
+    public static Transform Spawn(string prefabID, Transform parent, Vector3 startPosition = default,
+      Quaternion startRotation = default)
     {
-      var tr = Object.Instantiate(Box.Get<GameObject>(prefabID), parent.TransformPoint(startPosition), startRotation * parent.rotation, parent).transform;
+      var tr = Object.Instantiate(Box.Get<GameObject>(prefabID), parent.TransformPoint(startPosition),
+        startRotation * parent.rotation, parent).transform;
 
 
 #if UNITY_EDITOR
@@ -179,7 +184,8 @@ namespace Pixeye.Actors
       return tr;
     }
 
-    public static T Spawn<T>(string prefabID, Transform parent, Vector3 startPosition = default, Quaternion startRotation = default)
+    public static T Spawn<T>(string prefabID, Transform parent, Vector3 startPosition = default,
+      Quaternion startRotation = default)
     {
 #if UNITY_EDITOR
       var o = Spawn(prefabID, parent, startPosition, startRotation).GetComponentInChildren<T>();
@@ -201,12 +207,12 @@ namespace Pixeye.Actors
 #endif
     }
 
-
     // Pooled
-    public static Transform Spawn(int poolID, string prefabID, Vector3 startPosition = default, Quaternion startRotation = default)
+    public static Transform Spawn(int poolID, string prefabID, Vector3 startPosition = default,
+      Quaternion startRotation = default)
     {
       var tr = Pool.pools[poolID].Spawn(Box.Get<GameObject>(prefabID), startPosition, startRotation).transform;
- 
+
 #if UNITY_EDITOR
       tr.SetAsLastSibling();
 #endif
@@ -214,7 +220,8 @@ namespace Pixeye.Actors
       return tr;
     }
 
-    public static Transform Spawn(int poolID, string prefabID, Transform parent, Vector3 startPosition = default, Quaternion startRotation = default)
+    public static Transform Spawn(int poolID, string prefabID, Transform parent, Vector3 startPosition = default,
+      Quaternion startRotation = default)
     {
       var tr = Pool.pools[poolID].Spawn(Box.Get<GameObject>(prefabID), startPosition, startRotation, parent).transform;
 
@@ -226,7 +233,8 @@ namespace Pixeye.Actors
       return tr;
     }
 
-    public static T Spawn<T>(int poolID, string prefabID, Transform parent, Vector3 startPosition = default, Quaternion startRotation = default)
+    public static T Spawn<T>(int poolID, string prefabID, Transform parent, Vector3 startPosition = default,
+      Quaternion startRotation = default)
     {
 #if UNITY_EDITOR
       var o = Spawn(poolID, prefabID, parent, startPosition, startRotation).GetComponentInChildren<T>();
@@ -237,7 +245,8 @@ namespace Pixeye.Actors
 #endif
     }
 
-    public static T Spawn<T>(int poolID, string prefabID, Vector3 startPosition = default, Quaternion startRotation = default)
+    public static T Spawn<T>(int poolID, string prefabID, Vector3 startPosition = default,
+      Quaternion startRotation = default)
     {
 #if UNITY_EDITOR
       var o = Spawn(poolID, prefabID, startPosition, startRotation).GetComponentInChildren<T>();
@@ -246,40 +255,6 @@ namespace Pixeye.Actors
 #else
      return Spawn(poolID, prefabID, startPosition, startRotation).GetComponentInChildren<T>();
 #endif
-    }
-  }
-
-  public static partial class HelperFramework
-  {
-    public static void Release(this GameObject o, int poolID = 0)
-    {
-      if (poolID <= 0)
-        GameObject.Destroy(o);
-      else Pool.Despawn(poolID, o);
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static T Get<T>(this GameObject obj, string path)
-    {
-      return obj.transform.Find(path).GetComponent<T>();
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static T Get<T>(this Transform tr, string path)
-    {
-      return tr.Find(path).GetComponent<T>();
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static T Get<T>(this Behaviour obj, string path)
-    {
-      return obj.transform.Find(path).GetComponent<T>();
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static T Get<T>(this Behaviour obj)
-    {
-      return obj.GetComponent<T>();
     }
   }
 }

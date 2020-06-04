@@ -7,13 +7,14 @@ namespace Pixeye.Actors
   internal partial class ProcessorEcs
   {
     static int GroupNextID;
+
     internal static List<GroupCore> Groups = new List<GroupCore>();
     internal FamilyGroup familyTags = new FamilyGroup();
     internal FamilyGroup familyTypes = new FamilyGroup();
 
     #region BindGroups
 
-    public void Add(object obj)
+    internal void Add(object obj)
     {
       var type = obj.GetType();
       var objectFields =
@@ -98,6 +99,7 @@ namespace Pixeye.Actors
       }
 
       var group = CreateGroup();
+      // Groups.Add(group);
       Groups.Add(group);
       return group;
 

@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Pixeye.Actors
 {
-  public static class HelperTransforms
+  public static class HelperGameObjects
   {
     static FastString strPath = new FastString(256);
 
@@ -111,5 +111,39 @@ namespace Pixeye.Actors
       obj.Find(path).GetComponentsInChildren(results);
       return results;
     }
+    
+    
+    
+    public static void Release(this GameObject o, int poolID = 0)
+    {
+      if (poolID <= 0)
+        GameObject.Destroy(o);
+      else Pool.Despawn(poolID, o);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static T Get<T>(this GameObject obj, string path)
+    {
+      return obj.transform.Find(path).GetComponent<T>();
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static T Get<T>(this Transform tr, string path)
+    {
+      return tr.Find(path).GetComponent<T>();
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static T Get<T>(this Behaviour obj, string path)
+    {
+      return obj.transform.Find(path).GetComponent<T>();
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static T Get<T>(this Behaviour obj)
+    {
+      return obj.GetComponent<T>();
+    }
+    
   }
 }

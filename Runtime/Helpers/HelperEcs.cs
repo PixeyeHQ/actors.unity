@@ -44,7 +44,6 @@ namespace Pixeye.Actors
     }
 
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static bool IsSubsetOf(this bool[] signature, EntityMeta* meta)
     {
       int match = 0;
@@ -59,7 +58,7 @@ namespace Pixeye.Actors
 
     internal static bool IsSubsetOf(this ComponentMask[] signature, ref EntityManagedMeta managed)
     {
-      ref var generations = ref managed.generations;
+      ref var generations = ref managed.signature;
 
       for (var i = 0; i < signature.Length; i++)
       {
@@ -72,41 +71,15 @@ namespace Pixeye.Actors
 
     internal static bool Overlaps(this ComponentMask[] signature, ref EntityManagedMeta managed)
     {
+      ref var generations = ref managed.signature;
+      
       for (var i = 0; i < signature.Length; i++)
       {
-        if ((managed.generations[signature[i].generation] & signature[i].mask) == signature[i].mask)
+        if ((generations[signature[i].generation] & signature[i].mask) == signature[i].mask)
           return true;
       }
 
       return false;
     }
-
-
-    // [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    // internal bool ExcludeTypes(int entityID)
-    // {
-    //   ref var components = ref EntityImplOld.entities[entityID];
-    //
-    //   for (int i = 0; i < components.componentsAmount; i++)
-    //   {
-    //     if (excludeComponents[components.componentsIds[i]])
-    //     {
-    //       return true;
-    //     }
-    //   }
-    //
-    //   return false;
-    // }
-
-
-    // [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    // internal bool CanProceed(int entityID)
-    // {
-    //   for (var ll = 0; ll < ids.Length; ll++)
-    //     if ((EntityImplOld.Generations[entityID, generations[ll]] & ids[ll]) != ids[ll])
-    //       return false;
-    //
-    //   return true;
-    // }
   }
 }

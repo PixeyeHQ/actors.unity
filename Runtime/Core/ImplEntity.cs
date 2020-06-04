@@ -13,8 +13,8 @@ namespace Pixeye.Actors
     {
       processorEcs = layer.processorEcs;
     }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    
+    
     public ent Create()
     {
       processorEcs.Create(out var entity);
@@ -22,37 +22,98 @@ namespace Pixeye.Actors
       return entity;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    //===============================//
+    // From string
+    //===============================//
+
     public ent Create(string prefabID, Vector3 position = default, bool pooled = false)
     {
-      processorEcs.Create(out var entity);
+      processorEcs.Create(out var entity, pooled);
       entity.managed.transform = pooled ? Obj.Spawn(Pool.Entities, prefabID, position) : Obj.Spawn(prefabID, position);
       processorEcs.SetOperation(entity, -1, ProcessorEcs.Action.Activate);
       return entity;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public ent Create(string prefabID, ModelComposer model, Vector3 position = default, bool pooled = false)
     {
-      processorEcs.Create(out var entity);
+      processorEcs.Create(out var entity, pooled);
       entity.managed.transform = pooled ? Obj.Spawn(Pool.Entities, prefabID, position) : Obj.Spawn(prefabID, position);
       model(entity);
       processorEcs.SetOperation(entity, -1, ProcessorEcs.Action.Activate);
       return entity;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public ent Create(string prefabID, Transform parent, Vector3 position = default, bool pooled = false)
     {
-      processorEcs.Create(out var entity);
+      processorEcs.Create(out var entity, pooled, true);
       entity.managed.transform =
         pooled ? Obj.Spawn(Pool.Entities, prefabID, parent, position) : Obj.Spawn(prefabID, parent, position);
-  
+
       processorEcs.SetOperation(entity, -1, ProcessorEcs.Action.Activate);
       return entity;
     }
 
+    //===============================//
+    // From prefab
+    //===============================//
 
-    //model(entity);
+    public ent Create(GameObject prefab, Vector3 position = default, bool pooled = false)
+    {
+      processorEcs.Create(out var entity, pooled);
+      entity.managed.transform =
+        pooled ? Obj.Spawn(Pool.Entities, prefab, position) : Obj.Spawn(prefab, position);
+
+      processorEcs.SetOperation(entity, -1, ProcessorEcs.Action.Activate);
+      return entity;
+    }
+
+    public ent Create(GameObject prefab, ModelComposer model, Vector3 position = default, bool pooled = false)
+    {
+      processorEcs.Create(out var entity, pooled);
+      entity.managed.transform =
+        pooled ? Obj.Spawn(Pool.Entities, prefab, position) : Obj.Spawn(prefab, position);
+      model(entity);
+      processorEcs.SetOperation(entity, -1, ProcessorEcs.Action.Activate);
+      return entity;
+    }
+
+    public ent Create(GameObject prefab, Transform parent, Vector3 position = default, bool pooled = false)
+    {
+      processorEcs.Create(out var entity, pooled, true);
+      entity.managed.transform =
+        pooled ? Obj.Spawn(Pool.Entities, prefab, parent, position) : Obj.Spawn(prefab, parent, position);
+
+      processorEcs.SetOperation(entity, -1, ProcessorEcs.Action.Activate);
+      return entity;
+    }
+
+    //===============================//
+    // For object
+    //===============================//
+
+    public ent CreateFor(GameObject go, ModelComposer model)
+    {
+      processorEcs.Create(out var entity, false, true);
+      entity.managed.transform = go.transform;
+      model(entity);
+      processorEcs.SetOperation(entity, -1, ProcessorEcs.Action.Activate);
+      return entity;
+    }
+
+    public ent CreateFor(GameObject go)
+    {
+      processorEcs.Create(out var entity, false, true);
+      entity.managed.transform = go.transform;
+      processorEcs.SetOperation(entity, -1, ProcessorEcs.Action.Activate);
+      return entity;
+    }
+
+    public ent CreateFor(string name)
+    {
+      processorEcs.Create(out var entity, false, true);
+      entity.managed.transform = GameObject.Find(name).transform;
+      processorEcs.SetOperation(entity, -1, ProcessorEcs.Action.Activate);
+      return entity;
+    }
   }
 }

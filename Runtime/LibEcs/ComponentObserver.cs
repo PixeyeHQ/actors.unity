@@ -4,17 +4,20 @@
 namespace Pixeye.Actors
 {
 #if ACTORS_COMPONENTS_STRUCTS
-	struct ComponentObserver
-	{
-		public IWrap[] wrappers;
-		public int length;
-	}
+  struct ComponentObserver
+  {
+    public IWrap[] wrappers;
+    public int length;
+  }
+
 #else
+
   sealed class ComponentObserver
   {
     public IWrap[] wrappers = new IWrap[1];
     public int length;
   }
+
 #endif
 
   #region HELPERS

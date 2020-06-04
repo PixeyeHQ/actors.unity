@@ -49,8 +49,7 @@ namespace Pixeye.Actors
 
       return storage;
     }
-
-
+    
     public static T Get<T>(string id) where T : Object
     {
       var key      = id.GetHashCode();
@@ -63,8 +62,7 @@ namespace Pixeye.Actors
 
       return obj as T;
     }
-
-
+    
     public static T Get<T>(int id) where T : Object
     {
       if (Default.items.TryGetValue(id, out var obj))

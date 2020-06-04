@@ -15,10 +15,10 @@ namespace Pixeye.Actors
     internal ProcessorCoroutine processorCoroutine;
     internal ProcessorSignals processorSignals;
     internal ProcessorEcs processorEcs;
-
+    
     internal ImplEntity implEntity;
     internal ImplEcs implEcs;
-
+    internal ImplObserver implObserver;
 
     internal int id = LayerNextID++;
     internal bool isDirty = true;

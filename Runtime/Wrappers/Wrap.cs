@@ -47,10 +47,10 @@ namespace Pixeye.Actors
     public void Dispose()
     {
       callback = null;
-      prop = null;
+      prop     = null;
       comparer = null;
-      source = default;
-      val = default;
+      source   = default;
+      val      = default;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -62,82 +62,88 @@ namespace Pixeye.Actors
 
   public static class HelperWrapper
   {
-    public static void ValueChange<TSource, TProp>(this TSource source, Func<TSource, TProp> propertySelector, Action<TProp> callback, ref ent e)
+    public static void ValueChange<T>(this T type)
     {
-      var w = new Wrap<TSource, TProp>();
-      w.source = source;
-      w.prop = propertySelector;
-      w.callback = callback;
-
-#if UNITY_EDITOR
-
-      if (Comparers.storage.TryGetValue(typeof(TProp).GetHashCode(), out object comparer))
-        w.comparer = comparer as IEqualityComparer<TProp>;
-      else
-      {
-        Debug.LogError($"Comparer for {typeof(TProp)} not found.");
-      }
-
-#else
-			w.comparer = Comparers.storage[typeof(TProp).GetHashCode()]  as IEqualityComparer<TProp>;
-#endif
-      var cObserver = default(ComponentObserver);
-      if (!e.exist)
-      {
-        e = EntityImplOld.Create();
-        cObserver = e.SetOld<ComponentObserver>();
-      }
-      else
-      {
-        cObserver = e.ComponentObserver();
-      }
-
-#if ACTORS_COMPONENTS_STRUCTS
-			if (cObserver.wrappers == null)
-				cObserver.wrappers = new IWrap[2];
-			Debug.Log(cObserver.wrappers.Length);
-#endif
-
-      if (cObserver.length >= cObserver.wrappers.Length)
-        Array.Resize(ref cObserver.wrappers, cObserver.length << 1);
-
-      cObserver.wrappers[cObserver.length++] = w;
     }
 
-    public static ent ValueChange<TSource, TProp>(this TSource source, Func<TSource, TProp> propertySelector, Action<TProp> callback)
-    {
-      var w = new Wrap<TSource, TProp>();
-      w.source = source;
-      w.prop = propertySelector;
-      w.callback = callback;
-
-#if UNITY_EDITOR
-
-      if (Comparers.storage.TryGetValue(typeof(TProp).GetHashCode(), out object comparer))
-        w.comparer = comparer as IEqualityComparer<TProp>;
-      else
-      {
-        Debug.LogError($"Comparer for {typeof(TProp)} not found.");
-      }
-
-#else
-			w.comparer = Comparers.storage[typeof(TProp).GetHashCode()]  as IEqualityComparer<TProp>;
-#endif
-
-      var e = EntityImplOld.Create();
-      ref var cObserver = ref e.SetOld<ComponentObserver>();
-
-#if ACTORS_COMPONENTS_STRUCTS
-			if (cObserver.wrappers == null)
-				cObserver.wrappers = new IWrap[2];
-#endif
-
-      if (cObserver.length == cObserver.wrappers.Length)
-        Array.Resize(ref cObserver.wrappers, cObserver.length << 1);
-
-      cObserver.wrappers[cObserver.length++] = w;
-
-      return e;
-    }
+    //     public static void ValueChange<TSource, TProp>(this TSource source, Func<TSource, TProp> propertySelector,
+    //       Action<TProp> callback, ref ent e)
+    //     {
+    //       var w = new Wrap<TSource, TProp>();
+    //       w.source   = source;
+    //       w.prop     = propertySelector;
+    //       w.callback = callback;
+    //
+    // #if UNITY_EDITOR
+    //
+    //       if (Comparers.storage.TryGetValue(typeof(TProp).GetHashCode(), out object comparer))
+    //         w.comparer = comparer as IEqualityComparer<TProp>;
+    //       else
+    //       {
+    //         Debug.LogError($"Comparer for {typeof(TProp)} not found.");
+    //       }
+    //
+    // #else
+    //       w.comparer = Comparers.storage[typeof(TProp).GetHashCode()] as IEqualityComparer<TProp>;
+    // #endif
+    //       var cObserver = default(ComponentObserver);
+    //       if (!e.exist)
+    //       {
+    //         e         = Entity.Create();
+    //         cObserver = e.SetOld<ComponentObserver>();
+    //       }
+    //       else
+    //       {
+    //         cObserver = e.ComponentObserver();
+    //       }
+    //
+    // #if ACTORS_COMPONENTS_STRUCTS
+    //       if (cObserver.wrappers == null)
+    //         cObserver.wrappers = new IWrap[2];
+    //       Debug.Log(cObserver.wrappers.Length);
+    // #endif
+    //
+    //       if (cObserver.length >= cObserver.wrappers.Length)
+    //         Array.Resize(ref cObserver.wrappers, cObserver.length << 1);
+    //
+    //       cObserver.wrappers[cObserver.length++] = w;
+    //     }
+    //
+    //     public static ent ValueChange<TSource, TProp>(this TSource source, Func<TSource, TProp> propertySelector,
+    //       Action<TProp> callback)
+    //     {
+    //       var w = new Wrap<TSource, TProp>();
+    //       w.source   = source;
+    //       w.prop     = propertySelector;
+    //       w.callback = callback;
+    //
+    // #if UNITY_EDITOR
+    //
+    //       if (Comparers.storage.TryGetValue(typeof(TProp).GetHashCode(), out object comparer))
+    //         w.comparer = comparer as IEqualityComparer<TProp>;
+    //       else
+    //       {
+    //         Debug.LogError($"Comparer for {typeof(TProp)} not found.");
+    //       }
+    //
+    // #else
+    //       w.comparer = Comparers.storage[typeof(TProp).GetHashCode()] as IEqualityComparer<TProp>;
+    // #endif
+    //
+    //       var     e         = EntityImplOld.Create();
+    //       ref var cObserver = ref e.SetOld<ComponentObserver>();
+    //
+    // #if ACTORS_COMPONENTS_STRUCTS
+    //       if (cObserver.wrappers == null)
+    //         cObserver.wrappers = new IWrap[2];
+    // #endif
+    //
+    //       if (cObserver.length == cObserver.wrappers.Length)
+    //         Array.Resize(ref cObserver.wrappers, cObserver.length << 1);
+    //
+    //       cObserver.wrappers[cObserver.length++] = w;
+    //
+    //       return e;
+    //     }
   }
 }

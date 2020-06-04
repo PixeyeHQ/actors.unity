@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.IL2CPP.CompilerServices;
@@ -13,6 +14,7 @@ namespace Pixeye.Actors
     internal static EntityManagedMeta[] EntitiesManaged;
 
     internal ents entities = new ents();
+    internal List<Processor> processors = new List<Processor>();
 
     LayerCore layer;
 
@@ -73,7 +75,7 @@ namespace Pixeye.Actors
       ptr->isDirty = true;
     }
 
-    public void Bootstrap(LayerCore layer)
+    void IRequireActorsLayer.Bootstrap(LayerCore layer)
     {
       this.layer = layer;
     }

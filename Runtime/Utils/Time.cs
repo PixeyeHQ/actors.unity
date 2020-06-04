@@ -40,9 +40,8 @@ namespace Pixeye.Actors
       }
     }
 
-    /// <summary>
+
     /// <para> The time in seconds it took to complete the last frame</para>
-    /// </summary>
     public static float delta => Default.deltaTime;
 
     public static float deltaUnscaled => Default.deltaTime;

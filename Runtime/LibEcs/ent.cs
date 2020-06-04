@@ -4,16 +4,18 @@
 
 
 using System;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Unity.IL2CPP.CompilerServices;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Debug = UnityEngine.Debug;
 
 namespace Pixeye.Actors
 {
   [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Unicode)]
-  public unsafe struct ent
+  public unsafe partial struct ent
   {
     //===============================//
     // Released entities
@@ -67,23 +69,6 @@ namespace Pixeye.Actors
       return id.ToString();
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Release()
-    {
-#if UNITY_EDITOR
-      if (!exist)
-      {
-        Kernel.Debugger.Log(LogType.DESTROYED, this, transform);
-        return;
-      }
-#endif
-
-
-      EntityImplOld.entities[id].CleanMask(id);
-      ProcessorEcs.SetOld(this, 0, ProcessorEcs.Action.Kill);
-      EntityImplOld.entities[id].isAlive = false;
-    }
-
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Equals(ent other)
@@ -131,7 +116,7 @@ namespace Pixeye.Actors
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Has<T>()
     {
-      return (managed.generationsInstant[Storage<T>.Generation] & Storage<T>.ComponentMask) ==
+      return (managed.signature[Storage<T>.Generation] & Storage<T>.ComponentMask) ==
              Storage<T>.ComponentMask;
     }
 
@@ -142,8 +127,8 @@ namespace Pixeye.Actors
       var mask  = Storage<T>.ComponentMask;
       var mask2 = Storage<Y>.ComponentMask;
 
-      return (managed.generationsInstant[Storage<T>.Generation] & mask) == mask &&
-             (managed.generationsInstant[Storage<T>.Generation] & mask2) == mask2;
+      return (managed.signature[Storage<T>.Generation] & mask) == mask &&
+             (managed.signature[Storage<T>.Generation] & mask2) == mask2;
     }
 
     [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
@@ -154,9 +139,9 @@ namespace Pixeye.Actors
       var mask2 = Storage<Y>.ComponentMask;
       var mask3 = Storage<U>.ComponentMask;
 
-      return (managed.generationsInstant[Storage<T>.Generation] & mask) == mask &&
-             (managed.generationsInstant[Storage<T>.Generation] & mask2) == mask2 &&
-             (managed.generationsInstant[Storage<T>.Generation] & mask3) == mask3;
+      return (managed.signature[Storage<T>.Generation] & mask) == mask &&
+             (managed.signature[Storage<T>.Generation] & mask2) == mask2 &&
+             (managed.signature[Storage<T>.Generation] & mask3) == mask3;
     }
 
 
@@ -169,10 +154,10 @@ namespace Pixeye.Actors
       var mask3 = Storage<U>.ComponentMask;
       var mask4 = Storage<I>.ComponentMask;
 
-      return (managed.generationsInstant[Storage<T>.Generation] & mask) == mask &&
-             (managed.generationsInstant[Storage<T>.Generation] & mask2) == mask2 &&
-             (managed.generationsInstant[Storage<T>.Generation] & mask3) == mask3 &&
-             (managed.generationsInstant[Storage<T>.Generation] & mask4) == mask4;
+      return (managed.signature[Storage<T>.Generation] & mask) == mask &&
+             (managed.signature[Storage<T>.Generation] & mask2) == mask2 &&
+             (managed.signature[Storage<T>.Generation] & mask3) == mask3 &&
+             (managed.signature[Storage<T>.Generation] & mask4) == mask4;
     }
 
 
@@ -186,11 +171,11 @@ namespace Pixeye.Actors
       var mask4 = Storage<I>.ComponentMask;
       var mask5 = Storage<O>.ComponentMask;
 
-      return (managed.generationsInstant[Storage<T>.Generation] & mask) == mask &&
-             (managed.generationsInstant[Storage<T>.Generation] & mask2) == mask2 &&
-             (managed.generationsInstant[Storage<T>.Generation] & mask3) == mask3 &&
-             (managed.generationsInstant[Storage<T>.Generation] & mask4) == mask4 &&
-             (managed.generationsInstant[Storage<T>.Generation] & mask5) == mask5;
+      return (managed.signature[Storage<T>.Generation] & mask) == mask &&
+             (managed.signature[Storage<T>.Generation] & mask2) == mask2 &&
+             (managed.signature[Storage<T>.Generation] & mask3) == mask3 &&
+             (managed.signature[Storage<T>.Generation] & mask4) == mask4 &&
+             (managed.signature[Storage<T>.Generation] & mask5) == mask5;
     }
 
     public void MoveTo<T>() where T : LayerCore
@@ -213,123 +198,5 @@ namespace Pixeye.Actors
 #endif
       managed.layer.processorEcs.SwapLayer(this, nextLayer);
     }
-
-
-#if !ACTORS_COMPONENTS_STRUCTS
-    /// <summary>
-    /// <para>Safely gets the component by type from the entity.</para>
-    /// </summary>
-    /// <param name="entity"></param>
-    /// <param name="arg0"></param>
-    /// <typeparam name="T"></typeparam>
-    /// <returns>Returns true if the entity has this component.</returns>
-    [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool Get<T>(out T arg0)
-    {
-      return (arg0 = (managed.generationsInstant[Storage<T>.Generation] & Storage<T>.ComponentMask) ==
-                     Storage<T>.ComponentMask
-        ? Storage<T>.components[id]
-        : default) != null;
-    }
-
-    /// <summary>
-    /// <para>Safely gets the components by type from the entity.</para>
-    /// </summary>
-    /// <param name="entity"></param>
-    /// <param name="arg0"></param>
-    /// <param name="arg1"></param>
-    /// <typeparam name="T"></typeparam>
-    /// <typeparam name="Y"></typeparam>
-    /// <returns>Returns true if the entity has these components.</returns>
-    [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
-    public bool Get<T, Y>(out T arg0, out Y arg1)
-    {
-      arg0 = default;
-      arg1 = default;
-      if ((arg0 = Storage<T>.Instance.TryGet(id)) == null) return false;
-      return (arg1 = Storage<Y>.Instance.TryGet(id)) != null;
-    }
-
-    /// <summary>
-    /// <para>Safely gets the components by type from the entity.</para>
-    /// </summary>
-    /// <param name="entity"></param>
-    /// <param name="arg0"></param>
-    /// <param name="arg1"></param>
-    /// <param name="arg2"></param>
-    /// <typeparam name="T"></typeparam>
-    /// <typeparam name="Y"></typeparam>
-    /// <typeparam name="U"></typeparam>
-    /// <returns>Returns true if the entity has these components.</returns>
-    [Il2CppSetOption(Option.NullChecks, false)]
-    public bool Get<T, Y, U>(out T arg0, out Y arg1, out U arg2)
-    {
-      arg0 = default;
-      arg1 = default;
-      arg2 = default;
-      if ((arg0 = Storage<T>.Instance.TryGet(id)) == null) return false;
-      if ((arg1 = Storage<Y>.Instance.TryGet(id)) == null) return false;
-      return (arg2 = Storage<U>.Instance.TryGet(id)) != null;
-    }
-
-    /// <summary>
-    /// <para>Safely gets the components by type from the entity.</para>
-    /// </summary>
-    /// <param name="entity"></param>
-    /// <param name="arg0"></param>
-    /// <param name="arg1"></param>
-    /// <param name="arg2"></param>
-    /// <param name="arg3"></param>
-    /// <typeparam name="T"></typeparam>
-    /// <typeparam name="Y"></typeparam>
-    /// <typeparam name="U"></typeparam>
-    /// <typeparam name="I"></typeparam>
-    /// <returns>Returns true if the entity has these components.</returns>
-    [Il2CppSetOption(Option.NullChecks, false)]
-    public bool Get<T, Y, U, I>(out T arg0, out Y arg1, out U arg2, out I arg3)
-    {
-      arg0 = default;
-      arg1 = default;
-      arg2 = default;
-      arg3 = default;
-      if ((arg0 = Storage<T>.Instance.TryGet(id)) == null) return false;
-      if ((arg1 = Storage<Y>.Instance.TryGet(id)) == null) return false;
-      if ((arg2 = Storage<U>.Instance.TryGet(id)) == null) return false;
-      return (arg3 = Storage<I>.Instance.TryGet(id)) != null;
-    }
-
-    /// <summary>
-    /// Safely gets the components by type from the entity.
-    /// </summary>
-    /// <param name="entity"></param>
-    /// <param name="arg0"></param>
-    /// <param name="arg1"></param>
-    /// <param name="arg2"></param>
-    /// <param name="arg3"></param>
-    /// <param name="arg4"></param>
-    /// <typeparam name="T"></typeparam>
-    /// <typeparam name="Y"></typeparam>
-    /// <typeparam name="U"></typeparam>
-    /// <typeparam name="I"></typeparam>
-    /// <typeparam name="O"></typeparam>
-    /// <returns>Returns true if the entity has these components.</returns>
-    [Il2CppSetOption(Option.NullChecks, false)]
-    public bool Get<T, Y, U, I, O>(out T arg0, out Y arg1, out U arg2, out I arg3, out O arg4)
-    {
-      arg0 = default;
-      arg1 = default;
-      arg2 = default;
-      arg3 = default;
-      arg4 = default;
-      if ((arg0 = Storage<T>.Instance.TryGet(id)) == null) return false;
-      if ((arg1 = Storage<Y>.Instance.TryGet(id)) == null) return false;
-      if ((arg2 = Storage<U>.Instance.TryGet(id)) == null) return false;
-      if ((arg3 = Storage<I>.Instance.TryGet(id)) == null) return false;
-      return (arg4 = Storage<O>.Instance.TryGet(id)) != null;
-    }
-
-
-#endif
   }
 }
