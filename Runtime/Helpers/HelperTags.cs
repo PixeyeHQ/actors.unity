@@ -14,8 +14,6 @@ namespace Pixeye.Actors
   [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
   public static unsafe class HelperTags
   {
- 
-
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static bool Overlaps(this int[] tags, EntityMeta* meta)
     {
@@ -56,25 +54,11 @@ namespace Pixeye.Actors
       return match == tags.Length;
     }
 
- 
-
-    
-
-    
 
     public static int TagsAmount(in this ent entity, int tagID)
     {
-      return Actors.EntityImplOld.Tags[entity.id].GetAmount(tagID);
+      return entity.meta->tags.GetAmount(tagID);
     }
-
-
-     
-
-     
-
-    
-
-     
 
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -151,8 +135,6 @@ namespace Pixeye.Actors
       }
     }
 
- 
-
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     static Type GetTypeTag()
@@ -226,6 +208,5 @@ namespace Pixeye.Actors
 
       return default;
     }
- 
   }
 }

@@ -7,7 +7,7 @@ namespace Pixeye.Actors
   [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
   public sealed class ProcessorCoroutine : ITick, IDisposable, IRequireActorsLayer
   {
-    internal bool timescaled = false;
+    internal bool timescaled = true;
     internal float period = -1;
 
     IEnumerator[] running = new IEnumerator[36];
@@ -15,6 +15,14 @@ namespace Pixeye.Actors
 
     internal int currentIndex;
     int length;
+
+    LayerCore layer;
+
+    public void Bootstrap(LayerCore layer)
+    {
+      this.layer = layer;
+      layer.Updates.Add(this);
+    }
 
     internal RoutineCall Run(float delay, IEnumerator routine)
     {
@@ -95,9 +103,9 @@ namespace Pixeye.Actors
     {
       if (timescaled == false)
       {
-        dt = time.Default.deltaTimeUnscaled;
+        dt = layer.Time.deltaTimeUnscaled;
       }
-
+      
       if (period > -1)
       {
         accum += dt;
@@ -158,11 +166,6 @@ namespace Pixeye.Actors
     public void Dispose()
     {
       StopAll();
-    }
-
-    public void Bootstrap(LayerCore layer)
-    {
-      layer.processorUpdate.Add(this);
     }
   }
 

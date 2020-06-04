@@ -9,13 +9,12 @@ namespace Pixeye.Actors
   [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
   public class PoolContainer
   {
-    public bool globalPool = false;
-    private List<GameObject> activeObjs = new List<GameObject>(500);
+    List<GameObject> activeObjs = new List<GameObject>(500);
 
-    private Dictionary<int, Stack<GameObject>> cachedObjects =
+    Dictionary<int, Stack<GameObject>> cachedObjects =
       new Dictionary<int, Stack<GameObject>>(500, new FastComparable());
 
-    private Dictionary<int, int> cachedIds = new Dictionary<int, int>(500, new FastComparable());
+    Dictionary<int, int> cachedIds = new Dictionary<int, int>(500, new FastComparable());
 
     public void RegisterObject(GameObject prefab)
     {
@@ -49,12 +48,12 @@ namespace Pixeye.Actors
       Stack<GameObject> stack;
       var               hasValue = cachedObjects.TryGetValue(key, out stack);
       if (!hasValue) cachedObjects.Add(key, new Stack<GameObject>(amount));
-      
+
       LayerApp.Run(CoPop());
 
       IEnumerator CoPop()
       {
-        var delay = time.delta * timeRate;
+        var delay = LayerApp.Time.deltaTime;
         yield return LayerApp.Wait(delay);
 
         for (var i = 0; i < amountPerTick; i++)

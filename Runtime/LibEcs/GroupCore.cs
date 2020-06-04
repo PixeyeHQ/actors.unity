@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using Unity.IL2CPP.CompilerServices;
+using UnityEngine;
 
 
 namespace Pixeye.Actors
@@ -104,9 +105,9 @@ namespace Pixeye.Actors
       this.composition = composition;
       processorEcs     = layer.processorEcs;
 
- 
+
       HelperTags.RegisterGroup(this);
- 
+
 
       for (var i = 0; i < composition.excluded.Length; i++)
       {
@@ -225,6 +226,21 @@ namespace Pixeye.Actors
       return true;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal void RemoveFast(int entityID)
+    {
+      var i = HelperArray.BinarySearch(ref entities, entityID, 0, length - 1);
+      
+#if ACTORS_EVENTS_MANUAL
+      if (hasEventRemove)
+        removed.source[removed.length++] = entities[i];
+#else
+      removed.source[removed.length++] = entities[i];
+#endif
+       
+      if (i < --length)
+        Array.Copy(entities, i + 1, entities, i, length - i);
+    }
 
     //===============================//
     // Remove
@@ -238,19 +254,10 @@ namespace Pixeye.Actors
 #else
       removed.source[removed.length++] = entities[i];
 #endif
-
       if (i < --length)
         Array.Copy(entities, i + 1, entities, i, length - i);
     }
 
-    // [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    // internal void RemoveSilently(int i)
-    // {
-    //   if (i < --length)
-    //     Array.Copy(entities, i + 1, entities, i, length - i);
-    // }
-    
- 
 
     public virtual void Dispose()
     {
@@ -1113,5 +1120,4 @@ namespace Pixeye.Actors
       }
     }
   }
-  
 }

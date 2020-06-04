@@ -8,6 +8,8 @@ namespace Pixeye.Actors
   [Serializable]
   public class SettingsActors
   {
+    public int Fps = -1;
+    public int FpsPhysics = 50;
     public int SizeEntities = 1024;
     public int SizeComponents = 128;
     public int SizeGenerations = 4;

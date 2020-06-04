@@ -5,7 +5,7 @@
 using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
 
-//TODO: ACTORS FRAMEWORK: STARTER
+
 namespace Pixeye.Actors
 {
   using UnityEditor;
@@ -27,34 +27,31 @@ namespace Pixeye.Actors
     static PostProcessorCheckPools()
     {
       EditorApplication.update += Step;
-      //started = false;
-      // var starter = Object.FindObjectOfType<Starter>();
-      // if (starter == null) return;
-      // starter.ClearNodes();
+      var layer = Object.FindObjectOfType<LayerCore>();
+      if (layer == null) return;
+      layer.ClearNodes();
     }
 
     static void Step()
     {
       if (EditorApplication.isPlayingOrWillChangePlaymode && !EditorApplication.isPlaying)
       {
-        //	started = true;
         CheckScene();
       }
     }
 
     public static void CheckScene()
     {
-      // var starter = Object.FindObjectOfType<Starter>();
-      // if (starter == null) return;
-      // starter.ClearNodes();
+      var layer = Object.FindObjectOfType<LayerCore>();
+      if (layer == null) return;
+      layer.ClearNodes();
       var actors = Object.FindObjectsOfType<Actor>();
 
       for (int i = 0; i < actors.Length; i++)
       {
         var a = actors[i];
-
-        //if (!a.isPooled) continue;
-        //CheckPoolCache(a.gameObject, Pool.Entities, starter);
+        if (!a.isPooled) continue;
+        CheckPoolCache(a.gameObject, Pool.Entities, layer);
       }
     }
 
@@ -63,11 +60,11 @@ namespace Pixeye.Actors
       GameObject prefab;
 #if UNITY_2018_3_OR_NEWER
       prefab = PrefabUtility.GetCorrespondingObjectFromSource(gameObject);
-
-#else //prefab = (GameObject) PrefabUtility.GetPrefabObject(gameObject);
+#else
+      prefab = (GameObject) PrefabUtility.GetPrefabObject(gameObject);
 #endif
-      //   if (prefab == null) return;
-      //starter.AddToNode(prefab, gameObject, pool);
+      if (prefab == null) return;
+      layer.AddToNode(prefab, gameObject, pool);
     }
   }
 }

@@ -20,26 +20,32 @@ namespace Pixeye.Actors
     protected ImplActor Actor;
     protected ImplEntity Entity;
     protected ImplEcs Ecs;
+    protected ImplTime Time;
+    protected ImplObj Obj;
+     
 
     void IRequireActorsLayer.Bootstrap(LayerCore layer)
     {
       Layer = layer;
       id    = NextID++;
 
-      layer.processorUpdate.AddProc(this);
+      layer.Updates.AddProc(this);
       layer.processorEcs.Add(this);
       layer.processorEcs.processors.Add(this);
       layer.processorSignals.Add(this);
+      
 
       Entity   = layer.Entity;
       Ecs      = layer.Ecs;
       Observer = layer.Observer;
       Actor    = layer.Actor;
+      Time     = layer.Time;
+      Obj      = layer.Obj;
 
       OnLaunch();
     }
 
-    public void Dispose() => OnDispose();
+    void IDisposable.Dispose() => OnDispose();
 
     internal virtual void OnLaunch()
     {
@@ -53,13 +59,6 @@ namespace Pixeye.Actors
     {
     }
 
-    public ref T Send<T>() where T : struct
-    {
-      var     q = SignalsEcs<T>.layers[Layer.id];
-      ref var e = ref q.elements.Add();
-      e.firstReceiver = -1;
-      return ref e.signal;
-    }
 
     void ITick.Tick(float dt)
     {

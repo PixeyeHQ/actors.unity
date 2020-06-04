@@ -18,6 +18,7 @@ namespace Pixeye.Actors
       foreach (var entity in source.removed)
       {
         ref var cObserver = ref entity.ComponentObserver();
+
         for (var j = 0; j < cObserver.length; j++)
           cObserver.wrappers[j].Check();
       }

@@ -21,8 +21,8 @@ namespace Pixeye.Actors
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Actor Create(string prefabID, Vector3 position = default, bool pooled = false)
     {
-      var transform = pooled ? Obj.Spawn(Pool.Entities, prefabID, position) : Obj.Spawn(prefabID, position);
-      var       actor     = transform.AddGetActor();
+      var transform = pooled ? layer.Obj.Spawn(Pool.Entities, prefabID, position) : layer.Obj.Spawn(prefabID, position);
+      var actor     = transform.AddGetActor();
       actor.isPooled = pooled;
 
       actor.Bootstrap(layer);
@@ -33,10 +33,11 @@ namespace Pixeye.Actors
     public Actor Create(string prefabID, Transform parent, Vector3 position = default, bool pooled = false)
     {
       var transform =
-        pooled ? Obj.Spawn(Pool.Entities, prefabID, parent, position) : Obj.Spawn(prefabID, parent, position);
+        pooled
+          ? layer.Obj.Spawn(Pool.Entities, prefabID, parent, position)
+          : layer.Obj.Spawn(prefabID, parent, position);
       var actor = transform.AddGetActor();
       actor.isPooled = pooled;
-
       actor.Bootstrap(layer);
       return actor;
     }
@@ -44,8 +45,8 @@ namespace Pixeye.Actors
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Actor Create(string prefabID, ModelComposer model, Vector3 position = default, bool pooled = false)
     {
-      var transform = pooled ? Obj.Spawn(Pool.Entities, prefabID, position) : Obj.Spawn(prefabID, position);
-      var       actor     = transform.AddGetActor();
+      var transform = pooled ? layer.Obj.Spawn(Pool.Entities, prefabID, position) : layer.Obj.Spawn(prefabID, position);
+      var actor     = transform.AddGetActor();
       actor.isPooled = pooled;
 
       actor.Bootstrap(layer, model);
@@ -57,35 +58,35 @@ namespace Pixeye.Actors
       bool pooled = false)
     {
       var transform = pooled
-        ? Obj.Spawn(Pool.Entities, prefabID, parent, position)
-        : Obj.Spawn(prefabID, parent, position);
+        ? layer.Obj.Spawn(Pool.Entities, prefabID, parent, position)
+        : layer.Obj.Spawn(prefabID, parent, position);
       var actor = transform.AddGetActor();
       actor.isPooled = pooled;
 
       actor.Bootstrap(layer, model);
       return actor;
     }
- 
+
     //===============================//
     // From prefab
     //===============================//
- 
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Actor Create(GameObject prefab, Vector3 position = default, bool pooled = false)
     {
-      var transform = pooled ? Obj.Spawn(Pool.Entities, prefab, position) : Obj.Spawn(prefab, position);
-      var       actor     = transform.AddGetActor();
+      var transform = pooled ? layer.Obj.Spawn(Pool.Entities, prefab, position) : layer.Obj.Spawn(prefab, position);
+      var actor     = transform.AddGetActor();
       actor.isPooled = pooled;
 
       actor.Bootstrap(layer);
       return actor;
     }
-    
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Actor Create(GameObject prefab, Transform parent, Vector3 position = default, bool pooled = false)
     {
       var transform =
-        pooled ? Obj.Spawn(Pool.Entities, prefab, parent, position) : Obj.Spawn(prefab, parent, position);
+        pooled ? layer.Obj.Spawn(Pool.Entities, prefab, parent, position) : layer.Obj.Spawn(prefab, parent, position);
       var actor = transform.AddGetActor();
       actor.isPooled = pooled;
 
@@ -96,8 +97,8 @@ namespace Pixeye.Actors
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Actor Create(GameObject prefab, ModelComposer model, Vector3 position = default, bool pooled = false)
     {
-      var transform = pooled ? Obj.Spawn(Pool.Entities, prefab, position) : Obj.Spawn(prefab, position);
-      var       actor     = transform.AddGetActor();
+      var transform = pooled ? layer.Obj.Spawn(Pool.Entities, prefab, position) : layer.Obj.Spawn(prefab, position);
+      var actor     = transform.AddGetActor();
       actor.isPooled = pooled;
 
       actor.Bootstrap(layer, model);
@@ -109,7 +110,7 @@ namespace Pixeye.Actors
       bool pooled = false)
     {
       var transform =
-        pooled ? Obj.Spawn(Pool.Entities, prefab, parent, position) : Obj.Spawn(prefab, parent, position);
+        pooled ? layer.Obj.Spawn(Pool.Entities, prefab, parent, position) : layer.Obj.Spawn(prefab, parent, position);
       var actor = transform.AddGetActor();
       actor.isPooled = pooled;
 

@@ -26,12 +26,13 @@ namespace Pixeye.Actors
 
     public static void ChangeTo(string sceneName)
     {
+      var buildIndex = Kernel.SceneIndexFromName(sceneName);
       LayerApp.Run(CoChangeTo());
 
       IEnumerator CoChangeTo()
       {
-        Kernel.ChangingScene[SceneManager.GetSceneByName(sceneName).buildIndex] = true;
-        LayerCore.ActiveLayer.isDirty                                           = true;
+        Kernel.ChangingScene[buildIndex] = true;
+        LayerCore.ActiveLayer.isDirty    = true;
         yield return LayerApp.WaitFrame;
         LayerCore.ActiveLayer.Release();
         LayerApp.LoadJobs.Add(SceneManager.UnloadSceneAsync(LayerCore.ActiveLayer.Scene));

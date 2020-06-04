@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using UnityEngine.SceneManagement;
+using Debug = UnityEngine.Debug;
 
 
 namespace Pixeye.Actors
@@ -43,13 +43,11 @@ namespace Pixeye.Actors
 
 
     [Conditional("ACTORS_DEBUG")]
-    void DebugDontExist(int entityID, Storage storage)
+    void DebugDontExist(EntityMeta* meta, int entityID, Storage storage)
     {
-      if (EntityImplOld.entities[entityID].componentsAmount == 0)
-      {
-        Kernel.Debugger.Log(LogType.REMOVE_NON_EXISTANT, entityID, storage.GetComponentType().Name);
-        throw new Exception();
-      }
+      if (meta->componentsAmount != 0) return;
+      Kernel.Debugger.Log(LogType.REMOVE_NON_EXISTANT, entityID, storage.GetComponentType().Name);
+      throw new Exception();
     }
 
     internal void SwapLayer(ent entity, LayerCore otherLayer)
@@ -193,15 +191,15 @@ namespace Pixeye.Actors
             break;
           case Action.Kill:
           {
-            for (int j = 0; j < eMeta->groupsAmount; j++)
+            for (var j = 0; j < eMeta->groupsAmount; j++)
             {
               var group = Groups[eMeta->groups[j]];
-              group.Remove(entityID);
+              group.RemoveFast(entityID);
             }
 
             eMeta->groupsAmount = 0;
 
-            for (int j = 0; j < eMeta->componentsAmount; j++)
+            for (var j = 0; j < eMeta->componentsAmount; j++)
             {
               var componentID = eMeta->components[j];
               //var generation  = Storage.Generations[componentID];
@@ -213,6 +211,10 @@ namespace Pixeye.Actors
 
 
             eMeta->componentsAmount = 0;
+
+            for (var ii = 0; ii < Kernel.Settings.SizeGenerations; ii++)
+              eManaged.signature[ii] = 0;
+
 
             foreach (var child in eManaged.childs)
               child.Release();
@@ -246,7 +248,7 @@ namespace Pixeye.Actors
             //var mask        = Storage.Masks[componentID];
             var groups = storage.groups[eManaged.layer.id];
 
-            DebugDontExist(entityID, storage);
+            DebugDontExist(eMeta, entityID, storage);
 
             //eManaged.generations[generation] &= ~mask;
 
@@ -293,7 +295,7 @@ namespace Pixeye.Actors
               child.Release();
 
             eManaged.childs.length = 0;
-            
+
             eMeta->tags.Clear();
             eMeta->isAlive = false;
             entities.Remove(operation.entity);
@@ -325,7 +327,7 @@ namespace Pixeye.Actors
             nextGroup.added.length = 0;
         }
 #else
-        for (int ii = 0; ii < Groups.Count; ii++)
+        for (var ii = 0; ii < Groups.Count; ii++)
         {
           var nextGroup = Groups[ii];
           nextGroup.removed.length = 0;
@@ -334,7 +336,7 @@ namespace Pixeye.Actors
 #endif
         for (var i = 0; i < Actors.Storage.lastID; i++)
         {
-          var storage = Actors.Storage.All[i];
+          var storage = Storage.All[i];
           storage.Dispose(storage.toDispose);
           storage.toDispose.length = 0;
         }

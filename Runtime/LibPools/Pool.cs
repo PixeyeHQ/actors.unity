@@ -1,13 +1,12 @@
-//  Project  : ACTORS
-//  Contacts : Pixeye - ask@pixeye.games
-
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace Pixeye.Actors
 {
-  public static class Pool
+  public class Pool : IRequireActorsLayer, IDisposable
   {
+ 
     [TagField(categoryName = "Pool")] public const int None = -1;
 
     [TagField(categoryName = "Pool")] public const int Entities = 1;
@@ -16,39 +15,39 @@ namespace Pixeye.Actors
 
     [TagField(categoryName = "Pool")] public const int Audio = 3;
 
+    internal Dictionary<int, PoolContainer> pools = new Dictionary<int, PoolContainer>(4, new FastComparable());
 
-    internal static Dictionary<int, PoolContainer> pools = new Dictionary<int, PoolContainer>(4, new FastComparable());
 
-    static Pool()
+    void IRequireActorsLayer.Bootstrap(LayerCore layer)
     {
+      //this.layer = layer;
       Add(Entities);
       Add(Audio);
       Add(UI);
     }
 
-    static void Add(int id)
+    void Add(int id)
     {
       PoolContainer pool;
       pool = new PoolContainer();
       pools.Add(id, pool);
     }
 
-    internal static void Despawn(int poolID, GameObject obj)
+    internal void Despawn(int poolID, GameObject obj)
     {
       pools[poolID].Despawn(obj);
     }
 
-    internal static void Dispose()
+    void IDisposable.Dispose()
     {
       foreach (var kvp in pools)
       {
-        if (kvp.Value.globalPool) continue;
         kvp.Value.Dispose();
       }
     }
   }
 
-  [System.Serializable]
+  [Serializable]
   public class PoolNode
   {
     public int id;
@@ -57,11 +56,10 @@ namespace Pixeye.Actors
     public GameObject prefab;
     public List<GameObject> createdObjs = new List<GameObject>();
 
-
-    public void Populate()
+    public void Populate(LayerCore layer)
     {
       if (pool == Pool.None) return;
-      var poolStash = Pool.pools[pool];
+      var poolStash = layer.pool.pools[pool];
       poolStash.RegisterObject(prefab);
 
       for (var i = 0; i < createdObjs.Count; i++)

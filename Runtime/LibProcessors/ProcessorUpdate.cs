@@ -3,11 +3,11 @@
 
 
 using System.Collections.Generic;
-using UnityEngine;
+
 
 namespace Pixeye.Actors
 {
-  internal class ProcessorUpdate
+  public class ProcessorUpdate
   {
     internal readonly List<IReceiveEcsEvent> processors = new List<IReceiveEcsEvent>(64);
     internal readonly List<ITick> ticks = new List<ITick>(128);
@@ -21,43 +21,43 @@ namespace Pixeye.Actors
 
     internal int GetTicksCount => ticks.Count + ticksProc.Count + ticksFixed.Count + ticksLate.Count;
 
-    internal void AddTick(object updateble)
+    public void AddTick(object updateble)
     {
       ticks.Add(updateble as ITick);
     }
 
-    internal void RemoveTick(object updateble)
+    public void RemoveTick(object updateble)
     {
       if (ticks.Remove(updateble as ITick))
       {
       }
     }
 
-    internal void AddTickFixed(object updateble)
+    public void AddTickFixed(object updateble)
     {
       ticksFixed.Add(updateble as ITickFixed);
     }
 
-    internal void RemoveTickFixed(object updateble)
+    public void RemoveTickFixed(object updateble)
     {
       if (ticksFixed.Remove(updateble as ITickFixed))
       {
       }
     }
 
-    internal void AddTickLate(object updateble)
+    public void AddTickLate(object updateble)
     {
       ticksLate.Add(updateble as ITickLate);
     }
 
-    internal void RemoveTickLate(object updateble)
+    public void RemoveTickLate(object updateble)
     {
       if (ticksLate.Remove(updateble as ITickLate))
       {
       }
     }
 
-    internal void AddProc(Processor updateble)
+    public void AddProc(Processor updateble)
     {
       if (updateble is IReceiveEcsEvent receiver)
       {
@@ -78,7 +78,7 @@ namespace Pixeye.Actors
       else if (updateble is ITickLate tickableLate) ticksLateProc.Add(tickableLate);
     }
 
-    internal void RemoveProc(object updateble)
+    public void RemoveProc(object updateble)
     {
       processors.Remove(updateble as IReceiveEcsEvent);
       if (ticksProc.Remove(updateble as ITick))
@@ -94,7 +94,7 @@ namespace Pixeye.Actors
       }
     }
 
-    internal void Add(object updateble)
+    public void Add(object updateble)
     {
       if (updateble is ITick tickable)
       {
@@ -112,7 +112,7 @@ namespace Pixeye.Actors
       }
     }
 
-    internal void Remove(object updateble)
+    public void Remove(object updateble)
     {
       if (ticks.Remove(updateble as ITick))
       {

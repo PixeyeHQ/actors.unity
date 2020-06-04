@@ -8,7 +8,7 @@ using Unity.IL2CPP.CompilerServices;
 namespace Pixeye.Actors
 {
   [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
-  internal unsafe partial class ProcessorEcs : IRequireActorsLayer
+  internal unsafe partial class ProcessorEcs : IRequireActorsLayer, IDisposable
   {
     internal static PoolMem Entities;
     internal static EntityManagedMeta[] EntitiesManaged;
@@ -79,6 +79,37 @@ namespace Pixeye.Actors
       this.layer = layer;
     }
 
- 
+
+    public void Dispose()
+    {
+      if (Kernel.ApplicationIsQuitting) return;
+
+      operationsLength = 0;
+      processors.Clear();
+
+      foreach (var entity in entities)
+      {
+        ref var managed = ref EntitiesManaged[entity.id];
+        var     meta    = Entities.Get<EntityMeta>(entity.id);
+
+        meta->tags.length = 0;
+
+        for (var i = 0; i < meta->componentsAmount; i++)
+          Storage.All[meta->components[i]].toDispose.Add(entity.id);
+
+        for (var ii = 0; ii < Kernel.Settings.SizeGenerations; ii++)
+        {
+          managed.signature[ii] = 0;
+        }
+
+        meta->isAlive          = false;
+        meta->componentsAmount = 0;
+        meta->age              = 0;
+
+        ent.Released.Add(new ent(entity.id));
+      }
+
+      entities.length = 0;
+    }
   }
 }

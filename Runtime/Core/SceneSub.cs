@@ -29,10 +29,13 @@ namespace Pixeye.Actors
 
     public static void Add(string sceneName)
     {
-      Kernel.ChangingScene[SceneManager.GetSceneByName(sceneName).buildIndex] = true;
+      var buildIndex = Kernel.SceneIndexFromName(sceneName);
+      Kernel.ChangingScene[buildIndex] = true;
       LayerApp.LoadJobs.Add(SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive));
     }
 
+
+    
     public static void Remove(string sceneName)
     {
       var buildIndex = SceneManager.GetSceneByName(sceneName).buildIndex;

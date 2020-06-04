@@ -22,7 +22,7 @@ namespace Pixeye.Actors
         var amount = 0;
         foreach (var layer in LayersInUse)
         {
-          amount += layer.processorUpdate.GetTicksCount;
+          amount += layer.Updates.GetTicksCount;
         }
 
         return amount;
@@ -55,6 +55,18 @@ namespace Pixeye.Actors
           JsonUtility.FromJsonOverwrite(t.text, Settings);
 
         Settings.SizeGenerations = Settings.SizeComponents / 32;
+        if (Settings.Fps == -1)
+        {
+          ImplTime.Fps      = 60;
+          ImplTime.FpsLimit = false;
+        }
+        else
+        {
+          ImplTime.Fps      = Settings.Fps;
+          ImplTime.FpsLimit = true;
+        }
+
+        ImplTime.FpsPhysics = Settings.FpsPhysics;
       }
 
       void HandleScenes()
@@ -66,6 +78,12 @@ namespace Pixeye.Actors
         var kernel = objKernel.AddComponent<Kernel>();
         var layer  = objKernel.AddComponent<LayerApp>();
         Instance = kernel;
+
+        foreach (var plugPath in Settings.Plugins)
+        {
+          var pl = Resources.Load<Pluggable>(plugPath);
+          pl.Plug();
+        }
       }
     }
 
@@ -74,7 +92,7 @@ namespace Pixeye.Actors
       UpdateTypes();
     }
 
-    void UpdateTypes()
+    static void UpdateTypes()
     {
       var types    = AppDomain.CurrentDomain.GetAssemblies().SelectMany(t => t.GetTypes());
       var storages = types.Where(t => t.IsSubclassOf(typeof(Storage)) && !t.ContainsGenericParameters);
@@ -92,16 +110,6 @@ namespace Pixeye.Actors
       }
     }
 
-
-    // public static void Cleanup()
-    // {
-    //   groups.All.Dispose();
-    //
-    //   for (int i = 0; i < groups.globals.Length; i++)
-    //   {
-    //     groups.globals[i] = null;
-    //   }
-    // }
 
     public static class Debugger
     {
@@ -136,7 +144,6 @@ namespace Pixeye.Actors
       }
     }
 
-    internal float timescale_cache = 1;
 
     IEnumerator OnApplicationFocus(bool hasFocus)
     {
@@ -144,12 +151,18 @@ namespace Pixeye.Actors
       if (Settings.PauseOnFocusLost == false) yield break;
       if (!hasFocus)
       {
-        timescale_cache        = time.Default.timeScale;
-        time.Default.timeScale = 0;
+        foreach (var core in LayersInUse)
+        {
+          core.Time.timescaleCacheOnFocus = core.Time.scale;
+          core.Time.scale                 = 0;
+        }
       }
       else
       {
-        time.Default.timeScale = timescale_cache;
+        foreach (var core in LayersInUse)
+        {
+          core.Time.scale = core.Time.timescaleCacheOnFocus;
+        }
       }
     }
 
@@ -170,6 +183,27 @@ namespace Pixeye.Actors
       }
 
       UnmanagedMemory.Cleanup();
+    }
+
+    internal static string NameFromIndex(int BuildIndex)
+    {
+      var path  = SceneUtility.GetScenePathByBuildIndex(BuildIndex);
+      var slash = path.LastIndexOf('/');
+      var name  = path.Substring(slash + 1);
+      var dot   = name.LastIndexOf('.');
+      return name.Substring(0, dot);
+    }
+
+    internal static int SceneIndexFromName(string sceneName)
+    {
+      for (var i = 0; i < SceneManager.sceneCountInBuildSettings; i++)
+      {
+        var testedScreen = NameFromIndex(i);
+        if (testedScreen == sceneName)
+          return i;
+      }
+
+      return -1;
     }
   }
 

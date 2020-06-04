@@ -8,6 +8,18 @@ namespace Pixeye.Actors
   {
     static FastString strPath = new FastString(256);
 
+    public static LayerCore GetLayer(this GameObject go)
+    {
+      return Kernel.Layers[go.scene.buildIndex];
+    }
+
+    public static LayerCore GetLayer(this Transform tr)
+    {
+      
+      return Kernel.Layers[tr.gameObject.scene.buildIndex];
+    }
+
+
     public static string GetGameObjectPath(Transform transform)
     {
       string path = transform.name;
@@ -16,7 +28,7 @@ namespace Pixeye.Actors
       {
         transform.GetSiblingIndex();
         transform = transform.parent;
-        path = transform.name + "/" + path;
+        path      = transform.name + "/" + path;
       }
 
       return path;
@@ -27,7 +39,7 @@ namespace Pixeye.Actors
       string path = transform.name;
       if (transform.parent == null) return path;
       var sibls = new List<int>();
-      var tr = transform;
+      var tr    = transform;
       while (tr.parent != null)
       {
         sibls.Add(tr.GetSiblingIndex());
@@ -40,7 +52,7 @@ namespace Pixeye.Actors
       while (transform.parent.parent != null)
       {
         transform = transform.parent;
-        path = transform.name + "/" + path;
+        path      = transform.name + "/" + path;
       }
 
       return path;
@@ -111,14 +123,17 @@ namespace Pixeye.Actors
       obj.Find(path).GetComponentsInChildren(results);
       return results;
     }
-    
-    
-    
+
+
     public static void Release(this GameObject o, int poolID = 0)
     {
       if (poolID <= 0)
         GameObject.Destroy(o);
-      else Pool.Despawn(poolID, o);
+      else
+      {
+        var layer = Kernel.Layers[o.gameObject.scene.buildIndex];
+        layer.pool.Despawn(poolID, o);
+      }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -144,6 +159,49 @@ namespace Pixeye.Actors
     {
       return obj.GetComponent<T>();
     }
-    
+
+
+    public static List<int> FindValidNodes(this List<PoolNode> list, int id)
+    {
+      var l = new List<int>();
+      for (int i = 0; i < list.Count; i++)
+      {
+        if (list[i].id == id)
+          l.Add(i);
+      }
+
+      return l;
+    }
+
+    public static int FindValidNode(this List<PoolNode> list, int id, int pool)
+    {
+      for (int i = 0; i < list.Count; i++)
+      {
+        var l = list[i];
+        if (l.id == id && l.pool == pool)
+          return i;
+      }
+
+      return -1;
+    }
+
+    public static int FindInstanceID<T>(this List<T> list, T target) where T : UnityEngine.Object
+    {
+      int targetID = target.GetInstanceID();
+
+      for (int i = 0; i < list.Count; i++)
+      {
+        if (list[i].GetInstanceID() == targetID)
+          return i;
+      }
+
+      return -1;
+    }
+
+
+    public static void Destroy(this Transform tr)
+    {
+      GameObject.Destroy(tr.gameObject);
+    }
   }
 }
