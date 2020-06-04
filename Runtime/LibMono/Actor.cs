@@ -33,7 +33,9 @@ namespace Pixeye.Actors
       Layer = layer;
       if (!entity.exist)
         entity = layer.Entity.CreateForActor(this, buildFrom, isPooled);
+#if UNITY_EDITOR
       _entity = entity.id;
+#endif
       Setup();
       HandleEnable();
     }

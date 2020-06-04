@@ -5,10 +5,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-#if UNITY_EDITOR
 using System.Collections;
-
-#endif
 #if ODIN_INSPECTOR
 using Sirenix.OdinInspector;
 #endif
