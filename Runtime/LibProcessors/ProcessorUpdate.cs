@@ -75,12 +75,15 @@ namespace Pixeye.Actors
 
       if (updateble is ITickFixed tickableFixed)
         ticksFixedProc.Add(tickableFixed);
-      else if (updateble is ITickLate tickableLate) ticksLateProc.Add(tickableLate);
+
+      if (updateble is ITickLate tickableLate)
+        ticksLateProc.Add(tickableLate);
     }
 
     public void RemoveProc(object updateble)
     {
       processors.Remove(updateble as IReceiveEcsEvent);
+
       if (ticksProc.Remove(updateble as ITick))
       {
       }
