@@ -1,9 +1,0 @@
-
-using UnityEngine;
-namespace Pixeye.Actors{
-[CreateAssetMenu(fileName = "Factory &NAME&", menuName = "Actors/Add/Factories/&NAME&")]
-public class ##NAME## : Factory
-{
-     	 
-}
-}
