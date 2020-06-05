@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.Scripting;
 
-[assembly: AlwaysLinkAssembly]
+[assembly: Preserve]
 
 namespace Pixeye.Actors
 {
