@@ -1,7 +1,7 @@
 //  Project : ecs
 // Contacts : Pix - info@pixeye.games
 //     Date : 3/16/2019 
-
+using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Unity.IL2CPP.CompilerServices;
