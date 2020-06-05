@@ -77,7 +77,9 @@ namespace Pixeye.Actors
         ticksFixedProc.Add(tickableFixed);
 
       if (updateble is ITickLate tickableLate)
+      {
         ticksLateProc.Add(tickableLate);
+      }
     }
 
     public void RemoveProc(object updateble)
@@ -171,7 +173,7 @@ namespace Pixeye.Actors
     internal void LateUpdate(float delta)
     {
       var countTicksLate = ticksLate.Count;
-      var countTicksProc = ticksFixedProc.Count;
+      var countTicksProc = ticksLateProc.Count;
       for (var i = 0; i < countTicksLate; i++)
       {
         ticksLate[i].TickLate(delta);
