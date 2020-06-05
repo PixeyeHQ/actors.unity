@@ -73,7 +73,7 @@ namespace Pixeye.Actors
       return ref val;
     }
 
- 
+
     /// Creates the component for entity.
     /// Use this only in the initialization.
     public void Set<T>(T component)
@@ -126,7 +126,7 @@ namespace Pixeye.Actors
       return ref val;
     }
 
-   
+
     /// Removes the component from entity.
     public void Remove<T>()
     {
@@ -262,7 +262,10 @@ namespace Pixeye.Actors
     public void Release()
     {
       DebugDestroyed(this);
-      managed.layer.processorEcs.SetOperation(this, 0, ProcessorEcs.Action.Kill);
+      ref var _managed = ref managed;
+      foreach (var child in _managed.childs)
+        child.Release();
+      _managed.layer.processorEcs.SetOperation(this, 0, ProcessorEcs.Action.Kill);
     }
   }
 }

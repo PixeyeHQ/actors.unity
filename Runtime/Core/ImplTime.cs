@@ -25,6 +25,10 @@ namespace Pixeye.Actors
 
     public ImplTime()
     {
+      if (Application.targetFrameRate == -1)
+        Fps = 300;
+      else
+        Fps = Application.targetFrameRate;
       deltaTimeFixed    = 1 / FpsPhysics;
       deltaTime         = 1 / Fps;
       deltaTimeUnscaled = 1 / Fps;
@@ -39,7 +43,7 @@ namespace Pixeye.Actors
         deltaTime = 1 / Fps * scale;
       else
         deltaTime = Time.deltaTime * scale;
-      
+
       deltaTimeFixed = 1 / FpsPhysics * scale;
     }
   }

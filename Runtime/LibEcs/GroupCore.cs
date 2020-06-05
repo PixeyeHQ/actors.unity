@@ -7,27 +7,10 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using Unity.IL2CPP.CompilerServices;
-using UnityEngine;
-using UnityEngine.Scripting;
 
 
 namespace Pixeye.Actors
 {
-  class GroupCoreComparer : IEqualityComparer<GroupCore>
-  {
-    public static GroupCoreComparer Default = new GroupCoreComparer();
-
-    public bool Equals(GroupCore x, GroupCore y)
-    {
-      return y.id == x.id;
-    }
-
-    public int GetHashCode(GroupCore obj)
-    {
-      return obj.composition.hash;
-    }
-  }
-
   [Flags]
   public enum Op
   {
@@ -37,11 +20,11 @@ namespace Pixeye.Actors
   }
 
 
-  [Preserve]
   [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
   public abstract class GroupCore : IEnumerable, IEquatable<GroupCore>, IDisposable
   {
     public ent[] entities = new ent[Kernel.Settings.SizeEntities];
+
     public int length;
 
     internal ProcessorEcs processorEcs;
@@ -66,12 +49,11 @@ namespace Pixeye.Actors
     int position;
 
 
-    public ent this[int index]
+    public ref ent this[int index]
     {
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
-      get =>  entities[index];
+      get => ref entities[index];
     }
-
 
     public void Release(int index)
     {
@@ -105,24 +87,21 @@ namespace Pixeye.Actors
     {
       this.layer       = layer;
       this.composition = composition;
-      Debug.Log("HOPA: " + layer.processorEcs);
-      processorEcs     = layer.processorEcs;
+
+      processorEcs = layer.processorEcs;
 
 #if ACTORS_TAGS_CHECKS
-      Debug.Log("HOPA2: " + layer.processorEcs);
       HelperTags.RegisterGroup(this);
 #endif
-      Debug.Log("HOPA3: " + composition.excluded);
-      Debug.Log("HOPA3: " + composition.excluded.Length);
+
       for (var i = 0; i < composition.excluded.Length; i++)
       {
         ref var m = ref composition.excluded[i];
-          Debug.Log("HOPA6: " + Storage.All[m.id].groups[layer.id]);
-       Debug.Log("HOPA4: " + m.id);
- 
+
+
         Storage.All[m.id].groups[layer.id].Add(this);
       }
-      Debug.Log("HOPA7: " + this);
+
       return this;
     }
 
@@ -139,28 +118,30 @@ namespace Pixeye.Actors
 
       if (entity.id >= entities.Length)
       {
-        Array.Resize(ref entities, entity.id << 1);
+        var l = entity.id + entity.id / 5;
+        Array.Resize(ref entities, l);
 #if ACTORS_EVENTS_MANUAL
         if (hasEventAdd)
-          Array.Resize(ref added.source, entity.id << 1);
+          Array.Resize(ref added.source, l);
         if (hasEventRemove)
-          Array.Resize(ref removed.source, entity.id << 1);
+          Array.Resize(ref removed.source, l);
 #else
-        Array.Resize(ref added.source, entity.id << 1);
-        Array.Resize(ref removed.source, entity.id << 1);
+        Array.Resize(ref added.source, l);
+        Array.Resize(ref removed.source, l);
 #endif
       }
       else if (length >= entities.Length)
       {
-        Array.Resize(ref entities, length << 1);
+        var l = length + length / 5;
+        Array.Resize(ref entities, l);
 #if ACTORS_EVENTS_MANUAL
         if (hasEventAdd)
-          Array.Resize(ref added.source, length << 1);
+          Array.Resize(ref added.source, l);
         if (hasEventRemove)
-          Array.Resize(ref removed.source, length << 1);
+          Array.Resize(ref removed.source, l);
 #else
-        Array.Resize(ref added.source, length << 1);
-        Array.Resize(ref removed.source, length << 1);
+        Array.Resize(ref added.source, l);
+        Array.Resize(ref removed.source, l);
 #endif
       }
 
@@ -238,14 +219,14 @@ namespace Pixeye.Actors
     internal void RemoveFast(int entityID)
     {
       var i = HelperArray.BinarySearch(ref entities, entityID, 0, length - 1);
-      
+
 #if ACTORS_EVENTS_MANUAL
       if (hasEventRemove)
         removed.source[removed.length++] = entities[i];
 #else
       removed.source[removed.length++] = entities[i];
 #endif
-       
+
       if (i < --length)
         Array.Copy(entities, i + 1, entities, i, length - i);
     }
@@ -528,7 +509,7 @@ namespace Pixeye.Actors
     #endregion
   }
 
-  [Preserve]
+  [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
   public class Group<T> : GroupCore
   {
     internal override GroupCore Initialize(Composition composition, LayerCore layer)
@@ -548,7 +529,8 @@ namespace Pixeye.Actors
       return gr;
     }
   }
-  [Preserve]
+
+  [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
   public class Group<T, Y> : GroupCore
   {
     internal override GroupCore Initialize(Composition composition, LayerCore layer)
@@ -576,6 +558,7 @@ namespace Pixeye.Actors
     }
   }
 
+  [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
   public class Group<T, Y, U> : GroupCore
   {
     internal override GroupCore Initialize(Composition composition, LayerCore layer)
@@ -612,6 +595,7 @@ namespace Pixeye.Actors
     }
   }
 
+  [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
   public class Group<T, Y, U, I> : GroupCore
   {
     internal override GroupCore Initialize(Composition composition, LayerCore layer)
@@ -654,6 +638,7 @@ namespace Pixeye.Actors
     }
   }
 
+  [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
   public class Group<T, Y, U, I, O> : GroupCore
   {
     internal override GroupCore Initialize(Composition composition, LayerCore layer)
@@ -698,6 +683,7 @@ namespace Pixeye.Actors
     }
   }
 
+  [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
   public class Group<T, Y, U, I, O, P> : GroupCore
 
   {
@@ -758,6 +744,7 @@ namespace Pixeye.Actors
     }
   }
 
+  [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
   public class Group<T, Y, U, I, O, P, A> : GroupCore
   {
     internal override GroupCore Initialize(Composition composition, LayerCore layer)
@@ -826,6 +813,7 @@ namespace Pixeye.Actors
     }
   }
 
+  [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
   public class Group<T, Y, U, I, O, P, A, S> : GroupCore
   {
     internal override GroupCore Initialize(Composition composition, LayerCore layer)
@@ -902,6 +890,7 @@ namespace Pixeye.Actors
     }
   }
 
+  [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
   public class Group<T, Y, U, I, O, P, A, S, D> : GroupCore
   {
     internal override GroupCore Initialize(Composition composition, LayerCore layer)
@@ -985,6 +974,7 @@ namespace Pixeye.Actors
     }
   }
 
+  [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
   public class Group<T, Y, U, I, O, P, A, S, D, F> : GroupCore
   {
     internal override GroupCore Initialize(Composition composition, LayerCore layer)

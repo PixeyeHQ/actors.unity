@@ -5,7 +5,9 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.Scripting;
 
+[assembly: AlwaysLinkAssembly]
 
 namespace Pixeye.Actors
 {
@@ -41,13 +43,13 @@ namespace Pixeye.Actors
 #else
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSplashScreen)]
 #endif
-    [assembly: AlwaysLinkAssembly]
     static void Bootstrap()
     {
       HandleSettings();
       Random.Bootstrap();
       ProcessorEcs.Bootstrap();
       HandleScenes();
+
 
       void HandleSettings()
       {
@@ -56,6 +58,10 @@ namespace Pixeye.Actors
           JsonUtility.FromJsonOverwrite(t.text, Settings);
 
         Settings.SizeGenerations = Settings.SizeComponents / 32;
+
+        Application.targetFrameRate = Settings.Fps;
+        QualitySettings.vSyncCount  = Settings.Vsync;
+
         if (Settings.Fps == -1)
         {
           ImplTime.Fps      = 60;
@@ -144,8 +150,7 @@ namespace Pixeye.Actors
         }
       }
     }
-
-
+    
     IEnumerator OnApplicationFocus(bool hasFocus)
     {
       yield return new WaitForSeconds(0.01f);

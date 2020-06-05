@@ -37,7 +37,7 @@ namespace Pixeye.Actors
         .transform;
 
       SceneManager.MoveGameObjectToScene(tr.gameObject, layer.Scene);
-      tr.SetAsLastSibling();
+      //tr.SetAsLastSibling();
       return tr;
     }
 
@@ -61,7 +61,7 @@ namespace Pixeye.Actors
       var tr = layer.pool.pools[poolID].Spawn(prefab, startPosition, startRotation, parent).transform;
 
       SceneManager.MoveGameObjectToScene(tr.gameObject, layer.Scene);
-      tr.SetAsLastSibling();
+      //tr.SetAsLastSibling();
 
       return tr;
     }
@@ -100,7 +100,7 @@ namespace Pixeye.Actors
 
 
       SceneManager.MoveGameObjectToScene(tr.gameObject, layer.Scene);
-      tr.SetAsLastSibling();
+      //tr.SetAsLastSibling();
 
       return tr;
     }
@@ -113,7 +113,7 @@ namespace Pixeye.Actors
 
 
       SceneManager.MoveGameObjectToScene(tr.gameObject, layer.Scene);
-      tr.SetAsLastSibling();
+      //tr.SetAsLastSibling();
 
       return tr;
     }
@@ -139,7 +139,7 @@ namespace Pixeye.Actors
       var tr = layer.pool.pools[poolID].Spawn(Box.Get<GameObject>(prefabID), startPosition, startRotation).transform;
       SceneManager.MoveGameObjectToScene(tr.gameObject, layer.Scene);
 
-      tr.SetAsLastSibling();
+      //tr.SetAsLastSibling();
 
       return tr;
     }
@@ -150,7 +150,7 @@ namespace Pixeye.Actors
       var tr = layer.pool.pools[poolID].Spawn(Box.Get<GameObject>(prefabID), startPosition, startRotation, parent)
         .transform;
       SceneManager.MoveGameObjectToScene(tr.gameObject, layer.Scene);
-      tr.SetAsLastSibling();
+      //tr.SetAsLastSibling();
       return tr;
     }
 

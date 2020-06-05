@@ -107,19 +107,16 @@ namespace Pixeye.Actors
         {
           var gr = fieldObj as GroupCore;
           gr.id = GroupNextID++;
-          Debug.Log(gr);
-          Debug.Log(composition + "COMPOA");
 
-          Debug.Log(layer + "LAYA");
 
-          gr = gr.Initialize(composition, layer);
+          gr.Initialize(composition, layer);
           return gr;
         }
         else
         {
           var gr = (System.Activator.CreateInstance(groupType, true) as GroupCore); 
       
-          gr =  gr.Initialize(composition, layer);
+          gr.Initialize(composition, layer);
           gr.id = GroupNextID++;
           return gr;
         }

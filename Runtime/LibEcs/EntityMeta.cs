@@ -102,21 +102,16 @@ namespace Pixeye.Actors
   public struct EntityManagedMeta
   {
     public bool isPooled;
-
-    // public bool isNested;
     internal LayerCore layer;
 
     internal Transform transform;
-
-    //internal int[] generations;
     internal int[] signature;
     internal ents childs;
     public ent parent;
 
     public void Initialize()
     {
-      childs = new ents();
-      //generations        = new int[Kernel.Settings.SizeGenerations];
+      childs    = new ents();
       signature = new int[Kernel.Settings.SizeGenerations];
     }
   }

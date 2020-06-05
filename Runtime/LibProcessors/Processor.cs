@@ -2,7 +2,6 @@
 //  Contacts : Pixeye - ask@pixeye.games
 
 using System;
-using UnityEngine;
 
 
 namespace Pixeye.Actors
@@ -68,11 +67,15 @@ namespace Pixeye.Actors
 
     void ITick.Tick(float dt)
     {
+       
     }
 
     void IReceiveEcsEvent.Receive()
     {
     }
+    
+    
+    
   }
 
   #region PROCESSORS

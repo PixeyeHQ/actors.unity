@@ -4,7 +4,6 @@ using System.Runtime.CompilerServices;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.IL2CPP.CompilerServices;
 
-
 namespace Pixeye.Actors
 {
   [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
@@ -12,6 +11,7 @@ namespace Pixeye.Actors
   {
     internal static PoolMem Entities;
     internal static EntityManagedMeta[] EntitiesManaged;
+
 
     internal ents entities = new ents();
     internal List<Processor> processors = new List<Processor>();
@@ -25,7 +25,7 @@ namespace Pixeye.Actors
       Entities.Alloc(length, UnsafeUtility.SizeOf<EntityMeta>());
       EntitiesManaged = new EntityManagedMeta[length];
 
-      for (int i = 0; i < length; i++)
+      for (var i = 0; i < length; i++)
       {
         Entities.Get<EntityMeta>(i)->Initialize();
         EntitiesManaged[i].Initialize();
@@ -53,10 +53,10 @@ namespace Pixeye.Actors
       var prevEntitiesLength = Entities.Length;
       if (entity.id >= prevEntitiesLength)
       {
-        Entities.Realloc(entity.id + prevEntitiesLength/5);
+        Entities.Realloc(entity.id + prevEntitiesLength / 5);
         Array.Resize(ref EntitiesManaged, Entities.Length);
 
-        for (int i = prevEntitiesLength; i < Entities.Length; i++)
+        for (var i = prevEntitiesLength; i < Entities.Length; i++)
         {
           Entities.Get<EntityMeta>(i)->Initialize();
           EntitiesManaged[i].Initialize();

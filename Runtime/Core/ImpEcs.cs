@@ -18,7 +18,7 @@
       e.firstReceiver = -1;
       return ref e.signal;
     }
-    
+
     public void Send<T>(in T obj) where T : struct
     {
       if (SignalsEcs<T>.layers[layer.id] == null) return;
@@ -26,6 +26,12 @@
       ref var e = ref q.elements.Add();
       e.firstReceiver = -1;
       e.signal        = obj;
+    }
+
+    /// Updates operations for groups.
+    public void Update()
+    {
+      layer.processorEcs.Execute();
     }
   }
 }

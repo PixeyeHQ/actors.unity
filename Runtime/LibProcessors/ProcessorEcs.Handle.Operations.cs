@@ -215,10 +215,7 @@ namespace Pixeye.Actors
             for (var ii = 0; ii < Kernel.Settings.SizeGenerations; ii++)
               eManaged.signature[ii] = 0;
 
-
-            foreach (var child in eManaged.childs)
-              child.Release();
-
+ 
             eManaged.childs.length = 0;
 
             if (eManaged.transform != null)

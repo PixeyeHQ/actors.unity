@@ -2,13 +2,10 @@
 // Contacts : Pix - info@pixeye.games
 //     Date : 3/16/2019 
 
-
-using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Unity.IL2CPP.CompilerServices;
 using UnityEngine;
-using Debug = UnityEngine.Debug;
 
 namespace Pixeye.Actors
 {
@@ -22,12 +19,6 @@ namespace Pixeye.Actors
     internal static ents Released = new ents(Kernel.Settings.SizeEntities);
     internal static int Size = sizeof(ent);
     internal static int NextID = 1;
-
-    //===============================//
-    // Groups
-    //===============================//
-    //public static readonly groups groups = new groups();
-
 
     //===============================//
     // Entity
