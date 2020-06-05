@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using Unity.IL2CPP.CompilerServices;
+using UnityEngine.Scripting;
 
 
 namespace Pixeye.Actors
@@ -21,6 +22,7 @@ namespace Pixeye.Actors
 
 
   [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
+  [Preserve]
   public abstract class GroupCore : IEnumerable, IEquatable<GroupCore>, IDisposable
   {
     public ent[] entities = new ent[Kernel.Settings.SizeEntities];
@@ -509,6 +511,7 @@ namespace Pixeye.Actors
     #endregion
   }
 
+  [Preserve]
   [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
   public class Group<T> : GroupCore
   {
@@ -530,6 +533,7 @@ namespace Pixeye.Actors
     }
   }
 
+  [Preserve]
   [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
   public class Group<T, Y> : GroupCore
   {
@@ -558,6 +562,7 @@ namespace Pixeye.Actors
     }
   }
 
+  [Preserve]
   [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
   public class Group<T, Y, U> : GroupCore
   {
@@ -595,6 +600,7 @@ namespace Pixeye.Actors
     }
   }
 
+  [Preserve]
   [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
   public class Group<T, Y, U, I> : GroupCore
   {
@@ -638,6 +644,7 @@ namespace Pixeye.Actors
     }
   }
 
+  [Preserve]
   [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
   public class Group<T, Y, U, I, O> : GroupCore
   {
@@ -683,6 +690,7 @@ namespace Pixeye.Actors
     }
   }
 
+  [Preserve]
   [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
   public class Group<T, Y, U, I, O, P> : GroupCore
 
@@ -744,6 +752,7 @@ namespace Pixeye.Actors
     }
   }
 
+  [Preserve]
   [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
   public class Group<T, Y, U, I, O, P, A> : GroupCore
   {
@@ -813,6 +822,7 @@ namespace Pixeye.Actors
     }
   }
 
+  [Preserve]
   [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
   public class Group<T, Y, U, I, O, P, A, S> : GroupCore
   {
@@ -890,6 +900,7 @@ namespace Pixeye.Actors
     }
   }
 
+  [Preserve]
   [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
   public class Group<T, Y, U, I, O, P, A, S, D> : GroupCore
   {
@@ -974,6 +985,7 @@ namespace Pixeye.Actors
     }
   }
 
+  [Preserve]
   [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
   public class Group<T, Y, U, I, O, P, A, S, D, F> : GroupCore
   {
