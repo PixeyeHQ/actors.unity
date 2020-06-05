@@ -1,0 +1,14 @@
+
+using UnityEngine;
+using Pixeye.Actors;
+
+namespace Pixeye
+{
+
+[CreateAssetMenu(fileName = "##NAME FILE##", menuName = "Actors/Add/Data/&NAME&", order = 10)]
+public class ##NAME## : DataGame
+{
+  protected override void Setup() { }   
+}
+
+}

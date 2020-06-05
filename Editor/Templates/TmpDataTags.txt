@@ -1,0 +1,24 @@
+
+using Pixeye.Actors;
+using UnityEngine;
+
+namespace Pixeye
+{
+   
+   public static class DataBase
+   {
+ 
+     ##CODEGEN1##
+ 
+   [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+     public static void Create()
+     {
+   
+     ##CODEGEN2##
+    
+     }
+ 
+   }
+   
+   
+}

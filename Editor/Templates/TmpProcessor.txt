@@ -1,0 +1,17 @@
+﻿
+using Pixeye.Actors;
+using UnityEngine;
+
+namespace Pixeye.Source
+{
+  sealed class ##NAME## : Processor, ITick
+  {
+    // Group Example
+    // Group<ComponentAlpaca> groupAlpacas = default;
+    
+    public void Tick(float delta)
+    {
+    
+    }
+  }
+}
