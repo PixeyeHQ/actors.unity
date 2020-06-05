@@ -53,7 +53,7 @@ namespace Pixeye.Actors
       var prevEntitiesLength = Entities.Length;
       if (entity.id >= prevEntitiesLength)
       {
-        Entities.Realloc(entity.id << 1);
+        Entities.Realloc(entity.id + prevEntitiesLength/5);
         Array.Resize(ref EntitiesManaged, Entities.Length);
 
         for (int i = prevEntitiesLength; i < Entities.Length; i++)

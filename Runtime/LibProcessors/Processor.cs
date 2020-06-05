@@ -2,6 +2,7 @@
 //  Contacts : Pixeye - ask@pixeye.games
 
 using System;
+using UnityEngine;
 
 
 namespace Pixeye.Actors
@@ -34,7 +35,6 @@ namespace Pixeye.Actors
       layer.processorEcs.processors.Add(this);
       layer.processorSignals.Add(this);
       
-
       Entity   = layer.Entity;
       Ecs      = layer.Ecs;
       Observer = layer.Observer;
@@ -43,10 +43,16 @@ namespace Pixeye.Actors
       Obj      = layer.Obj;
 
       OnLaunch();
+      OnAwake();
     }
 
+    protected virtual void OnAwake()
+    {
+      
+    }
+    
     void IDisposable.Dispose() => OnDispose();
-
+    
     internal virtual void OnLaunch()
     {
     }

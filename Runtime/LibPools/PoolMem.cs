@@ -24,7 +24,7 @@ namespace Pixeye.Actors
 
     public void Realloc(int length)
     {
-      Memory = (void*) UnmanagedMemory.ReAlloc(Memory, length);
+      Memory = (void*) UnmanagedMemory.ReAlloc(Memory, length * ElementSize);
       Length = length;
     }
 

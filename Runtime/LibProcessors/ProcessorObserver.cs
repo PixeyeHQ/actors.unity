@@ -11,7 +11,7 @@ namespace Pixeye.Actors
 #if ACTORS_EVENTS_MANUAL
   [Events(Op.Add | Op.Remove)]
 #endif
-    public Group<ComponentObserver> source = default;
+    public Group<ComponentObserver> source = new Group<ComponentObserver>();
 
     public override void HandleEcsEvents()
     {

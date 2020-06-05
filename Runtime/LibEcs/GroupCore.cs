@@ -8,6 +8,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using Unity.IL2CPP.CompilerServices;
 using UnityEngine;
+using UnityEngine.Scripting;
 
 
 namespace Pixeye.Actors
@@ -36,6 +37,7 @@ namespace Pixeye.Actors
   }
 
 
+  [Preserve]
   [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
   public abstract class GroupCore : IEnumerable, IEquatable<GroupCore>, IDisposable
   {
@@ -64,10 +66,10 @@ namespace Pixeye.Actors
     int position;
 
 
-    public ref ent this[int index]
+    public ent this[int index]
     {
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
-      get => ref entities[index];
+      get =>  entities[index];
     }
 
 
@@ -103,18 +105,24 @@ namespace Pixeye.Actors
     {
       this.layer       = layer;
       this.composition = composition;
+      Debug.Log("HOPA: " + layer.processorEcs);
       processorEcs     = layer.processorEcs;
 
-
+#if ACTORS_TAGS_CHECKS
+      Debug.Log("HOPA2: " + layer.processorEcs);
       HelperTags.RegisterGroup(this);
-
-
+#endif
+      Debug.Log("HOPA3: " + composition.excluded);
+      Debug.Log("HOPA3: " + composition.excluded.Length);
       for (var i = 0; i < composition.excluded.Length; i++)
       {
         ref var m = ref composition.excluded[i];
+          Debug.Log("HOPA6: " + Storage.All[m.id].groups[layer.id]);
+       Debug.Log("HOPA4: " + m.id);
+ 
         Storage.All[m.id].groups[layer.id].Add(this);
       }
-
+      Debug.Log("HOPA7: " + this);
       return this;
     }
 
@@ -520,7 +528,7 @@ namespace Pixeye.Actors
     #endregion
   }
 
-
+  [Preserve]
   public class Group<T> : GroupCore
   {
     internal override GroupCore Initialize(Composition composition, LayerCore layer)
@@ -540,7 +548,7 @@ namespace Pixeye.Actors
       return gr;
     }
   }
-
+  [Preserve]
   public class Group<T, Y> : GroupCore
   {
     internal override GroupCore Initialize(Composition composition, LayerCore layer)

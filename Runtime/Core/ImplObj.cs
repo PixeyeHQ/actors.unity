@@ -25,7 +25,7 @@ namespace Pixeye.Actors
     {
       var tr = GameObject.Instantiate(prefab, startPosition, startRotation).transform;
       SceneManager.MoveGameObjectToScene(tr.gameObject, layer.Scene);
-      tr.SetAsLastSibling();
+     // tr.SetAsLastSibling();
       return tr;
     }
 
@@ -84,7 +84,7 @@ namespace Pixeye.Actors
       var tr = layer.pool.pools[poolID].Spawn(prefab, startPosition, startRotation).transform;
  
       SceneManager.MoveGameObjectToScene(tr.gameObject, layer.Scene);
-      tr.SetAsLastSibling();
+      //tr.SetAsLastSibling();
 
       return tr;
     }

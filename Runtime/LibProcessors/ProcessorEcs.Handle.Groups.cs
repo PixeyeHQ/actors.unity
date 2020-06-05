@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using UnityEngine;
 
 namespace Pixeye.Actors
 {
@@ -65,7 +66,7 @@ namespace Pixeye.Actors
           .AndEach(composition.includedTags).And(17).AndEach(composition.excludedTags).And(31)
           .AndEach(excludeCompFilter);
 
-        var group = SetupGroup(myFieldInfo.FieldType, composition, layer);
+        var group = SetupGroup(myFieldInfo.FieldType, myFieldInfo.GetValue(obj), composition, layer);
         myFieldInfo.SetValue(obj, group);
 
         if (bindAttribute != null)
@@ -86,7 +87,7 @@ namespace Pixeye.Actors
       }
     }
 
-    GroupCore SetupGroup(Type groupType, Composition composition, LayerCore layer)
+    GroupCore SetupGroup(Type groupType, object fieldObj, Composition composition,   LayerCore layer)
     {
       foreach (var groupNext in Groups)
       {
@@ -97,15 +98,32 @@ namespace Pixeye.Actors
       }
 
       var group = CreateGroup();
-      // Groups.Add(group);
       Groups.Add(group);
       return group;
 
       GroupCore CreateGroup()
       {
-        var gr = (Activator.CreateInstance(groupType, true) as GroupCore).Initialize(composition, layer);
-        gr.id = GroupNextID++;
-        return gr;
+        if (fieldObj != null)
+        {
+          var gr = fieldObj as GroupCore;
+          gr.id = GroupNextID++;
+          Debug.Log(gr);
+          Debug.Log(composition + "COMPOA");
+
+          Debug.Log(layer + "LAYA");
+
+          gr = gr.Initialize(composition, layer);
+          return gr;
+        }
+        else
+        {
+          var gr = (System.Activator.CreateInstance(groupType, true) as GroupCore); 
+      
+          gr =  gr.Initialize(composition, layer);
+          gr.id = GroupNextID++;
+          return gr;
+        }
+         
       }
     }
 

@@ -41,6 +41,7 @@ namespace Pixeye.Actors
 #else
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSplashScreen)]
 #endif
+    [assembly: AlwaysLinkAssembly]
     static void Bootstrap()
     {
       HandleSettings();
