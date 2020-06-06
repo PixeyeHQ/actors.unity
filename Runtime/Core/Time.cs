@@ -5,14 +5,14 @@ using UnityEngine;
 
 namespace Pixeye.Actors
 {
-  public class ImplTime
+  public class Time
   {
     public static float Fps = 60;
     public static float FpsPhysics = 50;
-    internal static bool FpsLimit = false;
-
-    public static int frame => Time.frameCount;
-    public static float current => Time.time;
+    public static bool FpsLimit = false;
+ 
+    public static int Frame => UnityEngine.Time.frameCount;
+    public static float Current => UnityEngine.Time.time;
 
     /// The scale at which the time is passing. This can be used for slow motion effects.
     public float scale = 1.0f;
@@ -23,7 +23,7 @@ namespace Pixeye.Actors
 
     internal float timescaleCacheOnFocus;
 
-    public ImplTime()
+    public Time()
     {
       if (Application.targetFrameRate == -1)
         Fps = 300;
@@ -37,12 +37,12 @@ namespace Pixeye.Actors
 
     public void Tick()
     {
-      deltaTimeUnscaled = Time.unscaledDeltaTime;
+      deltaTimeUnscaled = UnityEngine.Time.unscaledDeltaTime;
 
       if (FpsLimit)
         deltaTime = 1 / Fps * scale;
       else
-        deltaTime = Time.deltaTime * scale;
+        deltaTime = UnityEngine.Time.deltaTime * scale;
 
       deltaTimeFixed = 1 / FpsPhysics * scale;
     }

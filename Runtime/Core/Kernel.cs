@@ -64,16 +64,16 @@ namespace Pixeye.Actors
 
         if (Settings.Fps == -1)
         {
-          ImplTime.Fps      = 60;
-          ImplTime.FpsLimit = false;
+          Time.Fps      = 60;
+          Time.FpsLimit = false;
         }
         else
         {
-          ImplTime.Fps      = Settings.Fps;
-          ImplTime.FpsLimit = true;
+          Time.Fps      = Settings.Fps;
+          Time.FpsLimit = true;
         }
 
-        ImplTime.FpsPhysics = Settings.FpsPhysics;
+        Time.FpsPhysics = Settings.FpsPhysics;
       }
 
       void HandleScenes()

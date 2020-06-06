@@ -15,7 +15,7 @@ namespace Pixeye.Actors
     public ImplActor Actor => Layer.Actor;
     public ImplEntity Entity => Layer.Entity;
     public ImplEcs Ecs => Layer.Ecs;
-    public ImplTime Time => Layer.Time;
+    public Time Time => Layer.Time;
     public ImplObj Obj => Layer.Obj;
 
     void Awake()

@@ -20,7 +20,7 @@ namespace Pixeye.Actors
     protected ImplActor Actor;
     protected ImplEntity Entity;
     protected ImplEcs Ecs;
-    protected ImplTime Time;
+    protected Time Time;
     protected ImplObj Obj;
      
 

@@ -20,7 +20,7 @@ namespace Pixeye.Actors
     public static new ImplEcs Ecs => LayerTyped.core.Ecs;
     public static new ImplObserver Observer => LayerTyped.core.Observer;
     public static new ImplActor Actor => LayerTyped.core.Actor;
-    public static new ImplTime Time => LayerTyped.core.Time;
+    public static new Time Time => LayerTyped.core.Time;
     public static new ImplObj Obj => LayerTyped.core.Obj;
 
     internal static Layer<T> LayerTyped;

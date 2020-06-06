@@ -11,7 +11,7 @@ namespace Pixeye.Actors
     public static ImplEcs Ecs => LayerCore.ActiveLayer.Ecs;
     public static ImplObserver Observer => LayerCore.ActiveLayer.Observer;
     public static ImplActor Actor => LayerCore.ActiveLayer.Actor;
-    public static ImplTime Time => LayerCore.ActiveLayer.Time;
+    public static Time Time => LayerCore.ActiveLayer.Time;
     public static ImplObj Obj => LayerCore.ActiveLayer.Obj;
 
 

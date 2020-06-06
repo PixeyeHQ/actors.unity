@@ -25,7 +25,7 @@ namespace Pixeye.Actors
 
     public ProcessorUpdate Updates;
     public ImplObj Obj;
-    public ImplTime Time;
+    public Time Time;
     public ImplActor Actor;
     public ImplEntity Entity;
     public ImplEcs Ecs;
@@ -42,7 +42,7 @@ namespace Pixeye.Actors
 
     protected virtual void Awake()
     {
-      Time = new ImplTime();
+      Time = new Time();
       Kernel.LayersInUse.Add(this);
     }
 

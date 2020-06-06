@@ -1,11 +1,14 @@
 //  Project : ecs
 // Contacts : Pix - info@pixeye.games
 //     Date : 3/16/2019 
+
 using System;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Unity.IL2CPP.CompilerServices;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace Pixeye.Actors
 {
@@ -183,10 +186,14 @@ namespace Pixeye.Actors
 
     public void MoveTo<T>() where T : LayerCore
     {
-      var nextLayer = Layer<T>.LayerTyped;
+      DebugMoveTo<T>();
+      managed.layer.processorEcs.SwapLayer(this, Layer<T>.LayerTyped);
+    }
 
-#if ACTORS_DEBUG
-      if (nextLayer == null)
+    [Conditional("ACTORS_DEBUG")]
+    void DebugMoveTo<T>()
+    {
+      if (Layer<T>.LayerTyped == null)
       {
         Debug.Log($"Layer {typeof(T)} doesn't exist in the game.");
         throw new Exception();
@@ -198,8 +205,6 @@ namespace Pixeye.Actors
           $"You are trying to send child entity. This is not allowed. Send parent [{managed.parent.id}] {managed.transform} instead.");
         throw new Exception();
       }
-#endif
-      managed.layer.processorEcs.SwapLayer(this, nextLayer);
     }
   }
 }
