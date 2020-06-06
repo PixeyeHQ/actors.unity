@@ -20,7 +20,8 @@ namespace Pixeye.Actors
 
     internal static void Bootstrap()
     {
-      var length = Kernel.Settings.SizeEntities;
+     
+      var length = LayerKernel.Settings.SizeEntities;
 
       Entities.Alloc(length, UnsafeUtility.SizeOf<EntityMeta>());
       EntitiesManaged = new EntityManagedMeta[length];
@@ -82,7 +83,7 @@ namespace Pixeye.Actors
 
     public void Dispose()
     {
-      if (Kernel.ApplicationIsQuitting) return;
+      if (LayerKernel.ApplicationIsQuitting) return;
 
       operationsLength = 0;
       processors.Clear();
@@ -97,7 +98,7 @@ namespace Pixeye.Actors
         for (var i = 0; i < meta->componentsAmount; i++)
           Storage.All[meta->components[i]].toDispose.Add(entity.id);
 
-        for (var ii = 0; ii < Kernel.Settings.SizeGenerations; ii++)
+        for (var ii = 0; ii < LayerKernel.Settings.SizeGenerations; ii++)
         {
           managed.signature[ii] = 0;
         }

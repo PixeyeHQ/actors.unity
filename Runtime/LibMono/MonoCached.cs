@@ -18,23 +18,23 @@ namespace Pixeye.Actors
     public Time Time => Layer.Time;
     public ImplObj Obj => Layer.Obj;
 
-    void Awake()
+    protected virtual void Start()
     {
-      if (!Kernel.Instance) return;
-      if (Kernel.ChangingScene[gameObject.scene.buildIndex]) return;
+      if (!LayerKernel.Instance) return;
+      if (LayerKernel.ChangingScene[gameObject.scene.buildIndex]) return;
       Setup();
     }
 
     void OnEnable()
     {
-      if (!Kernel.Instance) return;
-      if (Kernel.ChangingScene[gameObject.scene.buildIndex]) return;
+      if (!LayerKernel.Instance) return;
+      if (LayerKernel.ChangingScene[gameObject.scene.buildIndex]) return;
       HandleEnable();
     }
 
     void OnDisable()
     {
-      if (Kernel.ApplicationIsQuitting) return;
+      if (LayerKernel.ApplicationIsQuitting) return;
       HandleDisable();
     }
 

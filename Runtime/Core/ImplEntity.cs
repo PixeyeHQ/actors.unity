@@ -15,8 +15,7 @@ namespace Pixeye.Actors
       this.layer   = layer;
       processorEcs = layer.processorEcs;
     }
-
-
+    
     public ent Create()
     {
       processorEcs.Create(out var entity);
@@ -133,8 +132,7 @@ namespace Pixeye.Actors
       processorEcs.SetOperation(entity, -1, ProcessorEcs.Action.Activate);
       return entity;
     }
-
-
+ 
     public ent CreateFor(GameObject go, ModelComposer model)
     {
       processorEcs.Create(out var entity, false);

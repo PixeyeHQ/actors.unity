@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Diagnostics;
 using Debug = UnityEngine.Debug;
-#if ACTORS_DEBUG
 using System.Runtime.InteropServices;
 using System.Runtime.CompilerServices;
 using Unity.IL2CPP.CompilerServices;
-#endif
+
 
 namespace Pixeye.Actors
 {
@@ -18,7 +17,7 @@ namespace Pixeye.Actors
 
       if (!entity.exist)
       {
-        Kernel.Debugger.Log(LogType.NOT_ACTIVE, entity, typeof(T).Name);
+        LayerKernel.Debugger.Log(LogType.NOT_ACTIVE, entity, typeof(T).Name);
       }
 #endif
     }
@@ -27,7 +26,7 @@ namespace Pixeye.Actors
     static void DebugCheckNull(ent entity, Type type)
     {
       if (entity.id != 0) return;
-      Kernel.Debugger.Log(LogType.NULL_ENTITY, entity, type.Name);
+      LayerKernel.Debugger.Log(LogType.NULL_ENTITY, entity, type.Name);
       throw new ArgumentException();
     }
 
@@ -37,7 +36,7 @@ namespace Pixeye.Actors
 #if UNITY_EDITOR
       if (!entity.exist)
       {
-        Kernel.Debugger.Log(LogType.DESTROYED, entity, entity.transform);
+        LayerKernel.Debugger.Log(LogType.DESTROYED, entity, entity.transform);
       }
 #endif
     }
@@ -50,7 +49,7 @@ namespace Pixeye.Actors
       if ((entity.managed.signature[generation] & mask) == mask)
       {
         Debug.Log($"{entity.transform}");
-        Kernel.Debugger.Log(LogType.ALREADY_HAVE, entity.id, Storage<T>.Instance.GetComponentType().Name);
+        LayerKernel.Debugger.Log(LogType.ALREADY_HAVE, entity.id, Storage<T>.Instance.GetComponentType().Name);
       }
     }
 
@@ -98,7 +97,6 @@ namespace Pixeye.Actors
     public ref T Get<T>()
     {
       DebugCheckActive<T>(this);
-
       if (id >= Storage<T>.components.Length)
         Array.Resize(ref Storage<T>.components, id << 1);
 
@@ -134,7 +132,6 @@ namespace Pixeye.Actors
     public void Remove<T>()
     {
       DebugDestroyed(this);
-
       var     generation = Storage<T>.Generation;
       var     mask       = Storage<T>.ComponentMask;
       ref var _managed   = ref managed;

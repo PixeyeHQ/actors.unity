@@ -25,7 +25,7 @@ namespace Pixeye.Actors
   [Preserve]
   public abstract class GroupCore : IEnumerable, IEquatable<GroupCore>, IDisposable
   {
-    public ent[] entities = new ent[Kernel.Settings.SizeEntities];
+    public ent[] entities = new ent[LayerKernel.Settings.SizeEntities];
 
     public int length;
 
@@ -39,8 +39,8 @@ namespace Pixeye.Actors
     internal bool hasEventAdd;
     internal bool hasEventRemove;
 #else
-    public ents added = new ents(Kernel.Settings.SizeEntities);
-    public ents removed = new ents(Kernel.Settings.SizeEntities);
+    public ents added = new ents(LayerKernel.Settings.SizeEntities);
+    public ents removed = new ents(LayerKernel.Settings.SizeEntities);
 #endif
 
 
@@ -258,8 +258,8 @@ namespace Pixeye.Actors
       added = default;
       removed = default;
 #else
-      added   = new ents(Kernel.Settings.SizeEntities);
-      removed = new ents(Kernel.Settings.SizeEntities);
+      added   = new ents(LayerKernel.Settings.SizeEntities);
+      removed = new ents(LayerKernel.Settings.SizeEntities);
 #endif
 
 

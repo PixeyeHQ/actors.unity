@@ -49,12 +49,12 @@ namespace Pixeye.Actors
       var               hasValue = cachedObjects.TryGetValue(key, out stack);
       if (!hasValue) cachedObjects.Add(key, new Stack<GameObject>(amount));
 
-      LayerApp.Run(CoPop());
+      LayerKernel.Run(CoPop());
 
       IEnumerator CoPop()
       {
-        var delay = LayerApp.Time.deltaTime;
-        yield return LayerApp.Wait(delay);
+        var delay = LayerKernel.Time.deltaTime;
+        yield return LayerKernel.Wait(delay);
 
         for (var i = 0; i < amountPerTick; i++)
         {

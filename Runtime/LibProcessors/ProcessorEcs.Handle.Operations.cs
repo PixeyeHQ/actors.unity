@@ -21,7 +21,7 @@ namespace Pixeye.Actors
     }
 
     internal int operationsLength;
-    internal EntityOperation[] operations = new EntityOperation[Kernel.Settings.SizeEntities];
+    internal EntityOperation[] operations = new EntityOperation[LayerKernel.Settings.SizeEntities];
 
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -46,7 +46,7 @@ namespace Pixeye.Actors
     void DebugDontExist(EntityMeta* meta, int entityID, Storage storage)
     {
       if (meta->componentsAmount != 0) return;
-      Kernel.Debugger.Log(LogType.REMOVE_NON_EXISTANT, entityID, storage.GetComponentType().Name);
+      LayerKernel.Debugger.Log(LogType.REMOVE_NON_EXISTANT, entityID, storage.GetComponentType().Name);
       throw new Exception();
     }
 
@@ -212,7 +212,7 @@ namespace Pixeye.Actors
 
             eMeta->componentsAmount = 0;
 
-            for (var ii = 0; ii < Kernel.Settings.SizeGenerations; ii++)
+            for (var ii = 0; ii < LayerKernel.Settings.SizeGenerations; ii++)
               eManaged.signature[ii] = 0;
 
  

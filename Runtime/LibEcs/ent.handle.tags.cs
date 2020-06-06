@@ -10,7 +10,7 @@ namespace Pixeye.Actors
     {
       if (len == EcsTags.Capacity)
       {
-        Kernel.Debugger.Log(LogType.TAGS_LIMIT_REACHED, entity, EcsTags.Capacity);
+        LayerKernel.Debugger.Log(LogType.TAGS_LIMIT_REACHED, entity, EcsTags.Capacity);
         throw new ArgumentException();
       }
     }

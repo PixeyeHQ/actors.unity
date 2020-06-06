@@ -10,13 +10,13 @@ namespace Pixeye.Actors
 
     public static LayerCore GetLayer(this GameObject go)
     {
-      return Kernel.Layers[go.scene.buildIndex];
+      return LayerKernel.Layers[go.scene.buildIndex];
     }
 
     public static LayerCore GetLayer(this Transform tr)
     {
       
-      return Kernel.Layers[tr.gameObject.scene.buildIndex];
+      return LayerKernel.Layers[tr.gameObject.scene.buildIndex];
     }
 
 
@@ -131,7 +131,7 @@ namespace Pixeye.Actors
         GameObject.Destroy(o);
       else
       {
-        var layer = Kernel.Layers[o.gameObject.scene.buildIndex];
+        var layer = LayerKernel.Layers[o.gameObject.scene.buildIndex];
         layer.pool.Despawn(poolID, o);
       }
     }

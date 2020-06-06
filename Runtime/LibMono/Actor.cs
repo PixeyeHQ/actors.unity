@@ -24,6 +24,11 @@ namespace Pixeye.Actors
 
     [FoldoutGroup("Main")] public ScriptableBuild buildFrom;
 
+
+    protected sealed override void Start()
+    {
+    }
+
     //===============================//
     // Launch methods
     //===============================//

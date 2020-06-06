@@ -14,8 +14,7 @@ namespace Pixeye.Actors
     internal static int LayerNextID;
     internal static LayerCore ActiveLayer; // current main scene;
     internal Scene Scene => gameObject.scene;
-
-
+    
     internal ProcessorCoroutine processorCoroutine;
     internal ProcessorCoroutine processorCoroutineUnscaled;
 
@@ -44,7 +43,7 @@ namespace Pixeye.Actors
     protected virtual void Awake()
     {
       Time = new Time();
-      Kernel.LayersInUse.Add(this);
+      LayerKernel.LayersInUse.Add(this);
     }
 
     #region Signals
@@ -224,7 +223,7 @@ namespace Pixeye.Actors
       isDirty = true;
       processorCoroutine.Dispose();
       processorCoroutineUnscaled.Dispose();
-      Kernel.LayersInUse.Remove(this);
+      LayerKernel.LayersInUse.Remove(this);
       Updates.Dispose();
       OnLayerDestroy();
 
@@ -247,7 +246,7 @@ namespace Pixeye.Actors
 
     void Update()
     {
-      if (Kernel.ApplicationIsQuitting) return;
+      if (LayerKernel.ApplicationIsQuitting) return;
       if (isDirty) return;
       Time.Tick();
       var delta = Time.deltaTime;
@@ -256,7 +255,7 @@ namespace Pixeye.Actors
 
     void FixedUpdate()
     {
-      if (Kernel.ApplicationIsQuitting) return;
+      if (LayerKernel.ApplicationIsQuitting) return;
       if (isDirty) return;
 
       var delta = Time.deltaTimeFixed;
@@ -265,7 +264,7 @@ namespace Pixeye.Actors
 
     void LateUpdate()
     {
-      if (Kernel.ApplicationIsQuitting) return;
+      if (LayerKernel.ApplicationIsQuitting) return;
       if (isDirty) return;
 
       var delta = Time.deltaTime;

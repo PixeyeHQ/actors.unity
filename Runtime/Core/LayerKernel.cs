@@ -11,11 +11,14 @@ using UnityEngine.Scripting;
 
 namespace Pixeye.Actors
 {
-  public class Kernel : MonoBehaviour
+  public class LayerKernel : Layer<LayerKernel>, ITick
   {
     public static bool[] ChangingScene = new bool[128];
     public static bool ApplicationIsQuitting;
     public static bool IsQuittingOrChangingScene() => ApplicationIsQuitting;
+
+    internal static List<AsyncOperation> LoadJobs = new List<AsyncOperation>();
+    public static Action<float> OnSceneLoading = delegate { };
 
     public static int GetTicksCount
     {
@@ -33,7 +36,7 @@ namespace Pixeye.Actors
 
     internal static SettingsActors Settings = new SettingsActors();
 
-    internal static Kernel Instance;
+    internal static LayerKernel Instance;
     internal const string KernelSceneName = "Actors Framework";
     internal static LayerCore[] Layers = new LayerCore[128];
     internal static readonly List<LayerCore> LayersInUse = new List<LayerCore>();
@@ -46,10 +49,10 @@ namespace Pixeye.Actors
     static void Bootstrap()
     {
       HandleSettings();
+      UpdateTypes();
       Random.Bootstrap();
       ProcessorEcs.Bootstrap();
       HandleScenes();
-
 
       void HandleSettings()
       {
@@ -82,8 +85,8 @@ namespace Pixeye.Actors
         var objKernel = new GameObject("Actors Setup");
         SceneManager.MoveGameObjectToScene(objKernel, scene);
         SceneMain.NextActiveSceneName = SceneManager.GetActiveScene().name;
-        var kernel = objKernel.AddComponent<Kernel>();
-        var layer  = objKernel.AddComponent<LayerApp>();
+        var kernel = objKernel.AddComponent<LayerKernel>();
+
         Instance = kernel;
 
         foreach (var plugPath in Settings.Plugins)
@@ -94,10 +97,6 @@ namespace Pixeye.Actors
       }
     }
 
-    void Awake()
-    {
-      UpdateTypes();
-    }
 
     static void UpdateTypes()
     {
@@ -150,7 +149,7 @@ namespace Pixeye.Actors
         }
       }
     }
-    
+
     IEnumerator OnApplicationFocus(bool hasFocus)
     {
       yield return new WaitForSeconds(0.01f);
@@ -170,6 +169,14 @@ namespace Pixeye.Actors
           core.Time.scale = core.Time.timescaleCacheOnFocus;
         }
       }
+    }
+
+    protected override void Setup()
+    {
+    }
+
+    protected override void OnLayerDestroy()
+    {
     }
 
     void OnApplicationQuit()
@@ -210,6 +217,26 @@ namespace Pixeye.Actors
       }
 
       return -1;
+    }
+
+    public void Tick(float dt)
+    {
+      HandleLoadingProgress();
+    }
+
+    static void HandleLoadingProgress()
+    {
+      if (LoadJobs.Count <= 0) return;
+
+      var progress = 0f;
+      for (var i = 0; i < LoadJobs.Count; i++)
+        progress += LoadJobs[i].progress;
+      var ratio = progress / LoadJobs.Count;
+      OnSceneLoading(ratio);
+      if (ratio == 1)
+      {
+        LoadJobs.Clear();
+      }
     }
   }
 

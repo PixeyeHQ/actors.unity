@@ -33,7 +33,7 @@ namespace Pixeye.Actors
       Bootstrap(); // Setup actors logic for a scene.
       Setup();     // Entry point for developers.
       if (gameObject.scene.buildIndex >= 0)
-        Kernel.ChangingScene[gameObject.scene.buildIndex] = false;
+        LayerKernel.ChangingScene[gameObject.scene.buildIndex] = false;
     }
 
     void Start()
@@ -48,7 +48,7 @@ namespace Pixeye.Actors
       var buildIndex = gameObject.scene.buildIndex;
       if (buildIndex != -1)
       {
-        Kernel.Layers[buildIndex] = this;
+        LayerKernel.Layers[buildIndex] = this;
       }
 
       LayerTyped = this;
@@ -88,7 +88,7 @@ namespace Pixeye.Actors
 
       #region Update Active Layer
 
-      if (gameObject.scene.name != Kernel.KernelSceneName)
+      if (gameObject.scene.name != LayerKernel.KernelSceneName)
         if (SceneMain.NextActiveSceneName != null && SceneMain.NextActiveSceneName == gameObject.scene.name)
         {
           SceneMain.NextActiveSceneName = default;

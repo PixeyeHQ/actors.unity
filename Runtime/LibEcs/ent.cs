@@ -19,7 +19,7 @@ namespace Pixeye.Actors
     // Released entities
     //===============================//
 
-    internal static ents Released = new ents(Kernel.Settings.SizeEntities);
+    internal static ents Released = new ents(LayerKernel.Settings.SizeEntities);
     internal static int Size = sizeof(ent);
     internal static int NextID = 1;
 
@@ -40,8 +40,8 @@ namespace Pixeye.Actors
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
       get
       {
-        var m = meta;
-        return id > 0 && m->isAlive && m->age == age;
+        var _meta = meta;
+        return id > 0 && _meta->isAlive && _meta->age == age;
       }
     }
 

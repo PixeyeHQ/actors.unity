@@ -12,7 +12,7 @@ namespace Pixeye.Actors
     [Conditional("ACTORS_DEBUG")]
     public static void RenameGameobject(this ent entity)
     {
-      if (!Kernel.Settings.DebugNames) return;
+      if (!LayerKernel.Settings.DebugNames) return;
       var tr = ProcessorEcs.EntitiesManaged[entity.id].transform;
       if (tr != null)
       {

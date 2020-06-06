@@ -103,7 +103,6 @@ namespace Pixeye.Actors
   {
     public bool isPooled;
     internal LayerCore layer;
-
     internal Transform transform;
     internal int[] signature;
     internal ents childs;
@@ -112,7 +111,7 @@ namespace Pixeye.Actors
     public void Initialize()
     {
       childs    = new ents();
-      signature = new int[Kernel.Settings.SizeGenerations];
+      signature = new int[LayerKernel.Settings.SizeGenerations];
     }
   }
 }

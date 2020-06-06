@@ -8,47 +8,45 @@ namespace Pixeye.Actors
   {
     public static void Add(int buildIndex)
     {
-      Kernel.ChangingScene[buildIndex] = true;
-      LayerApp.LoadJobs.Add(SceneManager.LoadSceneAsync(buildIndex, LoadSceneMode.Additive));
+      LayerKernel.ChangingScene[buildIndex] = true;
+      LayerKernel.LoadJobs.Add(SceneManager.LoadSceneAsync(buildIndex, LoadSceneMode.Additive));
     }
 
     public static void Remove(int buildIndex)
     {
-      if (Kernel.Layers[buildIndex] == null) return;
+      if (LayerKernel.Layers[buildIndex] == null) return;
 
-      LayerApp.Run(CoRemove());
+      LayerKernel.Run(CoRemove());
 
       IEnumerator CoRemove()
       {
-        Kernel.Layers[buildIndex].Release();
-        yield return LayerApp.WaitFrame;
-        LayerApp.LoadJobs.Add(SceneManager.UnloadSceneAsync(buildIndex));
-        LayerApp.LoadJobs.Add(Resources.UnloadUnusedAssets());
+        LayerKernel.Layers[buildIndex].Release();
+        yield return LayerKernel.WaitFrame;
+        LayerKernel.LoadJobs.Add(SceneManager.UnloadSceneAsync(buildIndex));
+        LayerKernel.LoadJobs.Add(Resources.UnloadUnusedAssets());
       }
     }
 
     public static void Add(string sceneName)
     {
-      var buildIndex = Kernel.SceneIndexFromName(sceneName);
-      Kernel.ChangingScene[buildIndex] = true;
-      LayerApp.LoadJobs.Add(SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive));
+      var buildIndex = LayerKernel.SceneIndexFromName(sceneName);
+      LayerKernel.ChangingScene[buildIndex] = true;
+      LayerKernel.LoadJobs.Add(SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive));
     }
 
-
-    
     public static void Remove(string sceneName)
     {
       var buildIndex = SceneManager.GetSceneByName(sceneName).buildIndex;
-      if (Kernel.Layers[buildIndex] == null) return;
+      if (LayerKernel.Layers[buildIndex] == null) return;
 
-      LayerApp.Run(CoRemove());
+      LayerKernel.Run(CoRemove());
 
       IEnumerator CoRemove()
       {
-        Kernel.Layers[buildIndex].Release();
-        yield return LayerApp.WaitFrame;
-        LayerApp.LoadJobs.Add(SceneManager.UnloadSceneAsync(buildIndex));
-        LayerApp.LoadJobs.Add(Resources.UnloadUnusedAssets());
+        LayerKernel.Layers[buildIndex].Release();
+        yield return LayerKernel.WaitFrame;
+        LayerKernel.LoadJobs.Add(SceneManager.UnloadSceneAsync(buildIndex));
+        LayerKernel.LoadJobs.Add(Resources.UnloadUnusedAssets());
       }
     }
   }

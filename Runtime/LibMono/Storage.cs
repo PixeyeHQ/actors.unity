@@ -25,7 +25,7 @@ namespace Pixeye.Actors
 
     internal CacheGroup[] groups = new CacheGroup[64];
 
-    internal indexes toDispose = new indexes(Kernel.Settings.SizeEntities);
+    internal indexes toDispose = new indexes(LayerKernel.Settings.SizeEntities);
 
     internal abstract Type GetComponentType();
 
@@ -41,7 +41,7 @@ namespace Pixeye.Actors
     internal static int ComponentMask;
     internal static int Generation;
 
-    public static T[] components = new T[Kernel.Settings.SizeEntities];
+    public static T[] components = new T[LayerKernel.Settings.SizeEntities];
     internal int componentsLen = 0;
 
 
