@@ -22,7 +22,6 @@ namespace Pixeye.Actors
     internal ProcessorSignals processorSignals;
     internal ProcessorEcs processorEcs;
 
-    public Action Closed = delegate { };
 
     public ProcessorUpdate Updates;
     public ImplObj Obj;
@@ -220,7 +219,6 @@ namespace Pixeye.Actors
 
     internal void Release()
     {
-      Closed();
       isDirty = true;
       processorCoroutine.Dispose();
       processorCoroutineUnscaled.Dispose();
@@ -272,7 +270,7 @@ namespace Pixeye.Actors
       Updates.LateUpdate(delta);
     }
 
-
+   
     void OnApplicationQuit()
     {
       isDirty = true;
