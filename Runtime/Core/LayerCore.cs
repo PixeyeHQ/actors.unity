@@ -270,52 +270,7 @@ namespace Pixeye.Actors
       Updates.LateUpdate(delta);
     }
 
-    /// Initialize every actor or monocache on childs of the selected gameobject
-    public void InitChilds(GameObject obj, InitMode mode = InitMode.All)
-    {
-      var transforms = obj.GetComponentsInChildren<Transform>(mode == InitMode.All);
-      for (var i = 1; i < transforms.Length; i++)
-      {
-        var tr = transforms[i];
-        tr.gameObject.SetActive(true);
-        var oo = tr.GetComponents<MonoBehaviour>();
-
-        foreach (var o in oo)
-        {
-          if (o is IRequireActorsLayer req)
-          {
-            req.Bootstrap(this);
-            o.enabled = true;
-          }
-        }
-      }
-    }
-
-    /// Initialize every actor or monocache on the selected gameobject
-    public void Init(GameObject obj)
-    {
-#if ACTORS_DEBUG
-
-      var parent = obj.transform.parent;
-      if (!obj.activeInHierarchy && parent != null && parent.gameObject.activeSelf == false)
-      {
-        Debug.LogError("You are trying to init an object that is not active in hierarchy");
-        return;
-      }
-
-#endif
-      obj.SetActive(true);
-      var oo = obj.GetComponents<MonoBehaviour>();
-      foreach (var o in oo)
-      {
-        if (o is IRequireActorsLayer req)
-        {
-          req.Bootstrap(this);
-          o.enabled = true;
-        }
-      }
-    }
-
+   
     void OnApplicationQuit()
     {
       isDirty = true;

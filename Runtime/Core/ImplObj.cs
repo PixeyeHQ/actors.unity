@@ -1,5 +1,8 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Diagnostics;
+using UnityEngine;
 using UnityEngine.SceneManagement;
+using Debug = UnityEngine.Debug;
 
 
 namespace Pixeye.Actors
@@ -13,6 +16,59 @@ namespace Pixeye.Actors
       this.layer = layer;
     }
 
+    #region Init Childs
+
+    /// Initialize every actor or monocache on childs of the selected gameobject
+    public void InitChilds(GameObject obj, InitMode mode = InitMode.All)
+    {
+      var transforms = obj.GetComponentsInChildren<Transform>(mode == InitMode.All);
+      for (var i = 1; i < transforms.Length; i++)
+      {
+        var tr = transforms[i];
+        tr.gameObject.SetActive(true);
+        var oo = tr.GetComponents<MonoBehaviour>();
+
+        foreach (var o in oo)
+        {
+          if (o is IRequireActorsLayer req)
+          {
+            req.Bootstrap(layer);
+            o.enabled = true;
+          }
+        }
+      }
+    }
+
+    /// Initialize every actor or monocache on the selected gameobject
+    public void Init(GameObject obj)
+    {
+      DebugInit(obj);
+
+      obj.SetActive(true);
+      var oo = obj.GetComponents<MonoBehaviour>();
+      foreach (var o in oo)
+      {
+        if (o is IRequireActorsLayer req)
+        {
+          req.Bootstrap(layer);
+          o.enabled = true;
+        }
+      }
+    }
+
+    [Conditional("ACTORS_DEBUG")]
+    void DebugInit(GameObject obj)
+    {
+      var parent = obj.transform.parent;
+      if (!obj.activeInHierarchy && parent != null && parent.gameObject.activeSelf == false)
+      {
+        Debug.LogError("You are trying to init an object that is not active in hierarchy");
+        throw new Exception();
+      }
+    }
+
+    #endregion
+
     #region Create
 
     //===============================//
@@ -25,7 +81,7 @@ namespace Pixeye.Actors
     {
       var tr = GameObject.Instantiate(prefab, startPosition, startRotation).transform;
       SceneManager.MoveGameObjectToScene(tr.gameObject, layer.Scene);
-     // tr.SetAsLastSibling();
+      // tr.SetAsLastSibling();
       return tr;
     }
 
@@ -50,7 +106,7 @@ namespace Pixeye.Actors
 
     public T Spawn<T>(GameObject prefab, Vector3 startPosition = default, Quaternion startRotation = default)
     {
-      var o   = Spawn(prefab, startPosition, startRotation).GetComponentInChildren<T>();
+      var o = Spawn(prefab, startPosition, startRotation).GetComponentInChildren<T>();
       return o;
     }
 
@@ -82,7 +138,7 @@ namespace Pixeye.Actors
       Quaternion startRotation = default)
     {
       var tr = layer.pool.pools[poolID].Spawn(prefab, startPosition, startRotation).transform;
- 
+
       SceneManager.MoveGameObjectToScene(tr.gameObject, layer.Scene);
       //tr.SetAsLastSibling();
 
