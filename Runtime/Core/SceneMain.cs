@@ -13,37 +13,26 @@ namespace Pixeye.Actors
 
     public static void ChangeTo(int buildIndex)
     {
-      LayerKernel.Run(CoChangeTo());
-
-      IEnumerator CoChangeTo()
-      {
-        Closed();
-        LayerKernel.ChangingScene[buildIndex] = true;
-        LayerCore.ActiveLayer.Release();
-        yield return LayerKernel.WaitFrame;
-        LayerKernel.LoadJobs.Add(SceneManager.UnloadSceneAsync(LayerCore.ActiveLayer.Scene));
-        LayerKernel.LoadJobs.Add(Resources.UnloadUnusedAssets());
-        LayerKernel.LoadJobs.Add(SceneManager.LoadSceneAsync(buildIndex, LoadSceneMode.Additive));
-        NextActiveSceneName = SceneManager.GetSceneByBuildIndex(buildIndex).name;
-      }
+      NextActiveSceneName = SceneManager.GetSceneByBuildIndex(buildIndex).name;
+      LayerKernel.Run(CoChangeTo(buildIndex));
     }
 
     public static void ChangeTo(string sceneName)
     {
       var buildIndex = LayerKernel.SceneIndexFromName(sceneName);
-      LayerKernel.Run(CoChangeTo());
+      NextActiveSceneName = sceneName;
+      LayerKernel.Run(CoChangeTo(buildIndex));
+    }
 
-      IEnumerator CoChangeTo()
-      {
-        LayerKernel.ChangingScene[buildIndex] = true;
-        LayerCore.ActiveLayer.isDirty    = true;
-        yield return LayerKernel.WaitFrame;
-        LayerCore.ActiveLayer.Release();
-        LayerKernel.LoadJobs.Add(SceneManager.UnloadSceneAsync(LayerCore.ActiveLayer.Scene));
-        LayerKernel.LoadJobs.Add(Resources.UnloadUnusedAssets());
-        LayerKernel.LoadJobs.Add(SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive));
-        NextActiveSceneName = sceneName;
-      }
+    static IEnumerator CoChangeTo(int buildIndex)
+    {
+      LayerKernel.ChangingScene[buildIndex] = true;
+      LayerCore.ActiveLayer.isDirty         = true;
+      yield return LayerKernel.WaitFrame;
+      LayerCore.ActiveLayer.Release();
+      LayerKernel.LoadJobs.Add(SceneManager.UnloadSceneAsync(LayerCore.ActiveLayer.Scene));
+      LayerKernel.LoadJobs.Add(Resources.UnloadUnusedAssets());
+      LayerKernel.LoadJobs.Add(SceneManager.LoadSceneAsync(buildIndex, LoadSceneMode.Additive));
     }
   }
 }

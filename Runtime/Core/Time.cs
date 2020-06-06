@@ -10,7 +10,7 @@ namespace Pixeye.Actors
     public static float Fps = 60;
     public static float FpsPhysics = 50;
     public static bool FpsLimit = false;
- 
+
     public static int Frame => UnityEngine.Time.frameCount;
     public static float Current => UnityEngine.Time.time;
 
@@ -25,6 +25,7 @@ namespace Pixeye.Actors
 
     public Time()
     {
+      timescaleCacheOnFocus = 1;
       if (Application.targetFrameRate == -1)
         Fps = 300;
       else
