@@ -1,6 +1,11 @@
 ﻿using System;
 using System.Diagnostics;
 using Debug = UnityEngine.Debug;
+#if ACTORS_DEBUG
+using System.Runtime.InteropServices;
+using System.Runtime.CompilerServices;
+using Unity.IL2CPP.CompilerServices;
+#endif
 
 namespace Pixeye.Actors
 {
