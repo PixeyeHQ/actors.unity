@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -8,12 +9,15 @@ namespace Pixeye.Actors
   {
     internal static string NextActiveSceneName;
 
+    public static Action Closed = delegate { };
+
     public static void ChangeTo(int buildIndex)
     {
       LayerApp.Run(CoChangeTo());
 
       IEnumerator CoChangeTo()
       {
+        Closed();
         Kernel.ChangingScene[buildIndex] = true;
         LayerCore.ActiveLayer.Release();
         yield return LayerApp.WaitFrame;
