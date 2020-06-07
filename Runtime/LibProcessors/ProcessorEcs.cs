@@ -114,7 +114,15 @@ namespace Pixeye.Actors
       }
 
       entities.length = 0;
-      entities = null;
+      entities        = null;
+
+      for (int i = 0; i < groups.Count; i++)
+      {
+        Groups.Remove(groups[i]);
+        groups[i] = null;
+      }
+
+      groups.Clear();
     }
   }
 }

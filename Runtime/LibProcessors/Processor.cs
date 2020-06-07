@@ -3,7 +3,6 @@
 
 using System;
 
-
 namespace Pixeye.Actors
 {
   internal interface IReceiveEcsEvent

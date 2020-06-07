@@ -8,12 +8,14 @@ namespace Pixeye.Actors
   internal partial class ProcessorEcs
   {
     static int GroupNextID;
-    
+
     internal static List<GroupCore> Groups = new List<GroupCore>();
     internal static GroupCore[] Bindings = new GroupCore[16];
-    
+
     internal FamilyGroup familyTags = new FamilyGroup();
     internal FamilyGroup familyTypes = new FamilyGroup();
+
+    internal List<GroupCore> groups = new List<GroupCore>();
 
     #region BindGroups
 
@@ -87,17 +89,18 @@ namespace Pixeye.Actors
       }
     }
 
-    GroupCore SetupGroup(Type groupType, object fieldObj, Composition composition,   LayerCore layer)
+    GroupCore SetupGroup(Type groupType, object fieldObj, Composition composition, LayerCore layer)
     {
-      foreach (var groupNext in Groups)
+      foreach (var groupNext in groups)
       {
-        if (groupNext.composition.hash.value == composition.hash.value && groupNext.layer == layer)
+        if (groupNext.composition.hash.value == composition.hash.value)
         {
           return groupNext;
         }
       }
 
       var group = CreateGroup();
+      groups.Add(group);
       Groups.Add(group);
       return group;
 
@@ -114,13 +117,12 @@ namespace Pixeye.Actors
         }
         else
         {
-          var gr = (System.Activator.CreateInstance(groupType, true) as GroupCore); 
-      
+          var gr = (System.Activator.CreateInstance(groupType, true) as GroupCore);
+
           gr.Initialize(composition, layer);
           gr.id = GroupNextID++;
           return gr;
         }
-         
       }
     }
 
