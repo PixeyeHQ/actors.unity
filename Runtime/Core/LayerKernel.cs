@@ -175,9 +175,6 @@ namespace Pixeye.Actors
     {
     }
 
-    protected override void OnLayerDestroy()
-    {
-    }
 
     void OnApplicationQuit()
     {

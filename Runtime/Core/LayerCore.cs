@@ -46,7 +46,7 @@ namespace Pixeye.Actors
       LayerKernel.LayersInUse.Add(this);
     }
 
-    #region Signals
+    #region SIGNALS
 
     public void Send<T>(in T signal)
     {
@@ -243,23 +243,31 @@ namespace Pixeye.Actors
     /// Clean *your* custom scene stuff from here.
     protected virtual void OnLayerDestroy()
     {
-      
     }
 
 
     void Update()
     {
+#if UNITY_EDITOR
+      if (Engine == null) return;
+#endif
       Engine.Update();
     }
 
 
     void FixedUpdate()
     {
+#if UNITY_EDITOR
+      if (Engine == null) return;
+#endif
       Engine.FixedUpdate();
     }
 
     void LateUpdate()
     {
+#if UNITY_EDITOR
+      if (Engine == null) return;
+#endif
       Engine.LateUpdate();
     }
 
