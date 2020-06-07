@@ -6,6 +6,7 @@ using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections;
+
 #if ODIN_INSPECTOR
 using Sirenix.OdinInspector;
 #endif
@@ -144,6 +145,26 @@ namespace Pixeye.Actors
       LayerTyped.objects.Add(typeof(Y).GetHashCode(), obj);
       return obj;
     }
+
+    public static void Remove<Y>()
+    {
+      var key = typeof(Y).GetHashCode();
+      if (LayerTyped.objects.TryGetValue(key, out var obj))
+      {
+        if (obj is IDisposable member)
+          member.Dispose();
+        LayerTyped.objects.Remove(key);
+      }
+    }
+
+    public static void Remove<Y>(Y obj)
+    {
+      if (obj is IDisposable member)
+        member.Dispose();
+
+      LayerTyped.objects.Remove(typeof(Y).GetHashCode());
+    }
+
 
     public static Y Get<Y>() where Y : class
     {
