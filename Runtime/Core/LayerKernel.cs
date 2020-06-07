@@ -17,7 +17,7 @@ namespace Pixeye.Actors
     public static bool ApplicationIsQuitting;
     public static bool IsQuittingOrChangingScene() => ApplicationIsQuitting;
 
-    internal static List<AsyncOperation> LoadJobs = new List<AsyncOperation>();
+    public static List<AsyncOperation> LoadJobs = new List<AsyncOperation>();
     public static Action<float> OnSceneLoading = delegate { };
 
     public static int GetTicksCount
