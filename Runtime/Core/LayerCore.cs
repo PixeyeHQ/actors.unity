@@ -11,7 +11,8 @@ namespace Pixeye.Actors
 {
   public abstract class LayerCore : MonoBehaviour
   {
-    internal static int LayerNextID;
+    internal static int NEXT_FREE_ID;
+    internal static Dictionary<string, int> USED_IDS = new Dictionary<string, int>(StringComparer.Ordinal);
     internal static LayerCore ActiveLayer; // current main scene;
     internal Scene Scene => gameObject.scene;
 
@@ -34,7 +35,7 @@ namespace Pixeye.Actors
 
     internal Pool pool;
 
-    internal int id = LayerNextID++;
+    internal int id;
     internal bool isReleasing = true;
 
     internal Dictionary<int, object> objects = new Dictionary<int, object>();
@@ -42,6 +43,13 @@ namespace Pixeye.Actors
 
     protected virtual void Awake()
     {
+      if (!USED_IDS.TryGetValue(gameObject.scene.name, out id))
+      {
+        id = NEXT_FREE_ID++;
+        USED_IDS.Add(gameObject.scene.name, id);
+      }  
+
+
       Time = new Time();
       LayerKernel.LayersInUse.Add(this);
     }

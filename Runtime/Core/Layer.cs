@@ -58,7 +58,7 @@ namespace Pixeye.Actors
 
       #region Update Services
 
-      Processor.NextID = 0; // drop so the processors of the new layer can grab fresh ID.
+      Processor.NEXT_FREE_ID = 0; // drop so the processors of the new layer can grab fresh ID.
 
       core.Engine = new ProcessorUpdate();
       Engine.Add(this);

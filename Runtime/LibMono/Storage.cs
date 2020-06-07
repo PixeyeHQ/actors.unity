@@ -22,7 +22,7 @@ namespace Pixeye.Actors
     internal static int[] Generations = new int[32];
     internal static Storage[] All = new Storage[32];
  
-    internal CacheGroup[] groups = new CacheGroup[64];
+    internal CacheGroup[] groups = new CacheGroup[LayerKernel.LAYERS_AMOUNT_TOTAL];
 
     internal indexes toDispose = new indexes(LayerKernel.Settings.SizeEntities / 2 );
 

@@ -13,8 +13,8 @@ namespace Pixeye.Actors
 
   public abstract class Processor : IDisposable, IRequireActorsLayer, ITick, IReceiveEcsEvent
   {
-    internal static int NextID;
-    internal int id;
+    internal static int NEXT_FREE_ID;
+    internal int processorID;
     public LayerCore Layer;
     protected ImplObserver Observer;
     protected ImplActor Actor;
@@ -22,18 +22,19 @@ namespace Pixeye.Actors
     protected ImplEcs Ecs;
     protected Time Time;
     protected ImplObj Obj;
-     
+
 
     void IRequireActorsLayer.Bootstrap(LayerCore layer)
     {
       Layer = layer;
-      id    = NextID++;
-
+      // This increment is dropped every added layer, check layer implementation.
+      // The ID is used for working with ECS signals.
+      processorID    = NEXT_FREE_ID++;  
       layer.Engine.AddProc(this);
       layer.processorEcs.Add(this);
       layer.processorEcs.processors.Add(this);
       layer.processorSignals.Add(this);
-      
+
       Entity   = layer.Entity;
       Ecs      = layer.Ecs;
       Observer = layer.Observer;
@@ -47,11 +48,10 @@ namespace Pixeye.Actors
 
     protected virtual void OnAwake()
     {
-      
     }
-    
+
     void IDisposable.Dispose() => OnDispose();
-    
+
     internal virtual void OnLaunch()
     {
     }
@@ -67,22 +67,18 @@ namespace Pixeye.Actors
 
     void ITick.Tick(float dt)
     {
-       
     }
 
     void IReceiveEcsEvent.Receive()
     {
     }
-    
-    
-    
   }
 
   #region PROCESSORS
 
   public class SignalsEcs<T>
   {
-    internal static SignalsEcs<T>[] layers = new SignalsEcs<T>[64];
+    internal static SignalsEcs<T>[] layers = new SignalsEcs<T>[LayerKernel.LAYERS_AMOUNT_TOTAL];
 
     internal BufferCircular<Element> elements = new BufferCircular<Element>(4);
     internal bool lockSignal; // prevents breaking ordering.
@@ -121,13 +117,13 @@ namespace Pixeye.Actors
 
   public abstract class Processor<T> : Processor, IReceiveEcsEvent
   {
-    internal static SignalsEcs<T> signalsT = new SignalsEcs<T>();
+    internal SignalsEcs<T> signalsT = new SignalsEcs<T>();
 
     internal sealed override void OnLaunch() => SignalsEcs<T>.layers[Layer.id] = signalsT;
 
     void IReceiveEcsEvent.Receive()
     {
-      if (signalsT.Handle(id))
+      if (signalsT.Handle(processorID))
       {
         var stopSignal = false;
         ReceiveEcs(ref signalsT.elements.Peek().signal, ref stopSignal);
@@ -152,14 +148,14 @@ namespace Pixeye.Actors
 
     void IReceiveEcsEvent.Receive()
     {
-      if (signalsT.Handle(id))
+      if (signalsT.Handle(processorID))
       {
         var stopSignal = false;
         ReceiveEcs(ref signalsT.elements.Peek().signal, ref stopSignal);
         if (stopSignal) signalsT.elements.Dequeue();
       }
 
-      if (signalsY.Handle(id))
+      if (signalsY.Handle(processorID))
       {
         var stopSignal = false;
         ReceiveEcs(ref signalsY.elements.Peek().signal, ref stopSignal);
@@ -186,21 +182,21 @@ namespace Pixeye.Actors
 
     void IReceiveEcsEvent.Receive()
     {
-      if (signalsT.Handle(id))
+      if (signalsT.Handle(processorID))
       {
         var stopSignal = false;
         ReceiveEcs(ref signalsT.elements.Peek().signal, ref stopSignal);
         if (stopSignal) signalsT.elements.Dequeue();
       }
 
-      if (signalsY.Handle(id))
+      if (signalsY.Handle(processorID))
       {
         var stopSignal = false;
         ReceiveEcs(ref signalsY.elements.Peek().signal, ref stopSignal);
         if (stopSignal) signalsY.elements.Dequeue();
       }
 
-      if (signalsU.Handle(id))
+      if (signalsU.Handle(processorID))
       {
         var stopSignal = false;
         ReceiveEcs(ref signalsU.elements.Peek().signal, ref stopSignal);
@@ -230,28 +226,28 @@ namespace Pixeye.Actors
 
     void IReceiveEcsEvent.Receive()
     {
-      if (signalsT.Handle(id))
+      if (signalsT.Handle(processorID))
       {
         var stopSignal = false;
         ReceiveEcs(ref signalsT.elements.Peek().signal, ref stopSignal);
         if (stopSignal) signalsT.elements.Dequeue();
       }
 
-      if (signalsY.Handle(id))
+      if (signalsY.Handle(processorID))
       {
         var stopSignal = false;
         ReceiveEcs(ref signalsY.elements.Peek().signal, ref stopSignal);
         if (stopSignal) signalsY.elements.Dequeue();
       }
 
-      if (signalsU.Handle(id))
+      if (signalsU.Handle(processorID))
       {
         var stopSignal = false;
         ReceiveEcs(ref signalsU.elements.Peek().signal, ref stopSignal);
         if (stopSignal) signalsU.elements.Dequeue();
       }
 
-      if (signalsI.Handle(id))
+      if (signalsI.Handle(processorID))
       {
         var stopSignal = false;
         ReceiveEcs(ref signalsI.elements.Peek().signal, ref stopSignal);
@@ -284,35 +280,35 @@ namespace Pixeye.Actors
 
     void IReceiveEcsEvent.Receive()
     {
-      if (signalsT.Handle(id))
+      if (signalsT.Handle(processorID))
       {
         var stopSignal = false;
         ReceiveEcs(ref signalsT.elements.Peek().signal, ref stopSignal);
         if (stopSignal) signalsT.elements.Dequeue();
       }
 
-      if (signalsY.Handle(id))
+      if (signalsY.Handle(processorID))
       {
         var stopSignal = false;
         ReceiveEcs(ref signalsY.elements.Peek().signal, ref stopSignal);
         if (stopSignal) signalsY.elements.Dequeue();
       }
 
-      if (signalsU.Handle(id))
+      if (signalsU.Handle(processorID))
       {
         var stopSignal = false;
         ReceiveEcs(ref signalsU.elements.Peek().signal, ref stopSignal);
         if (stopSignal) signalsU.elements.Dequeue();
       }
 
-      if (signalsI.Handle(id))
+      if (signalsI.Handle(processorID))
       {
         var stopSignal = false;
         ReceiveEcs(ref signalsI.elements.Peek().signal, ref stopSignal);
         if (stopSignal) signalsI.elements.Dequeue();
       }
 
-      if (signalsO.Handle(id))
+      if (signalsO.Handle(processorID))
       {
         var stopSignal = false;
         ReceiveEcs(ref signalsO.elements.Peek().signal, ref stopSignal);
@@ -348,42 +344,42 @@ namespace Pixeye.Actors
 
     void IReceiveEcsEvent.Receive()
     {
-      if (signalsT.Handle(id))
+      if (signalsT.Handle(processorID))
       {
         var stopSignal = false;
         ReceiveEcs(ref signalsT.elements.Peek().signal, ref stopSignal);
         if (stopSignal) signalsT.elements.Dequeue();
       }
 
-      if (signalsY.Handle(id))
+      if (signalsY.Handle(processorID))
       {
         var stopSignal = false;
         ReceiveEcs(ref signalsY.elements.Peek().signal, ref stopSignal);
         if (stopSignal) signalsY.elements.Dequeue();
       }
 
-      if (signalsU.Handle(id))
+      if (signalsU.Handle(processorID))
       {
         var stopSignal = false;
         ReceiveEcs(ref signalsU.elements.Peek().signal, ref stopSignal);
         if (stopSignal) signalsU.elements.Dequeue();
       }
 
-      if (signalsI.Handle(id))
+      if (signalsI.Handle(processorID))
       {
         var stopSignal = false;
         ReceiveEcs(ref signalsI.elements.Peek().signal, ref stopSignal);
         if (stopSignal) signalsI.elements.Dequeue();
       }
 
-      if (signalsO.Handle(id))
+      if (signalsO.Handle(processorID))
       {
         var stopSignal = false;
         ReceiveEcs(ref signalsO.elements.Peek().signal, ref stopSignal);
         if (stopSignal) signalsO.elements.Dequeue();
       }
 
-      if (signalsP.Handle(id))
+      if (signalsP.Handle(processorID))
       {
         var stopSignal = false;
         ReceiveEcs(ref signalsP.elements.Peek().signal, ref stopSignal);
@@ -422,49 +418,49 @@ namespace Pixeye.Actors
 
     void IReceiveEcsEvent.Receive()
     {
-      if (signalsT.Handle(id))
+      if (signalsT.Handle(processorID))
       {
         var stopSignal = false;
         ReceiveEcs(ref signalsT.elements.Peek().signal, ref stopSignal);
         if (stopSignal) signalsT.elements.Dequeue();
       }
 
-      if (signalsY.Handle(id))
+      if (signalsY.Handle(processorID))
       {
         var stopSignal = false;
         ReceiveEcs(ref signalsY.elements.Peek().signal, ref stopSignal);
         if (stopSignal) signalsY.elements.Dequeue();
       }
 
-      if (signalsU.Handle(id))
+      if (signalsU.Handle(processorID))
       {
         var stopSignal = false;
         ReceiveEcs(ref signalsU.elements.Peek().signal, ref stopSignal);
         if (stopSignal) signalsU.elements.Dequeue();
       }
 
-      if (signalsI.Handle(id))
+      if (signalsI.Handle(processorID))
       {
         var stopSignal = false;
         ReceiveEcs(ref signalsI.elements.Peek().signal, ref stopSignal);
         if (stopSignal) signalsI.elements.Dequeue();
       }
 
-      if (signalsO.Handle(id))
+      if (signalsO.Handle(processorID))
       {
         var stopSignal = false;
         ReceiveEcs(ref signalsO.elements.Peek().signal, ref stopSignal);
         if (stopSignal) signalsO.elements.Dequeue();
       }
 
-      if (signalsP.Handle(id))
+      if (signalsP.Handle(processorID))
       {
         var stopSignal = false;
         ReceiveEcs(ref signalsP.elements.Peek().signal, ref stopSignal);
         if (stopSignal) signalsP.elements.Dequeue();
       }
 
-      if (signalsA.Handle(id))
+      if (signalsA.Handle(processorID))
       {
         var stopSignal = false;
         ReceiveEcs(ref signalsA.elements.Peek().signal, ref stopSignal);

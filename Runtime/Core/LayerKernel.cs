@@ -13,6 +13,8 @@ namespace Pixeye.Actors
 {
   public class LayerKernel : Layer<LayerKernel>, ITick
   {
+    internal const int LAYERS_AMOUNT_TOTAL = 128;
+
     public static bool[] ChangingScene = new bool[128];
     public static bool ApplicationIsQuitting;
     public static bool IsQuittingOrChangingScene() => ApplicationIsQuitting;
