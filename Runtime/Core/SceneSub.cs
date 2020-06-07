@@ -29,13 +29,14 @@ namespace Pixeye.Actors
       return State.NotAdded;
     }
 
-    public static void Add(int buildIndex)
+    public static AsyncOperation Add(int buildIndex)
     {
       var state = CheckSceneState(buildIndex);
-      if (state == State.AlreadyAdded) return;
+      if (state == State.AlreadyAdded) return null;
 
       LayerKernel.ChangingScene[buildIndex] = true;
       LayerKernel.LoadJobs.Add(SceneManager.LoadSceneAsync(buildIndex, LoadSceneMode.Additive));
+      return LayerKernel.LoadJobs[LayerKernel.LoadJobs.Count - 1];
     }
 
     public static void Add(string sceneName)
