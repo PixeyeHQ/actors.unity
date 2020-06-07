@@ -13,14 +13,13 @@ namespace Pixeye.Actors
     internal static EntityManagedMeta[] EntitiesManaged;
 
 
-    internal ents entities = new ents();
+    internal ents entities;
     internal List<Processor> processors = new List<Processor>();
 
     LayerCore layer;
 
     internal static void Bootstrap()
     {
-     
       var length = LayerKernel.Settings.SizeEntities;
 
       Entities.Alloc(length, UnsafeUtility.SizeOf<EntityMeta>());
@@ -73,11 +72,14 @@ namespace Pixeye.Actors
       ptr->age     = entity.age;
       ptr->isAlive = true;
       ptr->isDirty = true;
+
+      entities.Add(entity);
     }
 
     void IRequireActorsLayer.Bootstrap(LayerCore layer)
     {
       this.layer = layer;
+      entities   = new ents(LayerKernel.Settings.SizeEntities);
     }
 
 
