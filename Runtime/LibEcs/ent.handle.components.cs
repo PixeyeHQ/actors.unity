@@ -62,7 +62,7 @@ namespace Pixeye.Actors
       DebugAlreadyHave<T>(this);
 
       if (id >= Storage<T>.components.Length)
-        Array.Resize(ref Storage<T>.components, id << 1);
+        Array.Resize(ref Storage<T>.components, id + id / 4);
 
       meta->AddComponent(Storage<T>.componentId);
       managed.signature[Storage<T>.Generation] |= Storage<T>.ComponentMask;
@@ -84,7 +84,7 @@ namespace Pixeye.Actors
       DebugAlreadyHave<T>(this);
 
       if (id >= Storage<T>.components.Length)
-        Array.Resize(ref Storage<T>.components, id << 1);
+        Array.Resize(ref Storage<T>.components, id + id / 4);
 
       meta->AddComponent(Storage<T>.componentId);
       managed.signature[Storage<T>.Generation] |= Storage<T>.ComponentMask;
@@ -98,7 +98,7 @@ namespace Pixeye.Actors
     {
       DebugCheckActive<T>(this);
       if (id >= Storage<T>.components.Length)
-        Array.Resize(ref Storage<T>.components, id << 1);
+        Array.Resize(ref Storage<T>.components, id + id / 4);
 
       var     generation = Storage<T>.Generation;
       var     mask       = Storage<T>.ComponentMask;

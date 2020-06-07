@@ -25,7 +25,7 @@ namespace Pixeye.Actors
 
     internal CacheGroup[] groups = new CacheGroup[64];
 
-    internal indexes toDispose = new indexes(LayerKernel.Settings.SizeEntities);
+    internal indexes toDispose = new indexes(LayerKernel.Settings.SizeEntities / 2);
 
     internal abstract Type GetComponentType();
 
