@@ -88,6 +88,7 @@ namespace Pixeye.Actors
       if (LayerKernel.ApplicationIsQuitting) return;
 
       operationsLength = 0;
+      operations       = null;
       processors.Clear();
 
       foreach (var entity in entities)
@@ -113,6 +114,7 @@ namespace Pixeye.Actors
       }
 
       entities.length = 0;
+      entities = null;
     }
   }
 }

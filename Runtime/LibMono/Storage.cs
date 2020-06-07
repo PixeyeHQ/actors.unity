@@ -21,11 +21,10 @@ namespace Pixeye.Actors
     internal static int[] Masks = new int[32];
     internal static int[] Generations = new int[32];
     internal static Storage[] All = new Storage[32];
-
-
+ 
     internal CacheGroup[] groups = new CacheGroup[64];
 
-    internal indexes toDispose = new indexes(LayerKernel.Settings.SizeEntities / 2);
+    internal indexes toDispose = new indexes(LayerKernel.Settings.SizeEntities / 2 );
 
     internal abstract Type GetComponentType();
 
