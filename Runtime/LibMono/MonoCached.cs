@@ -10,7 +10,7 @@ namespace Pixeye.Actors
   {
     [HideInInspector] public LayerCore Layer;
 
-    public ProcessorUpdate Updates => Layer.Updates;
+    public ProcessorUpdate Engine => Layer.Engine;
     public ImplObserver Observer => Layer.Observer;
     public ImplActor Actor => Layer.Actor;
     public ImplEntity Entity => Layer.Entity;

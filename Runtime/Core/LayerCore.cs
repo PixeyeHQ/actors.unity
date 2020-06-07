@@ -23,7 +23,7 @@ namespace Pixeye.Actors
 
     public Action Closed = delegate { };
 
-    public ProcessorUpdate Updates;
+    public ProcessorUpdate Engine;
     public ImplObj Obj;
     public Time Time;
     public ImplActor Actor;
@@ -221,7 +221,7 @@ namespace Pixeye.Actors
     {
       isReleasing = true;
       Closed();
-      Updates.Dispose();
+      Engine.Dispose();
       processorCoroutine.Dispose();
       processorCoroutineUnscaled.Dispose();
       LayerKernel.LayersInUse.Remove(this);
@@ -246,29 +246,18 @@ namespace Pixeye.Actors
 
     void Update()
     {
-      if (LayerKernel.ApplicationIsQuitting) return;
-      if (isReleasing) return;
-      Time.Tick();
-      var delta = Time.deltaTime;
-      Updates.Update(delta);
+      Engine.Update();
     }
+
 
     void FixedUpdate()
     {
-      if (LayerKernel.ApplicationIsQuitting) return;
-      if (isReleasing) return;
-
-      var delta = Time.deltaTimeFixed;
-      Updates.FixedUpdate(delta);
+      Engine.FixedUpdate();
     }
 
     void LateUpdate()
     {
-      if (LayerKernel.ApplicationIsQuitting) return;
-      if (isReleasing) return;
-
-      var delta = Time.deltaTime;
-      Updates.LateUpdate(delta);
+      Engine.LateUpdate();
     }
 
 

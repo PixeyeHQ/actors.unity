@@ -163,8 +163,14 @@ namespace Pixeye.Actors
       }
     }
 
-    internal void Update(float delta)
+    public void Update()
     {
+      
+      if (LayerKernel.ApplicationIsQuitting) return;
+      if (layer.isReleasing) return;
+      layer.Time.Tick();
+      var delta = layer.Time.deltaTime;
+      
       for (var i = 0; i < countTicks; i++)
       {
         ticks[i].Tick(delta);
@@ -181,8 +187,12 @@ namespace Pixeye.Actors
       }
     }
 
-    internal void FixedUpdate(float delta)
+    public void FixedUpdate()
     {
+      if (LayerKernel.ApplicationIsQuitting) return;
+      if (layer.isReleasing) return;
+      var delta = layer.Time.deltaTimeFixed;
+      
       for (var i = 0; i < countTicksFixed; i++)
       {
         ticksFixed[i].TickFixed(delta);
@@ -194,8 +204,13 @@ namespace Pixeye.Actors
       }
     }
 
-    internal void LateUpdate(float delta)
+    public void LateUpdate()
     {
+      if (LayerKernel.ApplicationIsQuitting) return;
+      if (layer.isReleasing) return;
+      var delta = layer.Time.deltaTime;
+      
+      
       for (var i = 0; i < countTicksLate; i++)
       {
         ticksLate[i].TickLate(delta);

@@ -6,7 +6,7 @@ namespace Pixeye.Actors
 {
   public static class LayerMain
   {
-    public static ProcessorUpdate Updates => LayerCore.ActiveLayer.Updates;
+    public static ProcessorUpdate Engine => LayerCore.ActiveLayer.Engine;
     public static ImplEntity Entity => LayerCore.ActiveLayer.Entity;
     public static ImplEcs Ecs => LayerCore.ActiveLayer.Ecs;
     public static ImplObserver Observer => LayerCore.ActiveLayer.Observer;

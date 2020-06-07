@@ -27,7 +27,7 @@ namespace Pixeye.Actors
         var amount = 0;
         foreach (var layer in LayersInUse)
         {
-          amount += layer.Updates.GetTicksCount;
+          amount += layer.Engine.GetTicksCount;
         }
 
         return amount;

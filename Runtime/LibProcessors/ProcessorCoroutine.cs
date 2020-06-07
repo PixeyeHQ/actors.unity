@@ -21,7 +21,7 @@ namespace Pixeye.Actors
     public void Bootstrap(LayerCore layer)
     {
       this.layer = layer;
-      layer.Updates.Add(this);
+      layer.Engine.Add(this);
     }
 
     internal RoutineCall Run(float delay, IEnumerator routine)

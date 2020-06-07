@@ -15,7 +15,7 @@ namespace Pixeye.Actors
   /// A scene point of entry. The developer defines here scene dependencies and processing that will work on the scene. 
   public abstract class Layer<T> : LayerCore
   {
-    public static new ProcessorUpdate Updates => LayerTyped.core.Updates;
+    public static new ProcessorUpdate Engine => LayerTyped.core.Engine;
     public static new ImplEntity Entity => LayerTyped.core.Entity;
     public static new ImplEcs Ecs => LayerTyped.core.Ecs;
     public static new ImplObserver Observer => LayerTyped.core.Observer;
@@ -59,8 +59,8 @@ namespace Pixeye.Actors
 
       Processor.NextID = 0; // drop so the processors of the new layer can grab fresh ID.
 
-      core.Updates = new ProcessorUpdate();
-      Updates.Add(this);
+      core.Engine = new ProcessorUpdate();
+      Engine.Add(this);
 
       // cant add two same classes in toolbox :( temporary solution.
       processorCoroutineUnscaled            = new ProcessorCoroutine();
@@ -82,7 +82,7 @@ namespace Pixeye.Actors
 
       Add<ProcessorObserver>();
 
-      Updates.layer = LayerTyped;
+      Engine.layer = LayerTyped;
 
       #endregion
 

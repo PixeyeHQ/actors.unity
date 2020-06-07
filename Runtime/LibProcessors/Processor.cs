@@ -29,7 +29,7 @@ namespace Pixeye.Actors
       Layer = layer;
       id    = NextID++;
 
-      layer.Updates.AddProc(this);
+      layer.Engine.AddProc(this);
       layer.processorEcs.Add(this);
       layer.processorEcs.processors.Add(this);
       layer.processorSignals.Add(this);
