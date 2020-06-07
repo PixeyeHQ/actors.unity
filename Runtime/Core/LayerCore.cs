@@ -241,7 +241,10 @@ namespace Pixeye.Actors
     protected abstract void Setup();
 
     /// Clean *your* custom scene stuff from here.
-    protected abstract void OnLayerDestroy();
+    protected virtual void OnLayerDestroy()
+    {
+      
+    }
 
 
     void Update()
