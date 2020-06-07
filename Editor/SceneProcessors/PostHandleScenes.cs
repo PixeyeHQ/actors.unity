@@ -25,7 +25,8 @@ public class PostHandleScenes : EndNameEditAction
 
   static void CreateFromTemplate(string name, string path)
   {
-    ProjectWindowUtil.StartNameEditingIfProjectWindowExists(0, CreateInstance<PostHandleScenes>(), name, scriptIcon, path);
+    ProjectWindowUtil.StartNameEditingIfProjectWindowExists(0, CreateInstance<PostHandleScenes>(), name, scriptIcon,
+      path);
   }
 
 
@@ -33,7 +34,7 @@ public class PostHandleScenes : EndNameEditAction
   {
     ProcEditorSceneObserve.name = pathName;
     const NewSceneSetup setup = NewSceneSetup.EmptyScene;
-    var scene = EditorSceneManager.NewScene(setup);
+    var                 scene = EditorSceneManager.NewScene(setup);
     EditorSceneManager.SaveScene(scene, pathName);
   }
 }
@@ -63,14 +64,15 @@ public static class ProcEditorSceneObserve
       Object.DestroyImmediate(light.gameObject);
     }
 
-   
+
     var chunks = name.Split('/');
-    var n = chunks[chunks.Length - 1];
+    var n      = chunks[chunks.Length - 1];
     n = n.Split('.')[0];
     n = n.Replace("Scene", "");
- 
-    var gameObject = new GameObject(n + " Setup");
-    var o = new GameObject("---Dynamic-----------------------------------------------------------------------------------------------------");
+    n = n.Remove(0, 1);
+    var gameObject = new GameObject($"Layer {n}");
+    var o = new GameObject(
+      "---Dynamic-----------------------------------------------------------------------------------------------------");
     o.SetActive(false);
 
     Debug.Log("New scene created!");
