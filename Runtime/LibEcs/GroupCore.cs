@@ -84,7 +84,6 @@ namespace Pixeye.Actors
     }
 #endif
 
-
     internal virtual GroupCore Initialize(Composition composition, LayerCore layer)
     {
       this.layer       = layer;
@@ -261,7 +260,7 @@ namespace Pixeye.Actors
       added   = new ents(LayerKernel.Settings.SizeEntities);
       removed = new ents(LayerKernel.Settings.SizeEntities);
 #endif
-
+      length = 0;
 
       //parallel
       if (segmentGroups != null)
@@ -531,6 +530,12 @@ namespace Pixeye.Actors
       composition.includeComponents[Storage<T>.componentId] = true;
       return gr;
     }
+
+    public override void Dispose()
+    {
+      base.Dispose();
+      Storage<T>.Instance.groups[layer.id].Remove(this);
+    }
   }
 
   [Preserve]
@@ -559,6 +564,13 @@ namespace Pixeye.Actors
 
       composition.includeComponents[Storage<Y>.componentId] = true;
       return gr;
+    }
+
+    public override void Dispose()
+    {
+      base.Dispose();
+      Storage<T>.Instance.groups[layer.id].Remove(this);
+      Storage<Y>.Instance.groups[layer.id].Remove(this);
     }
   }
 
@@ -597,6 +609,14 @@ namespace Pixeye.Actors
 
       composition.includeComponents[Storage<U>.componentId] = true;
       return gr;
+    }
+
+    public override void Dispose()
+    {
+      base.Dispose();
+      Storage<T>.Instance.groups[layer.id].Remove(this);
+      Storage<Y>.Instance.groups[layer.id].Remove(this);
+      Storage<U>.Instance.groups[layer.id].Remove(this);
     }
   }
 
@@ -641,6 +661,15 @@ namespace Pixeye.Actors
 
       composition.includeComponents[Storage<I>.componentId] = true;
       return gr;
+    }
+
+    public override void Dispose()
+    {
+      base.Dispose();
+      Storage<T>.Instance.groups[layer.id].Remove(this);
+      Storage<Y>.Instance.groups[layer.id].Remove(this);
+      Storage<U>.Instance.groups[layer.id].Remove(this);
+      Storage<I>.Instance.groups[layer.id].Remove(this);
     }
   }
 
@@ -687,6 +716,16 @@ namespace Pixeye.Actors
       composition.includeComponents[Storage<O>.componentId] = true;
 
       return gr;
+    }
+
+    public override void Dispose()
+    {
+      base.Dispose();
+      Storage<T>.Instance.groups[layer.id].Remove(this);
+      Storage<Y>.Instance.groups[layer.id].Remove(this);
+      Storage<U>.Instance.groups[layer.id].Remove(this);
+      Storage<I>.Instance.groups[layer.id].Remove(this);
+      Storage<O>.Instance.groups[layer.id].Remove(this);
     }
   }
 
@@ -749,6 +788,17 @@ namespace Pixeye.Actors
 
       composition.includeComponents[Storage<P>.componentId] = true;
       return gr;
+    }
+
+    public override void Dispose()
+    {
+      base.Dispose();
+      Storage<T>.Instance.groups[layer.id].Remove(this);
+      Storage<Y>.Instance.groups[layer.id].Remove(this);
+      Storage<U>.Instance.groups[layer.id].Remove(this);
+      Storage<I>.Instance.groups[layer.id].Remove(this);
+      Storage<O>.Instance.groups[layer.id].Remove(this);
+      Storage<P>.Instance.groups[layer.id].Remove(this);
     }
   }
 
@@ -819,6 +869,18 @@ namespace Pixeye.Actors
 
       composition.includeComponents[Storage<A>.componentId] = true;
       return gr;
+    }
+
+    public override void Dispose()
+    {
+      base.Dispose();
+      Storage<T>.Instance.groups[layer.id].Remove(this);
+      Storage<Y>.Instance.groups[layer.id].Remove(this);
+      Storage<U>.Instance.groups[layer.id].Remove(this);
+      Storage<I>.Instance.groups[layer.id].Remove(this);
+      Storage<O>.Instance.groups[layer.id].Remove(this);
+      Storage<P>.Instance.groups[layer.id].Remove(this);
+      Storage<A>.Instance.groups[layer.id].Remove(this);
     }
   }
 
@@ -897,6 +959,19 @@ namespace Pixeye.Actors
 
       composition.includeComponents[Storage<S>.componentId] = true;
       return gr;
+    }
+
+    public override void Dispose()
+    {
+      base.Dispose();
+      Storage<T>.Instance.groups[layer.id].Remove(this);
+      Storage<Y>.Instance.groups[layer.id].Remove(this);
+      Storage<U>.Instance.groups[layer.id].Remove(this);
+      Storage<I>.Instance.groups[layer.id].Remove(this);
+      Storage<O>.Instance.groups[layer.id].Remove(this);
+      Storage<P>.Instance.groups[layer.id].Remove(this);
+      Storage<A>.Instance.groups[layer.id].Remove(this);
+      Storage<S>.Instance.groups[layer.id].Remove(this);
     }
   }
 
@@ -983,6 +1058,20 @@ namespace Pixeye.Actors
       composition.includeComponents[Storage<D>.componentId] = true;
       return gr;
     }
+
+    public override void Dispose()
+    {
+      base.Dispose();
+      Storage<T>.Instance.groups[layer.id].Remove(this);
+      Storage<Y>.Instance.groups[layer.id].Remove(this);
+      Storage<U>.Instance.groups[layer.id].Remove(this);
+      Storage<I>.Instance.groups[layer.id].Remove(this);
+      Storage<O>.Instance.groups[layer.id].Remove(this);
+      Storage<P>.Instance.groups[layer.id].Remove(this);
+      Storage<A>.Instance.groups[layer.id].Remove(this);
+      Storage<S>.Instance.groups[layer.id].Remove(this);
+      Storage<D>.Instance.groups[layer.id].Remove(this);
+    }
   }
 
   [Preserve]
@@ -1066,6 +1155,21 @@ namespace Pixeye.Actors
 
       composition.includeComponents[Storage<F>.componentId] = true;
       return gr;
+    }
+
+    public override void Dispose()
+    {
+      base.Dispose();
+      Storage<T>.Instance.groups[layer.id].Remove(this);
+      Storage<Y>.Instance.groups[layer.id].Remove(this);
+      Storage<U>.Instance.groups[layer.id].Remove(this);
+      Storage<I>.Instance.groups[layer.id].Remove(this);
+      Storage<O>.Instance.groups[layer.id].Remove(this);
+      Storage<P>.Instance.groups[layer.id].Remove(this);
+      Storage<A>.Instance.groups[layer.id].Remove(this);
+      Storage<S>.Instance.groups[layer.id].Remove(this);
+      Storage<D>.Instance.groups[layer.id].Remove(this);
+      Storage<F>.Instance.groups[layer.id].Remove(this);
     }
   }
 

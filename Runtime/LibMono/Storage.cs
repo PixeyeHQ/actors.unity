@@ -40,7 +40,7 @@ namespace Pixeye.Actors
     internal static int ComponentMask;
     internal static int Generation;
 
-    public static T[] components = new T[LayerKernel.Settings.SizeEntities];
+    public static T[] components = new T[LayerKernel.Settings.SizeEntities / 2];
     internal int componentsLen = 0;
 
 

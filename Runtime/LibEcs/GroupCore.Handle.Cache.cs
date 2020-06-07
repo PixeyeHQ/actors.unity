@@ -118,27 +118,8 @@ namespace Pixeye.Actors
 
       return false;
     }
-
-    internal static bool TryGetValue(this CacheGroup container, Type t, Composition composition, out GroupCore group)
-    {
-      var len = container.length;
-      for (int i = 0; i < len; i++)
-      {
-        var instance = container.Elements[i];
-        if (t != instance.GetType()) continue;
-
-        if (instance.composition.hash.value == composition.hash.value)
-        {
-          group = instance;
-          return true;
-        }
-      }
-
-      group = default;
-      return false;
-    }
-
-    internal static GroupCore Add(this CacheGroup container, GroupCore group)
+    
+    internal static void Add(this CacheGroup container, GroupCore group)
     {
       ref var len     = ref container.length;
       ref var storage = ref container.Elements;
@@ -150,15 +131,26 @@ namespace Pixeye.Actors
       }
 
       storage[len++] = group;
-      return group;
+      // return group;
     }
 
-    internal static void Dispose(this CacheGroup container)
+    internal static void Remove(this CacheGroup container, GroupCore group)
     {
-      for (int i = 0; i < container.length; i++)
-        container.Elements[i].Dispose();
+      ref var len     = ref container.length;
+      ref var storage = ref container.Elements;
 
-      container.length = 0;
+      var index = -1;
+      for (int i = 0; i < len; i++)
+      {
+        if (storage[i] == group)
+        {
+          index = i;
+          break;
+        }
+      }
+
+      if (index < --len)
+        Array.Copy(storage, index + 1, storage, index, len - index);
     }
   }
 }
