@@ -29,14 +29,13 @@ namespace Pixeye.Actors
       return State.NotAdded;
     }
 
-    public static AsyncOperation Add(int buildIndex)
+    public static void Add(int buildIndex)
     {
       var state = CheckSceneState(buildIndex);
-      if (state == State.AlreadyAdded) return null;
+      if (state == State.AlreadyAdded) return;
 
       LayerKernel.ChangingScene[buildIndex] = true;
       LayerKernel.LoadJobs.Add(SceneManager.LoadSceneAsync(buildIndex, LoadSceneMode.Additive));
-      return LayerKernel.LoadJobs[LayerKernel.LoadJobs.Count - 1];
     }
 
     public static void Add(string sceneName)
@@ -50,7 +49,7 @@ namespace Pixeye.Actors
     {
       var state = CheckSceneState(buildIndex);
       if (state == State.InvalidIndex || state == State.NotAdded) return;
-      LayerKernel.Run(CoRemove(buildIndex));
+      RemoveOp(buildIndex);
     }
 
     public static void Remove(string sceneName)
@@ -59,14 +58,13 @@ namespace Pixeye.Actors
       var state      = CheckSceneState(buildIndex);
       if (state == State.InvalidIndex || state == State.NotAdded) return;
 
-      LayerKernel.Run(CoRemove(buildIndex));
+      RemoveOp(buildIndex);
     }
 
-    static IEnumerator CoRemove(int buildIndex)
+    static void RemoveOp(int buildIndex)
     {
       if (LayerKernel.Layers[buildIndex] != null) // check if this scene is a part of Actors Layers.
         LayerKernel.Layers[buildIndex].Release();
-      yield return LayerKernel.WaitFrame;
       LayerKernel.LoadJobs.Add(SceneManager.UnloadSceneAsync(buildIndex));
       LayerKernel.LoadJobs.Add(Resources.UnloadUnusedAssets());
     }

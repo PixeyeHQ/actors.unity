@@ -38,7 +38,7 @@ namespace Pixeye.Actors
 
     void Start()
     {
-      isDirty = false;
+      isReleasing = false;
     }
 
     void Bootstrap()

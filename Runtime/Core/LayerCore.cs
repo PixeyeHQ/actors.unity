@@ -14,7 +14,7 @@ namespace Pixeye.Actors
     internal static int LayerNextID;
     internal static LayerCore ActiveLayer; // current main scene;
     internal Scene Scene => gameObject.scene;
-    
+
     internal ProcessorCoroutine processorCoroutine;
     internal ProcessorCoroutine processorCoroutineUnscaled;
 
@@ -35,7 +35,7 @@ namespace Pixeye.Actors
     internal Pool pool;
 
     internal int id = LayerNextID++;
-    internal bool isDirty = true;
+    internal bool isReleasing = true;
 
     internal Dictionary<int, object> objects = new Dictionary<int, object>();
 
@@ -219,12 +219,12 @@ namespace Pixeye.Actors
 
     internal void Release()
     {
+      isReleasing = true;
       Closed();
-      isDirty = true;
+      Updates.Dispose();
       processorCoroutine.Dispose();
       processorCoroutineUnscaled.Dispose();
       LayerKernel.LayersInUse.Remove(this);
-      Updates.Dispose();
       OnLayerDestroy();
 
       foreach (var obj in objects)
@@ -247,7 +247,7 @@ namespace Pixeye.Actors
     void Update()
     {
       if (LayerKernel.ApplicationIsQuitting) return;
-      if (isDirty) return;
+      if (isReleasing) return;
       Time.Tick();
       var delta = Time.deltaTime;
       Updates.Update(delta);
@@ -256,7 +256,7 @@ namespace Pixeye.Actors
     void FixedUpdate()
     {
       if (LayerKernel.ApplicationIsQuitting) return;
-      if (isDirty) return;
+      if (isReleasing) return;
 
       var delta = Time.deltaTimeFixed;
       Updates.FixedUpdate(delta);
@@ -265,7 +265,7 @@ namespace Pixeye.Actors
     void LateUpdate()
     {
       if (LayerKernel.ApplicationIsQuitting) return;
-      if (isDirty) return;
+      if (isReleasing) return;
 
       var delta = Time.deltaTime;
       Updates.LateUpdate(delta);
@@ -274,7 +274,7 @@ namespace Pixeye.Actors
 
     void OnApplicationQuit()
     {
-      isDirty = true;
+      isReleasing = true;
     }
   }
 

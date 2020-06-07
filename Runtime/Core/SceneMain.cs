@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -14,21 +13,19 @@ namespace Pixeye.Actors
     public static void ChangeTo(int buildIndex)
     {
       NextActiveSceneName = SceneManager.GetSceneByBuildIndex(buildIndex).name;
-      LayerKernel.Run(CoChangeTo(buildIndex));
+      ChangeOp(buildIndex);
     }
 
     public static void ChangeTo(string sceneName)
     {
-      var buildIndex = LayerKernel.SceneIndexFromName(sceneName);
       NextActiveSceneName = sceneName;
-      LayerKernel.Run(CoChangeTo(buildIndex));
+      ChangeOp(LayerKernel.SceneIndexFromName(sceneName));
     }
 
-    static IEnumerator CoChangeTo(int buildIndex)
+    static void ChangeOp(int buildIndex)
     {
       LayerKernel.ChangingScene[buildIndex] = true;
-      LayerCore.ActiveLayer.isDirty         = true;
-      yield return LayerKernel.WaitFrame;
+      Closed();
       LayerCore.ActiveLayer.Release();
       LayerKernel.LoadJobs.Add(SceneManager.UnloadSceneAsync(LayerCore.ActiveLayer.Scene));
       LayerKernel.LoadJobs.Add(Resources.UnloadUnusedAssets());
