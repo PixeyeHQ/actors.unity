@@ -25,7 +25,7 @@ namespace Pixeye.Actors
   static class component
   {
     internal static ref ComponentObserver ComponentObserver(in this ent entity) =>
-      ref Storage<ComponentObserver>.components[entity.id];
+      ref Storage<ComponentObserver>.components[entity.byte1 | (entity.byte2 << 0x8) | (entity.byte3 << 0x10)];
   }
 
   sealed class StorageComponentObserver : Storage<ComponentObserver>

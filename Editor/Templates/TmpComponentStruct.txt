@@ -13,7 +13,7 @@ using Pixeye.Actors;
    {
      public const string ##NAME2## = "##NAMESPACE2##.##NAME##";
      public static ref ##NAME## ##NAME##(in this ent entity) =>
-       ref Storage<##NAME##>.components[entity.id];
+       ref Storage<##NAME##>.components[entity.byte1 | (entity.byte2 << 0x8) | (entity.byte3 << 0x10)];
    }
  
    sealed class Storage##NAME## : Storage<##NAME##>

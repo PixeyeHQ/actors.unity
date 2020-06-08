@@ -60,14 +60,14 @@ namespace Pixeye.Actors
     {
       DebugCheckNull(this, typeof(T));
       DebugAlreadyHave<T>(this);
-
-      if (id >= Storage<T>.components.Length)
-        Array.Resize(ref Storage<T>.components, id + id / 4);
+      var _id = byte1 | (byte2 << 0x8) | (byte3 << 0x10);
+      if (_id >= Storage<T>.components.Length)
+        Array.Resize(ref Storage<T>.components, _id + _id / 4);
 
       meta->AddComponent(Storage<T>.componentId);
       managed.signature[Storage<T>.Generation] |= Storage<T>.ComponentMask;
 
-      ref var val = ref Storage<T>.components[id];
+      ref var val = ref Storage<T>.components[_id];
 #if !ACTORS_COMPONENTS_STRUCTS
       if (val == null)
         val = Storage<T>.Instance.Create();
@@ -82,23 +82,24 @@ namespace Pixeye.Actors
     {
       DebugCheckNull(this, typeof(T));
       DebugAlreadyHave<T>(this);
-
-      if (id >= Storage<T>.components.Length)
-        Array.Resize(ref Storage<T>.components, id + id / 4);
+      var _id = byte1 | (byte2 << 0x8) | (byte3 << 0x10);
+      if (_id >= Storage<T>.components.Length)
+        Array.Resize(ref Storage<T>.components, _id + _id / 4);
 
       meta->AddComponent(Storage<T>.componentId);
       managed.signature[Storage<T>.Generation] |= Storage<T>.ComponentMask;
 
-      ref var componentInStorage = ref Storage<T>.components[id];
+      ref var componentInStorage = ref Storage<T>.components[_id];
       componentInStorage = component;
     }
 
     /// Returns the component from entity. Creates the component if entity doesn't have one.
     public ref T Get<T>()
     {
+      var _id = byte1 | (byte2 << 0x8) | (byte3 << 0x10);
       DebugCheckActive<T>(this);
-      if (id >= Storage<T>.components.Length)
-        Array.Resize(ref Storage<T>.components, id + id / 4);
+      if (_id >= Storage<T>.components.Length)
+        Array.Resize(ref Storage<T>.components, _id + _id / 4);
 
       var     generation = Storage<T>.Generation;
       var     mask       = Storage<T>.ComponentMask;
@@ -117,7 +118,7 @@ namespace Pixeye.Actors
         }
       }
 
-      ref var val = ref Storage<T>.components[id];
+      ref var val = ref Storage<T>.components[_id];
 
 #if !ACTORS_COMPONENTS_STRUCTS
       if (val == null)
@@ -156,7 +157,7 @@ namespace Pixeye.Actors
     {
       return (arg0 = (managed.signature[Storage<T>.Generation] & Storage<T>.ComponentMask) ==
                      Storage<T>.ComponentMask
-        ? Storage<T>.components[id]
+        ? Storage<T>.components[byte1 | (byte2 << 0x8) | (byte3 << 0x10)]
         : default) != null;
     }
 
@@ -174,8 +175,8 @@ namespace Pixeye.Actors
     {
       arg0 = default;
       arg1 = default;
-      if ((arg0 = Storage<T>.Instance.TryGet(id)) == null) return false;
-      return (arg1 = Storage<Y>.Instance.TryGet(id)) != null;
+      if ((arg0 = Storage<T>.Instance.TryGet(byte1 | (byte2 << 0x8) | (byte3 << 0x10))) == null) return false;
+      return (arg1 = Storage<Y>.Instance.TryGet(byte1 | (byte2 << 0x8) | (byte3 << 0x10))) != null;
     }
 
     /// <summary>
@@ -195,9 +196,9 @@ namespace Pixeye.Actors
       arg0 = default;
       arg1 = default;
       arg2 = default;
-      if ((arg0 = Storage<T>.Instance.TryGet(id)) == null) return false;
-      if ((arg1 = Storage<Y>.Instance.TryGet(id)) == null) return false;
-      return (arg2 = Storage<U>.Instance.TryGet(id)) != null;
+      if ((arg0 = Storage<T>.Instance.TryGet(byte1 | (byte2 << 0x8) | (byte3 << 0x10))) == null) return false;
+      if ((arg1 = Storage<Y>.Instance.TryGet(byte1 | (byte2 << 0x8) | (byte3 << 0x10))) == null) return false;
+      return (arg2 = Storage<U>.Instance.TryGet(byte1 | (byte2 << 0x8) | (byte3 << 0x10))) != null;
     }
 
     /// <summary>
@@ -220,10 +221,10 @@ namespace Pixeye.Actors
       arg1 = default;
       arg2 = default;
       arg3 = default;
-      if ((arg0 = Storage<T>.Instance.TryGet(id)) == null) return false;
-      if ((arg1 = Storage<Y>.Instance.TryGet(id)) == null) return false;
-      if ((arg2 = Storage<U>.Instance.TryGet(id)) == null) return false;
-      return (arg3 = Storage<I>.Instance.TryGet(id)) != null;
+      if ((arg0 = Storage<T>.Instance.TryGet(byte1 | (byte2 << 0x8) | (byte3 << 0x10))) == null) return false;
+      if ((arg1 = Storage<Y>.Instance.TryGet(byte1 | (byte2 << 0x8) | (byte3 << 0x10))) == null) return false;
+      if ((arg2 = Storage<U>.Instance.TryGet(byte1 | (byte2 << 0x8) | (byte3 << 0x10))) == null) return false;
+      return (arg3 = Storage<I>.Instance.TryGet(byte1 | (byte2 << 0x8) | (byte3 << 0x10))) != null;
     }
 
     /// <summary>
@@ -249,11 +250,11 @@ namespace Pixeye.Actors
       arg2 = default;
       arg3 = default;
       arg4 = default;
-      if ((arg0 = Storage<T>.Instance.TryGet(id)) == null) return false;
-      if ((arg1 = Storage<Y>.Instance.TryGet(id)) == null) return false;
-      if ((arg2 = Storage<U>.Instance.TryGet(id)) == null) return false;
-      if ((arg3 = Storage<I>.Instance.TryGet(id)) == null) return false;
-      return (arg4 = Storage<O>.Instance.TryGet(id)) != null;
+      if ((arg0 = Storage<T>.Instance.TryGet(byte1 | (byte2 << 0x8) | (byte3 << 0x10))) == null) return false;
+      if ((arg1 = Storage<Y>.Instance.TryGet(byte1 | (byte2 << 0x8) | (byte3 << 0x10))) == null) return false;
+      if ((arg2 = Storage<U>.Instance.TryGet(byte1 | (byte2 << 0x8) | (byte3 << 0x10))) == null) return false;
+      if ((arg3 = Storage<I>.Instance.TryGet(byte1 | (byte2 << 0x8) | (byte3 << 0x10))) == null) return false;
+      return (arg4 = Storage<O>.Instance.TryGet(byte1 | (byte2 << 0x8) | (byte3 << 0x10))) != null;
     }
 
 
