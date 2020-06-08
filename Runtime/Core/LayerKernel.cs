@@ -36,7 +36,7 @@ namespace Pixeye.Actors
       }
     }
 
-    internal static SettingsActors Settings = new SettingsActors();
+    public static SettingsActors Settings = new SettingsActors();
 
     internal static LayerKernel Instance;
     internal const string KernelSceneName = "Actors Framework";
