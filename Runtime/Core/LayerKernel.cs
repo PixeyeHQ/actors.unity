@@ -43,12 +43,8 @@ namespace Pixeye.Actors
     internal static LayerCore[] Layers = new LayerCore[128];
     internal static readonly List<LayerCore> LayersInUse = new List<LayerCore>();
 
-#if UNITY_EDITOR
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-#else
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSplashScreen)]
-#endif
-    static void Bootstrap()
+
+    public static void Bootstrap()
     {
       HandleSettings();
       UpdateTypes();
