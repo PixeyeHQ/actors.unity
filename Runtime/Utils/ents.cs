@@ -10,6 +10,9 @@ using Unity.IL2CPP.CompilerServices;
 namespace Pixeye.Actors
 {
   [Serializable]
+  [Il2CppSetOption(Option.NullChecks, false)]
+  [Il2CppSetOption(Option.ArrayBoundsChecks, false)]
+  [Il2CppSetOption(Option.DivideByZeroChecks, false)]
   public class ents : IEnumerable
   {
     public ent[] source;
@@ -20,8 +23,7 @@ namespace Pixeye.Actors
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
       get => ref source[index];
     }
-
-
+    
     public ents(int cap = 0)
     {
       source = new ent[cap > 0 ? cap : 5];
@@ -38,7 +40,6 @@ namespace Pixeye.Actors
       }
     }
 
-    [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
     public bool Has(in ent entity)
     {
       for (var i = 0; i < length; i++)
@@ -51,7 +52,7 @@ namespace Pixeye.Actors
       return false;
     }
 
-    [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
+
     public void Add(ent entity)
     {
       if (length >= source.Length)
@@ -60,7 +61,7 @@ namespace Pixeye.Actors
       source[length++] = entity;
     }
 
-    [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
+
     public void Add(params ent[] entity)
     {
       foreach (var e in entity)
@@ -72,7 +73,7 @@ namespace Pixeye.Actors
       }
     }
 
-    [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
+
     public void Add(ents entities)
     {
       for (int i = 0; i < entities.length; i++)
@@ -81,7 +82,7 @@ namespace Pixeye.Actors
       }
     }
 
-    [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
+
     public bool Remove(in ent entity)
     {
       var index = -1;
@@ -102,7 +103,7 @@ namespace Pixeye.Actors
       return removed;
     }
 
-    [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
+
     public void RemoveAt(int index)
     {
       Array.Copy(source, index + 1, source, index, --length - index);
@@ -176,6 +177,9 @@ namespace Pixeye.Actors
   }
 
   [Serializable]
+  [Il2CppSetOption(Option.NullChecks, false)]
+  [Il2CppSetOption(Option.ArrayBoundsChecks, false)]
+  [Il2CppSetOption(Option.DivideByZeroChecks, false)]
   public class indexes : IEnumerable
   {
     public int[] source;
@@ -187,15 +191,12 @@ namespace Pixeye.Actors
       get => source[index];
     }
 
-
     public indexes(int cap = 0)
     {
       source = new int[cap > 0 ? cap : 5];
       length = 0;
     }
 
-
-    [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
     public void Add(int id)
     {
       if (length >= source.Length)
@@ -204,7 +205,6 @@ namespace Pixeye.Actors
       source[length++] = id;
     }
 
-    [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
     public void Add(params int[] ids)
     {
       foreach (var id in ids)
@@ -222,8 +222,6 @@ namespace Pixeye.Actors
       length = 0;
     }
 
-
-    [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
     public bool Remove(int id)
     {
       var index = -1;

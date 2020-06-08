@@ -1,13 +1,14 @@
 //  Project  : ACTORS
 //  Contacts : Pixeye - ask@pixeye.games
 
-
 using System.Collections.Generic;
-using UnityEngine;
-
+using Unity.IL2CPP.CompilerServices;
 
 namespace Pixeye.Actors
 {
+  [Il2CppSetOption(Option.NullChecks, false)]
+  [Il2CppSetOption(Option.ArrayBoundsChecks, false)]
+  [Il2CppSetOption(Option.DivideByZeroChecks, false)]
   public class ProcessorUpdate
   {
     internal readonly List<IReceiveEcsEvent> processors = new List<IReceiveEcsEvent>(64);

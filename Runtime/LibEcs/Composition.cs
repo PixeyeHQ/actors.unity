@@ -6,7 +6,9 @@ using UnityEngine.Scripting;
 namespace Pixeye.Actors
 {
   [Preserve]
-  [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
+  [Il2CppSetOption(Option.NullChecks, false)]
+  [Il2CppSetOption(Option.ArrayBoundsChecks, false)]
+  [Il2CppSetOption(Option.DivideByZeroChecks, false)]
   public unsafe class Composition : IEquatable<Composition>
   {
     internal ComponentMask[] included = new ComponentMask[0];

@@ -6,7 +6,9 @@ using Unity.IL2CPP.CompilerServices;
 
 namespace Pixeye.Actors
 {
-  [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
+  [Il2CppSetOption(Option.NullChecks, false)]
+  [Il2CppSetOption(Option.ArrayBoundsChecks, false)]
+  [Il2CppSetOption(Option.DivideByZeroChecks, false)]
   internal unsafe partial class ProcessorEcs : IRequireActorsLayer, IDisposable
   {
     internal static PoolMem Entities;
@@ -38,23 +40,13 @@ namespace Pixeye.Actors
       if (ent.Released.length > 0)
       {
         ref var pop = ref ent.Released.source[--ent.Released.length];
-        var     id  = pop.id;
-        entity.byte1 = (byte) id;
-        entity.byte2 = (byte) (id >> 0x8);
-        entity.byte3 = (byte) (id >> 0x10);
-
-        unchecked
-        {
-          entity.age = pop.age;
-        }
+        entity.id = pop.id;
+        entity.age = pop.age;
       }
       else
       {
-        var id = ent.NextID++;
-        entity.byte1 = (byte) id;
-        entity.byte2 = (byte) (id >> 0x8);
-        entity.byte3 = (byte) (id >> 0x10);
-        entity.age   = 0;
+        entity.id  = ent.NextID++;
+        entity.age = 0;
       }
 
       var prevEntitiesLength = Entities.Length;

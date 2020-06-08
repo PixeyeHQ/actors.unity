@@ -11,7 +11,9 @@ using Unity.IL2CPP.CompilerServices;
 
 namespace Pixeye.Actors
 {
-  [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
+  [Il2CppSetOption(Option.NullChecks, false)]
+  [Il2CppSetOption(Option.ArrayBoundsChecks, false)]
+  [Il2CppSetOption(Option.DivideByZeroChecks, false)]
   public static unsafe class HelperTags
   {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

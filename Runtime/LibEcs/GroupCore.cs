@@ -21,8 +21,11 @@ namespace Pixeye.Actors
   }
 
 
-  [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
+  
   [Preserve]
+  [Il2CppSetOption(Option.NullChecks, false)]
+  [Il2CppSetOption(Option.ArrayBoundsChecks, false)]
+  [Il2CppSetOption(Option.DivideByZeroChecks, false)]
   public abstract class GroupCore : IEnumerable, IEquatable<GroupCore>, IDisposable
   {
     public ent[] entities = new ent[LayerKernel.Settings.SizeEntities];
@@ -511,7 +514,9 @@ namespace Pixeye.Actors
   }
 
   [Preserve]
-  [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
+  [Il2CppSetOption(Option.NullChecks, false)]
+  [Il2CppSetOption(Option.ArrayBoundsChecks, false)]
+  [Il2CppSetOption(Option.DivideByZeroChecks, false)]
   public class Group<T> : GroupCore
   {
     internal override GroupCore Initialize(Composition composition, LayerCore layer)
@@ -539,7 +544,9 @@ namespace Pixeye.Actors
   }
 
   [Preserve]
-  [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
+  [Il2CppSetOption(Option.NullChecks, false)]
+  [Il2CppSetOption(Option.ArrayBoundsChecks, false)]
+  [Il2CppSetOption(Option.DivideByZeroChecks, false)]
   public class Group<T, Y> : GroupCore
   {
     internal override GroupCore Initialize(Composition composition, LayerCore layer)
@@ -575,7 +582,9 @@ namespace Pixeye.Actors
   }
 
   [Preserve]
-  [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
+  [Il2CppSetOption(Option.NullChecks, false)]
+  [Il2CppSetOption(Option.ArrayBoundsChecks, false)]
+  [Il2CppSetOption(Option.DivideByZeroChecks, false)]
   public class Group<T, Y, U> : GroupCore
   {
     internal override GroupCore Initialize(Composition composition, LayerCore layer)
@@ -621,7 +630,9 @@ namespace Pixeye.Actors
   }
 
   [Preserve]
-  [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
+  [Il2CppSetOption(Option.NullChecks, false)]
+  [Il2CppSetOption(Option.ArrayBoundsChecks, false)]
+  [Il2CppSetOption(Option.DivideByZeroChecks, false)]
   public class Group<T, Y, U, I> : GroupCore
   {
     internal override GroupCore Initialize(Composition composition, LayerCore layer)
@@ -674,7 +685,9 @@ namespace Pixeye.Actors
   }
 
   [Preserve]
-  [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
+  [Il2CppSetOption(Option.NullChecks, false)]
+  [Il2CppSetOption(Option.ArrayBoundsChecks, false)]
+  [Il2CppSetOption(Option.DivideByZeroChecks, false)]
   public class Group<T, Y, U, I, O> : GroupCore
   {
     internal override GroupCore Initialize(Composition composition, LayerCore layer)
@@ -730,9 +743,10 @@ namespace Pixeye.Actors
   }
 
   [Preserve]
-  [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
+  [Il2CppSetOption(Option.NullChecks, false)]
+  [Il2CppSetOption(Option.ArrayBoundsChecks, false)]
+  [Il2CppSetOption(Option.DivideByZeroChecks, false)]
   public class Group<T, Y, U, I, O, P> : GroupCore
-
   {
     internal override GroupCore Initialize(Composition composition, LayerCore layer)
     {
@@ -803,7 +817,9 @@ namespace Pixeye.Actors
   }
 
   [Preserve]
-  [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
+  [Il2CppSetOption(Option.NullChecks, false)]
+  [Il2CppSetOption(Option.ArrayBoundsChecks, false)]
+  [Il2CppSetOption(Option.DivideByZeroChecks, false)]
   public class Group<T, Y, U, I, O, P, A> : GroupCore
   {
     internal override GroupCore Initialize(Composition composition, LayerCore layer)
@@ -885,7 +901,9 @@ namespace Pixeye.Actors
   }
 
   [Preserve]
-  [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
+  [Il2CppSetOption(Option.NullChecks, false)]
+  [Il2CppSetOption(Option.ArrayBoundsChecks, false)]
+  [Il2CppSetOption(Option.DivideByZeroChecks, false)]
   public class Group<T, Y, U, I, O, P, A, S> : GroupCore
   {
     internal override GroupCore Initialize(Composition composition, LayerCore layer)
@@ -976,7 +994,9 @@ namespace Pixeye.Actors
   }
 
   [Preserve]
-  [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
+  [Il2CppSetOption(Option.NullChecks, false)]
+  [Il2CppSetOption(Option.ArrayBoundsChecks, false)]
+  [Il2CppSetOption(Option.DivideByZeroChecks, false)]
   public class Group<T, Y, U, I, O, P, A, S, D> : GroupCore
   {
     internal override GroupCore Initialize(Composition composition, LayerCore layer)
@@ -1075,7 +1095,9 @@ namespace Pixeye.Actors
   }
 
   [Preserve]
-  [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
+  [Il2CppSetOption(Option.NullChecks, false)]
+  [Il2CppSetOption(Option.ArrayBoundsChecks, false)]
+  [Il2CppSetOption(Option.DivideByZeroChecks, false)]
   public class Group<T, Y, U, I, O, P, A, S, D, F> : GroupCore
   {
     internal override GroupCore Initialize(Composition composition, LayerCore layer)

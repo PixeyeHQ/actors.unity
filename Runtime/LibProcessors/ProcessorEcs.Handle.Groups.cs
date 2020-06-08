@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using UnityEngine;
+using Unity.IL2CPP.CompilerServices;
 
 namespace Pixeye.Actors
 {
+  [Il2CppSetOption(Option.NullChecks, false)]
+  [Il2CppSetOption(Option.ArrayBoundsChecks, false)]
+  [Il2CppSetOption(Option.DivideByZeroChecks, false)]
   internal partial class ProcessorEcs
   {
     static int GroupNextID;

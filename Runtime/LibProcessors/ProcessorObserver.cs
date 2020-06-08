@@ -1,11 +1,13 @@
 //  Project : ecs
 // Contacts : Pix - ask@pixeye.games
 
-
-using UnityEngine;
+using Unity.IL2CPP.CompilerServices;
 
 namespace Pixeye.Actors
 {
+  [Il2CppSetOption(Option.NullChecks, false)]
+  [Il2CppSetOption(Option.ArrayBoundsChecks, false)]
+  [Il2CppSetOption(Option.DivideByZeroChecks, false)]
   sealed class ProcessorObserver : Processor, ITick
   {
 #if ACTORS_EVENTS_MANUAL

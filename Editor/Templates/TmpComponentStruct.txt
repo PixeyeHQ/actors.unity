@@ -1,4 +1,5 @@
-
+using System.Runtime.CompilerServices;
+using Unity.IL2CPP.CompilerServices;
 using Pixeye.Actors;
  
 ##NAMESPACE##
@@ -9,13 +10,20 @@ using Pixeye.Actors;
  
    #region HELPERS
  
+   [Il2CppSetOption(Option.NullChecks, false)]
+   [Il2CppSetOption(Option.ArrayBoundsChecks, false)]
+   [Il2CppSetOption(Option.DivideByZeroChecks, false)]
    static partial class Component
    {
      public const string ##NAME2## = "##NAMESPACE2##.##NAME##";
+     [MethodImpl(MethodImplOptions.AggressiveInlining)]
      public static ref ##NAME## ##NAME##(in this ent entity) =>
-       ref Storage<##NAME##>.components[entity.byte1 | (entity.byte2 << 0x8) | (entity.byte3 << 0x10)];
+       ref Storage<##NAME##>.components[entity.id];
    }
  
+   [Il2CppSetOption(Option.NullChecks, false)]
+   [Il2CppSetOption(Option.ArrayBoundsChecks, false)]
+   [Il2CppSetOption(Option.DivideByZeroChecks, false)]
    sealed class Storage##NAME## : Storage<##NAME##>
    {
      public override ##NAME## Create() => new ##NAME##();
