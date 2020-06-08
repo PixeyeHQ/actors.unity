@@ -2,6 +2,7 @@
 //  Contacts : Pixeye - ask@pixeye.games
 
 using System;
+using Unity.IL2CPP.CompilerServices;
 
 namespace Pixeye.Actors
 {
@@ -75,6 +76,9 @@ namespace Pixeye.Actors
 
   #region PROCESSORS
 
+  [Il2CppSetOption(Option.NullChecks, false)]
+  [Il2CppSetOption(Option.ArrayBoundsChecks, false)]
+  [Il2CppSetOption(Option.DivideByZeroChecks, false)]
   public class SignalsEcs<T>
   {
     internal static SignalsEcs<T>[] layers = new SignalsEcs<T>[LayerKernel.LAYERS_AMOUNT_TOTAL];

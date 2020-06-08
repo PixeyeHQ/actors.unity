@@ -25,34 +25,14 @@ namespace Pixeye.Actors
     // Entity
     //===============================//
 
-    internal byte age;
+    internal int age;
+    public int id;
 
-    /// do not change
-    public byte byte1;
-
-    /// do not change
-    public byte byte2;
-
-    /// do not change
-    public byte byte3;
-
-    public int id
-    {
-      [MethodImpl(MethodImplOptions.AggressiveInlining)]
-      get => byte1 | (byte2 << 0x8) | (byte3 << 0x10);
-      // [MethodImpl(MethodImplOptions.AggressiveInlining)]
-      // set
-      // {
-      //   byte1 = (byte) value;
-      //   byte2 = (byte) (value >> 0x8);
-      //   byte3 = (byte) (value >> 0x10);
-      // }
-    }
 
     public ref readonly Transform transform
     {
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
-      get => ref ProcessorEcs.EntitiesManaged[byte1 | (byte2 << 0x8) | (byte3 << 0x10)].transform;
+      get => ref ProcessorEcs.EntitiesManaged[id].transform;
     }
 
     public bool exist
@@ -61,34 +41,31 @@ namespace Pixeye.Actors
       get
       {
         var _meta = meta;
-        return (byte1 | (byte2 << 0x8) | (byte3 << 0x10)) > 0 && _meta->isAlive && _meta->age == age;
+        return id > 0 && _meta->isAlive && _meta->age == age;
       }
     }
 
     public ent(int value)
     {
-      byte1 = (byte) value;
-      byte2 = (byte) (value >> 0x8);
-      byte3 = (byte) (value >> 0x10);
-      age   = 0;
+      id  = value;
+      age = 0;
     }
 
     public override int GetHashCode()
     {
-      var _id = byte1 | (byte2 << 0x8) | (byte3 << 0x10);
-      return ((_id << 5) + _id) ^ age;
+      return ((id << 5) + id) ^ age;
     }
 
     public override string ToString()
     {
-      return (byte1 | (byte2 << 0x8) | (byte3 << 0x10)).ToString();
+      return id.ToString();
     }
 
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Equals(ent other)
     {
-      return (byte1 | (byte2 << 0x8) | (byte3 << 0x10)) == (other.byte1 | (other.byte2 << 0x8) | (other.byte3 << 0x10)) && age == other.age;
+      return id == other.id && age == other.age;
     }
 
     public override bool Equals(object obj)
@@ -101,7 +78,7 @@ namespace Pixeye.Actors
     //===============================//
     public static implicit operator int(ent value)
     {
-      return value.byte1 | (value.byte2 << 0x8) | (value.byte3 << 0x10);
+      return value.id;
     }
 
     public static implicit operator ent(int value)
@@ -112,8 +89,7 @@ namespace Pixeye.Actors
 
     public static bool operator ==(ent arg1, ent arg2)
     {
-       
-      return (arg1.byte1 | (arg1.byte2 << 0x8) | (arg1.byte3 << 0x10)) == (arg2.byte1 | (arg2.byte2 << 0x8) | (arg2.byte3 << 0x10)) && arg1.age == arg2.age;
+      return arg1.id == arg2.id && arg1.age == arg2.age;
     }
 
     public static bool operator !=(ent arg1, ent arg2)
@@ -125,8 +101,10 @@ namespace Pixeye.Actors
     // Utils
     //===============================//
 
-    internal ref EntityManagedMeta managed => ref ProcessorEcs.EntitiesManaged[byte1 | (byte2 << 0x8) | (byte3 << 0x10)];
-    internal EntityMeta* meta => ProcessorEcs.Entities.Get<EntityMeta>(byte1 | (byte2 << 0x8) | (byte3 << 0x10));
+    internal ref EntityManagedMeta managed =>
+      ref ProcessorEcs.EntitiesManaged[id];
+
+    internal EntityMeta* meta => ProcessorEcs.Entities.Get<EntityMeta>(id);
 
     [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

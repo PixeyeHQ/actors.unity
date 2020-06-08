@@ -15,15 +15,14 @@ namespace Pixeye.Actors
     public byte componentsAmount;
     public byte groupsLength;
     public byte groupsAmount;
-
-    public byte age;
-
+    
     public bool isDirty; //dirty allows to set all components for a new entity in one init command
     public bool isAlive;
-
-
+    
     public EcsTags tags;
 
+    public int age;
+    
     public ushort* components;
     public ushort* groups;
 

@@ -3,9 +3,13 @@
 
 using System;
 using System.Collections.Generic;
+using Unity.IL2CPP.CompilerServices;
 
 namespace Pixeye.Actors
 {
+  [Il2CppSetOption(Option.NullChecks, false)]
+  [Il2CppSetOption(Option.ArrayBoundsChecks, false)]
+  [Il2CppSetOption(Option.DivideByZeroChecks, false)]
   public sealed class ProcessorSignals : IDisposable
   {
     internal Dictionary<int, List<IReceive>> signals = new Dictionary<int, List<IReceive>>(new FastComparable());

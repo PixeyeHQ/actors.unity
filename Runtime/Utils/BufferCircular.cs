@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections;
 using System.Runtime.CompilerServices;
+using Unity.IL2CPP.CompilerServices;
 
 namespace Pixeye.Actors
 {
+  [Il2CppSetOption(Option.NullChecks, false)]
+  [Il2CppSetOption(Option.ArrayBoundsChecks, false)]
+  [Il2CppSetOption(Option.DivideByZeroChecks, false)]
   public class BufferCircular<T> : IEnumerable
   {
     internal int head;

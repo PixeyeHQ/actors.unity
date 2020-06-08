@@ -2,12 +2,14 @@
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Unity.IL2CPP.CompilerServices;
 using UnityEngine.SceneManagement;
-using Debug = UnityEngine.Debug;
-
 
 namespace Pixeye.Actors
 {
+  [Il2CppSetOption(Option.NullChecks, false)]
+  [Il2CppSetOption(Option.ArrayBoundsChecks, false)]
+  [Il2CppSetOption(Option.DivideByZeroChecks, false)]
   internal unsafe partial class ProcessorEcs
   {
     internal enum Action : byte
@@ -228,10 +230,9 @@ namespace Pixeye.Actors
 
             entities.Remove(operation.entity);
 
-            unchecked
-            {
-              operation.entity.age += 1;
-            }
+            operation.entity.age += 1;
+            if (operation.entity.age == int.MaxValue)
+              operation.entity.age = 0;
 
             ent.Released.Add(operation.entity);
           }
@@ -296,10 +297,10 @@ namespace Pixeye.Actors
             eMeta->tags.Clear();
             eMeta->isAlive = false;
             entities.Remove(operation.entity);
-            unchecked
-            {
-              operation.entity.age += 1;
-            }
+
+            operation.entity.age += 1;
+            if (operation.entity.age == int.MaxValue)
+              operation.entity.age = 0;
 
             ent.Released.Add(operation.entity);
           }
