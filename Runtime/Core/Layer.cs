@@ -33,8 +33,6 @@ namespace Pixeye.Actors
       base.Awake();
       Bootstrap(); // Setup actors logic for a scene.
       Setup();     // Entry point for developers.
-      if (gameObject.scene.buildIndex >= 0)
-        LayerKernel.ChangingScene[gameObject.scene.buildIndex] = false;
     }
 
     void Start()
@@ -87,25 +85,34 @@ namespace Pixeye.Actors
 
       #endregion
 
-      #region Update Active Layer
+      #region Update Layer
 
       if (gameObject.scene.name != LayerKernel.KernelSceneName)
         if (SceneMain.NextActiveSceneName != null && SceneMain.NextActiveSceneName == gameObject.scene.name)
         {
           SceneMain.NextActiveSceneName = default;
           ActiveLayer                   = this;
-          Run(CoWaitForSceneLoad());
-
-          IEnumerator CoWaitForSceneLoad()
-          {
-            while (!gameObject.scene.isLoaded)
-              yield return 0;
-
-            SceneManager.SetActiveScene(gameObject.scene);
-          }
         }
 
+      Run(CoWaitForSceneLoad());
+
+      IEnumerator CoWaitForSceneLoad()
+      {
+        while (!gameObject.scene.isLoaded)
+          yield return 0;
+
+        if (ActiveLayer == this)
+        {
+          SceneManager.SetActiveScene(gameObject.scene);
+        }
+
+
+        if (gameObject.scene.buildIndex >= 0)
+          LayerKernel.Initialized[gameObject.scene.buildIndex] = true;
+      }
+
       #endregion
+
 
       #region Pools & Activations
 

@@ -20,15 +20,13 @@ namespace Pixeye.Actors
 
     protected virtual void Start()
     {
-      if (!LayerKernel.Instance) return;
-      if (LayerKernel.ChangingScene[gameObject.scene.buildIndex]) return;
+      if (!LayerKernel.Instance || !LayerKernel.Initialized[gameObject.scene.buildIndex]) return;
       Setup();
     }
 
     void OnEnable()
     {
-      if (!LayerKernel.Instance) return;
-      if (LayerKernel.ChangingScene[gameObject.scene.buildIndex]) return;
+      if (!LayerKernel.Instance || !LayerKernel.Initialized[gameObject.scene.buildIndex]) return;
       HandleEnable();
     }
 
@@ -40,7 +38,7 @@ namespace Pixeye.Actors
 
     public virtual void Bootstrap(LayerCore layer)
     {
-      this.Layer = layer;
+      Layer = layer;
       Setup();
       HandleEnable();
     }

@@ -15,7 +15,8 @@ namespace Pixeye.Actors
   {
     internal const int LAYERS_AMOUNT_TOTAL = 128;
 
-    public static bool[] ChangingScene = new bool[128];
+    //public static bool[] ChangingScene = new bool[128];
+    public static bool[] Initialized = new bool[LAYERS_AMOUNT_TOTAL];
     public static bool ApplicationIsQuitting;
     public static bool IsQuittingOrChangingScene() => ApplicationIsQuitting;
 

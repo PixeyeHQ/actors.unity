@@ -24,7 +24,7 @@ namespace Pixeye.Actors
 
     static void ChangeOp(int buildIndex)
     {
-      LayerKernel.ChangingScene[buildIndex] = true;
+      LayerKernel.Initialized[buildIndex] = false;
       Closed();
       LayerCore.ActiveLayer.Release();
       LayerKernel.LoadJobs.Add(SceneManager.UnloadSceneAsync(LayerCore.ActiveLayer.Scene));

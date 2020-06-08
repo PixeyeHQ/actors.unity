@@ -34,7 +34,7 @@ namespace Pixeye.Actors
       var state = CheckSceneState(buildIndex);
       if (state == State.AlreadyAdded) return;
 
-      LayerKernel.ChangingScene[buildIndex] = true;
+      LayerKernel.Initialized[buildIndex] = false;
       LayerKernel.LoadJobs.Add(SceneManager.LoadSceneAsync(buildIndex, LoadSceneMode.Additive));
     }
 
