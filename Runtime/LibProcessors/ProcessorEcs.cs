@@ -38,7 +38,11 @@ namespace Pixeye.Actors
       if (ent.Released.length > 0)
       {
         ref var pop = ref ent.Released.source[--ent.Released.length];
-        entity.id = pop.id;
+        var     id  = pop.id;
+        entity.byte1 = (byte) id;
+        entity.byte2 = (byte) (id >> 0x8);
+        entity.byte3 = (byte) (id >> 0x10);
+
         unchecked
         {
           entity.age = pop.age;
@@ -46,8 +50,11 @@ namespace Pixeye.Actors
       }
       else
       {
-        entity.id  = ent.NextID++;
-        entity.age = 0;
+        var id = ent.NextID++;
+        entity.byte1 = (byte) id;
+        entity.byte2 = (byte) (id >> 0x8);
+        entity.byte3 = (byte) (id >> 0x10);
+        entity.age   = 0;
       }
 
       var prevEntitiesLength = Entities.Length;

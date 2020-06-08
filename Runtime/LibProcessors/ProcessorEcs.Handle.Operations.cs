@@ -215,7 +215,7 @@ namespace Pixeye.Actors
             for (var ii = 0; ii < LayerKernel.Settings.SizeGenerations; ii++)
               eManaged.signature[ii] = 0;
 
- 
+
             eManaged.childs.length = 0;
 
             if (eManaged.transform != null)
@@ -331,7 +331,7 @@ namespace Pixeye.Actors
           nextGroup.added.length   = 0;
         }
 #endif
-        for (var i = 0; i < Actors.Storage.lastID; i++)
+        for (var i = 0; i < Storage.lastID; i++)
         {
           var storage = Storage.All[i];
           storage.Dispose(storage.toDispose);

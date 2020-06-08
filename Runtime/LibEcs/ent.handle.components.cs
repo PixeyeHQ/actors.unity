@@ -262,6 +262,7 @@ namespace Pixeye.Actors
     public void Release()
     {
       DebugDestroyed(this);
+      meta->isAlive = false;
       ref var _managed = ref managed;
       foreach (var child in _managed.childs)
         child.Release();

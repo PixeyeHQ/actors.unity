@@ -5,14 +5,12 @@
 using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using Unity.IL2CPP.CompilerServices;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
 namespace Pixeye.Actors
 {
-  [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Unicode)]
   public unsafe partial struct ent
   {
     //===============================//
@@ -26,8 +24,24 @@ namespace Pixeye.Actors
     //===============================//
     // Entity
     //===============================//
-    public int id;
+
     internal byte age;
+    internal byte byte1;
+    internal byte byte2;
+    internal byte byte3;
+
+    public int id
+    {
+      [MethodImpl(MethodImplOptions.AggressiveInlining)]
+      get => byte1 | (byte2 << 0x8) | (byte3 << 0x10);
+      [MethodImpl(MethodImplOptions.AggressiveInlining)]
+      set
+      {
+        byte1 = (byte) value;
+        byte2 = (byte) (value >> 0x8);
+        byte3 = (byte) (value >> 0x10);
+      }
+    }
 
     public ref readonly Transform transform
     {
@@ -47,8 +61,10 @@ namespace Pixeye.Actors
 
     public ent(int value)
     {
-      id  = value;
-      age = 0;
+      byte1 = (byte) value;
+      byte2 = (byte) (value >> 0x8);
+      byte3 = (byte) (value >> 0x10);
+      age   = 0;
     }
 
     public override int GetHashCode()
