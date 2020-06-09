@@ -35,6 +35,14 @@ namespace Pixeye.Actors
       return entity;
     }
 
+    public ent Create(ModelComposer model)
+    {
+      processorEcs.Create(out var entity);
+      model(entity);
+      processorEcs.SetOperation(entity, -1, ProcessorEcs.Action.Activate);
+      return entity;
+    }
+    
     public ent Create(string prefabID, ModelComposer model, Vector3 position = default, bool pooled = false)
     {
       processorEcs.Create(out var entity, pooled);

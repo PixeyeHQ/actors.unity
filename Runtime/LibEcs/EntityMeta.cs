@@ -96,6 +96,18 @@ namespace Pixeye.Actors
         }
       }
     }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool AlreadyInGroup(int groupID)
+    {
+      for (var gIndex = 0; gIndex < groupsAmount; gIndex++)
+      {
+        if (groups[gIndex] == groupID) return true;
+      }
+
+      return false;
+    }
+    
   }
 
   public struct EntityManagedMeta

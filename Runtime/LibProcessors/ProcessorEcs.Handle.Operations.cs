@@ -107,7 +107,7 @@ namespace Pixeye.Actors
             for (int j = 0; j < eMeta->componentsAmount; j++)
             {
               var componentID = eMeta->components[j];
-              var storage     = Actors.Storage.All[componentID];
+              var storage     = Storage.All[componentID];
               //var generation  = Storage.Generations[componentID];
               //var mask        = Storage.Masks[componentID];
               var groups = storage.groups[eManaged.layer.id];
@@ -120,6 +120,7 @@ namespace Pixeye.Actors
                 var group = groups.Elements[l];
                 if (group.composition.Check(eMeta, ref eManaged))
                 {
+                  if (eMeta->AlreadyInGroup(group.id)) continue;
                   group.Insert(operation.entity);
                   eMeta->AddGroup(group.id);
                 }
