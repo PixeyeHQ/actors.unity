@@ -19,15 +19,15 @@ namespace Pixeye.Actors
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static bool Overlaps(this int[] tags, EntityMeta* meta)
     {
-      ref var entityTags = ref meta->tags;
-      int     len        = entityTags.length;
+      ref var entityTags    = ref meta->tags;
+      int     entityLenTags = entityTags.length;
 
       for (int l = 0; l < tags.Length; l++)
       {
         var next = tags[l];
-        for (int i = 0; i < len; i++)
+        for (int i = 0; i < entityLenTags; i++)
         {
-          ref var tag = ref entityTags.GetElementByRef(i);
+          var tag = entityTags.GetElement(i);
           if (tag == next) return true;
         }
       }
@@ -39,16 +39,17 @@ namespace Pixeye.Actors
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static bool IsSubsetOf(this int[] tags, EntityMeta* meta)
     {
-      ref var entityTags = ref meta->tags;
-      int     len        = tags.Length;
+      ref var entityTags    = ref meta->tags;
+      int     entityLenTags = entityTags.length;
+
 
       var match = 0;
       for (int l = 0; l < tags.Length; l++)
       {
         var next = tags[l];
-        for (int i = 0; i < len; i++)
+        for (int i = 0; i < entityLenTags; i++)
         {
-          ref var tag = ref entityTags.GetElementByRef(i);
+          var tag = entityTags.GetElement(i);
           if (tag == next) match++;
         }
       }
