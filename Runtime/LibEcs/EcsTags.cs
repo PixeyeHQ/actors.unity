@@ -92,9 +92,9 @@ namespace Pixeye.Actors
       RemoveAt(index);
     }
 
-    internal ref ushort GetElementByRef(int index)
+    internal ushort GetElement(int index)
     {
-      return ref tags[index];
+      return tags[index];
     }
 
 
