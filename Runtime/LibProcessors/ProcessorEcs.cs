@@ -40,7 +40,7 @@ namespace Pixeye.Actors
       if (ent.Released.length > 0)
       {
         ref var pop = ref ent.Released.source[--ent.Released.length];
-        entity.id = pop.id;
+        entity.id  = pop.id;
         entity.age = pop.age;
       }
       else
@@ -68,9 +68,11 @@ namespace Pixeye.Actors
       managed.layer    = layer;
       managed.isPooled = isPooled;
 
-      ptr->age     = entity.age;
-      ptr->isAlive = true;
-      ptr->isDirty = true;
+      ptr->age              = entity.age;
+      ptr->isAlive          = true;
+      ptr->isDirty          = true;
+      ptr->componentsAmount = 0;
+      ptr->groupsAmount     = 0;
 
       entities.Add(entity);
     }
@@ -107,6 +109,7 @@ namespace Pixeye.Actors
 
         meta->isAlive          = false;
         meta->componentsAmount = 0;
+        meta->groupsAmount     = 0;
         meta->age              = 0;
 
         ent.Released.Add(new ent(entity.id));
