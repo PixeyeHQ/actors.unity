@@ -42,7 +42,7 @@ namespace Pixeye.Actors
       var fType = new List<int>();
       for (int i = 0; i < args.Length; i++)
       {
-        fType.Add(ByName(args[i]).GetHashCode());
+        fType.Add(Storage.TypeNames[ByName(args[i]).GetHashCode()]);
       }
 
 
