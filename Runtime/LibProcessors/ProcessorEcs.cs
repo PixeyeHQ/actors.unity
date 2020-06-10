@@ -120,9 +120,9 @@ namespace Pixeye.Actors
 
       for (int i = 0; i < groups.Count; i++)
       {
-        Groups.Remove(groups[i]);
+      //  Groups.Remove(groups[i]);
         groups[i].Dispose();
-        groups[i] = null;
+ 
       }
 
       groups.Clear();

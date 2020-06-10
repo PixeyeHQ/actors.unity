@@ -94,10 +94,12 @@ namespace Pixeye.Actors
 
     GroupCore SetupGroup(Type groupType, object fieldObj, Composition composition, LayerCore layer)
     {
-      foreach (var groupNext in groups)
+      foreach (var groupNext in Groups)
       {
-        if (groupNext.composition.hash.value == composition.hash.value)
+        if (groupNext.composition.hash.value == composition.hash.value && groupNext.layer.id == layer.id)
         {
+          if (!groupNext.initialized)
+            groupNext.Initialize(composition, layer);
           return groupNext;
         }
       }

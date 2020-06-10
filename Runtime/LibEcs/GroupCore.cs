@@ -21,7 +21,6 @@ namespace Pixeye.Actors
   }
 
 
-  
   [Preserve]
   [Il2CppSetOption(Option.NullChecks, false)]
   [Il2CppSetOption(Option.ArrayBoundsChecks, false)]
@@ -32,6 +31,8 @@ namespace Pixeye.Actors
 
     public int length;
 
+
+    internal bool initialized = false;
     internal ProcessorEcs processorEcs;
     internal LayerCore layer;
 
@@ -101,8 +102,6 @@ namespace Pixeye.Actors
       for (var i = 0; i < composition.excluded.Length; i++)
       {
         ref var m = ref composition.excluded[i];
-
-
         Storage.All[m.id].groups[layer.id].Add(this);
       }
 
@@ -254,6 +253,7 @@ namespace Pixeye.Actors
 
     public virtual void Dispose()
     {
+      initialized = false;
 #if ACTORS_EVENTS_MANUAL
       hasEventAdd = false;
       hasEventRemove = false;
@@ -472,21 +472,21 @@ namespace Pixeye.Actors
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
       internal Enumerator(GroupCore groupEntities)
       {
-        position           = -1;
         this.groupEntities = groupEntities;
+        position           = -1;
         groupEntities.processorEcs.Execute();
       }
 
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
       public bool MoveNext()
       {
-        if (++position < groupEntities.length)
-        {
-          groupEntities.processorEcs.Execute();
-          return true;
-        }
+        // if (++position < groupEntities.length)
+        // {
+        //   groupEntities.processorEcs.Execute();
+        //   return true;
+        // }
 
-        return false;
+        return ++position < groupEntities.length;
       }
 
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
