@@ -31,6 +31,8 @@ namespace Pixeye.Actors
 
     public int length;
 
+
+    internal bool initialized = false;
     internal ProcessorEcs processorEcs;
     internal LayerCore layer;
 
@@ -100,8 +102,6 @@ namespace Pixeye.Actors
       for (var i = 0; i < composition.excluded.Length; i++)
       {
         ref var m = ref composition.excluded[i];
-
-
         Storage.All[m.id].groups[layer.id].Add(this);
       }
 
@@ -253,6 +253,7 @@ namespace Pixeye.Actors
 
     public virtual void Dispose()
     {
+      initialized = false;
 #if ACTORS_EVENTS_MANUAL
       hasEventAdd = false;
       hasEventRemove = false;

@@ -327,9 +327,9 @@ namespace Pixeye.Actors
             nextGroup.added.length = 0;
         }
 #else
-        for (var ii = 0; ii < Groups.Count; ii++)
+        for (var ii = 0; ii < groups.Count; ii++)
         {
-          var nextGroup = Groups[ii];
+          var nextGroup = groups[ii];
           nextGroup.removed.length = 0;
           nextGroup.added.length   = 0;
         }
