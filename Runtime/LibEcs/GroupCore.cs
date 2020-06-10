@@ -21,7 +21,6 @@ namespace Pixeye.Actors
   }
 
 
-  
   [Preserve]
   [Il2CppSetOption(Option.NullChecks, false)]
   [Il2CppSetOption(Option.ArrayBoundsChecks, false)]
@@ -472,21 +471,21 @@ namespace Pixeye.Actors
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
       internal Enumerator(GroupCore groupEntities)
       {
-        position           = -1;
         this.groupEntities = groupEntities;
+        position           = -1;
         groupEntities.processorEcs.Execute();
       }
 
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
       public bool MoveNext()
       {
-        if (++position < groupEntities.length)
-        {
-          groupEntities.processorEcs.Execute();
-          return true;
-        }
+        // if (++position < groupEntities.length)
+        // {
+        //   groupEntities.processorEcs.Execute();
+        //   return true;
+        // }
 
-        return false;
+        return ++position < groupEntities.length;
       }
 
       [MethodImpl(MethodImplOptions.AggressiveInlining)]

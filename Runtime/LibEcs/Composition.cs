@@ -53,7 +53,7 @@ namespace Pixeye.Actors
       if (types != null)
       {
         excluded = new ComponentMask[types.Length];
-
+ 
         for (int i = 0; i < types.Length; i++)
         {
           var t = types[i];
