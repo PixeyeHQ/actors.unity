@@ -88,13 +88,9 @@ namespace Pixeye.Actors
     public Transform Spawn(GameObject prefab, Transform parent, Vector3 startPosition = default,
       Quaternion startRotation = default)
     {
-      var tr = GameObject
+      return GameObject
         .Instantiate(prefab, parent.TransformPoint(startPosition), startRotation * parent.rotation, parent)
         .transform;
-
-      SceneManager.MoveGameObjectToScene(tr.gameObject, layer.Scene);
-      //tr.SetAsLastSibling();
-      return tr;
     }
 
     public T Spawn<T>(GameObject prefab, Transform parent, Vector3 startPosition = default,
@@ -114,12 +110,10 @@ namespace Pixeye.Actors
     public Transform Spawn(int poolID, GameObject prefab, Transform parent, Vector3 startPosition = default,
       Quaternion startRotation = default)
     {
-      var tr = layer.pool.pools[poolID].Spawn(prefab, startPosition, startRotation, parent).transform;
-
-      SceneManager.MoveGameObjectToScene(tr.gameObject, layer.Scene);
+      //SceneManager.MoveGameObjectToScene(tr.gameObject, layer.Scene);
       //tr.SetAsLastSibling();
 
-      return tr;
+      return layer.pool.pools[poolID].Spawn(prefab, startPosition, startRotation, parent).transform;
     }
 
     public T Spawn<T>(int poolID, GameObject prefab, Transform parent, Vector3 startPosition = default,
@@ -164,28 +158,19 @@ namespace Pixeye.Actors
     public Transform Spawn(string prefabID, Transform parent, Vector3 startPosition = default,
       Quaternion startRotation = default)
     {
-      var tr = GameObject.Instantiate(Box.Get<GameObject>(prefabID), parent.TransformPoint(startPosition),
+      return GameObject.Instantiate(Box.Get<GameObject>(prefabID), parent.TransformPoint(startPosition),
         startRotation * parent.rotation, parent).transform;
-
-
-      SceneManager.MoveGameObjectToScene(tr.gameObject, layer.Scene);
-      //tr.SetAsLastSibling();
-
-      return tr;
     }
 
     public T Spawn<T>(string prefabID, Transform parent, Vector3 startPosition = default,
       Quaternion startRotation = default)
     {
-      var o = Spawn(prefabID, parent, startPosition, startRotation).GetComponentInChildren<T>();
-      return o;
+      return Spawn(prefabID, parent, startPosition, startRotation).GetComponentInChildren<T>();
     }
 
     public T Spawn<T>(string prefabID, Vector3 startPosition = default, Quaternion startRotation = default)
     {
-      var o = Spawn(prefabID, startPosition, startRotation).GetComponentInChildren<T>();
-
-      return o;
+      return Spawn(prefabID, startPosition, startRotation).GetComponentInChildren<T>();
     }
 
     // Pooled
@@ -194,34 +179,26 @@ namespace Pixeye.Actors
     {
       var tr = layer.pool.pools[poolID].Spawn(Box.Get<GameObject>(prefabID), startPosition, startRotation).transform;
       SceneManager.MoveGameObjectToScene(tr.gameObject, layer.Scene);
-
-      //tr.SetAsLastSibling();
-
       return tr;
     }
 
     public Transform Spawn(int poolID, string prefabID, Transform parent, Vector3 startPosition = default,
       Quaternion startRotation = default)
     {
-      var tr = layer.pool.pools[poolID].Spawn(Box.Get<GameObject>(prefabID), startPosition, startRotation, parent)
+      return layer.pool.pools[poolID].Spawn(Box.Get<GameObject>(prefabID), startPosition, startRotation, parent)
         .transform;
-      SceneManager.MoveGameObjectToScene(tr.gameObject, layer.Scene);
-      //tr.SetAsLastSibling();
-      return tr;
     }
 
     public T Spawn<T>(int poolID, string prefabID, Transform parent, Vector3 startPosition = default,
       Quaternion startRotation = default)
     {
-      var o = Spawn(poolID, prefabID, parent, startPosition, startRotation).GetComponentInChildren<T>();
-      return o;
+      return Spawn(poolID, prefabID, parent, startPosition, startRotation).GetComponentInChildren<T>();
     }
 
     public T Spawn<T>(int poolID, string prefabID, Vector3 startPosition = default,
       Quaternion startRotation = default)
     {
-      var o = Spawn(poolID, prefabID, startPosition, startRotation).GetComponentInChildren<T>();
-      return o;
+      return Spawn(poolID, prefabID, startPosition, startRotation).GetComponentInChildren<T>();
     }
 
     #endregion

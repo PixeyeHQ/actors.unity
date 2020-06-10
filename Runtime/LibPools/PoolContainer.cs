@@ -200,7 +200,7 @@ namespace Pixeye.Actors
     }
 
     [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
-    private void Populate(GameObject prefab, int key)
+    void Populate(GameObject prefab, int key)
     {
       var go = Object.Instantiate(prefab);
       go.SetActive(false);
