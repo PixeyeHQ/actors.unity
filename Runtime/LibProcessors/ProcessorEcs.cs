@@ -118,11 +118,17 @@ namespace Pixeye.Actors
       entities.length = 0;
       entities        = null;
 
+      for (var i = 0; i < Storage.lastID; i++)
+      {
+        var storage = Storage.All[i];
+        storage.Dispose(storage.toDispose);
+        storage.toDispose.length = 0;
+      }
+
       for (int i = 0; i < groups.Count; i++)
       {
-      //  Groups.Remove(groups[i]);
+        //  Groups.Remove(groups[i]);
         groups[i].Dispose();
- 
       }
 
       groups.Clear();

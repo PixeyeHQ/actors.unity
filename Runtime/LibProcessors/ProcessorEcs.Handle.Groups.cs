@@ -122,7 +122,7 @@ namespace Pixeye.Actors
         }
         else
         {
-          var gr = (System.Activator.CreateInstance(groupType, true) as GroupCore);
+          var gr = (Activator.CreateInstance(groupType, true) as GroupCore);
 
           gr.Initialize(composition, layer);
           gr.id = GroupNextID++;
