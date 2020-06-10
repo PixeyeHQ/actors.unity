@@ -185,6 +185,7 @@ namespace Pixeye.Actors
       {
         processors[i].Receive();
         ticksProc[i].Tick(delta);
+        layer.processorEcs.Execute();
       }
     }
 
