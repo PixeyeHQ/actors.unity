@@ -1,8 +1,7 @@
 ﻿
 using Pixeye.Actors;
-using UnityEngine;
 
-namespace Pixeye.Source
+##NAMESPACE##
 {
   sealed class ##NAME## : Processor, ITick
   {

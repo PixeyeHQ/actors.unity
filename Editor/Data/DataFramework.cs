@@ -10,6 +10,8 @@ namespace Pixeye.Actors
 {
   static class DataFramework
   {
+    
+
     public static bool eventsManual
     {
       get => EditorPrefs.GetBool("hba.data.eventsManual", false);
@@ -52,7 +54,8 @@ namespace Pixeye.Actors
       set => EditorPrefs.SetString("hba.path.tags", value);
     }
 
-    public static string pathTags => Directory.GetCurrentDirectory() + EditorPrefs.GetString("hba.path.tags", @"\Assets\Runtime\Tags");
+    public static string pathTags => Directory.GetCurrentDirectory() +
+                                     EditorPrefs.GetString("hba.path.tags", @"\Assets\Runtime\Tags");
   }
 }
 
