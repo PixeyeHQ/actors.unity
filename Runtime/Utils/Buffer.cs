@@ -18,7 +18,7 @@ namespace Pixeye.Actors
       layers[layerID] = this;
     }
 
-    public int length;
+    public int length; 
     int layerID;
 
     int[] queue;

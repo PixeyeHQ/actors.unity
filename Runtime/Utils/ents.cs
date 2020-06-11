@@ -56,7 +56,7 @@ namespace Pixeye.Actors
     public void Add(ent entity)
     {
       if (length >= source.Length)
-        Array.Resize(ref source, length + length / 4);
+        Array.Resize(ref source, length << 1);
 
       source[length++] = entity;
     }
@@ -67,7 +67,7 @@ namespace Pixeye.Actors
       foreach (var e in entity)
       {
         if (length >= source.Length)
-          Array.Resize(ref source, length + length / 4);
+          Array.Resize(ref source, length << 1);
 
         source[length++] = e;
       }
