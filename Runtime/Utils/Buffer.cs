@@ -8,10 +8,18 @@ namespace Pixeye.Actors
   [Il2CppSetOption(Option.NullChecks, false)]
   [Il2CppSetOption(Option.ArrayBoundsChecks, false)]
   [Il2CppSetOption(Option.DivideByZeroChecks, false)]
-  public class Buffer<T> : IEnumerable where T : struct
+  public class Buffer<T> : IRequireActorsLayer, IDisposable, IEnumerable where T : struct
   {
-    public static Buffer<T> Instance;
+    internal static Buffer<T>[] layers = new Buffer<T>[LayerKernel.LAYERS_AMOUNT_TOTAL];
+
+    public void Bootstrap(LayerCore layer)
+    {
+      layerID         = layer.id;
+      layers[layerID] = this;
+    }
+
     public int length;
+    int layerID;
 
     int[] queue;
     int[] pointers;
@@ -27,13 +35,18 @@ namespace Pixeye.Actors
       elements = new T[size];
     }
 
+    public Buffer()
+    {
+      queue    = new int[64];
+      pointers = new int[64];
+      elements = new T[64];
+    }
 
     public void Clear()
     {
       length     = 0;
       queueIndex = 0;
     }
-
 
     public ref T Add(out int pointer)
     {
@@ -131,7 +144,7 @@ namespace Pixeye.Actors
       public int Current
       {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        get { return position; }
+        get => position;
       }
 
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -142,5 +155,11 @@ namespace Pixeye.Actors
     }
 
     #endregion
+
+    public void Dispose()
+    {
+      length          = 0;
+      layers[layerID] = null;
+    }
   }
 }
