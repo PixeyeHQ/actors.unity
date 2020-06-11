@@ -63,8 +63,7 @@ namespace Pixeye.Actors
     protected virtual void OnDispose()
     {
     }
-
-
+    
     void IReceiveEcsEvent.Receive()
     {
     }

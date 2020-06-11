@@ -54,6 +54,12 @@ namespace Pixeye.Actors
       LayerKernel.LayersInUse.Add(this);
     }
 
+    public Buffer<Y> GetBuffer<Y>() where Y : struct
+    {
+      return Buffer<Y>.layers[id];
+    }
+
+
     #region SIGNALS
 
     public void Send<T>(in T signal)
