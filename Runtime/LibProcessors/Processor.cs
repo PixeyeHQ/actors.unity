@@ -11,7 +11,7 @@ namespace Pixeye.Actors
     void Receive();
   }
 
-  public abstract class Processor : IDisposable, IRequireActorsLayer, ITick, IReceiveEcsEvent
+  public abstract class Processor : IDisposable, IRequireActorsLayer, IReceiveEcsEvent
   {
     internal static int NEXT_FREE_ID;
     internal int processorID;
@@ -29,7 +29,7 @@ namespace Pixeye.Actors
       Layer = layer;
       // This increment is dropped every added layer, check layer implementation.
       // The ID is used for working with ECS signals.
-      processorID    = NEXT_FREE_ID++;  
+      processorID = NEXT_FREE_ID++;
       layer.Engine.AddProc(this);
       layer.processorEcs.Add(this);
       layer.processorEcs.processors.Add(this);
@@ -65,13 +65,10 @@ namespace Pixeye.Actors
     }
 
 
-    void ITick.Tick(float dt)
-    {
-    }
-
     void IReceiveEcsEvent.Receive()
     {
     }
+ 
   }
 
   #region PROCESSORS
