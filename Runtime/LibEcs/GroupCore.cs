@@ -734,6 +734,7 @@ namespace Pixeye.Actors
     public override void Dispose()
     {
       base.Dispose();
+
       Storage<T>.Instance.groups[layer.id].Remove(this);
       Storage<Y>.Instance.groups[layer.id].Remove(this);
       Storage<U>.Instance.groups[layer.id].Remove(this);

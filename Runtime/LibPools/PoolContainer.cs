@@ -179,7 +179,6 @@ namespace Pixeye.Actors
     public void Despawn(GameObject go)
     {
       go.SetActive(false);
-
       cachedObjects[cachedIds[go.GetInstanceID()]].Push(go);
     }
 
