@@ -47,7 +47,7 @@ namespace Pixeye.Actors
       {
         id = NEXT_FREE_ID++;
         USED_IDS.Add(gameObject.scene.name, id);
-      }  
+      }
 
 
       Time = new Time();
@@ -157,7 +157,7 @@ namespace Pixeye.Actors
 
     #region POOLING
 
-    internal List<PoolNode> nodes = new List<PoolNode>();
+    [SerializeField] [HideInInspector] internal List<PoolNode> nodes = new List<PoolNode>();
 #if UNITY_EDITOR
     public void ClearNodes()
     {
@@ -218,6 +218,7 @@ namespace Pixeye.Actors
         node.pool        = pool;
         node.createdObjs = new List<GameObject>();
         node.createdObjs.Add(instance);
+
         nodes.Add(node);
       }
     }
