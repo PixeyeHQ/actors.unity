@@ -1,5 +1,6 @@
 //  Project  : ACTORS
 //  Contacts : Pixeye - ask@pixeye.games
+
 using UnityEditor;
 using UnityEngine;
 
@@ -8,9 +9,6 @@ namespace Pixeye.Actors
 {
   public class EditorWindowFramework : EditorWindow
   {
-    
-   
-    
     [MenuItem("Tools/Actors/Preferences", priority = -200)]
     public static void ShowWindow()
     {
@@ -19,7 +17,7 @@ namespace Pixeye.Actors
 
     void OnGUI()
     {
-      DataFramework.nameSpace = EditorGUILayout.TextField("Namespace: ", DataFramework.nameSpace);
+      DataFramework.nameSpace      = EditorGUILayout.TextField("Namespace: ", DataFramework.nameSpace);
       DataFramework.pathTagsEditor = EditorGUILayout.TextField("Tags path: ", DataFramework.pathTagsEditor);
     }
   }
@@ -49,8 +47,8 @@ namespace Pixeye.Actors
 
         if (t >= 0.3f)
         {
-          t -= 0.3f;
-          needToRepaint = false;
+          t             -= 0.3f;
+          needToRepaint =  false;
         }
       }
     }
