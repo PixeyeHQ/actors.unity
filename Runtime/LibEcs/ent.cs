@@ -35,6 +35,12 @@ namespace Pixeye.Actors
       get => ref ProcessorEcs.EntitiesManaged[id].transform;
     }
 
+    public LayerCore layer
+    {
+      [MethodImpl(MethodImplOptions.AggressiveInlining)]
+      get => ProcessorEcs.EntitiesManaged[id].layer;
+    }
+
     public bool exist
     {
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
