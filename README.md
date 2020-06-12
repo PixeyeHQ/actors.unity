@@ -180,6 +180,7 @@ public class ProcessorAlpaca : Processor, ITick
       {
         var routine = Layer.Run(CoHangWithAlpaca()); // run routine and get routine call.
         routine.Stop(); // stop the routine
+        routine = Layer.RunUnscaled(CoHangWithAlpaca()); // run routine that ignores time scale.
       }
   }
 }
@@ -199,12 +200,13 @@ IEnumerator CoWorld()
       yield return Layer.Run(CoHello()).Wait();
       Debug.Log("World !");
     }
-    IEnumerator CoHello()
+IEnumerator CoHello()
     {
       Debug.Log("Hello");
       yield return Layer.Wait(1.0f);
     }
 ```
+
 
 
 
