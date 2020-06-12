@@ -43,7 +43,7 @@ namespace Pixeye.Actors
       // When childs are initialized manually from the parent, layer will treat them as eligable
       // objects to bootstrap. To prevent double bootstrap we check the layer. If it is not null
       // then we know that the monocache was already activated.
-      if (layer != null) return;
+      if (Layer != null) return;
       Layer = layer;
       Setup();
       HandleEnable();
