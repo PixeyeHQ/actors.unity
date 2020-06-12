@@ -21,6 +21,7 @@ namespace Pixeye.Actors
     protected virtual void Start()
     {
       if (!LayerKernel.Instance || !LayerKernel.Initialized[gameObject.scene.buildIndex]) return;
+      Layer = LayerKernel.Layers[gameObject.scene.buildIndex];
       Setup();
     }
 

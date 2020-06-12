@@ -1,5 +1,7 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using UnityEngine;
 
 
 namespace Pixeye.Actors
@@ -43,6 +45,17 @@ namespace Pixeye.Actors
       }
     }
 
+    public static ent GetEntity(this GameObject obj)
+    {
+     var actor = obj.GetComponent<Actor>();
+#if UNITY_EDITOR
+      if (actor == null)
+      {
+        throw new Exception("You can receive entity from a gameobject that have an actor component.");
+      }
+#endif
+      return actor.entity;
+    }
 
     internal static bool IsSubsetOf(this bool[] signature, EntityMeta* meta)
     {
@@ -72,7 +85,7 @@ namespace Pixeye.Actors
     internal static bool Overlaps(this ComponentMask[] signature, ref EntityManagedMeta managed)
     {
       ref var generations = ref managed.signature;
-      
+
       for (var i = 0; i < signature.Length; i++)
       {
         if ((generations[signature[i].generation] & signature[i].mask) == signature[i].mask)
