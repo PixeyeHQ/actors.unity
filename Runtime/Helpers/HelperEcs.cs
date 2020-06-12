@@ -47,7 +47,7 @@ namespace Pixeye.Actors
 
     public static ent GetEntity(this GameObject obj)
     {
-     var actor = obj.GetComponent<Actor>();
+      var actor = obj.GetComponent<Actor>();
 #if UNITY_EDITOR
       if (actor == null)
       {
