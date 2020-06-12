@@ -159,11 +159,10 @@ As already said, layers are very important part of the framework. Each layer rep
 
 ### 📘 Routine Overview
 **Routines** are custom coroutines that can work outside of Unity scope and more performant than native Unity coroutines.
-Routines work inside of a **layer** and will be stopped if the layer they work on would be destroyed.
+Routines work inside of a **layer** and will be stopped if the layer they work on would be destroyed. Routines have similar to Coroutines API so it will be very easy to start using them.
 There are two types of routines:
 * **Scaled**  : These routines are affected by layer's time scale.
 * **Unscaled**: These routines are not affected by layer's time scale.
-
 
 ```csharp
 public class ProcessorAlpaca : Processor, ITick
@@ -179,12 +178,34 @@ public class ProcessorAlpaca : Processor, ITick
   {
       if (Input.GetKeyDown(KeyCode.Alpha1))
       {
-        var routine = Layer.Run(CoHangWithAlpaca());
+        var routine = Layer.Run(CoHangWithAlpaca()); // run routine and get routine call.
         routine.Stop(); // stop the routine
       }
   }
 }
 ```
+**🔖 Wait for** are delayed actions based on coroutines.
+```csharp
+if (Input.GetKeyDown(KeyCode.Alpha1))
+{
+   Layer.WaitFor(1.0f, () => { Debug.Log("Hello!"); });
+}
+```
+
+**🔖 Wait** is used to wait for a period of time or to finish another routine.
+```csharp
+IEnumerator CoWorld()
+    {
+      yield return Layer.Run(CoHello()).Wait();
+      Debug.Log("World !");
+    }
+    IEnumerator CoHello()
+    {
+      Debug.Log("Hello");
+      yield return Layer.Wait(1.0f);
+    }
+```
+
 
 
 ## 📖 How to Install  
