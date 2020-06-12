@@ -151,6 +151,8 @@ namespace Pixeye.Actors
         if (transform.parent != parent)
           transform.SetParent(parent);
 
+        transform.position = position;
+        transform.rotation = rotation;
         transform.gameObject.SetActive(true);
 
         return obj;
