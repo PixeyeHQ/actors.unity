@@ -160,8 +160,6 @@ As already said, layers are very important part of the framework. Each layer rep
 ### 📘 Buffers Overview
 **Buffers** are iterators for structs. Buffers perform simple actions that don't require composition and ECS stuff. Buffers designed to be fast and despite their dynamic nature, they don't copy structs every time buffer grows. Instead, buffer uses an array of indexes to refer to the struct.
 
-> 💡 Custom particles or objects that are created and destroyed a lot are ideal candidates for buffers.
-
 **💬 How to use buffers?**
 
 👉 Create new struct. I prefer to call them segments.
@@ -226,8 +224,8 @@ public class ProcessorShoot : Processor, ITick
 }
 ```
 
-> 💡 Remember that you receive pointer when iterating buffers. Use the pointer both to get struct or to remove struct from the buffer.
-
+> 💡 Remember that you receive pointer when iterating buffers. Use the pointer both to get struct or to remove struct from the buffer.   
+> 💡 Custom particles or objects that are created and destroyed a lot are ideal candidates for buffers.
 
 
 ### 📘 Routine Overview
