@@ -146,7 +146,7 @@ As already said, layers are very important part of the framework. Each layer rep
   * **Observer** : Reactive observer for any variable.
   * **Time**     : API for custom timing on the layer.
   * **Obj**      : API for instantiating prefabs on the layer.
-
+ 
 * **Private Layer Modules**
   * **Pool**     : Module that controls GameObject pooling. 
   * **Signals**  : Module that controls signals, a global event dispatcher.
@@ -157,13 +157,81 @@ As already said, layers are very important part of the framework. Each layer rep
   * **Monocache**  : Base monobehavior classes in the framework. They get the reference of a layer when initialized.
   * **Actors**     : Inherited from monocache class. They represent entity view.
 
+### 📘 Buffers Overview
+**Buffers** are iterators for structs. Buffers perform simple actions that don't require composition and ECS stuff. Buffers designed to be fast and despite their dynamic nature, they don't copy structs every time buffer grows. Instead, buffer uses an array of indexes to refer to the struct.
+
+**💬 How to use buffers?**
+
+Create new struct. I prefer to call them segments.
+```csharp
+  public struct SegmentShoot
+  {
+    public Transform obj;
+    public Vector3 position;
+    public float speed;
+  }
+```
+Register new buffer via layer setup.
+```csharp
+using Pixeye.Actors;
+
+public class LayerGame : Layer<LayerGame>
+{
+  protected override void Setup()
+  {
+    // the order affects on execution
+    Add<ProcessorShoot>(); // we will use this processor for our buffer.
+    Add<Buffer<SegmentShoot>>(); // register new buffer.
+  }
+}
+```
+Add a new segment to the buffer.
+```csharp
+ ref var segShoot = ref Layer.GetBuffer<SegmentShoot>().Add();
+ segShoot.obj             =  bullet;
+ segShoot.position        = position;
+ segShoot.speed           = 10f;
+```
+If you need to cache the pointer to the segment in the buffer than use slightly different method:
+
+```csharp
+ var pointer = 0;
+ ref var segShoot = ref Layer.GetBuffer<SegmentShoot>().Add(out pointer);
+ segShoot.obj             =  bullet;
+ segShoot.position        = position;
+ segShoot.speed           = 10f;
+```
+Use Processor to work with your buffer. You are not forced to use processors but it's a convenient way.
+```csharp
+public class ProcessorShoot : Processor, ITick
+{
+    public void Tick(float dt)
+    {
+      var shoots     = Layer.GetBuffer<SegmentShoot>(); // receive buffer.
+      foreach (var pointer in shoots) // remember that we get a pointer, not the element of the buffer.
+      {
+        ref var source   = ref shoots[pointer];
+        ref var position = ref source.position;
+        position.x += source.speed * dt;
+        if (position.x >= 100)
+        {
+            shoots.RemoveAt(pointer); // remove buffer element by pointer.
+        }
+      }
+    }
+}
+```
+
+> 💡 Remember that you receive pointer when iterating buffers. Use the pointer both to get struct or to remove struct from the buffer.   
+> 💡 Custom particles or objects that are created and destroyed a lot are ideal candidates for buffers.
+
+
 ### 📘 Routine Overview
 **Routines** are custom coroutines that can work outside of Unity scope and more performant than native Unity coroutines.
-Routines work inside of a **layer** and will be stopped if the layer they work on would be destroyed.
+Routines work inside of a **layer** and will be stopped if the layer they work on would be destroyed. Routines have similar to Coroutines API so it will be very easy to start using them.
 There are two types of routines:
 * **Scaled**  : These routines are affected by layer's time scale.
 * **Unscaled**: These routines are not affected by layer's time scale.
-
 
 ```csharp
 public class ProcessorAlpaca : Processor, ITick
@@ -179,12 +247,36 @@ public class ProcessorAlpaca : Processor, ITick
   {
       if (Input.GetKeyDown(KeyCode.Alpha1))
       {
-        var routine = Layer.Run(CoHangWithAlpaca());
+        var routine = Layer.Run(CoHangWithAlpaca()); // run routine and get routine call.
         routine.Stop(); // stop the routine
+        routine = Layer.RunUnscaled(CoHangWithAlpaca()); // run routine that ignores time scale.
       }
   }
 }
 ```
+**🔖 Wait for** are delayed actions based on coroutines.
+```csharp
+if (Input.GetKeyDown(KeyCode.Alpha1))
+{
+   Layer.WaitFor(1.0f, () => { Debug.Log("Hello!"); });
+}
+```
+
+**🔖 Wait** is used to wait for a period of time or to finish another routine.
+```csharp
+IEnumerator CoWorld()
+    {
+      yield return Layer.Run(CoHello()).Wait();
+      Debug.Log("World !");
+    }
+IEnumerator CoHello()
+    {
+      Debug.Log("Hello");
+      yield return Layer.Wait(1.0f);
+    }
+```
+
+
 
 
 ## 📖 How to Install  

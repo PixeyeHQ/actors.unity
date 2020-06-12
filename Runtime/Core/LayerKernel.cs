@@ -226,7 +226,10 @@ namespace Pixeye.Actors
 
       var progress = 0f;
       for (var i = 0; i < LoadJobs.Count; i++)
+      {
         progress += LoadJobs[i].progress;
+      }
+
       var ratio = progress / LoadJobs.Count;
       OnSceneLoading(ratio);
       if (ratio == 1)

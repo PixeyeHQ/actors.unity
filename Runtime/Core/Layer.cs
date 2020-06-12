@@ -16,15 +16,15 @@ namespace Pixeye.Actors
   /// A scene point of entry. The developer defines here scene dependencies and processing that will work on the scene. 
   public abstract class Layer<T> : LayerCore
   {
-    public static new ProcessorUpdate Engine => LayerTyped.core.Engine;
-    public static new ImplEntity Entity => LayerTyped.core.Entity;
-    public static new ImplEcs Ecs => LayerTyped.core.Ecs;
-    public static new ImplObserver Observer => LayerTyped.core.Observer;
-    public static new ImplActor Actor => LayerTyped.core.Actor;
-    public static new Time Time => LayerTyped.core.Time;
-    public static new ImplObj Obj => LayerTyped.core.Obj;
+    public static new ProcessorUpdate Engine => Instance.core.Engine;
+    public static new ImplEntity Entity => Instance.core.Entity;
+    public static new ImplEcs Ecs => Instance.core.Ecs;
+    public static new ImplObserver Observer => Instance.core.Observer;
+    public static new ImplActor Actor => Instance.core.Actor;
+    public static new Time Time => Instance.core.Time;
+    public static new ImplObj Obj => Instance.core.Obj;
 
-    internal static Layer<T> LayerTyped;
+    public static Layer<T> Instance;
     internal LayerCore core;
 
     protected sealed override void Awake()
@@ -50,7 +50,7 @@ namespace Pixeye.Actors
         LayerKernel.Layers[buildIndex] = this;
       }
 
-      LayerTyped = this;
+      Instance = this;
 
       #endregion
 
@@ -81,7 +81,7 @@ namespace Pixeye.Actors
 
       Add<ProcessorObserver>();
 
-      Engine.layer = LayerTyped;
+      Engine.layer = Instance;
 
       #endregion
 
@@ -150,19 +150,19 @@ namespace Pixeye.Actors
     {
       var obj = new Y();
       if (obj is IRequireActorsLayer member)
-        member.Bootstrap(LayerTyped);
-      LayerTyped.objects.Add(typeof(Y).GetHashCode(), obj);
+        member.Bootstrap(Instance);
+      Instance.objects.Add(typeof(Y).GetHashCode(), obj);
       return obj;
     }
 
     public static void Remove<Y>()
     {
       var key = typeof(Y).GetHashCode();
-      if (LayerTyped.objects.TryGetValue(key, out var obj))
+      if (Instance.objects.TryGetValue(key, out var obj))
       {
         if (obj is IDisposable member)
           member.Dispose();
-        LayerTyped.objects.Remove(key);
+        Instance.objects.Remove(key);
       }
     }
 
@@ -171,13 +171,13 @@ namespace Pixeye.Actors
       if (obj is IDisposable member)
         member.Dispose();
 
-      LayerTyped.objects.Remove(typeof(Y).GetHashCode());
+      Instance.objects.Remove(typeof(Y).GetHashCode());
     }
 
 
     public static Y Get<Y>() where Y : class
     {
-      return LayerTyped.objects[typeof(Y).GetHashCode()] as Y;
+      return Instance.objects[typeof(Y).GetHashCode()] as Y;
     }
 
     #endregion
@@ -187,38 +187,38 @@ namespace Pixeye.Actors
     /// Run coroutine on the top of this layer.
     public new static RoutineCall Run(IEnumerator routine)
     {
-      return LayerTyped.processorCoroutine.Run(routine);
+      return Instance.processorCoroutine.Run(routine);
     }
 
     /// Run coroutine on the top of this layer.
     public new static RoutineCall Run(float delay, IEnumerator routine)
     {
-      return LayerTyped.processorCoroutine.Run(delay, routine);
+      return Instance.processorCoroutine.Run(delay, routine);
     }
 
 
     /// Run coroutine on the top of this layer.
     public new static RoutineCall RunUnscaled(IEnumerator routine)
     {
-      return LayerTyped.processorCoroutineUnscaled.Run(routine);
+      return Instance.processorCoroutineUnscaled.Run(routine);
     }
 
     /// Run coroutine on the top of this layer.
     public new static RoutineCall RunUnscaled(float delay, IEnumerator routine)
     {
-      return LayerTyped.processorCoroutineUnscaled.Run(delay, routine);
+      return Instance.processorCoroutineUnscaled.Run(delay, routine);
     }
 
     /// Stop coroutine on the top of this layer.
     public new static bool Stop(IEnumerator routine)
     {
-      return LayerTyped.processorCoroutine.Stop(routine);
+      return Instance.processorCoroutine.Stop(routine);
     }
 
     /// Stop coroutine on the top of this layer.
     public new static bool StopUnscaled(IEnumerator routine)
     {
-      return LayerTyped.processorCoroutineUnscaled.Stop(routine);
+      return Instance.processorCoroutineUnscaled.Stop(routine);
     }
 
 
@@ -226,13 +226,13 @@ namespace Pixeye.Actors
 
     public new static IEnumerator Wait(float t)
     {
-      LayerTyped.processorCoroutine.delays[LayerTyped.processorCoroutine.currentIndex] = t;
+      Instance.processorCoroutine.delays[Instance.processorCoroutine.currentIndex] = t;
       return null;
     }
 
     public new static IEnumerator WaitUnscaled(float t)
     {
-      LayerTyped.processorCoroutineUnscaled.delays[LayerTyped.processorCoroutineUnscaled.currentIndex] = t;
+      Instance.processorCoroutineUnscaled.delays[Instance.processorCoroutineUnscaled.currentIndex] = t;
       return null;
     }
 
@@ -266,9 +266,9 @@ namespace Pixeye.Actors
 
     #region Signals
 
-    public new static void Send<Y>(in Y signal) => LayerTyped.processorSignals.Dispatch(signal);
-    public new static void AddSignal(object signal) => LayerTyped.processorSignals.Add(signal);
-    public new static void RemoveSignal(object signal) => LayerTyped.processorSignals.Remove(signal);
+    public new static void Send<Y>(in Y signal) => Instance.processorSignals.Dispatch(signal);
+    public new static void AddSignal(object signal) => Instance.processorSignals.Add(signal);
+    public new static void RemoveSignal(object signal) => Instance.processorSignals.Remove(signal);
 
     #endregion
   }
