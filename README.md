@@ -162,8 +162,7 @@ As already said, layers are very important part of the framework. Each layer rep
 
 **💬 How to use buffers?**
 
-👉 Create new struct. I prefer to call them segments.
-
+Create new struct. I prefer to call them segments.
 ```csharp
   public struct SegmentShoot
   {
@@ -172,7 +171,7 @@ As already said, layers are very important part of the framework. Each layer rep
     public float speed;
   }
 ```
-👉 Register new buffer via layer setup.
+Register new buffer via layer setup.
 ```csharp
 using Pixeye.Actors;
 
@@ -186,14 +185,14 @@ public class LayerGame : Layer<LayerGame>
   }
 }
 ```
-👉 Add a new segment to the buffer.
+Add a new segment to the buffer.
 ```csharp
  ref var segShoot = ref Layer.GetBuffer<SegmentShoot>().Add();
  segShoot.obj             =  bullet;
  segShoot.position        = position;
  segShoot.speed           = 10f;
 ```
-👉 If you need to cache the pointer to the segment in the buffer than use slightly different method:
+If you need to cache the pointer to the segment in the buffer than use slightly different method:
 
 ```csharp
  var pointer = 0;
@@ -202,8 +201,7 @@ public class LayerGame : Layer<LayerGame>
  segShoot.position        = position;
  segShoot.speed           = 10f;
 ```
-
-👉 Use Processor to work with your buffer. You are not forced to use processors but it's a convenient way.
+Use Processor to work with your buffer. You are not forced to use processors but it's a convenient way.
 ```csharp
 public class ProcessorShoot : Processor, ITick
 {
