@@ -183,13 +183,12 @@ public class ProcessorAlpaca : Processor, ITick
 ```
 > 💡 *Processors, Actors, and Monocached objects know about the layer and can directly access Observer.*
 
-In case you are working out of Processor, Actor, or Monocached scope you can access Observer by pointing to a specific layer.
+In case you are working out of Processor, Actor, or Monocached scope you can access Observer by pointing to a specific layer. Note that layer must be active.
 ```csharp
 // Take Observer of the LayerApp. This is just an example.
 Layer<LayerApp>.Observer.Add(this, x => x.level,
         levelNext => Debug.Log($"Alpaca's level has changed {levelNext}!"));
 ```
-> 💡 *Note that layer must be active.*
 
 **💬 How to release observers?**
 Observers work inside of ECS so when you register a new observer you will get an **entity** of the observer.
