@@ -249,7 +249,8 @@ public class ProcessorAlpaca : Processor, ITick
    public AlpacaPower alpacaPower;
    public ProcessorAlpaca()
    {
-     Observer.Add(this, x => alpacaPower, alpacaPowerNext => Debug.Log($"Alpaca's level has changed {alpacaPowerNext.power}!"));
+     Observer.Add(this, x => alpacaPower, 
+        alpacaPowerNext => Debug.Log($"Alpaca's level has changed {alpacaPowerNext.power}!"));
    }
    public void Tick(float dt)
    {
@@ -260,7 +261,6 @@ public class ProcessorAlpaca : Processor, ITick
     }
 }
 ```
-
 🔖 Comparers for types added by default:
 * **float**
 * **int**
