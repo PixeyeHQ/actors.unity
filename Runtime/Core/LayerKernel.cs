@@ -88,7 +88,7 @@ namespace Pixeye.Actors
         SceneMain.NextActiveSceneName = SceneManager.GetActiveScene().name;
         var kernel = objKernel.AddComponent<LayerKernel>();
 
-        Instance = kernel;
+        InternalInstance = kernel;
 
         foreach (var plugPath in Settings.Plugins)
         {
