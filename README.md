@@ -246,14 +246,11 @@ Now you can use your custom values!
 ```csharp
 public class ProcessorAlpaca : Processor, ITick
 {
-   public int level;
    public AlpacaPower alpacaPower;
-
    public ProcessorAlpaca()
    {
-     Observer.Add(this, x => alpacaPower, alpacaPowerNext => { Debug.Log($"Alpaca's level have changed {alpacaPowerNext.power}"); });
+     Observer.Add(this, x => alpacaPower, alpacaPowerNext => Debug.Log($"Alpaca's level has changed {alpacaPowerNext.power}!"));
    }
-
    public void Tick(float dt)
    {
       if (Input.GetKeyDown(KeyCode.A))
@@ -263,6 +260,27 @@ public class ProcessorAlpaca : Processor, ITick
     }
 }
 ```
+
+🔖 Comparers for types added by default:
+* **float**
+* **int**
+* **byte**
+* **bool**    
+* **ent**
+* **Vector2**
+* **Vector3**
+* **Vector4**
+* **Color**
+* **Rect**    
+* **Bounds**
+* **Quaternion**
+* **Color32**
+* **Vector2Int**
+* **Vector3Int**
+* **RangeInt**    
+* **RectInt**
+* **BoundsInt**
+
 
 ### 📘 Buffers Overview
 **Buffers** are iterators for structs. Buffers perform simple actions that don't require composition and ECS stuff. Buffers designed to be fast and despite their dynamic nature, they don't copy structs every time buffer grows. Instead, buffer uses an array of indexes to refer to the struct.
