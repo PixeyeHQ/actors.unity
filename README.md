@@ -136,7 +136,7 @@ Note that you can have **only one** copy of each scene. In case you try to add s
 
 
 ## 📖 Layers Overview
-As already said, layers are very important part of the framework. Each layer represents a unity scene and holds several important modules of the framework. When the layer is removed or changed everything that is inside of the layer will be cleaned up. Another important thing is that *any* **Actor** or **Monocache** components will start working *only* after initialization and setup of the layer. The concepts of **actor** and **monocache** will be discussed further.
+As already said, layers are very important part of the framework. Each layer represents a unity scene and holds several important modules of the framework. When the layer is removed or changed everything that is inside of the layer will be cleaned up. Another important thing is that *any* **actor** or **monocached** components will start working *only* after initialization and setup of the layer. The concepts of **actor** and **monocached** will be discussed further.
 
 * **Public Layer Modules** 
   * **Engine**   : Core module that controls all other updates.
@@ -154,8 +154,116 @@ As already said, layers are very important part of the framework. Each layer rep
 
 * **Who are aware of Layers?**
   * **Processors** : Created in the layer and get the reference of it.
-  * **Monocache**  : Base monobehavior classes in the framework. They get the reference of a layer when initialized.
+  * **Monocached**  : Base monobehavior classes in the framework. They get the reference of a layer when initialized.
   * **Actors**     : Inherited from monocache class. They represent entity view.
+
+### 📘 Observers Overview
+**Observers** allows to handle changes of a variable. It's very handy for working with UI but can be used in game logic too. Routines work inside of a **layer** and will be stopped if the layer they work on would be destroyed.
+
+**💬 How to use observers?**   
+You need to register the variable you are looking on and the callback.
+```csharp
+public class ProcessorAlpaca : Processor, ITick
+  {
+    public int level;
+
+    public ProcessorAlpaca()
+    {
+      Observer.Add(this, x => x.level,levelNext => Debug.Log($"Alpaca's level has changed {levelNext}!"));
+    }
+
+    public void Tick(float dt)
+    {
+      if (Input.GetKeyDown(KeyCode.A))
+      {
+        level++;
+      }
+    }
+  }
+```
+> 💡 *Processors, Actors, and Monocached objects know about the layer and can directly access Observer.*
+
+In case you are working out of Processor, Actor, or Monocached scope you can access Observer by pointing to a specific layer.
+```csharp
+// Take Observer of the LayerApp. This is just an example.
+Layer<LayerApp>.Observer.Add(this, x => x.level,
+        levelNext => Debug.Log($"Alpaca's level has changed {levelNext}!"));
+```
+> 💡 *Note that layer must be active.*
+
+**💬 How to release observers?**
+Observers work inside of ECS so when you register a new observer you will get an **entity** of the observer.
+To release observer all you have to do is to release the provided entity.
+```csharp
+public int level;
+public ent levelObserver;
+
+public ProcessorAlpaca()
+{
+  levelObserver = Observer.Add(this, x => x.level,
+  levelNext => Debug.Log($"Alpaca's level has changed {levelNext}!"));
+}
+
+public void Tick(float dt)
+{
+  if (Input.GetKeyDown(KeyCode.A))
+  {
+     levelObserver.Release();
+  }
+}
+```
+**💬 How to add comparers?**
+In order to check values, comparers are provided. If you want to check *custom* type you need a custom comparer.
+```csharp
+  // custom value
+  public struct AlpacaPower
+  {
+    public int power;
+  }
+  
+  // comparer
+  sealed class EqualityAlpacaPower : IEqualityComparer<AlpacaPower>
+  {
+    internal static EqualityAlpacaPower Default = new EqualityAlpacaPower();
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool Equals(AlpacaPower x, AlpacaPower y)
+    {
+      return x.power == y.power;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public int GetHashCode(AlpacaPower obj)
+    {
+      return obj.power;
+    }
+  }
+```
+Once, somewhere at the very beginning of your game register the comparer. Note that comparer **must** be provided **before** you start observing the value.
+```csharp
+Comparers.Add(EqualityAlpacaPower.Default);
+```
+Now you can use your custom values!
+```csharp
+public class ProcessorAlpaca : Processor, ITick
+{
+   public int level;
+   public AlpacaPower alpacaPower;
+
+   public ProcessorAlpaca()
+   {
+     Observer.Add(this, x => alpacaPower, alpacaPowerNext => { Debug.Log($"Alpaca's level have changed {alpacaPowerNext.power}"); });
+   }
+
+   public void Tick(float dt)
+   {
+      if (Input.GetKeyDown(KeyCode.A))
+      {
+        alpacaPower.power++;
+      }
+    }
+}
+```
 
 ### 📘 Buffers Overview
 **Buffers** are iterators for structs. Buffers perform simple actions that don't require composition and ECS stuff. Buffers designed to be fast and despite their dynamic nature, they don't copy structs every time buffer grows. Instead, buffer uses an array of indexes to refer to the struct.
@@ -226,7 +334,7 @@ public class ProcessorShoot : Processor, ITick
 > 💡 Custom particles or objects that are created and destroyed a lot are ideal candidates for buffers.
 
 
-### 📘 Routine Overview
+### 📘 Routines Overview
 **Routines** are custom coroutines that can work outside of Unity scope and more performant than native Unity coroutines.
 Routines work inside of a **layer** and will be stopped if the layer they work on would be destroyed. Routines have similar to Coroutines API so it will be very easy to start using them.
 There are two types of routines:
