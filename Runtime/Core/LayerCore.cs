@@ -31,7 +31,8 @@ namespace Pixeye.Actors
     public ImplEntity Entity;
     public ImplEcs Ecs;
     public ImplObserver Observer;
-
+    
+    public virtual int ID => id;
 
     internal Pool pool;
 

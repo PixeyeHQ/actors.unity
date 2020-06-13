@@ -195,13 +195,13 @@ namespace Pixeye.Actors
     public void MoveTo<T>() where T : LayerCore
     {
       DebugMoveTo<T>();
-      managed.layer.processorEcs.SwapLayer(this, Layer<T>.Instance);
+      managed.layer.processorEcs.SwapLayer(this, Layer<T>.InternalInstance);
     }
 
     [Conditional("ACTORS_DEBUG")]
     void DebugMoveTo<T>()
     {
-      if (Layer<T>.Instance == null)
+      if (Layer<T>.InternalInstance == null)
       {
         Debug.Log($"Layer {typeof(T)} doesn't exist in the game.");
         throw new Exception();
