@@ -15,7 +15,7 @@ namespace Pixeye.Actors
   {
     internal const int LAYERS_AMOUNT_TOTAL = 128;
 
-    //public static bool[] ChangingScene = new bool[128];
+     
     public static bool[] Initialized = new bool[LAYERS_AMOUNT_TOTAL];
     public static bool ApplicationIsQuitting;
     public static bool IsQuittingOrChangingScene() => ApplicationIsQuitting;
@@ -39,7 +39,8 @@ namespace Pixeye.Actors
 
     public static SettingsActors Settings = new SettingsActors();
 
-    internal static LayerKernel Instance;
+    internal static LayerCore LayerCurrentInit; // only for setup stuff to provide layer to the processors constructors.
+ 
     internal const string KernelSceneName = "Actors Framework";
     internal static LayerCore[] Layers = new LayerCore[128];
     internal static readonly List<LayerCore> LayersInUse = new List<LayerCore>();
@@ -50,6 +51,7 @@ namespace Pixeye.Actors
       HandleSettings();
       UpdateTypes();
       Random.Bootstrap();
+      Comparers.Bootstrap();
       ProcessorEcs.Bootstrap();
       HandleScenes();
 

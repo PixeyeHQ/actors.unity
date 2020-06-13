@@ -3,6 +3,7 @@
 
 using Unity.IL2CPP.CompilerServices;
 
+
 namespace Pixeye.Actors
 {
   [Il2CppSetOption(Option.NullChecks, false)]
@@ -33,13 +34,16 @@ namespace Pixeye.Actors
       }
     }
 
+
     public void Tick(float dt)
     {
       for (var i = 0; i < source.length; i++)
       {
         ref var cObserver = ref source.entities[i].ComponentObserver();
         for (var j = 0; j < cObserver.length; j++)
+        {
           cObserver.wrappers[j].Check();
+        }
       }
     }
   }

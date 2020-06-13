@@ -1,13 +1,13 @@
 //  Project : ecs
 // Contacts : Pix - ask@pixeye.games
 
+
 using System.Runtime.CompilerServices;
 using Unity.IL2CPP.CompilerServices;
 
 namespace Pixeye.Actors
 {
 #if ACTORS_COMPONENTS_STRUCTS
- 
   struct ComponentObserver
   {
     public IWrap[] wrappers;

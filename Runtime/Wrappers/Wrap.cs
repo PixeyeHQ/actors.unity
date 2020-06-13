@@ -59,10 +59,4 @@ namespace Pixeye.Actors
       return Equals(val, other);
     }
   }
-
-  public static class HelperWrapper
-  {
- 
-    
-  }
 }
