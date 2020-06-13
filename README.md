@@ -157,7 +157,12 @@ As already said, layers are very important part of the framework. Each layer rep
   * **Monocache**  : Base monobehavior classes in the framework. They get the reference of a layer when initialized.
   * **Actors**     : Inherited from monocache class. They represent entity view.
 
-### 📘 Buffers Overview
+### 📘 Observers Overview
+**Observers** allows to handle changes of a variable. It's very handy for working with UI but can be used in game logic too. Routines work inside of a **layer** and will be stopped if the layer they work on would be destroyed.
+
+**💬 How to use observers?**
+
+### 📘 Buffer Overview
 **Buffers** are iterators for structs. Buffers perform simple actions that don't require composition and ECS stuff. Buffers designed to be fast and despite their dynamic nature, they don't copy structs every time buffer grows. Instead, buffer uses an array of indexes to refer to the struct.
 
 **💬 How to use buffers?**
@@ -226,7 +231,7 @@ public class ProcessorShoot : Processor, ITick
 > 💡 Custom particles or objects that are created and destroyed a lot are ideal candidates for buffers.
 
 
-### 📘 Routine Overview
+### 📘 Routines Overview
 **Routines** are custom coroutines that can work outside of Unity scope and more performant than native Unity coroutines.
 Routines work inside of a **layer** and will be stopped if the layer they work on would be destroyed. Routines have similar to Coroutines API so it will be very easy to start using them.
 There are two types of routines:
