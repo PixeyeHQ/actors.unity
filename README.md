@@ -167,7 +167,7 @@ public class ProcessorAlpaca : Processor, ITick
   {
     public int level;
 
-    protected override void Awake()
+    public ProcessorAlpaca()
     {
       Observer.Add(this, x => x.level,levelNext => Debug.Log($"Alpaca's level has changed {levelNext}!"));
     }
@@ -198,7 +198,7 @@ To release observer all you have to do is to release the provided entity.
 public int level;
 public ent levelObserver;
 
-protected override void Awake()
+public ProcessorAlpaca()
 {
   levelObserver = Observer.Add(this, x => x.level,
   levelNext => Debug.Log($"Alpaca's level has changed {levelNext}!"));
@@ -210,6 +210,58 @@ public void Tick(float dt)
   {
      levelObserver.Release();
   }
+}
+```
+**💬 How to add comparers?**
+In order to check values, comparers are provided. If you want to check *custom* type you need a custom comparer.
+```csharp
+  // custom value
+  public struct AlpacaPower
+  {
+    public int power;
+  }
+  
+  // comparer
+  sealed class EqualityAlpacaPower : IEqualityComparer<AlpacaPower>
+  {
+    internal static EqualityAlpacaPower Default = new EqualityAlpacaPower();
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool Equals(AlpacaPower x, AlpacaPower y)
+    {
+      return x.power == y.power;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public int GetHashCode(AlpacaPower obj)
+    {
+      return obj.power;
+    }
+  }
+```
+Once, somewhere at the very beginning of your game register the comparer. Note that comparer **must** be provided **before** you start observing the value.
+```csharp
+Comparers.Add(EqualityAlpacaPower.Default);
+```
+Now you can use your custom values!
+```csharp
+public class ProcessorAlpaca : Processor, ITick
+{
+   public int level;
+   public AlpacaPower alpacaPower;
+
+   public ProcessorAlpaca()
+   {
+     Observer.Add(this, x => alpacaPower, alpacaPowerNext => { Debug.Log($"Alpaca's level have changed {alpacaPowerNext.power}"); });
+   }
+
+   public void Tick(float dt)
+   {
+      if (Input.GetKeyDown(KeyCode.A))
+      {
+        alpacaPower.power++;
+      }
+    }
 }
 ```
 
