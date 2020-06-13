@@ -406,7 +406,7 @@ IEnumerator CoHello()
 ### 📘 Group Bindings
 You can bind a group with an id and later get this group by this id. This is very useful when you need to work with several groups and want to filter them. For example you would want to raycast against entities that are in a group of allies and a group of objects.
 
-**💬 How to bind a group?**
+**💬 How to bind a group?**   
 You should use a special bind attribute.
 ```csharp
    const int tagPlayers = 0; // just an example
@@ -416,10 +416,10 @@ You should use a special bind attribute.
 
    public void Tick(float dt)
    {
-      var group = Ecs.Group(tagPlayer);
+      var group = Ecs.Group(tagPlayer); // get a group by id.
    }
 ```
-
+> 💡 Note that group bindings refer to the layer where group was registered.
 
 ## 📖 How to Install  
 #### Git Installation
