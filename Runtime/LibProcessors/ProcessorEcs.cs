@@ -131,6 +131,7 @@ namespace Pixeye.Actors
         groups[i].Dispose();
       }
 
+      bindings.Clear();
       groups.Clear();
     }
   }

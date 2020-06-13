@@ -11,6 +11,9 @@
 
     public ents Alive => layer.processorEcs.entities;
 
+    /// Get group by binding id.
+    public GroupCore Group(int index) => layer.processorEcs.bindings[index];
+
     public ref T Send<T>() where T : struct
     {
       var     q = SignalsEcs<T>.layers[layer.id];
