@@ -157,7 +157,7 @@ As already said, layers are very important part of the framework. Each layer rep
   * **Monocached**  : Base monobehavior classes in the framework. They get the reference of a layer when initialized.
   * **Actors**     : Inherited from monocache class. They represent entity view.
 
-### 📘 Observers Overview
+### 📘 Observers
 **Observers** allows to handle changes of a variable. It's very handy for working with UI but can be used in game logic too. Routines work inside of a **layer** and will be stopped if the layer they work on would be destroyed.
 
 **💬 How to use observers?**   
@@ -282,7 +282,7 @@ public class ProcessorAlpaca : Processor, ITick
 * **BoundsInt**
 
 
-### 📘 Buffers Overview
+### 📘 Buffers
 **Buffers** are iterators for structs. Buffers perform simple actions that don't require composition and ECS stuff. Buffers designed to be fast and despite their dynamic nature, they don't copy structs every time buffer grows. Instead, buffer uses an array of indexes to refer to the struct.
 
 **💬 How to use buffers?**
@@ -351,7 +351,7 @@ public class ProcessorShoot : Processor, ITick
 > 💡 Custom particles or objects that are created and destroyed a lot are ideal candidates for buffers.
 
 
-### 📘 Routines Overview
+### 📘 Routines
 **Routines** are custom coroutines that can work outside of Unity scope and more performant than native Unity coroutines.
 Routines work inside of a **layer** and will be stopped if the layer they work on would be destroyed. Routines have similar to Coroutines API so it will be very easy to start using them.
 There are two types of routines:
@@ -401,8 +401,25 @@ IEnumerator CoHello()
     }
 ```
 
+## 📖 Advanced
 
+### 📘 Group Bindings
+You can bind a group with an id and later get this group by this id. This is very useful when you need to work with several groups and want to filter them. For example you would want to raycast against entities that are in a group of allies and a group of objects.
 
+**💬 How to bind a group?**   
+You should use a special bind attribute.
+```csharp
+   const int tagPlayers = 0; // just an example
+    
+   [Bind(tagPlayers)]
+   Group<ComponentPlayer> players;
+
+   public void Tick(float dt)
+   {
+      var group = Ecs.Group(tagPlayer); // get a group by id.
+   }
+```
+> 💡 Note that group bindings refer to the layer where group was registered.
 
 ## 📖 How to Install  
 #### Git Installation

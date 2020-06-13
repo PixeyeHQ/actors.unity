@@ -60,7 +60,7 @@ namespace Pixeye.Actors
     {
       DebugCheckNull(this, typeof(T));
       DebugAlreadyHave<T>(this);
-      
+
       if (id >= Storage<T>.components.Length)
         Array.Resize(ref Storage<T>.components, id + id / 2);
 
@@ -82,7 +82,7 @@ namespace Pixeye.Actors
     {
       DebugCheckNull(this, typeof(T));
       DebugAlreadyHave<T>(this);
-       
+
       if (id >= Storage<T>.components.Length)
         Array.Resize(ref Storage<T>.components, id + id / 2);
 
@@ -96,7 +96,6 @@ namespace Pixeye.Actors
     /// Returns the component from entity. Creates the component if entity doesn't have one.
     public ref T Get<T>()
     {
-    
       DebugCheckActive<T>(this);
       if (id >= Storage<T>.components.Length)
         Array.Resize(ref Storage<T>.components, id + id / 2);
@@ -105,7 +104,7 @@ namespace Pixeye.Actors
       var     mask       = Storage<T>.ComponentMask;
       var     _meta      = meta; // POINTER
       ref var _managed   = ref managed;
-      if ((_managed.signature[generation] & generation) != mask)
+      if ((_managed.signature[generation] & mask) != mask)
       {
         var componentID = Storage<T>.componentId;
 
