@@ -13,12 +13,12 @@ namespace Pixeye.Actors
     static int GroupNextID;
 
     internal static List<GroupCore> Groups = new List<GroupCore>();
-    internal static GroupCore[] Bindings = new GroupCore[16];
 
     internal FamilyGroup familyTags = new FamilyGroup();
     internal FamilyGroup familyTypes = new FamilyGroup();
 
     internal List<GroupCore> groups = new List<GroupCore>();
+    internal Dictionary<int, GroupCore> bindings = new Dictionary<int, GroupCore>(FastComparable.Default);
 
     #region BindGroups
 
@@ -76,10 +76,7 @@ namespace Pixeye.Actors
 
         if (bindAttribute != null)
         {
-          if (bindAttribute.id >= Bindings.Length)
-            Array.Resize<GroupCore>(ref Bindings, bindAttribute.id + 5);
-
-          Bindings[bindAttribute.id] = group;
+          bindings.Add(bindAttribute.id, group);
         }
 
 
@@ -122,7 +119,7 @@ namespace Pixeye.Actors
         }
         else
         {
-          var gr = (Activator.CreateInstance(groupType, true) as GroupCore);
+          var gr = Activator.CreateInstance(groupType, true) as GroupCore;
 
           gr.Initialize(composition, layer);
           gr.id = GroupNextID++;
