@@ -144,10 +144,9 @@ namespace Pixeye.Actors
 
     #region Services
 
-     
-
     public static Y Add<Y>() where Y : new()
     {
+      LayerKernel.LayerCurrentInit = Instance;
       var obj = new Y();
       if (obj is IRequireActorsLayer member)
         member.Bootstrap(Instance);

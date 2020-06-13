@@ -9,10 +9,10 @@ namespace Pixeye.Actors
 {
   public static class Comparers
   {
-    public static readonly Dictionary<int, object> storage = new Dictionary<int, object>(FastComparable.Default);
+    internal static readonly Dictionary<int, object> storage = new Dictionary<int, object>(FastComparable.Default);
 
-    [RuntimeInitializeOnLoadMethod]
-    static void Initialize()
+
+    internal static void Bootstrap()
     {
       storage.Add(typeof(float).GetHashCode(), EqualityFloat.Default);
       storage.Add(typeof(int).GetHashCode(), EqualityInt.Default);
@@ -35,6 +35,16 @@ namespace Pixeye.Actors
       storage.Add(typeof(RangeInt).GetHashCode(), EqualityRangeInt.Default);
       storage.Add(typeof(RectInt).GetHashCode(), EqualityRectInt.Default);
       storage.Add(typeof(BoundsInt).GetHashCode(), EqualityBoundsInt.Default);
+    }
+
+    public static void Add<T>(IEqualityComparer<T> comparer)
+    {
+      storage.Add(typeof(T).GetHashCode(), comparer);
+    }
+    
+    public static IEqualityComparer<T> Get<T>()
+    {
+      return storage[typeof(T).GetHashCode()] as IEqualityComparer<T>;
     }
 
     //===============================//

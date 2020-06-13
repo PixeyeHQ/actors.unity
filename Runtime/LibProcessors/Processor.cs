@@ -4,6 +4,7 @@
 using System;
 using Unity.IL2CPP.CompilerServices;
 
+
 namespace Pixeye.Actors
 {
   internal interface IReceiveEcsEvent
@@ -23,32 +24,33 @@ namespace Pixeye.Actors
     protected Time Time;
     protected ImplObj Obj;
 
-
     void IRequireActorsLayer.Bootstrap(LayerCore layer)
     {
-      Layer = layer;
+      // We don't use IRequireActorsLayer in processors. Instead we use constructor.
+    }
+
+    protected Processor()
+    {
+      // This will be always the layer that added the processor.
+      Layer = LayerKernel.LayerCurrentInit;
       // This increment is dropped every added layer, check layer implementation.
       // The ID is used for working with ECS signals.
       processorID = NEXT_FREE_ID++;
-      layer.Engine.AddProc(this);
-      layer.processorEcs.Add(this);
-      layer.processorEcs.processors.Add(this);
-      layer.processorSignals.Add(this);
+      Layer.Engine.AddProc(this);
+      Layer.processorEcs.Add(this);
+      Layer.processorEcs.processors.Add(this);
+      Layer.processorSignals.Add(this);
 
-      Entity   = layer.Entity;
-      Ecs      = layer.Ecs;
-      Observer = layer.Observer;
-      Actor    = layer.Actor;
-      Time     = layer.Time;
-      Obj      = layer.Obj;
+      Entity   = Layer.Entity;
+      Ecs      = Layer.Ecs;
+      Observer = Layer.Observer;
+      Actor    = Layer.Actor;
+      Time     = Layer.Time;
+      Obj      = Layer.Obj;
 
       OnLaunch();
-      OnAwake();
     }
 
-    protected virtual void OnAwake()
-    {
-    }
 
     void IDisposable.Dispose() => OnDispose();
 
@@ -63,11 +65,10 @@ namespace Pixeye.Actors
     protected virtual void OnDispose()
     {
     }
-    
+
     void IReceiveEcsEvent.Receive()
     {
     }
- 
   }
 
   #region PROCESSORS
