@@ -489,7 +489,7 @@ Actor in the inspector
 <a href="https://gyazo.com/742384979f2cf627c5b89c93a854cf38"><img src="https://i.gyazo.com/742384979f2cf627c5b89c93a854cf38.gif" alt="Actor="000"/></a>
 </details>
 
-**🔖 IsPooled** 
+**🔖 IsPooled**    
 Actors on scene may be pooled. To do this you need to toggle ```IsPooled``` variable in the actor's inspector panel.
 
 ## 📖 Advanced
