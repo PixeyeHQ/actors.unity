@@ -158,7 +158,7 @@ As already said, layers are very important part of the framework. Each layer rep
   * **Actors**     : Inherited from monocache class. They represent entity view.
 
 ### 📘 Engine
-**Engines** is a centralized update processor based on Unity update. Think of it as a one Unity update that controls them all. Engine work inside of a **layer** and will be stopped if the layer they work on would be destroyed. You are not forced to use custom updates but every processor and framework module work via engine. 
+**Engine** is a centralized update processor based on Unity update. Think of it as a one Unity update that controls them all. Engine work inside of a **layer** and will be stopped if the layer they work on would be destroyed. You are not forced to use custom updates but every processor and framework module work via engine. 
 
 Why use this module?
 - You can use it outside monobehavior classes.
