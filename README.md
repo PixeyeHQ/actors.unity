@@ -483,7 +483,9 @@ public class MonoAlpaca : Monocached
 > 💡 Actors will be initialized after the layer.
 
 ## 📖 Actor Overview
-**Actors** are special wrapper classes that act like a bridge between Ecs and Unity logic and inherited from **Monocached**. You can think about actors as a view class or components provider for an entity. Actors **are not entities**, but they create an entity automatically once initialized. You can use actors as lazy object setter. Actors **may** content view logic or be used for scripting if needed. 
+The **Actor** is a monobehavior class inherited from the monocached that allows communicating between unity game objects and ecs. Most of the time you will inherit from actors when defining new objects.
+
+The actor class is for setting your entity. You can use it as view class if you like MVC patterns and define logic inside of the actor.
 
 **💬 How to use actors?**   
 
