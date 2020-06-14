@@ -32,16 +32,12 @@ namespace Pixeye.Actors
     //===============================//
     // Launch methods
     //===============================//
-
-    public sealed override void Bootstrap(Layer layer)
+    
+    // used when actor is created in session.
+    internal void BootstrapCreated(Layer layer)
     {
-      // Case: Session Start. 
-      // When childs are initialized manually from the parent, layer will treat them as eligable
-      // objects to bootstrap. To prevent double bootstrap we check the layer. If it is not null
-      // then we know that the monocache was already activated.
-      if (Layer != null) return;
-
       Layer = layer;
+
       if (!entity.exist)
         entity = layer.Entity.CreateForActor(this, (ScriptableBuild) null, isPooled);
 #if UNITY_EDITOR
@@ -51,7 +47,17 @@ namespace Pixeye.Actors
       HandleEnable();
     }
 
-    internal void Bootstrap(Layer layer, ModelComposer model)
+    public sealed override void Bootstrap(Layer layer)
+    {
+      // Case: Session Start. 
+      // When childs are initialized manually from the parent, layer will treat them as eligable
+      // objects to bootstrap. To prevent double bootstrap we check the layer. If it is not null
+      // then we know that the monocache was already activated.
+      if (Layer != null) return;
+      BootstrapCreated(layer);
+    }
+
+    internal void BootstrapCreated(Layer layer, ModelComposer model)
     {
       Layer = layer;
       if (!entity.exist)

@@ -25,7 +25,7 @@ namespace Pixeye.Actors
       var actor     = transform.AddGetActor();
       actor.isPooled = pooled;
 
-      actor.Bootstrap(layer);
+      actor.BootstrapCreated(layer);
       return actor;
     }
 
@@ -38,7 +38,7 @@ namespace Pixeye.Actors
           : layer.Obj.Spawn(prefabID, parent, position);
       var actor = transform.AddGetActor();
       actor.isPooled = pooled;
-      actor.Bootstrap(layer);
+      actor.BootstrapCreated(layer);
       return actor;
     }
 
@@ -49,7 +49,7 @@ namespace Pixeye.Actors
       var actor     = transform.AddGetActor();
       actor.isPooled = pooled;
 
-      actor.Bootstrap(layer, model);
+      actor.BootstrapCreated(layer, model);
       return actor;
     }
 
@@ -63,7 +63,7 @@ namespace Pixeye.Actors
       var actor = transform.AddGetActor();
       actor.isPooled = pooled;
 
-      actor.Bootstrap(layer, model);
+      actor.BootstrapCreated(layer, model);
       return actor;
     }
 
@@ -78,7 +78,7 @@ namespace Pixeye.Actors
       var actor     = transform.AddGetActor();
       actor.isPooled = pooled;
 
-      actor.Bootstrap(layer);
+      actor.BootstrapCreated(layer);
       return actor;
     }
 
@@ -90,7 +90,7 @@ namespace Pixeye.Actors
       var actor = transform.AddGetActor();
       actor.isPooled = pooled;
 
-      actor.Bootstrap(layer);
+      actor.BootstrapCreated(layer);
       return actor;
     }
 
@@ -101,7 +101,7 @@ namespace Pixeye.Actors
       var actor     = transform.AddGetActor();
       actor.isPooled = pooled;
 
-      actor.Bootstrap(layer, model);
+      actor.BootstrapCreated(layer, model);
       return actor;
     }
 
@@ -114,7 +114,7 @@ namespace Pixeye.Actors
       var actor = transform.AddGetActor();
       actor.isPooled = pooled;
 
-      actor.Bootstrap(layer, model);
+      actor.BootstrapCreated(layer, model);
       return actor;
     }
   }
