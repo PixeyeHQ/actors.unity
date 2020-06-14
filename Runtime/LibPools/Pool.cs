@@ -18,7 +18,7 @@ namespace Pixeye.Actors
     internal Dictionary<int, PoolContainer> pools = new Dictionary<int, PoolContainer>(4, new FastComparable());
 
 
-    void IRequireActorsLayer.Bootstrap(LayerCore layer)
+    void IRequireActorsLayer.Bootstrap(Layer layer)
     {
       //this.layer = layer;
       Add(Entities);
@@ -56,7 +56,7 @@ namespace Pixeye.Actors
     public GameObject prefab;
     public List<GameObject> createdObjs = new List<GameObject>();
 
-    public void Populate(LayerCore layer)
+    public void Populate(Layer layer)
     {
       if (pool == Pool.None) return;
       var poolStash = layer.pool.pools[pool];

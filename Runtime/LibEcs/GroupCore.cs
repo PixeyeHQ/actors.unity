@@ -34,7 +34,7 @@ namespace Pixeye.Actors
 
     internal bool initialized = false;
     internal ProcessorEcs processorEcs;
-    internal LayerCore layer;
+    internal Layer layer;
 
 #if ACTORS_EVENTS_MANUAL
     public ents added;
@@ -88,7 +88,7 @@ namespace Pixeye.Actors
     }
 #endif
 
-    internal virtual GroupCore Initialize(Composition composition, LayerCore layer)
+    internal virtual GroupCore Initialize(Composition composition, Layer layer)
     {
       this.layer       = layer;
       this.composition = composition;
@@ -519,7 +519,7 @@ namespace Pixeye.Actors
   [Il2CppSetOption(Option.DivideByZeroChecks, false)]
   public class Group<T> : GroupCore
   {
-    internal override GroupCore Initialize(Composition composition, LayerCore layer)
+    internal override GroupCore Initialize(Composition composition, Layer layer)
     {
       var gr = base.Initialize(composition, layer);
 
@@ -549,7 +549,7 @@ namespace Pixeye.Actors
   [Il2CppSetOption(Option.DivideByZeroChecks, false)]
   public class Group<T, Y> : GroupCore
   {
-    internal override GroupCore Initialize(Composition composition, LayerCore layer)
+    internal override GroupCore Initialize(Composition composition, Layer layer)
     {
       var gr = base.Initialize(composition, layer);
 
@@ -587,7 +587,7 @@ namespace Pixeye.Actors
   [Il2CppSetOption(Option.DivideByZeroChecks, false)]
   public class Group<T, Y, U> : GroupCore
   {
-    internal override GroupCore Initialize(Composition composition, LayerCore layer)
+    internal override GroupCore Initialize(Composition composition, Layer layer)
     {
       var gr = base.Initialize(composition, layer);
       Storage<T>.Instance.groups[layer.id].Add(this);
@@ -635,7 +635,7 @@ namespace Pixeye.Actors
   [Il2CppSetOption(Option.DivideByZeroChecks, false)]
   public class Group<T, Y, U, I> : GroupCore
   {
-    internal override GroupCore Initialize(Composition composition, LayerCore layer)
+    internal override GroupCore Initialize(Composition composition, Layer layer)
     {
       var gr = base.Initialize(composition, layer);
       Storage<T>.Instance.groups[layer.id].Add(this);
@@ -690,7 +690,7 @@ namespace Pixeye.Actors
   [Il2CppSetOption(Option.DivideByZeroChecks, false)]
   public class Group<T, Y, U, I, O> : GroupCore
   {
-    internal override GroupCore Initialize(Composition composition, LayerCore layer)
+    internal override GroupCore Initialize(Composition composition, Layer layer)
     {
       var gr = base.Initialize(composition, layer);
       Storage<T>.Instance.groups[layer.id].Add(this);
@@ -749,7 +749,7 @@ namespace Pixeye.Actors
   [Il2CppSetOption(Option.DivideByZeroChecks, false)]
   public class Group<T, Y, U, I, O, P> : GroupCore
   {
-    internal override GroupCore Initialize(Composition composition, LayerCore layer)
+    internal override GroupCore Initialize(Composition composition, Layer layer)
     {
       var gr = base.Initialize(composition, layer);
       Storage<T>.Instance.groups[layer.id].Add(this);
@@ -823,7 +823,7 @@ namespace Pixeye.Actors
   [Il2CppSetOption(Option.DivideByZeroChecks, false)]
   public class Group<T, Y, U, I, O, P, A> : GroupCore
   {
-    internal override GroupCore Initialize(Composition composition, LayerCore layer)
+    internal override GroupCore Initialize(Composition composition, Layer layer)
     {
       var gr = base.Initialize(composition, layer);
       Storage<T>.Instance.groups[layer.id].Add(this);
@@ -907,7 +907,7 @@ namespace Pixeye.Actors
   [Il2CppSetOption(Option.DivideByZeroChecks, false)]
   public class Group<T, Y, U, I, O, P, A, S> : GroupCore
   {
-    internal override GroupCore Initialize(Composition composition, LayerCore layer)
+    internal override GroupCore Initialize(Composition composition, Layer layer)
     {
       var gr = base.Initialize(composition, layer);
       Storage<T>.Instance.groups[layer.id].Add(this);
@@ -1000,7 +1000,7 @@ namespace Pixeye.Actors
   [Il2CppSetOption(Option.DivideByZeroChecks, false)]
   public class Group<T, Y, U, I, O, P, A, S, D> : GroupCore
   {
-    internal override GroupCore Initialize(Composition composition, LayerCore layer)
+    internal override GroupCore Initialize(Composition composition, Layer layer)
     {
       var gr = base.Initialize(composition, layer);
       Storage<T>.Instance.groups[layer.id].Add(this);
@@ -1101,7 +1101,7 @@ namespace Pixeye.Actors
   [Il2CppSetOption(Option.DivideByZeroChecks, false)]
   public class Group<T, Y, U, I, O, P, A, S, D, F> : GroupCore
   {
-    internal override GroupCore Initialize(Composition composition, LayerCore layer)
+    internal override GroupCore Initialize(Composition composition, Layer layer)
     {
       var gr = base.Initialize(composition, layer);
       Storage<T>.Instance.groups[layer.id].Add(this);

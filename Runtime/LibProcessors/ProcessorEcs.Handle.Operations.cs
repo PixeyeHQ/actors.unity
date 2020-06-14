@@ -53,7 +53,7 @@ namespace Pixeye.Actors
       throw new Exception();
     }
 
-    internal void SwapLayer(ent entity, LayerCore otherLayer)
+    internal void SwapLayer(ent entity, Layer otherLayer)
     {
       var     eMeta    = entity.meta;
       ref var eManaged = ref entity.managed;

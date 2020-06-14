@@ -27,7 +27,7 @@ namespace Pixeye.Actors
     static PostProcessorCheckPools()
     {
       EditorApplication.update += Step;
-      var layer = Object.FindObjectOfType<LayerCore>();
+      var layer = Object.FindObjectOfType<Layer>();
       if (layer == null) return;
       layer.ClearNodes();
     }
@@ -42,7 +42,7 @@ namespace Pixeye.Actors
 
     public static void CheckScene()
     {
-      var layer = Object.FindObjectOfType<LayerCore>();
+      var layer = Object.FindObjectOfType<Layer>();
       if (layer == null) return;
       layer.ClearNodes();
       var actors = Object.FindObjectsOfType<Actor>();
@@ -55,7 +55,7 @@ namespace Pixeye.Actors
       }
     }
 
-    public static void CheckPoolCache(GameObject gameObject, int pool, LayerCore layer)
+    public static void CheckPoolCache(GameObject gameObject, int pool, Layer layer)
     {
       GameObject prefab;
 #if UNITY_2018_3_OR_NEWER

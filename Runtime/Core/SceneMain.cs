@@ -26,8 +26,8 @@ namespace Pixeye.Actors
     {
       LayerKernel.Initialized[buildIndex] = false;
       Closed();
-      LayerCore.ActiveLayer.Release();
-      LayerKernel.LoadJobs.Add(SceneManager.UnloadSceneAsync(LayerCore.ActiveLayer.Scene));
+      Layer.ActiveLayer.Release();
+      LayerKernel.LoadJobs.Add(SceneManager.UnloadSceneAsync(Layer.ActiveLayer.Scene));
       LayerKernel.LoadJobs.Add(Resources.UnloadUnusedAssets());
       LayerKernel.LoadJobs.Add(SceneManager.LoadSceneAsync(buildIndex, LoadSceneMode.Additive));
     }

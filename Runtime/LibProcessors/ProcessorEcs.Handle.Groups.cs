@@ -89,7 +89,7 @@ namespace Pixeye.Actors
       }
     }
 
-    GroupCore SetupGroup(Type groupType, object fieldObj, Composition composition, LayerCore layer)
+    GroupCore SetupGroup(Type groupType, object fieldObj, Composition composition, Layer layer)
     {
       foreach (var groupNext in Groups)
       {

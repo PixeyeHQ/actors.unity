@@ -8,12 +8,12 @@ namespace Pixeye.Actors
   {
     static FastString strPath = new FastString(256);
 
-    public static LayerCore GetLayer(this GameObject go)
+    public static Layer GetLayer(this GameObject go)
     {
       return LayerKernel.Layers[go.scene.buildIndex];
     }
 
-    public static LayerCore GetLayer(this Transform tr)
+    public static Layer GetLayer(this Transform tr)
     {
       
       return LayerKernel.Layers[tr.gameObject.scene.buildIndex];

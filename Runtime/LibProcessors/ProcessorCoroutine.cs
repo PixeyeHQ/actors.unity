@@ -16,9 +16,9 @@ namespace Pixeye.Actors
     internal int currentIndex;
     int length;
 
-    LayerCore layer;
+    Layer layer;
 
-    public void Bootstrap(LayerCore layer)
+    public void Bootstrap(Layer layer)
     {
       this.layer = layer;
       layer.Engine.Add(this);

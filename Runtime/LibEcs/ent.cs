@@ -35,7 +35,7 @@ namespace Pixeye.Actors
       get => ref ProcessorEcs.EntitiesManaged[id].transform;
     }
 
-    public LayerCore layer
+    public Layer layer
     {
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
       get => ProcessorEcs.EntitiesManaged[id].layer;
@@ -192,7 +192,7 @@ namespace Pixeye.Actors
       _managed.parent = default;
     }
 
-    public void MoveTo<T>() where T : LayerCore
+    public void MoveTo<T>() where T : Layer
     {
       DebugMoveTo<T>();
       managed.layer.processorEcs.SwapLayer(this, Layer<T>.InternalInstance);

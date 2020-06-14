@@ -12,7 +12,7 @@ namespace Pixeye.Actors
   {
     internal static Buffer<T>[] layers = new Buffer<T>[LayerKernel.LAYERS_AMOUNT_TOTAL];
 
-    public void Bootstrap(LayerCore layer)
+    public void Bootstrap(Layer layer)
     {
       layerID         = layer.id;
       layers[layerID] = this;

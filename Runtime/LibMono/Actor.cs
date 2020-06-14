@@ -33,7 +33,7 @@ namespace Pixeye.Actors
     // Launch methods
     //===============================//
 
-    public sealed override void Bootstrap(LayerCore layer)
+    public sealed override void Bootstrap(Layer layer)
     {
       // Case: Session Start. 
       // When childs are initialized manually from the parent, layer will treat them as eligable
@@ -51,7 +51,7 @@ namespace Pixeye.Actors
       HandleEnable();
     }
 
-    internal void Bootstrap(LayerCore layer, ModelComposer model)
+    internal void Bootstrap(Layer layer, ModelComposer model)
     {
       Layer = layer;
       if (!entity.exist)

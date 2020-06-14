@@ -39,11 +39,11 @@ namespace Pixeye.Actors
 
     public static SettingsActors Settings = new SettingsActors();
 
-    internal static LayerCore LayerCurrentInit; // only for setup stuff to provide layer to the processors constructors.
+    internal static Layer LayerCurrentInit; // only for setup stuff to provide layer to the processors constructors.
  
     internal const string KernelSceneName = "Actors Framework";
-    internal static LayerCore[] Layers = new LayerCore[128];
-    internal static readonly List<LayerCore> LayersInUse = new List<LayerCore>();
+    internal static Layer[] Layers = new Layer[128];
+    internal static readonly List<Layer> LayersInUse = new List<Layer>();
 
 
     public static void Bootstrap()

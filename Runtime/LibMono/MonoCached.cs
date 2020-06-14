@@ -8,7 +8,7 @@ namespace Pixeye.Actors
 {
   public abstract class MonoCached : MonoBehaviour, IRequireActorsLayer
   {
-    [HideInInspector] public LayerCore Layer;
+    [HideInInspector] public Layer Layer;
 
     public ProcessorUpdate Engine => Layer.Engine;
     public ImplObserver Observer => Layer.Observer;
@@ -37,7 +37,7 @@ namespace Pixeye.Actors
       HandleDisable();
     }
 
-    public virtual void Bootstrap(LayerCore layer)
+    public virtual void Bootstrap(Layer layer)
     {
       // Case: Session Start. 
       // When childs are initialized manually from the parent, layer will treat them as eligable

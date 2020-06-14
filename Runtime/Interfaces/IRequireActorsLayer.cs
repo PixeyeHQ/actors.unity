@@ -5,6 +5,6 @@ namespace Pixeye.Actors
 {
   public interface IRequireActorsLayer
   {
-    void Bootstrap(LayerCore layer);
+    void Bootstrap(Layer layer);
   }
 }
