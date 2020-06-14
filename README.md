@@ -156,8 +156,6 @@ As already said, layers are very important part of the framework. Each layer rep
   * **Processors** : Created in the layer and get the reference of it.
   * **Monocached**  : Base monobehavior classes in the framework. They get the reference of a layer when initialized.
   * **Actors**     : Inherited from monocache class. They represent entity view.
-### 📘 Signals
-**Signals** are pub/sub message system.
 
 ### 📘 Time
 **Time** is a module that controls time flow. Each **layer** has it's own time and timescale.
@@ -462,6 +460,50 @@ IEnumerator CoHello()
 ```
 
 ## 📖 Advanced
+### 📘 Signals
+**Signals** are pub/sub message system. 
+
+**💬 How to add signals?**   
+Inherit your class from IReceive<T> interface and add signal to the layer.
+```csharp
+public class ActorAlpaca : Actor, IReceive<SignalGameStarted>
+  {
+    // add signal to layer that actor belongs to.
+    protected override void HandleEnable() => Layer.AddSignal(this);    
+    // remove signal from layer when actor is disabled/destroyed. 
+    protected override void HandleDisable() => Layer.RemoveSignal(this);
+
+    public void HandleSignal(in SignalGameStarted arg)
+    {
+      Debug.Log(arg.message);
+    }
+  }
+```
+**💬 How to send signals?** 
+```csharp
+public class ProcessorAlpaca : Processor, ITick
+  {
+    public void Tick(float dt)
+    {
+      // will send a signal to the layer where ProcessorAlpaca registered.
+      if (Input.GetKeyDown(KeyCode.Space))
+      {
+        SignalGameStarted signal;
+        signal.message = "hello world!";
+        Layer.Send(signal);
+      }
+      
+      // will send a signal to all layers.
+      if (Input.GetKeyDown(KeyCode.Q))
+      {
+        SignalGameStarted signal;
+        signal.message = "hello world!";
+        Every.Layer.Send(signal);
+      }
+    }
+  }
+```
+
 ### 📘 Box
 Box is a small wrapper to take assets from the resources foler.
 
