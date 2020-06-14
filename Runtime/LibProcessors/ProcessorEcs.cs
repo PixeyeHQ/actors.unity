@@ -67,6 +67,10 @@ namespace Pixeye.Actors
 
       managed.layer    = layer;
       managed.isPooled = isPooled;
+      // we always need to cleanup transforms as they can be pooled.
+      // if the next entity id is not used in pool and will still have
+      // a link to the transform it will destroy a transform.
+      managed.transform = null;  
 
       ptr->age              = entity.age;
       ptr->isAlive          = true;
