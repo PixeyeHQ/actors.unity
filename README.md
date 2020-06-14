@@ -652,6 +652,32 @@ You should use a special bind attribute.
 ```
 > 💡 Note that group bindings refer to the layer where group was registered.
 
+### 📘 Settings
+You can cusotomize some parametres through the SettingsFramework.json. If you don't have one just create it inside of your resources folder.
+```json
+{
+  "//": "Vsync",
+  "Vsync": 0,
+  "//": "Fixed FPS, 50 by default",
+  "FpsPhysics": 50,
+  "//": "FPS, -1 for fast as possible",
+  "Fps": -1,
+  "//": "How much entities do you need at start",
+  "SizeEntities": 5000,
+  "//": "Amount of component types. Must be multiple of 32",
+  "SizeComponents": 128,
+  "//": "Namespace for your components. Remove if you don't use namespaces",
+  "Namespace": "Pixeye.Source",
+  "//": "Extra Debug ( works only in the debug mode )",
+  "DebugNames": false,
+  "//": "Plugins. Put them in Rersources folder",
+  "Plugins": [
+  ],
+  "//": "Pause on losing focus",
+  "PauseOnFocusLost": true
+}
+```
+
 ## 📖 How to Install  
 #### Git Installation
 - Open the manifest.json file of your Unity project.
