@@ -8,9 +8,9 @@ namespace Pixeye.Actors
   public class ImplEntity : IRequireActorsLayer
   {
     internal ProcessorEcs processorEcs;
-    internal LayerCore layer;
+    internal Layer layer;
 
-    void IRequireActorsLayer.Bootstrap(LayerCore layer)
+    void IRequireActorsLayer.Bootstrap(Layer layer)
     {
       this.layer   = layer;
       processorEcs = layer.processorEcs;

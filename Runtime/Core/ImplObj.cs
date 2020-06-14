@@ -9,9 +9,9 @@ namespace Pixeye.Actors
 {
   public class ImplObj : IRequireActorsLayer
   {
-    LayerCore layer;
+    Layer layer;
 
-    void IRequireActorsLayer.Bootstrap(LayerCore layer)
+    void IRequireActorsLayer.Bootstrap(Layer layer)
     {
       this.layer = layer;
     }

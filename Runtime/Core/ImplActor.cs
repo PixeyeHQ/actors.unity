@@ -7,9 +7,9 @@ namespace Pixeye.Actors
   [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
   public class ImplActor : IRequireActorsLayer
   {
-    LayerCore layer;
+    Layer layer;
 
-    void IRequireActorsLayer.Bootstrap(LayerCore layer)
+    void IRequireActorsLayer.Bootstrap(Layer layer)
     {
       this.layer = layer;
     }

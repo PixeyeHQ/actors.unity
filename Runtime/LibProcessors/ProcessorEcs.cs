@@ -18,7 +18,7 @@ namespace Pixeye.Actors
     internal ents entities;
     internal List<Processor> processors = new List<Processor>();
 
-    LayerCore layer;
+    Layer layer;
 
     internal static void Bootstrap()
     {
@@ -77,7 +77,7 @@ namespace Pixeye.Actors
       entities.Add(entity);
     }
 
-    void IRequireActorsLayer.Bootstrap(LayerCore layer)
+    void IRequireActorsLayer.Bootstrap(Layer layer)
     {
       this.layer = layer;
       entities   = new ents(LayerKernel.Settings.SizeEntities);

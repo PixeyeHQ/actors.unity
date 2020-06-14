@@ -6,18 +6,18 @@ namespace Pixeye.Actors
 {
   public static class LayerMain
   {
-    public static ProcessorUpdate Engine => LayerCore.ActiveLayer.Engine;
-    public static ImplEntity Entity => LayerCore.ActiveLayer.Entity;
-    public static ImplEcs Ecs => LayerCore.ActiveLayer.Ecs;
-    public static ImplObserver Observer => LayerCore.ActiveLayer.Observer;
-    public static ImplActor Actor => LayerCore.ActiveLayer.Actor;
-    public static Time Time => LayerCore.ActiveLayer.Time;
-    public static ImplObj Obj => LayerCore.ActiveLayer.Obj;
+    public static ProcessorUpdate Engine => Layer.ActiveLayer.Engine;
+    public static ImplEntity Entity => Layer.ActiveLayer.Entity;
+    public static ImplEcs Ecs => Layer.ActiveLayer.Ecs;
+    public static ImplObserver Observer => Layer.ActiveLayer.Observer;
+    public static ImplActor Actor => Layer.ActiveLayer.Actor;
+    public static Time Time => Layer.ActiveLayer.Time;
+    public static ImplObj Obj => Layer.ActiveLayer.Obj;
 
 
-    public static void Send<Y>(in Y signal) => LayerCore.ActiveLayer.processorSignals.Dispatch(signal);
-    public static void AddSignal(object signal) => LayerCore.ActiveLayer.processorSignals.Add(signal);
-    public static void RemoveSignal(object signal) => LayerCore.ActiveLayer.processorSignals.Remove(signal);
+    public static void Send<Y>(in Y signal) => Layer.ActiveLayer.processorSignals.Dispatch(signal);
+    public static void AddSignal(object signal) => Layer.ActiveLayer.processorSignals.Add(signal);
+    public static void RemoveSignal(object signal) => Layer.ActiveLayer.processorSignals.Remove(signal);
 
 
     /// Initialize every actor or monocache on childs of the selected gameobject
@@ -34,7 +34,7 @@ namespace Pixeye.Actors
         {
           if (o is IRequireActorsLayer req)
           {
-            req.Bootstrap(LayerCore.ActiveLayer);
+            req.Bootstrap(Layer.ActiveLayer);
             o.enabled = true;
           }
         }
@@ -59,7 +59,7 @@ namespace Pixeye.Actors
       {
         if (o is IRequireActorsLayer req)
         {
-          req.Bootstrap(LayerCore.ActiveLayer);
+          req.Bootstrap(Layer.ActiveLayer);
           o.enabled = true;
         }
       }
@@ -71,38 +71,38 @@ namespace Pixeye.Actors
     /// Run coroutine on the top of this layer.
     public static RoutineCall Run(IEnumerator routine)
     {
-      return LayerCore.ActiveLayer.processorCoroutine.Run(routine);
+      return Layer.ActiveLayer.processorCoroutine.Run(routine);
     }
 
     /// Run coroutine on the top of this layer.
     public static RoutineCall Run(float delay, IEnumerator routine)
     {
-      return LayerCore.ActiveLayer.processorCoroutine.Run(delay, routine);
+      return Layer.ActiveLayer.processorCoroutine.Run(delay, routine);
     }
 
 
     /// Run coroutine on the top of this layer.
     public static RoutineCall RunUnscaled(IEnumerator routine)
     {
-      return LayerCore.ActiveLayer.processorCoroutineUnscaled.Run(routine);
+      return Layer.ActiveLayer.processorCoroutineUnscaled.Run(routine);
     }
 
     /// Run coroutine on the top of this layer.
     public static RoutineCall RunUnscaled(float delay, IEnumerator routine)
     {
-      return LayerCore.ActiveLayer.processorCoroutineUnscaled.Run(delay, routine);
+      return Layer.ActiveLayer.processorCoroutineUnscaled.Run(delay, routine);
     }
 
     /// Stop coroutine on the top of this layer.
     public static bool Stop(IEnumerator routine)
     {
-      return LayerCore.ActiveLayer.processorCoroutine.Stop(routine);
+      return Layer.ActiveLayer.processorCoroutine.Stop(routine);
     }
 
     /// Stop coroutine on the top of this layer.
     public static bool StopUnscaled(IEnumerator routine)
     {
-      return LayerCore.ActiveLayer.processorCoroutineUnscaled.Stop(routine);
+      return Layer.ActiveLayer.processorCoroutineUnscaled.Stop(routine);
     }
 
 
@@ -110,14 +110,14 @@ namespace Pixeye.Actors
 
     public static IEnumerator Wait(float t)
     {
-      LayerCore.ActiveLayer.processorCoroutine.delays[LayerCore.ActiveLayer.processorCoroutine.currentIndex] = t;
+      Layer.ActiveLayer.processorCoroutine.delays[Layer.ActiveLayer.processorCoroutine.currentIndex] = t;
       return null;
     }
 
     public static IEnumerator WaitUnscaled(float t)
     {
-      LayerCore.ActiveLayer.processorCoroutineUnscaled.delays[
-        LayerCore.ActiveLayer.processorCoroutineUnscaled.currentIndex] = t;
+      Layer.ActiveLayer.processorCoroutineUnscaled.delays[
+        Layer.ActiveLayer.processorCoroutineUnscaled.currentIndex] = t;
       return null;
     }
 

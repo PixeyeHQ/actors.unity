@@ -27,7 +27,7 @@ namespace Pixeye.Actors
     int countTicksFixed;
     int countTicksLate;
 
-    internal LayerCore layer;
+    internal Layer layer;
 
     internal int GetTicksCount => countTicks + countTicksFixed + countTicksLate
                                   + countTicksProc + countTicksProcFixed + countTicksProcLate;

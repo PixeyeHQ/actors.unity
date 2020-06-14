@@ -113,7 +113,7 @@ namespace Pixeye.Actors
   public struct EntityManagedMeta
   {
     public bool isPooled;
-    internal LayerCore layer;
+    internal Layer layer;
     internal Transform transform;
     internal int[] signature;
     internal ents childs;
