@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="https://i.gyazo.com/0d279c9e9fefb1198b5566a98c8776aa.png" alt="Actors">
+    <img src="http://pixeye.games/images/logo_actors-1024.png" width="512" height="512" alt="Actors">
 </p>
 
 [![Discord](https://img.shields.io/discord/320945300892286996.svg?label=Discord)](http://discord.pixeye.games)
