@@ -458,6 +458,39 @@ IEnumerator CoHello()
       yield return Layer.Wait(1.0f);
     }
 ```
+## 📖 Monocached Overview
+**Monocached** classes are basic monobehavior classes in the world of Actors. They are intialized **after** the layer and use special Setup method for Awaking. It's better to create monocomponents from monocached.
+
+## 📖 Actor Overview
+**Actors** are special wrapper classes that act like a bridge between Ecs and Unity logic and inherited from **Monocached**. You can think about actors as a view class or components provider for an entity. Actors **are not entities**, but they create an entitie once initialized. You can use actors as lazy object setter. Actors **may** content view logic or be used for scripting if needed. 
+
+**💬 How to use actors?**   
+
+```csharp
+public class ActorAlpaca : Actor
+  {
+    // you are not forced to use attribute.
+    [FoldoutGroup("Components", true)]
+    public ComponentHealth componentHealth;
+    public ComponentDamager componentDamager;
+
+    protected override void Setup()
+    {
+      entity.Set(componentHealth);
+      entity.Set(componentDamager);
+    }
+  }
+```
+> 💡 Actors will be initialized after the layer.
+<details>
+<summary>
+Actor in the inspector
+</summary>
+<a href="https://gyazo.com/742384979f2cf627c5b89c93a854cf38"><img src="https://i.gyazo.com/742384979f2cf627c5b89c93a854cf38.gif" alt="Actor="000"/></a>
+</details>
+
+**🔖 IsPooled** 
+Actors on scene may be pooled. To do this you need to toggle ```IsPooled``` variable in the actor's inspector panel.
 
 ## 📖 Advanced
 ### 📘 ECS Events
