@@ -459,10 +459,31 @@ IEnumerator CoHello()
     }
 ```
 ## 📖 Monocached Overview
-**Monocached** classes are basic monobehavior classes in the world of Actors. They are intialized **after** the layer and use special Setup method for Awaking. It's better to create monocomponents from monocached.
+**Monocached** classes are basic monobehavior classes in the world of Actors. They are intialized **after** the layer and use special Setup method for Awaking. It's better to create monocomponents inherited from monocached.
+
+**💬 How to use monocached?**   
+
+```csharp
+public class MonoAlpaca : Monocached
+{
+    // use instead of the start method.
+    protected override void Setup()
+    {
+    }
+    // use instead of the enable method.
+    protected override void HandleEnable()
+    {
+    }  
+    // use instead of the disable method.
+    protected override void HandleEnable()
+    {
+    }    
+}
+```
+> 💡 Actors will be initialized after the layer.
 
 ## 📖 Actor Overview
-**Actors** are special wrapper classes that act like a bridge between Ecs and Unity logic and inherited from **Monocached**. You can think about actors as a view class or components provider for an entity. Actors **are not entities**, but they create an entitie once initialized. You can use actors as lazy object setter. Actors **may** content view logic or be used for scripting if needed. 
+**Actors** are special wrapper classes that act like a bridge between Ecs and Unity logic and inherited from **Monocached**. You can think about actors as a view class or components provider for an entity. Actors **are not entities**, but they create an entity automatically once initialized. You can use actors as lazy object setter. Actors **may** content view logic or be used for scripting if needed. 
 
 **💬 How to use actors?**   
 
@@ -473,7 +494,8 @@ public class ActorAlpaca : Actor
     [FoldoutGroup("Components", true)]
     public ComponentHealth componentHealth;
     public ComponentDamager componentDamager;
-
+    
+    // use instead of the start method to initialize the entity.
     protected override void Setup()
     {
       entity.Set(componentHealth);
