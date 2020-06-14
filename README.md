@@ -156,6 +156,18 @@ As already said, layers are very important part of the framework. Each layer rep
   * **Processors** : Created in the layer and get the reference of it.
   * **Monocached**  : Base monobehavior classes in the framework. They get the reference of a layer when initialized.
   * **Actors**     : Inherited from monocache class. They represent entity view.
+### 📘 Time
+**Time** is a module that controls time flow. Each **layer** has it's own time and timescale.
+```csharp
+ public class ProcessorAlpaca : Processor, ITick
+  {
+    public void Tick(float dt)
+    {
+      if (Input.GetKeyDown(KeyCode.Space))
+        Time.scale = 0.5f;
+    }
+  }
+```
 
 ### 📘 Engine
 **Engine** is a centralized update processor based on Unity update. Think of it as a one Unity update that controls them all. Engine work inside of a **layer** and will be stopped if the layer they work on would be destroyed. You are not forced to use custom updates but every processor and framework module work via engine. 
