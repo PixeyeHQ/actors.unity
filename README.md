@@ -22,11 +22,59 @@ The framework favors simplicity and doesn't try to "abstract away" Unity workflo
 
 ## 📖 ECS Basic Overview
 **🔖 Entities** are containers for components. Entity ID is represented by ent structure.
+
+**💬 How to create an entity?**
 ```csharp
-// Create entity
-ent alpaca = Entity.Create();
-// Kill entity
-alpaca.Release();
+public void SomeMethod()
+{
+    // Bare entity
+    ent e = Entity.Create();
+}
+```
+Entities can hold information about unity objects as well!
+```csharp
+public void SomeMethod()
+{    
+     // New entity with a new GO ( GameObject ).
+     // The GO prefab will be taken from the Resources folder by string ID.
+     ent e = Entity.Create("Obj Fluffy Unicorn");
+     // Access to the transform of Obj Fluffy Unicorn gameobject.
+     e.transform.position = new Vector3(0,0,0) ;
+}
+```
+You can pool gameobject by adding ```true``` variable in the end of the method.
+```csharp
+public GameObject prefabFluffyUnicorn;
+public void SomeMethod()
+{    
+     // New entity with a new GO ( GameObject ).
+     // The GO will be created from the provided prefab.
+     // The GO will be pooled.
+     ent e = Entity.Create(prefabFluffyUnicorn, true);
+     // Access to the transform of Obj Fluffy Unicorn gameobject.
+     e.transform.position = new Vector3(0,0,0) ;
+}
+```
+```csharp
+public void SomeMethod()
+{    
+     // New entity with a new GO ( GameObject ).
+     // The GO prefab will be taken from the Resources folder by string ID. 
+     // The GO will be pooled.
+     ent e = Entity.Create("Obj Fluffy Unicorn", true);
+     // Access to the transform of Obj Fluffy Unicorn gameobject.
+     e.transform.position = new Vector3(0,0,0) ;
+}
+```
+Entity API is layer specific. You will find more info about layers below. If you want to create an entity on a different layer you need to use slightly different approach:
+```csharp
+public void SomeMethod()
+{    
+     // we use LayerApp API to create entity inside of the LayerApp.
+     ent e = LayerApp.Entity.Create("Obj Fluffy Unicorn", true);
+     // Access to the transform of Obj Fluffy Unicorn gameobject.
+     e.transform.position = new Vector3(0,0,0) ;
+}
 ```
 
 **🔖 Components** are containers for data.
