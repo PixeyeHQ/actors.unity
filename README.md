@@ -460,6 +460,51 @@ IEnumerator CoHello()
 ```
 
 ## 📖 Advanced
+### 📘 ECS Signals
+**ECS Signals** are special events that are send through all processors on the layer. This is a very powerful concept and I don't recommend to use it until you really understand what are you doing. These events can be *changed* or even stopped on their route. 
+
+**💬 How they work?**   
+Ecs signals are deterministic and sent in order. See example below:
+```csharp
+ public class LayerBattle : Layer<LayerBattle>
+  {
+    protected override void Setup()
+    {
+      Add<ProcessorReceiverA>(); // receive the event ( second receiver )
+      Add<ProcessorSender>();    // send the event.
+      Add<ProcessorReceiverB>(); // receive the event ( first receiver ) 
+    }
+  }
+```
+**💬 How to subscribe on ecs signal?**   
+Inherit from ```Processor<T>```. T type is your event.
+```csharp
+public class ProcessorReceiverA : Processor<SignalGameStarted>
+  {
+    public override void ReceiveEcs(ref SignalGameStarted signal, ref bool stopSignal)
+    {
+      Debug.Log(signal.message);
+      stopSignal = true; // you can stop signal from moving on to the next processor.
+    }
+  }
+```
+**💬 How to send ecs signal?**
+```csharp
+public class ProcessorSender : Processor, ITick
+  {
+    public void Tick(float dt)
+    {
+      if (Input.GetKeyDown(KeyCode.Space))
+      {
+        SignalGameStarted signal;
+        signal.message = "hello world";
+        Ecs.Send(signal);
+      }
+    }
+  }
+```
+
+
 ### 📘 Signals
 **Signals** are pub/sub message system. 
 
