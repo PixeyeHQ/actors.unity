@@ -5,6 +5,6 @@ namespace Pixeye.Actors
 {
   public interface ITickLate
   {
-    void TickLate(float delta);
+    void TickLate(float dt);
   }
 }
