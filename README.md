@@ -460,6 +460,46 @@ IEnumerator CoHello()
 ```
 
 ## 📖 Advanced
+### 📘 ECS Events
+You can perfrom actions when entities are added or removed from the groups.  
+**💬 How to use ecs events?**
+You need to use the HandleEcsEvents method and iterate through added/removed stack of the group.
+```csharp
+public class ProcessorTest : Processor, ITick
+  {
+    Group<ComponentHealth> objects;
+
+    public override void HandleEcsEvents()
+    {
+      foreach (var e in objects.added)
+      {
+        Debug.Log($"{e} was added!");
+      }
+
+      foreach (var e in objects.removed)
+      {
+        Debug.Log($"{e} was removed!");
+      }
+    }
+
+    public void Tick(float dt)
+    {
+      if (Input.GetKeyDown(KeyCode.Space))
+      {
+        var entity = Entity.Create();
+        entity.Set<ComponentHealth>();
+      }
+
+      if (Input.GetKeyDown(KeyCode.Q))
+      {
+        if (objects.length > 0)
+          objects[0].Release();
+      }
+    }
+  }
+```
+
+
 ### 📘 ECS Signals
 **ECS Signals** are special events that are send through all processors on the layer. This is a very powerful concept and I don't recommend to use it until you really understand what are you doing. These events can be *changed* or even stopped on their route. 
 
