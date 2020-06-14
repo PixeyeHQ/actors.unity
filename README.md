@@ -157,6 +157,52 @@ As already said, layers are very important part of the framework. Each layer rep
   * **Monocached**  : Base monobehavior classes in the framework. They get the reference of a layer when initialized.
   * **Actors**     : Inherited from monocache class. They represent entity view.
 
+### 📘 Engine
+**Engines** is a centralized update processor based on Unity update. Think of it as a one Unity update that controls them all. Engine work inside of a **layer** and will be stopped if the layer they work on would be destroyed. You are not forced to use custom updates but every processor and framework module work via engine. 
+
+Why use this module?
+- You can use it outside monobehavior classes.
+- Delta variable right inside of your update method.
+- Better performance then using plain unity update method. ( You would never encounter performance issues with that though. )
+
+**💬 How to use custom updates?**
+First, you need to add a special interface for using updates.
+
+* **ITick**: Normal Updates
+* **ITickFixed**: Fixed Updates
+* **ITickLate**: Late Updates
+
+If you are using those interfaces with processors then this is all you need to provide.
+
+```csharp
+public class ProcessorAlpaca : Processor, ITick, ITickFixed
+  {
+    public void Tick(float dt)
+    {
+    }
+
+    public void TickFixed(float dt)
+    {
+      
+    }
+  }
+```
+
+In case you are using custom class or monocached/actor class you will need to manually add your object to the engine.
+```csharp
+public class ActorAlpaca : Actor, ITick
+  {
+    protected override void HandleEnable() => Engine.Add(this);     // add this to ticks.
+    protected override void HandleDisable() => Engine.Remove(this); // remove this from ticks.
+
+    public void Tick(float dt)
+    {
+    }
+  }
+```
+> 💡 *Don't forget to remove update from engine when object is destroyed/deactivated.*
+
+
 ### 📘 Observers
 **Observers** allows to handle changes of a variable. It's very handy for working with UI but can be used in game logic too. Routines work inside of a **layer** and will be stopped if the layer they work on would be destroyed.
 
