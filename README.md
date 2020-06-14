@@ -453,7 +453,8 @@ Box is a small wrapper to take assets from the resources foler.
 
 **🔖 Box.Load<T>** is used to load asset as Resources.Load.
 ```csharp
-Box.Load<DataObject>("Data Hero Alpaca");
+var data = Box.Load<DataObject>("Data Hero Alpaca");
+var sprites = Box.LoadAll<Sprite>("Tex Hero Alpaca"); // take elements from array.
 ```
 **🔖 Box.Get<T>** is used to load and cache asset. When you load the asset for the first time it will be saved in dictionary. Next time you will get it from the dict.
 ```csharp
