@@ -74,7 +74,7 @@ namespace Pixeye.Actors
       }
     }
 
-    public void AddProc(Processor updateble)
+    internal void AddProc(Processor updateble)
     {
       if (updateble is IReceiveEcsEvent receiver)
       {
@@ -105,7 +105,7 @@ namespace Pixeye.Actors
       }
     }
 
-    public void RemoveProc(object updateble)
+    internal void RemoveProc(object updateble)
     {
       processors.Remove(updateble as IReceiveEcsEvent);
 
@@ -166,12 +166,11 @@ namespace Pixeye.Actors
 
     public void Update()
     {
-      
       if (LayerKernel.ApplicationIsQuitting) return;
       if (layer.isReleasing) return;
       layer.Time.Tick();
       var delta = layer.Time.deltaTime;
-      
+
       for (var i = 0; i < countTicks; i++)
       {
         ticks[i].Tick(delta);
@@ -194,7 +193,7 @@ namespace Pixeye.Actors
       if (LayerKernel.ApplicationIsQuitting) return;
       if (layer.isReleasing) return;
       var delta = layer.Time.deltaTimeFixed;
-      
+
       for (var i = 0; i < countTicksFixed; i++)
       {
         ticksFixed[i].TickFixed(delta);
@@ -211,8 +210,8 @@ namespace Pixeye.Actors
       if (LayerKernel.ApplicationIsQuitting) return;
       if (layer.isReleasing) return;
       var delta = layer.Time.deltaTime;
-      
-      
+
+
       for (var i = 0; i < countTicksLate; i++)
       {
         ticksLate[i].TickLate(delta);
