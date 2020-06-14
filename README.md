@@ -448,7 +448,17 @@ IEnumerator CoHello()
 ```
 
 ## 📖 Advanced
+### 📘 Box
+Box is a small wrapper to take assets from the resources foler.
 
+**🔖 Box.Load<T>** is used to load asset as Resources.Load.
+```csharp
+Box.Load<DataObject>("Data Hero Alpaca");
+```
+**🔖 Box.Get<T>** is used to load and cache asset. When you load the asset for the first time it will be saved in dictionary. Next time you will get it from the dict.
+```csharp
+Box.Get<DataObject>("Data Hero Alpaca");
+```
 ### 📘 Group Bindings
 You can bind a group with an id and later get this group by this id. This is very useful when you need to work with several groups and want to filter them. For example you would want to raycast against entities that are in a group of allies and a group of objects.
 
