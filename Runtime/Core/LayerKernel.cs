@@ -45,8 +45,8 @@ namespace Pixeye.Actors
     internal static Layer[] Layers = new Layer[128];
     internal static readonly List<Layer> LayersInUse = new List<Layer>();
 
-
-    public static void Bootstrap()
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+    static void Bootstrap()
     {
       HandleSettings();
       UpdateTypes();

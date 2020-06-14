@@ -22,7 +22,7 @@ namespace Pixeye.Actors
 
     [FoldoutGroup("Main")] public bool isPooled;
 
-    [FoldoutGroup("Main")] public ScriptableBuild buildFrom;
+    //[FoldoutGroup("Main")] public ScriptableBuild buildFrom;
 
 
     protected sealed override void Start()
@@ -40,10 +40,10 @@ namespace Pixeye.Actors
       // objects to bootstrap. To prevent double bootstrap we check the layer. If it is not null
       // then we know that the monocache was already activated.
       if (Layer != null) return;
-      
+
       Layer = layer;
       if (!entity.exist)
-        entity = layer.Entity.CreateForActor(this, buildFrom, isPooled);
+        entity = layer.Entity.CreateForActor(this, (ScriptableBuild) null, isPooled);
 #if UNITY_EDITOR
       _entity = entity.id;
 #endif
