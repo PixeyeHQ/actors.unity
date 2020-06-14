@@ -22,11 +22,59 @@ The framework favors simplicity and doesn't try to "abstract away" Unity workflo
 
 ## 📖 ECS Basic Overview
 **🔖 Entities** are containers for components. Entity ID is represented by ent structure.
+
+**💬 How to create an entity?**
 ```csharp
-// Create entity
-ent alpaca = Entity.Create();
-// Kill entity
-alpaca.Release();
+public void SomeMethod()
+{
+    // Bare entity
+    ent e = Entity.Create();
+}
+```
+Entities can hold information about unity objects as well!
+```csharp
+public void SomeMethod()
+{    
+     // New entity with a new GO ( GameObject ).
+     // The GO prefab will be taken from the Resources folder by string ID.
+     ent e = Entity.Create("Obj Fluffy Unicorn");
+     // Access to the transform of Obj Fluffy Unicorn gameobject.
+     e.transform.position = new Vector3(0,0,0) ;
+}
+```
+You can pool gameobject by adding ```true``` variable in the end of the method.
+```csharp
+public GameObject prefabFluffyUnicorn;
+public void SomeMethod()
+{    
+     // New entity with a new GO ( GameObject ).
+     // The GO will be created from the provided prefab.
+     // The GO will be pooled.
+     ent e = Entity.Create(prefabFluffyUnicorn, true);
+     // Access to the transform of Obj Fluffy Unicorn gameobject.
+     e.transform.position = new Vector3(0,0,0) ;
+}
+```
+```csharp
+public void SomeMethod()
+{    
+     // New entity with a new GO ( GameObject ).
+     // The GO prefab will be taken from the Resources folder by string ID. 
+     // The GO will be pooled.
+     ent e = Entity.Create("Obj Fluffy Unicorn", true);
+     // Access to the transform of Obj Fluffy Unicorn gameobject.
+     e.transform.position = new Vector3(0,0,0) ;
+}
+```
+Entity API is layer specific. You will find more info about layers below. If you want to create an entity on a different layer you need to use slightly different approach:
+```csharp
+public void SomeMethod()
+{    
+     // we use LayerApp API to create entity inside of the LayerApp.
+     ent e = LayerApp.Entity.Create("Obj Fluffy Unicorn", true);
+     // Access to the transform of Obj Fluffy Unicorn gameobject.
+     e.transform.position = new Vector3(0,0,0) ;
+}
 ```
 
 **🔖 Components** are containers for data.
@@ -459,10 +507,33 @@ IEnumerator CoHello()
     }
 ```
 ## 📖 Monocached Overview
-**Monocached** classes are basic monobehavior classes in the world of Actors. They are intialized **after** the layer and use special Setup method for Awaking. It's better to create monocomponents from monocached.
+**Monocached** classes are basic monobehavior classes in the world of Actors. They are intialized **after** the layer and use special Setup method for Awaking. It's better to create monocomponents inherited from monocached.
+
+**💬 How to use monocached?**   
+
+```csharp
+public class MonoAlpaca : Monocached
+{
+    // use instead of the start method.
+    protected override void Setup()
+    {
+    }
+    // use instead of the enable method.
+    protected override void HandleEnable()
+    {
+    }  
+    // use instead of the disable method.
+    protected override void HandleEnable()
+    {
+    }    
+}
+```
+> 💡 Actors will be initialized after the layer.
 
 ## 📖 Actor Overview
-**Actors** are special wrapper classes that act like a bridge between Ecs and Unity logic and inherited from **Monocached**. You can think about actors as a view class or components provider for an entity. Actors **are not entities**, but they create an entitie once initialized. You can use actors as lazy object setter. Actors **may** content view logic or be used for scripting if needed. 
+The **Actor** is a monobehavior class inherited from the monocached that allows communicating between unity game objects and ecs. Most of the time you will inherit from actors when defining new objects.
+
+The actor class is for setting your entity. You can use it as view class if you like MVC patterns and define logic inside of the actor.
 
 **💬 How to use actors?**   
 
@@ -473,7 +544,8 @@ public class ActorAlpaca : Actor
     [FoldoutGroup("Components", true)]
     public ComponentHealth componentHealth;
     public ComponentDamager componentDamager;
-
+    
+    // use instead of the start method to initialize the entity.
     protected override void Setup()
     {
       entity.Set(componentHealth);
@@ -651,6 +723,32 @@ You should use a special bind attribute.
    }
 ```
 > 💡 Note that group bindings refer to the layer where group was registered.
+
+### 📘 Settings
+You can cusotomize some parametres through the SettingsFramework.json. If you don't have one just create it inside of your resources folder.
+```json
+{
+  "//": "Vsync",
+  "Vsync": 0,
+  "//": "Fixed FPS, 50 by default",
+  "FpsPhysics": 50,
+  "//": "FPS, -1 for fast as possible",
+  "Fps": -1,
+  "//": "How much entities do you need at start",
+  "SizeEntities": 5000,
+  "//": "Amount of component types. Must be multiple of 32",
+  "SizeComponents": 128,
+  "//": "Namespace for your components. Remove if you don't use namespaces",
+  "Namespace": "Pixeye.Source",
+  "//": "Extra Debug ( works only in the debug mode )",
+  "DebugNames": false,
+  "//": "Plugins. Put them in Rersources folder",
+  "Plugins": [
+  ],
+  "//": "Pause on losing focus",
+  "PauseOnFocusLost": true
+}
+```
 
 ## 📖 How to Install  
 #### Git Installation
