@@ -462,7 +462,7 @@ IEnumerator CoHello()
 ## 📖 Advanced
 ### 📘 ECS Events
 You can perfrom actions when entities are added or removed from the groups.  
-**💬 How to use ecs events?**
+**💬 How to use ecs events?**   
 You need to use the HandleEcsEvents method and iterate through added/removed stack of the group.
 ```csharp
 public class ProcessorTest : Processor, ITick
