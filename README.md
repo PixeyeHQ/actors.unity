@@ -6,6 +6,7 @@
 [![Discord](https://img.shields.io/discord/320945300892286996.svg?label=Discord)](http://discord.pixeye.games)
 [![license](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](https://github.com/dimmpixeye/Actors-Unity3d-Framework/blob/master/LICENSE)
 [![openupm](https://img.shields.io/npm/v/com.pixeye.ecs?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.pixeye.ecs/)
+[![stars](https://img.shields.io/github/stars/PixeyeHQ/actors.unity?style=social)](https://github.com/PixeyeHQ/actors.unity/stargazers)
 
 #### Actors is a framework empowering developers to make better games faster on Unity.
 ## ⭐ Why Actors ?
@@ -848,13 +849,10 @@ Press Tools->Actors->Update Actors to get a new update.
 
 ## 📖 Gallery <a name="Gallery"></a> 
 This is a list of known projects that uses Actors by far. If you want to add a project, feel free to contact me :)
-### Until We Die
-[Steam](https://store.steampowered.com/app/1197570/Until_We_Die/)
+#### Until We Die | [Steam](https://store.steampowered.com/app/1197570/Until_We_Die/)
 [![Steam](https://i.gyazo.com/d74cfd05151cc1627cfcd3f7eb296edd.jpg)](https://store.steampowered.com/app/1197570/Until_We_Die/)
-### Snake Demo
-[Github link](https://store.steampowered.com/app/1197570/Until_We_Die/)
-### Actors Benchmark
-[Github link](https://store.steampowered.com/app/1197570/Until_We_Die/) 
+#### Snake Demo | [Github link](https://store.steampowered.com/app/1197570/Until_We_Die/)
+#### Actors Benchmark | [Github link](https://store.steampowered.com/app/1197570/Until_We_Die/) 
 
 ## 📖 About
 ### 💬 How to help
