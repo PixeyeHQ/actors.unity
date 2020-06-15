@@ -1,41 +1,43 @@
- 
-using Pixeye.Actors;
 
+using System.Runtime.CompilerServices;
+using Unity.IL2CPP.CompilerServices;
+using Pixeye.Actors;
+ 
 ##NAMESPACE##
-{
-    
-       public class ##NAME## 
-  	   {
-     	 
-       
+ {
+   public class ##NAME##
+   {
+   }
+ 
+   #region HELPERS
+ 
+   [Il2CppSetOption(Option.NullChecks, false)]
+   [Il2CppSetOption(Option.ArrayBoundsChecks, false)]
+   [Il2CppSetOption(Option.DivideByZeroChecks, false)]
+   static partial class Component
+   {
+     public const string ##NAME2## = "##NAMESPACE2##.##NAME##";
+     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+     public static ref ##NAME## ##NAME##(in this ent entity) =>
+       ref Storage<##NAME##>.components[entity.id];
+   }
+
+   [Il2CppSetOption(Option.NullChecks, false)]
+   [Il2CppSetOption(Option.ArrayBoundsChecks, false)]
+   [Il2CppSetOption(Option.DivideByZeroChecks, false)]
+   sealed class Storage##NAME## : Storage<##NAME##>
+   {
+     public override ##NAME## Create() => new ##NAME##();
+     // Use for cleaning components that were removed at the current frame.
+     public override void Dispose(indexes disposed)
+     {
+       foreach (var id in disposed)
+       {
+         ref var component = ref components[id];
        }
-    
-       #region HELPERS
-       static partial class Component
-        {
-            public const string ##NAME2## = "##NAMESPACE2##.##NAME##";
-            
-    		public static ref ##NAME## ##NAME##(in this ent entity) =>
-            ref Storage<##NAME##>.components[entity.id];
-        }
-        
-        sealed class Storage##NAME## : Storage<##NAME##>
-        {
-    	    public override ##NAME## Create() => new ##NAME##();
-    	     
-    	     
-    	    // Use for cleaning components that were removed at the current frame.
-           	public override void Dispose(indexes disposed)
-             {
-            	foreach (var id in disposed)
-                {
-            		ref var component = ref components[id];
-                }
-             }
-         }
-        #endregion
-}
-  	
+     }
+   }
  
- 
+   #endregion
+ }
  

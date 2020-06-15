@@ -2,11 +2,9 @@
 // Contacts : Pix - ask@pixeye.games
 
 
-
 namespace Pixeye.Actors
 {
-   public interface IBind
-    {
-         
-    }
+  public interface IBind
+  {
+  }
 }

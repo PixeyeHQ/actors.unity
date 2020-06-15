@@ -1,246 +1,243 @@
 //  Project  : ACTORS
 //  Contacts : Pixeye - ask@pixeye.games
 
-using System;
 using System.Collections.Generic;
-using UnityEngine;
+using Unity.IL2CPP.CompilerServices;
 
 namespace Pixeye.Actors
 {
-  public sealed class ProcessorUpdate : MonoBehaviour, IDisposable, IKernel
+  [Il2CppSetOption(Option.NullChecks, false)]
+  [Il2CppSetOption(Option.ArrayBoundsChecks, false)]
+  [Il2CppSetOption(Option.DivideByZeroChecks, false)]
+  public class ProcessorUpdate
   {
-    public static ProcessorUpdate Default;
+    internal readonly List<IReceiveEcsEvent> processors = new List<IReceiveEcsEvent>(64);
+    internal readonly List<ITick> ticks = new List<ITick>(128);
+    internal readonly List<ITick> ticksProc = new List<ITick>(64);
+    internal readonly List<ITickFixed> ticksFixedProc = new List<ITickFixed>(64);
+    internal readonly List<ITickLate> ticksLateProc = new List<ITickLate>(64);
+    internal readonly List<ITickFixed> ticksFixed = new List<ITickFixed>();
+    internal readonly List<ITickLate> ticksLate = new List<ITickLate>();
 
-    internal static List<time> times = new List<time>();
-    internal static int timesLen = 0;
-
-    readonly List<ITick> ticks = new List<ITick>(128);
-    readonly List<ITick> ticksProc = new List<ITick>(64);
-    readonly List<ITickFixed> ticksFixed = new List<ITickFixed>();
-    readonly List<ITickLate> ticksLate = new List<ITickLate>();
-
+    // counting manually allows to instantly shut down everything when scene releasing without waiting one frame.
     int countTicksProc;
+    int countTicksProcFixed;
+    int countTicksProcLate;
     int countTicks;
     int countTicksFixed;
     int countTicksLate;
 
-    void Awake()
+    internal Layer layer;
+
+    internal int GetTicksCount => countTicks + countTicksFixed + countTicksLate
+                                  + countTicksProc + countTicksProcFixed + countTicksProcLate;
+
+    public void AddTick(object updateble)
     {
-      Default = this;
+      ticks.Add(updateble as ITick);
+      countTicks++;
     }
 
-    public int GetTicksCount()
+    public void RemoveTick(object updateble)
     {
-      return countTicks + countTicksProc + countTicksFixed + countTicksLate;
-    }
-
-    public static void AddTick(object updateble)
-    {
-      Default.ticks.Add(updateble as ITick);
-      Default.countTicks++;
-    }
-
-    public static void RemoveTick(object updateble)
-    {
-      if (Default.ticks.Remove(updateble as ITick))
+      if (ticks.Remove(updateble as ITick))
       {
-        Default.countTicks--;
+        countTicks--;
       }
     }
 
-
-    public static void AddTickFixed(object updateble)
+    public void AddTickFixed(object updateble)
     {
-      Default.ticksFixed.Add(updateble as ITickFixed);
-      Default.countTicksFixed++;
+      ticksFixed.Add(updateble as ITickFixed);
+      countTicksFixed++;
     }
 
-    public static void RemoveTickFixed(object updateble)
+    public void RemoveTickFixed(object updateble)
     {
-      if (Default.ticksFixed.Remove(updateble as ITickFixed))
+      if (ticksFixed.Remove(updateble as ITickFixed))
       {
-        Default.countTicksFixed--;
-      }
-    }
-
-
-    public static void AddTickLate(object updateble)
-    {
-      Default.ticksLate.Add(updateble as ITickLate);
-      Default.countTicksLate++;
-    }
-
-    public static void RemoveTickLate(object updateble)
-    {
-      if (Default.ticksLate.Remove(updateble as ITickLate))
-      {
-        Default.countTicksLate--;
+        countTicksFixed--;
       }
     }
 
-    public static void AddProc(object updateble)
+    public void AddTickLate(object updateble)
     {
-      var tickable = updateble as ITick;
+      ticksLate.Add(updateble as ITickLate);
+      countTicksLate++;
+    }
 
-      if (tickable != null)
+    public void RemoveTickLate(object updateble)
+    {
+      if (ticksLate.Remove(updateble as ITickLate))
       {
-        Default.ticksProc.Add(tickable);
-        Default.countTicksProc++;
-      }
-
-      var tickableFixed = updateble as ITickFixed;
-      if (tickableFixed != null)
-      {
-        Default.ticksFixed.Add(tickableFixed);
-        Default.countTicksFixed++;
-      }
-
-      var tickableLate = updateble as ITickLate;
-      if (tickableLate != null)
-      {
-        Default.ticksLate.Add(tickableLate);
-        Default.countTicksLate++;
+        countTicksLate--;
       }
     }
 
-
-    public static void RemoveProc(object updateble)
+    internal void AddProc(Processor updateble)
     {
-      if (Default.ticksProc.Remove(updateble as ITick))
+      if (updateble is IReceiveEcsEvent receiver)
       {
-        Default.countTicksProc--;
+        processors.Add(receiver);
       }
 
-      if (Default.ticksFixed.Remove(updateble as ITickFixed))
+      if (updateble is ITick tickable)
       {
-        Default.countTicksFixed--;
+        ticksProc.Add(tickable);
+        countTicksProc += 1;
+      }
+      else
+      {
+        ticksProc.Add(new Dummy());
+        countTicksProc += 1;
       }
 
-      if (Default.ticksLate.Remove(updateble as ITickLate))
+      if (updateble is ITickFixed tickableFixed)
       {
-        Default.countTicksLate--;
+        ticksFixedProc.Add(tickableFixed);
+        countTicksProcFixed++;
+      }
+
+      if (updateble is ITickLate tickableLate)
+      {
+        ticksLateProc.Add(tickableLate);
+        countTicksProcLate++;
       }
     }
 
-
-    public static void Add(object updateble)
+    internal void RemoveProc(object updateble)
     {
-      var tickable = updateble as ITick;
-      if (tickable != null)
-      {
-        Default.ticks.Add(tickable);
+      processors.Remove(updateble as IReceiveEcsEvent);
 
-        Default.countTicks++;
+      if (ticksProc.Remove(updateble as ITick))
+      {
+        countTicksProc--;
       }
 
-      var tickableFixed = updateble as ITickFixed;
-      if (tickableFixed != null)
+      if (ticksFixedProc.Remove(updateble as ITickFixed))
       {
-        Default.ticksFixed.Add(tickableFixed);
-        Default.countTicksFixed++;
+        countTicksProcFixed--;
       }
 
-      var tickableLate = updateble as ITickLate;
-      if (tickableLate != null)
+      if (ticksLateProc.Remove(updateble as ITickLate))
       {
-        Default.ticksLate.Add(tickableLate);
-        Default.countTicksLate++;
+        countTicksProcLate--;
       }
     }
 
-    public static void Remove(object updateble)
+    public void Add(object updateble)
     {
-      if (Default.ticks.Remove(updateble as ITick))
+      if (updateble is ITick tickable)
       {
-        Default.countTicks--;
+        ticks.Add(tickable);
+        countTicks++;
       }
 
-      if (Default.ticksFixed.Remove(updateble as ITickFixed))
+      if (updateble is ITickFixed tickableFixed)
       {
-        Default.countTicksFixed--;
+        ticksFixed.Add(tickableFixed);
+        countTicksFixed++;
       }
 
-      if (Default.ticksLate.Remove(updateble as ITickLate))
+      if (updateble is ITickLate tickableLate)
       {
-        Default.countTicksLate--;
+        ticksLate.Add(tickableLate);
+        countTicksLate++;
       }
     }
 
-    void Update()
+    public void Remove(object updateble)
     {
-      var delta = time.delta;
-     
-
-      routines.Global.Tick(time.deltaUnscaled);
-
-      if (Toolbox.changingScene) return;
-
-      for (var i = 0; i < timesLen; i++)
+      if (ticks.Remove(updateble as ITick))
       {
-        times[i].Tick();
+        countTicks--;
       }
 
+      if (ticksFixed.Remove(updateble as ITickFixed))
+      {
+        countTicksFixed--;
+      }
+
+      if (ticksLate.Remove(updateble as ITickLate))
+      {
+        countTicksLate--;
+      }
+    }
+
+    public void Update()
+    {
+      if (LayerKernel.ApplicationIsQuitting) return;
+      if (layer.isReleasing) return;
+      layer.Time.Tick();
+      var delta = layer.Time.deltaTime;
 
       for (var i = 0; i < countTicks; i++)
       {
         ticks[i].Tick(delta);
       }
-      
-      ProcessorEntities.Execute();
 
+      layer.processorEcs.Execute();
+
+      // dirty. we are using Dummy class for making all processors work here.
+      // this is need for receiving ecs events.
       for (var i = 0; i < countTicksProc; i++)
       {
+        processors[i].Receive();
         ticksProc[i].Tick(delta);
-        ProcessorEntities.Execute();
-      }
-
-      for (var i = 0; i < ProcessorCoroutines.coroutine_handlers.Count; i++)
-      {
-        ProcessorCoroutines.coroutine_handlers[i].Tick(delta);
+        layer.processorEcs.Execute();
       }
     }
 
-    void FixedUpdate()
+    public void FixedUpdate()
     {
-      if (Toolbox.changingScene) return;
-      var delta = time.deltaFixed;
+      if (LayerKernel.ApplicationIsQuitting) return;
+      if (layer.isReleasing) return;
+      var delta = layer.Time.deltaTimeFixed;
+
       for (var i = 0; i < countTicksFixed; i++)
       {
         ticksFixed[i].TickFixed(delta);
       }
+
+      for (var i = 0; i < countTicksProcFixed; i++)
+      {
+        ticksFixedProc[i].TickFixed(delta);
+      }
     }
 
-    void LateUpdate()
+    public void LateUpdate()
     {
-      if (Toolbox.changingScene) return;
-      var delta = time.delta;
+      if (LayerKernel.ApplicationIsQuitting) return;
+      if (layer.isReleasing) return;
+      var delta = layer.Time.deltaTime;
+
+
       for (var i = 0; i < countTicksLate; i++)
       {
         ticksLate[i].TickLate(delta);
       }
+
+      for (var i = 0; i < countTicksProcLate; i++)
+      {
+        ticksLateProc[i].TickLate(delta);
+      }
     }
 
-
-    public void Dispose()
+    internal void Dispose()
     {
-      countTicks      = 0;
-      countTicksFixed = 0;
-      countTicksLate  = 0;
-      countTicksProc  = 0;
-      ticks.RemoveAll(t => t is IKernel == false);
+      countTicks          = 0;
+      countTicksLate      = 0;
+      countTicksFixed     = 0;
+      countTicksProc      = 0;
+      countTicksProcFixed = 0;
+      countTicksProcLate  = 0;
 
+      ticks.Clear();
       ticksFixed.Clear();
       ticksLate.Clear();
       ticksProc.Clear();
-
-      countTicks = ticks.Count;
-    }
-
-    public static void Create()
-    {
-      var obj = new GameObject("ActorsUpdate");
-      DontDestroyOnLoad(obj);
-      Default = obj.AddComponent<ProcessorUpdate>();
+      ticksFixedProc.Clear();
+      ticksLateProc.Clear();
     }
   }
 }

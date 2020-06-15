@@ -7,26 +7,11 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using Unity.IL2CPP.CompilerServices;
-using UnityEngine;
+using UnityEngine.Scripting;
 
 
 namespace Pixeye.Actors
 {
-  class GroupCoreComparer : IEqualityComparer<GroupCore>
-  {
-    public static GroupCoreComparer Default = new GroupCoreComparer();
-
-    public bool Equals(GroupCore x, GroupCore y)
-    {
-      return y.id == x.id;
-    }
-
-    public int GetHashCode(GroupCore obj)
-    {
-      return obj.composition.hash;
-    }
-  }
-
   [Flags]
   public enum Op
   {
@@ -36,22 +21,30 @@ namespace Pixeye.Actors
   }
 
 
-  [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
+  [Preserve]
+  [Il2CppSetOption(Option.NullChecks, false)]
+  [Il2CppSetOption(Option.ArrayBoundsChecks, false)]
+  [Il2CppSetOption(Option.DivideByZeroChecks, false)]
   public abstract class GroupCore : IEnumerable, IEquatable<GroupCore>, IDisposable
   {
-    public ent[] entities = new ent[Framework.Settings.SizeEntities];
+    public ent[] entities = new ent[LayerKernel.Settings.SizeEntities];
+
     public int length;
 
 
+    internal bool initialized = false;
+    internal ProcessorEcs processorEcs;
+    internal Layer layer;
+
 #if ACTORS_EVENTS_MANUAL
-		public ents added;
-		public ents removed;
-		
-		internal bool hasEventAdd;
-		internal bool hasEventRemove;
+    public ents added;
+    public ents removed;
+
+    internal bool hasEventAdd;
+    internal bool hasEventRemove;
 #else
-    public ents added = new ents(Framework.Settings.SizeEntities);
-    public ents removed = new ents(Framework.Settings.SizeEntities);
+    public ents added = new ents(LayerKernel.Settings.SizeEntities);
+    public ents removed = new ents(LayerKernel.Settings.SizeEntities);
 #endif
 
 
@@ -68,7 +61,6 @@ namespace Pixeye.Actors
       get => ref entities[index];
     }
 
-
     public void Release(int index)
     {
       if (length == 0) return;
@@ -76,34 +68,43 @@ namespace Pixeye.Actors
     }
 
 #if ACTORS_EVENTS_MANUAL
-		internal void SetSelf(Op op, Processor pr)
-		{
-			if ((op & Op.Add) == Op.Add)
-			{
-				if (added == null)
-					added = new ents(Framework.Settings.SizeEntities);
-
-				hasEventAdd = true;
-			}
-
-			if ((op & Op.Remove) == Op.Remove)
-			{
-				if (removed == null)
-					removed = new ents(Framework.Settings.SizeEntities);
-
-				hasEventRemove = true;
-			}
-		}
-#endif
-
-    internal virtual GroupCore Initialize(Composition composition)
+    internal void SetSelf(Op op, Processor pr)
     {
-      this.composition = composition;
-#if !ACTORS_TAGS_0
-      HelperTags.Add(this);
+      if ((op & Op.Add) == Op.Add)
+      {
+        if (added == null)
+          added = new ents(Framework.Settings.SizeEntities);
+
+        hasEventAdd = true;
+      }
+
+      if ((op & Op.Remove) == Op.Remove)
+      {
+        if (removed == null)
+          removed = new ents(Framework.Settings.SizeEntities);
+
+        hasEventRemove = true;
+      }
+    }
 #endif
 
-      this.composition.SetupExcludeTypes(this);
+    internal virtual GroupCore Initialize(Composition composition, Layer layer)
+    {
+      this.layer       = layer;
+      this.composition = composition;
+
+      processorEcs = layer.processorEcs;
+
+#if ACTORS_TAGS_CHECKS
+      HelperTags.RegisterGroup(this);
+#endif
+
+      for (var i = 0; i < composition.excluded.Length; i++)
+      {
+        ref var m = ref composition.excluded[i];
+        Storage.All[m.id].groups[layer.id].Add(this);
+      }
+
       return this;
     }
 
@@ -120,28 +121,30 @@ namespace Pixeye.Actors
 
       if (entity.id >= entities.Length)
       {
-        Array.Resize(ref entities, entity.id << 1);
+        var l = entity.id + entity.id / 5;
+        Array.Resize(ref entities, l);
 #if ACTORS_EVENTS_MANUAL
-				if (hasEventAdd)
-				Array.Resize(ref added.source, entity.id << 1);
-				if (hasEventRemove)
-				Array.Resize(ref removed.source, entity.id << 1);
+        if (hasEventAdd)
+          Array.Resize(ref added.source, l);
+        if (hasEventRemove)
+          Array.Resize(ref removed.source, l);
 #else
-        Array.Resize(ref added.source, entity.id << 1);
-        Array.Resize(ref removed.source, entity.id << 1);
+        Array.Resize(ref added.source, l);
+        Array.Resize(ref removed.source, l);
 #endif
       }
       else if (length >= entities.Length)
       {
-        Array.Resize(ref entities, length << 1);
+        var l = length + length / 5;
+        Array.Resize(ref entities, l);
 #if ACTORS_EVENTS_MANUAL
-				if (hasEventAdd)
-				Array.Resize(ref added.source, length << 1);
-				if (hasEventRemove)
-				Array.Resize(ref removed.source, length << 1);
+        if (hasEventAdd)
+          Array.Resize(ref added.source, l);
+        if (hasEventRemove)
+          Array.Resize(ref removed.source, l);
 #else
-        Array.Resize(ref added.source, length << 1);
-        Array.Resize(ref removed.source, length << 1);
+        Array.Resize(ref added.source, l);
+        Array.Resize(ref removed.source, l);
 #endif
       }
 
@@ -170,8 +173,8 @@ namespace Pixeye.Actors
         Array.Copy(entities, index, entities, index + 1, length - index);
         entities[index] = entity;
 #if ACTORS_EVENTS_MANUAL
-				if (hasEventAdd)
-					added.source[added.length++] = entity;
+        if (hasEventAdd)
+          added.source[added.length++] = entity;
 #else
         added.source[added.length++] = entity;
 #endif
@@ -180,8 +183,8 @@ namespace Pixeye.Actors
       {
         entities[right] = entity;
 #if ACTORS_EVENTS_MANUAL
-				if (hasEventAdd)
-					added.source[added.length++] = entity;
+        if (hasEventAdd)
+          added.source[added.length++] = entity;
 #else
         added.source[added.length++] = entity;
 #endif
@@ -195,16 +198,34 @@ namespace Pixeye.Actors
 
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void TryRemove(int entityID)
+    internal bool TryRemove(int entityID)
     {
-      if (length == 0) return;
+      if (length == 0) return false;
 
       var i = HelperArray.BinarySearch(ref entities, entityID, 0, length - 1);
-      if (i == -1) return;
+      if (i == -1) return false;
 
 #if ACTORS_EVENTS_MANUAL
-			if (hasEventRemove)
-				removed.source[removed.length++] = entities[i];
+      if (hasEventRemove)
+        removed.source[removed.length++] = entities[i];
+#else
+      removed.source[removed.length++] = entities[i];
+#endif
+
+      if (i < --length)
+        Array.Copy(entities, i + 1, entities, i, length - i);
+
+      return true;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal void RemoveFast(int entityID)
+    {
+      var i = HelperArray.BinarySearch(ref entities, entityID, 0, length - 1);
+
+#if ACTORS_EVENTS_MANUAL
+      if (hasEventRemove)
+        removed.source[removed.length++] = entities[i];
 #else
       removed.source[removed.length++] = entities[i];
 #endif
@@ -212,7 +233,6 @@ namespace Pixeye.Actors
       if (i < --length)
         Array.Copy(entities, i + 1, entities, i, length - i);
     }
-
 
     //===============================//
     // Remove
@@ -221,12 +241,11 @@ namespace Pixeye.Actors
     internal void Remove(int i)
     {
 #if ACTORS_EVENTS_MANUAL
-			if (hasEventRemove)
-				removed.source[removed.length++] = entities[i];
+      if (hasEventRemove)
+        removed.source[removed.length++] = entities[i];
 #else
       removed.source[removed.length++] = entities[i];
 #endif
-
       if (i < --length)
         Array.Copy(entities, i + 1, entities, i, length - i);
     }
@@ -234,18 +253,17 @@ namespace Pixeye.Actors
 
     public virtual void Dispose()
     {
+      initialized = false;
 #if ACTORS_EVENTS_MANUAL
-			hasEventAdd = false;
-			hasEventRemove = false;
-
-			added = default;
-			removed = default;
+      hasEventAdd = false;
+      hasEventRemove = false;
+      added = default;
+      removed = default;
 #else
-
-      added   = new ents(Framework.Settings.SizeEntities);
-      removed = new ents(Framework.Settings.SizeEntities);
+      added   = new ents(LayerKernel.Settings.SizeEntities);
+      removed = new ents(LayerKernel.Settings.SizeEntities);
 #endif
-
+      length = 0;
 
       //parallel
       if (segmentGroups != null)
@@ -351,8 +369,8 @@ namespace Pixeye.Actors
     {
       if (length > 0)
       {
-        var entitiesNext      = 0;
-        var threadsInWork     = 0;
+        var entitiesNext = 0;
+        int threadsInWork;
         var entitiesPerThread = length / (threadsAmount + 1);
         if (entitiesPerThread > entitiesPerThreadMin)
         {
@@ -447,22 +465,28 @@ namespace Pixeye.Actors
 
     public struct Enumerator : IEnumerator<ent>
     {
-      GroupCore g;
+      GroupCore groupEntities;
       int position;
 
 
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
-      internal Enumerator(GroupCore g)
+      internal Enumerator(GroupCore groupEntities)
       {
-        position = -1;
-        this.g   = g;
-        ProcessorEntities.Execute();
+        this.groupEntities = groupEntities;
+        position           = -1;
+        groupEntities.processorEcs.Execute();
       }
 
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
       public bool MoveNext()
       {
-        return ++position < g.length;
+        // if (++position < groupEntities.length)
+        // {
+        //   groupEntities.processorEcs.Execute();
+        //   return true;
+        // }
+
+        return ++position < groupEntities.length;
       }
 
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -476,428 +500,382 @@ namespace Pixeye.Actors
       public ent Current
       {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        get { return g.entities[position]; }
+        get => groupEntities.entities[position];
       }
 
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
       public void Dispose()
       {
-        g = null;
+        groupEntities = null;
       }
     }
 
     #endregion
   }
 
-
+  [Preserve]
+  [Il2CppSetOption(Option.NullChecks, false)]
+  [Il2CppSetOption(Option.ArrayBoundsChecks, false)]
+  [Il2CppSetOption(Option.DivideByZeroChecks, false)]
   public class Group<T> : GroupCore
   {
-    internal override GroupCore Initialize(Composition composition)
+    internal override GroupCore Initialize(Composition composition, Layer layer)
     {
-      var gr = base.Initialize(composition);
+      var gr = base.Initialize(composition, layer);
 
-      Storage<T>.Instance.groups.Add(this);
-
-      var len = 1;
-
-      composition.generations = new int[len];
-      composition.ids         = new int[len];
-
-      composition.generations[0] = Storage<T>.Generation;
-      composition.ids[0]         = Storage<T>.ComponentMask;
-
-      composition.includeComponents[Storage<T>.componentId] = true;
+      Storage<T>.Instance.groups[layer.id].Add(this);
+ 
       return gr;
+    }
+
+    public override void Dispose()
+    {
+      base.Dispose();
+      Storage<T>.Instance.groups[layer.id].Remove(this);
     }
   }
 
+  [Preserve]
+  [Il2CppSetOption(Option.NullChecks, false)]
+  [Il2CppSetOption(Option.ArrayBoundsChecks, false)]
+  [Il2CppSetOption(Option.DivideByZeroChecks, false)]
   public class Group<T, Y> : GroupCore
   {
-    internal override GroupCore Initialize(Composition composition)
+    internal override GroupCore Initialize(Composition composition, Layer layer)
     {
-      var gr = base.Initialize(composition);
-      Storage<T>.Instance.groups.Add(this);
-      Storage<Y>.Instance.groups.Add(this);
+      var gr = base.Initialize(composition, layer);
 
-      var len = 2;
-
-      composition.generations = new int[len];
-      composition.ids         = new int[len];
-
-      composition.generations[0]                            = Storage<T>.Generation;
-      composition.ids[0]                                    = Storage<T>.ComponentMask;
-      composition.includeComponents[Storage<T>.componentId] = true;
-
-      composition.generations[1]                            = Storage<Y>.Generation;
-      composition.ids[1]                                    = Storage<Y>.ComponentMask;
-      composition.includeComponents[Storage<Y>.componentId] = true;
+      Storage<T>.Instance.groups[layer.id].Add(this);
+      Storage<Y>.Instance.groups[layer.id].Add(this);
+ 
       return gr;
+    }
+
+    public override void Dispose()
+    {
+      base.Dispose();
+      Storage<T>.Instance.groups[layer.id].Remove(this);
+      Storage<Y>.Instance.groups[layer.id].Remove(this);
     }
   }
 
+  [Preserve]
+  [Il2CppSetOption(Option.NullChecks, false)]
+  [Il2CppSetOption(Option.ArrayBoundsChecks, false)]
+  [Il2CppSetOption(Option.DivideByZeroChecks, false)]
   public class Group<T, Y, U> : GroupCore
   {
-    internal override GroupCore Initialize(Composition composition)
+    internal override GroupCore Initialize(Composition composition, Layer layer)
     {
-      var gr = base.Initialize(composition);
-      Storage<T>.Instance.groups.Add(this);
-      Storage<Y>.Instance.groups.Add(this);
-      Storage<U>.Instance.groups.Add(this);
+      var gr = base.Initialize(composition, layer);
+      Storage<T>.Instance.groups[layer.id].Add(this);
+      Storage<Y>.Instance.groups[layer.id].Add(this);
+      Storage<U>.Instance.groups[layer.id].Add(this);
 
-      var len = 3;
-
-      composition.generations = new int[len];
-      composition.ids         = new int[len];
-
-      composition.generations[0]                            = Storage<T>.Generation;
-      composition.ids[0]                                    = Storage<T>.ComponentMask;
-      composition.includeComponents[Storage<T>.componentId] = true;
-
-      composition.generations[1]                            = Storage<Y>.Generation;
-      composition.ids[1]                                    = Storage<Y>.ComponentMask;
-      composition.includeComponents[Storage<Y>.componentId] = true;
-
-      composition.generations[2]                            = Storage<U>.Generation;
-      composition.ids[2]                                    = Storage<U>.ComponentMask;
-      composition.includeComponents[Storage<U>.componentId] = true;
+ 
       return gr;
+    }
+
+    public override void Dispose()
+    {
+      base.Dispose();
+      Storage<T>.Instance.groups[layer.id].Remove(this);
+      Storage<Y>.Instance.groups[layer.id].Remove(this);
+      Storage<U>.Instance.groups[layer.id].Remove(this);
     }
   }
 
+  [Preserve]
+  [Il2CppSetOption(Option.NullChecks, false)]
+  [Il2CppSetOption(Option.ArrayBoundsChecks, false)]
+  [Il2CppSetOption(Option.DivideByZeroChecks, false)]
   public class Group<T, Y, U, I> : GroupCore
   {
-    internal override GroupCore Initialize(Composition composition)
+    internal override GroupCore Initialize(Composition composition, Layer layer)
     {
-      var gr = base.Initialize(composition);
-      Storage<T>.Instance.groups.Add(this);
-      Storage<Y>.Instance.groups.Add(this);
-      Storage<U>.Instance.groups.Add(this);
-      Storage<I>.Instance.groups.Add(this);
+      var gr = base.Initialize(composition, layer);
+      Storage<T>.Instance.groups[layer.id].Add(this);
+      Storage<Y>.Instance.groups[layer.id].Add(this);
+      Storage<U>.Instance.groups[layer.id].Add(this);
+      Storage<I>.Instance.groups[layer.id].Add(this);
 
-      var len = 4;
-
-      composition.generations = new int[len];
-      composition.ids         = new int[len];
-
-      composition.generations[0]                            = Storage<T>.Generation;
-      composition.ids[0]                                    = Storage<T>.ComponentMask;
-      composition.includeComponents[Storage<T>.componentId] = true;
-
-      composition.generations[1]                            = Storage<Y>.Generation;
-      composition.ids[1]                                    = Storage<Y>.ComponentMask;
-      composition.includeComponents[Storage<Y>.componentId] = true;
-
-      composition.generations[2]                            = Storage<U>.Generation;
-      composition.ids[2]                                    = Storage<U>.ComponentMask;
-      composition.includeComponents[Storage<U>.componentId] = true;
-
-      composition.generations[3]                            = Storage<I>.Generation;
-      composition.ids[3]                                    = Storage<I>.ComponentMask;
-      composition.includeComponents[Storage<I>.componentId] = true;
       return gr;
+    }
+
+    public override void Dispose()
+    {
+      base.Dispose();
+      Storage<T>.Instance.groups[layer.id].Remove(this);
+      Storage<Y>.Instance.groups[layer.id].Remove(this);
+      Storage<U>.Instance.groups[layer.id].Remove(this);
+      Storage<I>.Instance.groups[layer.id].Remove(this);
     }
   }
 
+  [Preserve]
+  [Il2CppSetOption(Option.NullChecks, false)]
+  [Il2CppSetOption(Option.ArrayBoundsChecks, false)]
+  [Il2CppSetOption(Option.DivideByZeroChecks, false)]
   public class Group<T, Y, U, I, O> : GroupCore
   {
-    internal override GroupCore Initialize(Composition composition)
+    internal override GroupCore Initialize(Composition composition, Layer layer)
     {
-      var gr = base.Initialize(composition);
-      Storage<T>.Instance.groups.Add(this);
-      Storage<Y>.Instance.groups.Add(this);
-      Storage<U>.Instance.groups.Add(this);
-      Storage<I>.Instance.groups.Add(this);
-      Storage<O>.Instance.groups.Add(this);
-      var len = 5;
-
-      composition.generations = new int[len];
-      composition.ids         = new int[len];
-
-      composition.generations[0] = Storage<T>.Generation;
-      composition.ids[0]         = Storage<T>.ComponentMask;
-
-      composition.generations[1] = Storage<Y>.Generation;
-      composition.ids[1]         = Storage<Y>.ComponentMask;
-
-      composition.generations[2] = Storage<U>.Generation;
-      composition.ids[2]         = Storage<U>.ComponentMask;
-
-      composition.generations[3] = Storage<I>.Generation;
-      composition.ids[3]         = Storage<I>.ComponentMask;
-
-      composition.generations[4] = Storage<O>.Generation;
-      composition.ids[4]         = Storage<O>.ComponentMask;
+      var gr = base.Initialize(composition, layer);
+      Storage<T>.Instance.groups[layer.id].Add(this);
+      Storage<Y>.Instance.groups[layer.id].Add(this);
+      Storage<U>.Instance.groups[layer.id].Add(this);
+      Storage<I>.Instance.groups[layer.id].Add(this);
+      Storage<O>.Instance.groups[layer.id].Add(this);
 
       return gr;
     }
+
+    public override void Dispose()
+    {
+      base.Dispose();
+
+      Storage<T>.Instance.groups[layer.id].Remove(this);
+      Storage<Y>.Instance.groups[layer.id].Remove(this);
+      Storage<U>.Instance.groups[layer.id].Remove(this);
+      Storage<I>.Instance.groups[layer.id].Remove(this);
+      Storage<O>.Instance.groups[layer.id].Remove(this);
+    }
   }
 
+  [Preserve]
+  [Il2CppSetOption(Option.NullChecks, false)]
+  [Il2CppSetOption(Option.ArrayBoundsChecks, false)]
+  [Il2CppSetOption(Option.DivideByZeroChecks, false)]
   public class Group<T, Y, U, I, O, P> : GroupCore
-
   {
-    internal override GroupCore Initialize(Composition composition)
+    internal override GroupCore Initialize(Composition composition, Layer layer)
     {
-      var gr = base.Initialize(composition);
-      Storage<T>.Instance.groups.Add(this);
-      Storage<Y>.Instance.groups.Add(this);
-      Storage<U>.Instance.groups.Add(this);
-      Storage<I>.Instance.groups.Add(this);
-      Storage<O>.Instance.groups.Add(this);
-      Storage<P>.Instance.groups.Add(this);
+      var gr = base.Initialize(composition, layer);
+      Storage<T>.Instance.groups[layer.id].Add(this);
+      Storage<Y>.Instance.groups[layer.id].Add(this);
+      Storage<U>.Instance.groups[layer.id].Add(this);
+      Storage<I>.Instance.groups[layer.id].Add(this);
+      Storage<O>.Instance.groups[layer.id].Add(this);
+      Storage<P>.Instance.groups[layer.id].Add(this);
 
-      var len = 6;
-
-      composition.generations = new int[len];
-      composition.ids         = new int[len];
-
-      composition.generations[0]                            = Storage<T>.Generation;
-      composition.ids[0]                                    = Storage<T>.ComponentMask;
-      composition.includeComponents[Storage<T>.componentId] = true;
-
-      composition.generations[1]                            = Storage<Y>.Generation;
-      composition.ids[1]                                    = Storage<Y>.ComponentMask;
-      composition.includeComponents[Storage<Y>.componentId] = true;
-
-      composition.generations[2]                            = Storage<U>.Generation;
-      composition.ids[2]                                    = Storage<U>.ComponentMask;
-      composition.includeComponents[Storage<U>.componentId] = true;
-
-      composition.generations[3]                            = Storage<I>.Generation;
-      composition.ids[3]                                    = Storage<I>.ComponentMask;
-      composition.includeComponents[Storage<I>.componentId] = true;
-
-      composition.generations[4]                            = Storage<O>.Generation;
-      composition.ids[4]                                    = Storage<O>.ComponentMask;
-      composition.includeComponents[Storage<O>.componentId] = true;
-
-      composition.generations[5]                            = Storage<P>.Generation;
-      composition.ids[5]                                    = Storage<P>.ComponentMask;
-      composition.includeComponents[Storage<P>.componentId] = true;
       return gr;
+    }
+
+    public override void Dispose()
+    {
+      base.Dispose();
+      Storage<T>.Instance.groups[layer.id].Remove(this);
+      Storage<Y>.Instance.groups[layer.id].Remove(this);
+      Storage<U>.Instance.groups[layer.id].Remove(this);
+      Storage<I>.Instance.groups[layer.id].Remove(this);
+      Storage<O>.Instance.groups[layer.id].Remove(this);
+      Storage<P>.Instance.groups[layer.id].Remove(this);
     }
   }
 
+  [Preserve]
+  [Il2CppSetOption(Option.NullChecks, false)]
+  [Il2CppSetOption(Option.ArrayBoundsChecks, false)]
+  [Il2CppSetOption(Option.DivideByZeroChecks, false)]
   public class Group<T, Y, U, I, O, P, A> : GroupCore
   {
-    internal override GroupCore Initialize(Composition composition)
+    internal override GroupCore Initialize(Composition composition, Layer layer)
     {
-      var gr = base.Initialize(composition);
-      Storage<T>.Instance.groups.Add(this);
-      Storage<Y>.Instance.groups.Add(this);
-      Storage<U>.Instance.groups.Add(this);
-      Storage<I>.Instance.groups.Add(this);
-      Storage<O>.Instance.groups.Add(this);
-      Storage<P>.Instance.groups.Add(this);
-      Storage<A>.Instance.groups.Add(this);
+      var gr = base.Initialize(composition, layer);
+      Storage<T>.Instance.groups[layer.id].Add(this);
+      Storage<Y>.Instance.groups[layer.id].Add(this);
+      Storage<U>.Instance.groups[layer.id].Add(this);
+      Storage<I>.Instance.groups[layer.id].Add(this);
+      Storage<O>.Instance.groups[layer.id].Add(this);
+      Storage<P>.Instance.groups[layer.id].Add(this);
+      Storage<A>.Instance.groups[layer.id].Add(this);
 
-      var len = 7;
-
-      composition.generations = new int[len];
-      composition.ids         = new int[len];
-
-      composition.generations[0]                            = Storage<T>.Generation;
-      composition.ids[0]                                    = Storage<T>.ComponentMask;
-      composition.includeComponents[Storage<T>.componentId] = true;
-
-      composition.generations[1]                            = Storage<Y>.Generation;
-      composition.ids[1]                                    = Storage<Y>.ComponentMask;
-      composition.includeComponents[Storage<Y>.componentId] = true;
-
-      composition.generations[2]                            = Storage<U>.Generation;
-      composition.ids[2]                                    = Storage<U>.ComponentMask;
-      composition.includeComponents[Storage<U>.componentId] = true;
-
-      composition.generations[3]                            = Storage<I>.Generation;
-      composition.ids[3]                                    = Storage<I>.ComponentMask;
-      composition.includeComponents[Storage<I>.componentId] = true;
-
-      composition.generations[4]                            = Storage<O>.Generation;
-      composition.ids[4]                                    = Storage<O>.ComponentMask;
-      composition.includeComponents[Storage<O>.componentId] = true;
-
-      composition.generations[5]                            = Storage<P>.Generation;
-      composition.ids[5]                                    = Storage<P>.ComponentMask;
-      composition.includeComponents[Storage<P>.componentId] = true;
-
-      composition.generations[6]                            = Storage<A>.Generation;
-      composition.ids[6]                                    = Storage<A>.ComponentMask;
-      composition.includeComponents[Storage<A>.componentId] = true;
       return gr;
+    }
+
+    public override void Dispose()
+    {
+      base.Dispose();
+      Storage<T>.Instance.groups[layer.id].Remove(this);
+      Storage<Y>.Instance.groups[layer.id].Remove(this);
+      Storage<U>.Instance.groups[layer.id].Remove(this);
+      Storage<I>.Instance.groups[layer.id].Remove(this);
+      Storage<O>.Instance.groups[layer.id].Remove(this);
+      Storage<P>.Instance.groups[layer.id].Remove(this);
+      Storage<A>.Instance.groups[layer.id].Remove(this);
     }
   }
 
+  [Preserve]
+  [Il2CppSetOption(Option.NullChecks, false)]
+  [Il2CppSetOption(Option.ArrayBoundsChecks, false)]
+  [Il2CppSetOption(Option.DivideByZeroChecks, false)]
   public class Group<T, Y, U, I, O, P, A, S> : GroupCore
   {
-    internal override GroupCore Initialize(Composition composition)
+    internal override GroupCore Initialize(Composition composition, Layer layer)
     {
-      var gr = base.Initialize(composition);
-      Storage<T>.Instance.groups.Add(this);
-      Storage<Y>.Instance.groups.Add(this);
-      Storage<U>.Instance.groups.Add(this);
-      Storage<I>.Instance.groups.Add(this);
-      Storage<O>.Instance.groups.Add(this);
-      Storage<P>.Instance.groups.Add(this);
-      Storage<A>.Instance.groups.Add(this);
-      Storage<S>.Instance.groups.Add(this);
+      var gr = base.Initialize(composition, layer);
+      Storage<T>.Instance.groups[layer.id].Add(this);
+      Storage<Y>.Instance.groups[layer.id].Add(this);
+      Storage<U>.Instance.groups[layer.id].Add(this);
+      Storage<I>.Instance.groups[layer.id].Add(this);
+      Storage<O>.Instance.groups[layer.id].Add(this);
+      Storage<P>.Instance.groups[layer.id].Add(this);
+      Storage<A>.Instance.groups[layer.id].Add(this);
+      Storage<S>.Instance.groups[layer.id].Add(this);
 
-      var len = 8;
-
-      composition.generations = new int[len];
-      composition.ids         = new int[len];
-
-      composition.generations[0]                            = Storage<T>.Generation;
-      composition.ids[0]                                    = Storage<T>.ComponentMask;
-      composition.includeComponents[Storage<T>.componentId] = true;
-
-      composition.generations[1]                            = Storage<Y>.Generation;
-      composition.ids[1]                                    = Storage<Y>.ComponentMask;
-      composition.includeComponents[Storage<Y>.componentId] = true;
-
-      composition.generations[2]                            = Storage<U>.Generation;
-      composition.ids[2]                                    = Storage<U>.ComponentMask;
-      composition.includeComponents[Storage<U>.componentId] = true;
-
-      composition.generations[3]                            = Storage<I>.Generation;
-      composition.ids[3]                                    = Storage<I>.ComponentMask;
-      composition.includeComponents[Storage<I>.componentId] = true;
-
-      composition.generations[4]                            = Storage<O>.Generation;
-      composition.ids[4]                                    = Storage<O>.ComponentMask;
-      composition.includeComponents[Storage<O>.componentId] = true;
-
-      composition.generations[5]                            = Storage<P>.Generation;
-      composition.ids[5]                                    = Storage<P>.ComponentMask;
-      composition.includeComponents[Storage<P>.componentId] = true;
-
-      composition.generations[6]                            = Storage<A>.Generation;
-      composition.ids[6]                                    = Storage<A>.ComponentMask;
-      composition.includeComponents[Storage<A>.componentId] = true;
-
-      composition.generations[7]                            = Storage<S>.Generation;
-      composition.ids[7]                                    = Storage<S>.ComponentMask;
-      composition.includeComponents[Storage<S>.componentId] = true;
       return gr;
+    }
+
+    public override void Dispose()
+    {
+      base.Dispose();
+      Storage<T>.Instance.groups[layer.id].Remove(this);
+      Storage<Y>.Instance.groups[layer.id].Remove(this);
+      Storage<U>.Instance.groups[layer.id].Remove(this);
+      Storage<I>.Instance.groups[layer.id].Remove(this);
+      Storage<O>.Instance.groups[layer.id].Remove(this);
+      Storage<P>.Instance.groups[layer.id].Remove(this);
+      Storage<A>.Instance.groups[layer.id].Remove(this);
+      Storage<S>.Instance.groups[layer.id].Remove(this);
     }
   }
 
+  [Preserve]
+  [Il2CppSetOption(Option.NullChecks, false)]
+  [Il2CppSetOption(Option.ArrayBoundsChecks, false)]
+  [Il2CppSetOption(Option.DivideByZeroChecks, false)]
   public class Group<T, Y, U, I, O, P, A, S, D> : GroupCore
   {
-    internal override GroupCore Initialize(Composition composition)
+    internal override GroupCore Initialize(Composition composition, Layer layer)
     {
-      var gr = base.Initialize(composition);
-      Storage<T>.Instance.groups.Add(this);
-      Storage<Y>.Instance.groups.Add(this);
-      Storage<U>.Instance.groups.Add(this);
-      Storage<I>.Instance.groups.Add(this);
-      Storage<O>.Instance.groups.Add(this);
-      Storage<P>.Instance.groups.Add(this);
-      Storage<A>.Instance.groups.Add(this);
-      Storage<S>.Instance.groups.Add(this);
-      Storage<D>.Instance.groups.Add(this);
-      var len = 9;
+      var gr = base.Initialize(composition, layer);
+      Storage<T>.Instance.groups[layer.id].Add(this);
+      Storage<Y>.Instance.groups[layer.id].Add(this);
+      Storage<U>.Instance.groups[layer.id].Add(this);
+      Storage<I>.Instance.groups[layer.id].Add(this);
+      Storage<O>.Instance.groups[layer.id].Add(this);
+      Storage<P>.Instance.groups[layer.id].Add(this);
+      Storage<A>.Instance.groups[layer.id].Add(this);
+      Storage<S>.Instance.groups[layer.id].Add(this);
+      Storage<D>.Instance.groups[layer.id].Add(this);
 
-      composition.generations = new int[len];
-      composition.ids         = new int[len];
-
-      composition.generations[0]                            = Storage<T>.Generation;
-      composition.ids[0]                                    = Storage<T>.ComponentMask;
-      composition.includeComponents[Storage<T>.componentId] = true;
-
-      composition.generations[1]                            = Storage<Y>.Generation;
-      composition.ids[1]                                    = Storage<Y>.ComponentMask;
-      composition.includeComponents[Storage<Y>.componentId] = true;
-
-      composition.generations[2]                            = Storage<U>.Generation;
-      composition.ids[2]                                    = Storage<U>.ComponentMask;
-      composition.includeComponents[Storage<U>.componentId] = true;
-
-      composition.generations[3]                            = Storage<I>.Generation;
-      composition.ids[3]                                    = Storage<I>.ComponentMask;
-      composition.includeComponents[Storage<I>.componentId] = true;
-
-      composition.generations[4]                            = Storage<O>.Generation;
-      composition.ids[4]                                    = Storage<O>.ComponentMask;
-      composition.includeComponents[Storage<O>.componentId] = true;
-
-      composition.generations[5]                            = Storage<P>.Generation;
-      composition.ids[5]                                    = Storage<P>.ComponentMask;
-      composition.includeComponents[Storage<P>.componentId] = true;
-
-      composition.generations[6]                            = Storage<A>.Generation;
-      composition.ids[6]                                    = Storage<A>.ComponentMask;
-      composition.includeComponents[Storage<A>.componentId] = true;
-
-      composition.generations[7]                            = Storage<S>.Generation;
-      composition.ids[7]                                    = Storage<S>.ComponentMask;
-      composition.includeComponents[Storage<S>.componentId] = true;
-
-      composition.generations[8]                            = Storage<D>.Generation;
-      composition.ids[8]                                    = Storage<D>.ComponentMask;
-      composition.includeComponents[Storage<D>.componentId] = true;
       return gr;
+    }
+
+    public override void Dispose()
+    {
+      base.Dispose();
+      Storage<T>.Instance.groups[layer.id].Remove(this);
+      Storage<Y>.Instance.groups[layer.id].Remove(this);
+      Storage<U>.Instance.groups[layer.id].Remove(this);
+      Storage<I>.Instance.groups[layer.id].Remove(this);
+      Storage<O>.Instance.groups[layer.id].Remove(this);
+      Storage<P>.Instance.groups[layer.id].Remove(this);
+      Storage<A>.Instance.groups[layer.id].Remove(this);
+      Storage<S>.Instance.groups[layer.id].Remove(this);
+      Storage<D>.Instance.groups[layer.id].Remove(this);
     }
   }
 
+  [Preserve]
+  [Il2CppSetOption(Option.NullChecks, false)]
+  [Il2CppSetOption(Option.ArrayBoundsChecks, false)]
+  [Il2CppSetOption(Option.DivideByZeroChecks, false)]
   public class Group<T, Y, U, I, O, P, A, S, D, F> : GroupCore
   {
-    internal override GroupCore Initialize(Composition composition)
+    internal override GroupCore Initialize(Composition composition, Layer layer)
     {
-      var gr = base.Initialize(composition);
-      Storage<T>.Instance.groups.Add(this);
-      Storage<Y>.Instance.groups.Add(this);
-      Storage<U>.Instance.groups.Add(this);
-      Storage<I>.Instance.groups.Add(this);
-      Storage<O>.Instance.groups.Add(this);
-      Storage<P>.Instance.groups.Add(this);
-      Storage<A>.Instance.groups.Add(this);
-      Storage<S>.Instance.groups.Add(this);
-      Storage<D>.Instance.groups.Add(this);
-      Storage<F>.Instance.groups.Add(this);
-      var len = 10;
-
-      composition.generations = new int[len];
-      composition.ids         = new int[len];
-
-      composition.generations[0]                            = Storage<T>.Generation;
-      composition.ids[0]                                    = Storage<T>.ComponentMask;
-      composition.includeComponents[Storage<T>.componentId] = true;
-
-      composition.generations[1]                            = Storage<Y>.Generation;
-      composition.ids[1]                                    = Storage<Y>.ComponentMask;
-      composition.includeComponents[Storage<Y>.componentId] = true;
-
-      composition.generations[2]                            = Storage<U>.Generation;
-      composition.ids[2]                                    = Storage<U>.ComponentMask;
-      composition.includeComponents[Storage<U>.componentId] = true;
-
-      composition.generations[3]                            = Storage<I>.Generation;
-      composition.ids[3]                                    = Storage<I>.ComponentMask;
-      composition.includeComponents[Storage<I>.componentId] = true;
-
-      composition.generations[4]                            = Storage<O>.Generation;
-      composition.ids[4]                                    = Storage<O>.ComponentMask;
-      composition.includeComponents[Storage<O>.componentId] = true;
-
-      composition.generations[5]                            = Storage<P>.Generation;
-      composition.ids[5]                                    = Storage<P>.ComponentMask;
-      composition.includeComponents[Storage<P>.componentId] = true;
-
-      composition.generations[6]                            = Storage<A>.Generation;
-      composition.ids[6]                                    = Storage<A>.ComponentMask;
-      composition.includeComponents[Storage<A>.componentId] = true;
-
-      composition.generations[7]                            = Storage<S>.Generation;
-      composition.ids[7]                                    = Storage<S>.ComponentMask;
-      composition.includeComponents[Storage<S>.componentId] = true;
-
-      composition.generations[8]                            = Storage<D>.Generation;
-      composition.ids[8]                                    = Storage<D>.ComponentMask;
-      composition.includeComponents[Storage<D>.componentId] = true;
-
-      composition.generations[9]                            = Storage<F>.Generation;
-      composition.ids[9]                                    = Storage<F>.ComponentMask;
-      composition.includeComponents[Storage<F>.componentId] = true;
+      var gr = base.Initialize(composition, layer);
+      Storage<T>.Instance.groups[layer.id].Add(this);
+      Storage<Y>.Instance.groups[layer.id].Add(this);
+      Storage<U>.Instance.groups[layer.id].Add(this);
+      Storage<I>.Instance.groups[layer.id].Add(this);
+      Storage<O>.Instance.groups[layer.id].Add(this);
+      Storage<P>.Instance.groups[layer.id].Add(this);
+      Storage<A>.Instance.groups[layer.id].Add(this);
+      Storage<S>.Instance.groups[layer.id].Add(this);
+      Storage<D>.Instance.groups[layer.id].Add(this);
+      Storage<F>.Instance.groups[layer.id].Add(this);
+ 
       return gr;
+    }
+
+    public override void Dispose()
+    {
+      base.Dispose();
+      Storage<T>.Instance.groups[layer.id].Remove(this);
+      Storage<Y>.Instance.groups[layer.id].Remove(this);
+      Storage<U>.Instance.groups[layer.id].Remove(this);
+      Storage<I>.Instance.groups[layer.id].Remove(this);
+      Storage<O>.Instance.groups[layer.id].Remove(this);
+      Storage<P>.Instance.groups[layer.id].Remove(this);
+      Storage<A>.Instance.groups[layer.id].Remove(this);
+      Storage<S>.Instance.groups[layer.id].Remove(this);
+      Storage<D>.Instance.groups[layer.id].Remove(this);
+      Storage<F>.Instance.groups[layer.id].Remove(this);
+    }
+  }
+
+  public delegate void HandleSegmentGroup(SegmentGroup segment);
+
+  public sealed class SegmentGroup
+  {
+    public GroupCore source;
+    public float delta;
+
+    public int indexFrom;
+    public int indexTo;
+
+    internal Thread thread;
+    internal ManualResetEvent HasWork;
+    internal ManualResetEvent WorkDone;
+
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Enumerator GetEnumerator()
+    {
+      return new Enumerator(indexFrom, indexTo);
+    }
+
+    public struct Enumerator : IEnumerator<int>
+    {
+      readonly int length;
+      int position;
+
+      [MethodImpl(MethodImplOptions.AggressiveInlining)]
+      internal Enumerator(int from, int to)
+      {
+        position = from - 1;
+        length   = to;
+      }
+
+      public int Current
+      {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get { return position; }
+      }
+
+      object IEnumerator.Current => Current;
+
+      [MethodImpl(MethodImplOptions.AggressiveInlining)]
+      public bool MoveNext()
+      {
+        return ++position < length;
+      }
+
+
+      [MethodImpl(MethodImplOptions.AggressiveInlining)]
+      public void Dispose()
+      {
+      }
+
+
+      [MethodImpl(MethodImplOptions.AggressiveInlining)]
+      public void Reset()
+      {
+        position = -1;
+      }
     }
   }
 }

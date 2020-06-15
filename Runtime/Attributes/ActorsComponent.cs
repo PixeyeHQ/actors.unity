@@ -2,6 +2,7 @@
 
 namespace Pixeye.Actors
 {
+    
     public class ActorsComponent : Attribute
     {
     }

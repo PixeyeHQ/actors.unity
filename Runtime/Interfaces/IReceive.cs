@@ -3,10 +3,12 @@
 
 namespace Pixeye.Actors
 {
-	public interface IReceive<T> : IReceive
-	{
-		void HandleSignal(in T arg);
-	}
+  public interface IReceive<T> : IReceive
+  {
+    void HandleSignal(in T arg);
+  }
 
-	public interface IReceive { }
+  public interface IReceive
+  {
+  }
 }

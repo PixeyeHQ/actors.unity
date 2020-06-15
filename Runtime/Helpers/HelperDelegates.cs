@@ -3,15 +3,15 @@
 
 namespace Pixeye.Actors
 {
-	public delegate bool EntityCallback(in ent entity);
+  public delegate bool EntityFunction(ent entity);
 
-	public delegate bool EntityCallbackUpdated(in ent entity, float delta);
+  public delegate bool EntityFunctionUpdated(ent entity, float delta);
 
-	public delegate void EntityAction(in ent entity);
-	
-	public delegate void EntityActionUpdated(in ent entity, float delta);
+  public delegate void EntityAction(ent entity);
 
-	public delegate void ModelComposer(in ent entity);
+  public delegate void EntityActionUpdated(ent entity, float delta);
 
-	public delegate void GroupEvent(ent[] entities, int length);
+  public delegate void ModelComposer(ent entity);
+
+  public delegate void GroupEvent(ent[] entities, int length);
 }

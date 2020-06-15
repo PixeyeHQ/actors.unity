@@ -2,7 +2,7 @@
     "name": "com.pixeye.ecs",
     "author": "Pixeye",
     "displayName": "Actors",
-    "description": "ACTORS is a complete game framework with multiscene editing, game object pooling, ECS and data-driven approach for game logic explicitly built for Unity3d. It is used to ease the pain of decoupling data from behaviors without tons of boilerplate code and unnecessary overhead.",
+    "description": "Actors is a framework empowering developers to make better games faster on Unity.",
     "unity": "2019.3",
     "version": "2020.5.14",
     "keywords": [
@@ -17,6 +17,6 @@
     "dependencies": {},
     "repository": {
         "type": "git",
-        "url": "https://github.com/dimmpixeye/actors.git"
+        "url": "https://github.com/dimmpixeye/actors.unity.git"
     }
 }
