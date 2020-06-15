@@ -618,6 +618,23 @@ Actor in the inspector
 Actors on scene may be pooled. To do this you need to toggle ```IsPooled``` variable in the actor's inspector panel.
 
 ## 📖 Advanced
+### 📘 ECS entity childs
+You can child an entity. Child entities will be released along with the parent.
+```csharp
+var e = Entity.Create();
+var eChild = Entity.Create();
+eChild.SetParent(e);
+// you can remove the parent from a child.
+eChild.Unparent();
+```
+### 📘 ECS moving entities to another layer
+You can move entities to different layers. This is a relatively complex operation where entity will be removed from the current layer ECS systems and migrated to the new layer ECS. If an entity is with gameobject then gameobject will be moved to the layer's scene.
+```csharp
+// assuming we create alpaca in the LayerGame
+var e = Entity.Create("Obj Alpaca");
+e.MoveTo<LayerField>();
+```
+ 
 ### 📘 ECS Events
 You can perfrom actions when entities are added or removed from the groups.  
 **💬 How to use ecs events?**   
