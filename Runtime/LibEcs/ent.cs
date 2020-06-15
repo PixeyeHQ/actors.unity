@@ -180,17 +180,28 @@ namespace Pixeye.Actors
 
     public void SetParent(ent entity)
     {
-      var _managed = managed;
+      ref var _managed = ref managed;
       _managed.parent = entity;
       entity.managed.childs.Add(this);
     }
 
     public void Unparent()
     {
-      var _managed = managed;
+      ref var _managed = ref managed;
       _managed.parent.managed.childs.Remove(this);
       _managed.parent = default;
     }
+
+    public ents GetChilds()
+    {
+      return managed.childs;
+    }
+
+    public ent Child(int index)
+    {
+      return managed.childs[index];
+    }
+
 
     public void MoveTo<T>()
     {
