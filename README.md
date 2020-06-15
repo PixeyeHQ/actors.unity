@@ -853,7 +853,7 @@ This is a list of known projects that uses Actors by far. If you want to add a p
 #### Until We Die | [Steam](https://store.steampowered.com/app/1197570/Until_We_Die/)
 [![Steam](https://i.gyazo.com/d74cfd05151cc1627cfcd3f7eb296edd.jpg)](https://store.steampowered.com/app/1197570/Until_We_Die/)
 #### Snake Demo | [Github link](https://store.steampowered.com/app/1197570/Until_We_Die/)
-#### Actors Benchmark | [Github link](https://store.steampowered.com/app/1197570/Until_We_Die/) 
+#### Actors Benchmark | [Github link](https://github.com/PixeyeHQ/actors.unity.benchmark) 
 
 ## 📖 About <a name="About"></a> 
 ### 💬 How to help
