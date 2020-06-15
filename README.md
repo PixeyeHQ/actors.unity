@@ -20,7 +20,7 @@ The framework favors simplicity and doesn't try to "abstract away" Unity workflo
 - Fast coroutines working in any class.
 - Update methods working in any class.
 
-## 📖 ECS Basic Overview
+## 📖 ECS Overview
 **🔖 Entities** are containers for components. Entity ID is represented by ent structure.
 
 **💬 How to create an entity?**
@@ -92,6 +92,47 @@ To create a new component right click in project window and select Create->Actor
 </details>
 
 > 💡 *For comfortable workflow a component is created together with special helper class. While you can live without that helper all examples are provided with use of it.*
+
+**💬 How to add components?**
+There are several ways to add components depending on the context of your code.
+In case you want to setup your new entity use ```Set``` Method. Use ```Set``` method only with newly created entities.
+
+```csharp
+public void SomeMethod()
+{    
+     ent e = Entity.Create("Obj Bunny");
+     // Add components
+     var cCute       = e.Set<ComponentCute>();
+     var cJumping    = e.Set<ComponentJumping>();
+     var cConsumable = e.Set<ComponentConsumable>();
+     var cPoo        = e.Set<ComponentCanPoo>();
+
+     // Component Cute
+     cCute.attractivness = float.PositiveInfinity;
+     // Component Jumping
+     cJumping.power = 100;
+}
+```
+
+Use ```Get``` method when you want to attach new component to already existed entity.
+```csharp
+public void SomeMethod()
+{    
+     // where e is some entity.
+     // Add components
+     var cCute       = e.Add<ComponentCute>();
+     var cJumping    = e.Add<ComponentJumping>();
+     var cConsumable = e.Add<ComponentConsumable>();
+     var cPoo        = e.Add<ComponentCanPoo>();
+
+     // Component Cute
+     cCute.attractivness = float.PositiveInfinity;
+     // Component Jumping
+     cJumping.power = 100;
+
+}
+```
+
 
 
 **🔖 Systems** in Actors are called **Processors**. Processors execute game logic with **groups**. Groups are containers for entities filtered by components mask.
