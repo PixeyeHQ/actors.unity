@@ -2,8 +2,8 @@
     <img src="http://pixeye.games/images/logo_actors-1024.png" width="512" height="512" alt="Actors">
 </p>
 
+[![Twitter Follow](https://img.shields.io/twitter/follow/PixeyeHQ?color=blue&label=Follow%20on%20Twitter&logo=%20&logoColor=%20&style=flat-square)](https://twitter.com/PixeyeHQ)
 [![Discord](https://img.shields.io/discord/320945300892286996.svg?label=Discord)](http://discord.pixeye.games)
-[![Twitter Follow](https://img.shields.io/badge/twitter-%40dimmPixeye-blue.svg?style=flat-square&label=Follow)](https://twitter.com/dimmPixeye)
 [![license](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](https://github.com/dimmpixeye/Actors-Unity3d-Framework/blob/master/LICENSE)
 [![openupm](https://img.shields.io/npm/v/com.pixeye.ecs?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.pixeye.ecs/)
 
@@ -20,7 +20,11 @@ The framework favors simplicity and doesn't try to "abstract away" Unity workflo
 - Fast coroutines working in any class.
 - Update methods working in any class.
 
-## 📖 ECS Overview
+| [How To Install](#HowToInstall) - [Projects](#Gallery)|
+:----------------------------------------------------------: |
+ 
+
+## 📖 ECS Overview 
 **🔖 Entities** are containers for components. Entity ID is represented by ent structure.
 
 **💬 How to create an entity?**
@@ -767,12 +771,12 @@ public class ProcessorAlpaca : Processor, ITick
 ### 📘 Box
 Box is a small wrapper to take assets from the resources foler.
 
-**🔖 Box.Load<T>** is used to load asset as Resources.Load.
+**🔖 Box.Load** is used to load asset as Resources.Load.
 ```csharp
 var data = Box.Load<DataObject>("Data Hero Alpaca");
 var sprites = Box.LoadAll<Sprite>("Tex Hero Alpaca"); // take elements from array.
 ```
-**🔖 Box.Get<T>** is used to load and cache asset. When you load the asset for the first time it will be saved in dictionary. Next time you will get it from the dict.
+**🔖 Box.Get** is used to load and cache asset. When you load the asset for the first time it will be saved in dictionary. Next time you will get it from the dict.
 ```csharp
 Box.Get<DataObject>("Data Hero Alpaca");
 ```
@@ -820,7 +824,7 @@ You can cusotomize some parametres through the SettingsFramework.json. If you do
 }
 ```
 
-## 📖 How to Install  
+## 📖 How to Install <a name="HowToInstall"></a> 
 #### Git Installation
 - Open the manifest.json file of your Unity project.
 - Add ```"com.pixeye.ecs": "https://github.com/PixeyeHQ/actors.unity.git"```
@@ -842,15 +846,27 @@ Press Tools->Actors->Update Actors to get a new update.
         
 > 💡 *If you install via **OpenUPM** registry, you can update the package using the Unity package manager.*
 
-    
-    
-In Actors components can be either classes or structures.
-<details>
-<summary>
-To change component type press Tools->Actors->Set Struct Components
-</summary>
-<a href="https://gyazo.com/eb9e8cd2e5b9000e412d8466c15b6281"><img src="https://i.gyazo.com/eb9e8cd2e5b9000e412d8466c15b6281.gif" alt="switch to struct" width="1512.5"/></a>
-</details>
+## 📖 Gallery <a name="Gallery"></a> 
+This is a list of known projects that uses Actors by far. If you want to add a project, feel free to contact me :)
+### Until We Die
+[Steam](https://store.steampowered.com/app/1197570/Until_We_Die/)
+[![Steam](https://i.gyazo.com/d74cfd05151cc1627cfcd3f7eb296edd.jpg)](https://store.steampowered.com/app/1197570/Until_We_Die/)
+### Snake Demo
+[Github link](https://store.steampowered.com/app/1197570/Until_We_Die/)
+### Actors Benchmark
+[Github link](https://store.steampowered.com/app/1197570/Until_We_Die/) 
 
-> 💡 *You should decide from the start what component types you want to use as the workflow slightly differs. Personally, I advice to stick with classes.*
+## 📖 About
+### 💬 How to help
+- Spread the word about Actors.
+- Make games with Actors! :)
+- Share your demos and examples with Actors.
+- Help with docs translation & proofreading.
+- Become member of our friendly [Discord Community](https://discord.com/invite/Szv4eTA).
 
+### 💬 Credits
+Developed by Dmitry Mitrofanov and every direct or indirect contributors to the GitHub.     
+Recurring contributors (2020): Dmitry Mitrofanov @PixeyeHQ, Alex Ohezin @Allexeee.
+
+### 📘 License
+Actors is licensed under the MIT License, see LICENSE for more information.
