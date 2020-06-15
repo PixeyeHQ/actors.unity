@@ -616,7 +616,7 @@ Actor in the inspector
 
 **🔖 IsPooled**    
 Actors on scene may be pooled. To do this you need to toggle ```IsPooled``` variable in the actor's inspector panel.
-
+> 💡 Pooled actors must be unity prefabs. This won't work for plain objects in the scene.
 ## 📖 Advanced
 ### 📘 ECS entity childs
 You can child an entity. Child entities will be released along with the parent.
