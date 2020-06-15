@@ -2,9 +2,9 @@
     "name": "com.pixeye.ecs",
     "author": "Pixeye",
     "displayName": "Actors",
-    "description": "Actors is a framework empowering developers to make better games faster on Unity.",
+    "description": "🚀 Actors is a framework empowering developers to make better games faster on Unity.",
     "unity": "2019.3",
-    "version": "2020.5.14",
+    "version": "2020.6.15",
     "keywords": [
         "ecs",
         "pixeye",
