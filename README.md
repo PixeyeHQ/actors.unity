@@ -21,7 +21,7 @@ The framework favors simplicity and doesn't try to "abstract away" Unity workflo
 - Fast coroutines working in any class.
 - Update methods working in any class.
 
-| [How To Install](#HowToInstall) - [Projects](#Gallery)|
+| [How To Install](#HowToInstall) - [Advanced](#Advanced)| - [Projects](#Gallery)| - [About](#About)|
 :----------------------------------------------------------: |
  
 
@@ -622,7 +622,8 @@ Actor in the inspector
 **🔖 IsPooled**    
 Actors on scene may be pooled. To do this you need to toggle ```IsPooled``` variable in the actor's inspector panel.
 > 💡 Pooled actors must be unity prefabs. This won't work for plain objects in the scene.
-## 📖 Advanced
+
+## 📖 Advanced <a name="Advanced"></a> 
 ### 📘 ECS entity childs
 You can child an entity. Child entities will be released along with the parent.
 ```csharp
@@ -854,7 +855,7 @@ This is a list of known projects that uses Actors by far. If you want to add a p
 #### Snake Demo | [Github link](https://store.steampowered.com/app/1197570/Until_We_Die/)
 #### Actors Benchmark | [Github link](https://store.steampowered.com/app/1197570/Until_We_Die/) 
 
-## 📖 About
+## 📖 About <a name="About"></a> 
 ### 💬 How to help
 - Spread the word about Actors.
 - Make games with Actors! :)
