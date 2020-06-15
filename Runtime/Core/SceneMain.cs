@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -24,12 +25,25 @@ namespace Pixeye.Actors
 
     static void ChangeOp(int buildIndex)
     {
+      var nextIndex = buildIndex;
+
       LayerKernel.Initialized[buildIndex] = false;
       Closed();
       Layer.ActiveLayer.Release();
       LayerKernel.LoadJobs.Add(SceneManager.UnloadSceneAsync(Layer.ActiveLayer.Scene));
       LayerKernel.LoadJobs.Add(Resources.UnloadUnusedAssets());
       LayerKernel.LoadJobs.Add(SceneManager.LoadSceneAsync(buildIndex, LoadSceneMode.Additive));
+
+
+      LayerKernel.RunUnscaled(CoChangeOP());
+
+      IEnumerator CoChangeOP()
+      {
+        while (LayerKernel.LoadJobs.Count > 0)
+          yield return 0;
+        
+        SceneManager.SetActiveScene(SceneManager.GetSceneByBuildIndex(nextIndex));
+      }
     }
   }
 }

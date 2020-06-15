@@ -20,14 +20,14 @@ namespace Pixeye.Actors
 
     protected virtual void Start()
     {
-      if (!LayerKernel.InternalInstance || !LayerKernel.Initialized[gameObject.scene.buildIndex]) return;
+      if (!LayerKernel.InstanceInternal || !LayerKernel.Initialized[gameObject.scene.buildIndex]) return;
       Layer = LayerKernel.Layers[gameObject.scene.buildIndex];
       Setup();
     }
 
     void OnEnable()
     {
-      if (!LayerKernel.InternalInstance || !LayerKernel.Initialized[gameObject.scene.buildIndex]) return;
+      if (!LayerKernel.InstanceInternal || !LayerKernel.Initialized[gameObject.scene.buildIndex]) return;
       HandleEnable();
     }
 

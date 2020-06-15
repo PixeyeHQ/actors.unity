@@ -2,8 +2,10 @@
 //  Contacts : Pixeye - ask@pixeye.games
 
 #if UNITY_EDITOR
+using System.Linq;
 using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
+using UnityEngine.SceneManagement;
 
 
 namespace Pixeye.Actors
@@ -24,12 +26,37 @@ namespace Pixeye.Actors
   [InitializeOnLoad]
   public static class PostProcessorCheckPools
   {
+    public static IPooledLayer Find(int index)
+    {
+      GameObject[] rootGameObjects = SceneManager.GetSceneAt(index).GetRootGameObjects();
+      foreach (var rootGameObject in rootGameObjects)
+      {
+        IPooledLayer[] childrenInterfaces = rootGameObject.GetComponentsInChildren<IPooledLayer>();
+        foreach (var childInterface in childrenInterfaces)
+        {
+          return childInterface;
+        }
+      }
+
+      return null;
+    }
+
     static PostProcessorCheckPools()
     {
       EditorApplication.update += Step;
-      var layer = Object.FindObjectOfType<Layer>();
-      if (layer == null) return;
-      layer.ClearNodes();
+
+      for (int i = 0; i < SceneManager.sceneCount; i++)
+      {
+        GameObject[] rootGameObjects = SceneManager.GetSceneAt(i).GetRootGameObjects();
+        foreach (var rootGameObject in rootGameObjects)
+        {
+          IPooledLayer[] childrenInterfaces = rootGameObject.GetComponentsInChildren<IPooledLayer>();
+          foreach (var ilayer in childrenInterfaces)
+          {
+            ilayer.ClearNodes();
+          }
+        }
+      }
     }
 
     static void Step()
@@ -42,20 +69,33 @@ namespace Pixeye.Actors
 
     public static void CheckScene()
     {
-      var layer = Object.FindObjectOfType<Layer>();
-      if (layer == null) return;
-      layer.ClearNodes();
-      var actors = Object.FindObjectsOfType<Actor>();
-
-      for (int i = 0; i < actors.Length; i++)
+      for (int i = 0; i < SceneManager.sceneCount; i++)
       {
-        var a = actors[i];
-        if (!a.isPooled) continue;
-        CheckPoolCache(a.gameObject, Pool.Entities, layer);
+        GameObject[] rootGameObjects = SceneManager.GetSceneAt(i).GetRootGameObjects();
+        foreach (var rootGameObject in rootGameObjects)
+        {
+          IPooledLayer[] childrenInterfaces = rootGameObject.GetComponentsInChildren<IPooledLayer>();
+          foreach (var ilayer in childrenInterfaces)
+          {
+            ilayer.ClearNodes();
+       
+            foreach (var obj in rootGameObjects)
+            {
+              var actors = obj.GetComponentsInChildren<Actor>();
+ 
+              foreach (var a in actors)
+              {
+               
+                if (!a.isPooled) continue;
+                CheckPoolCache(a.gameObject, Pool.Entities, ilayer);
+              }
+            }
+          }
+        }
       }
     }
 
-    public static void CheckPoolCache(GameObject gameObject, int pool, Layer layer)
+    public static void CheckPoolCache(GameObject gameObject, int pool, IPooledLayer layer)
     {
       GameObject prefab;
 #if UNITY_2018_3_OR_NEWER

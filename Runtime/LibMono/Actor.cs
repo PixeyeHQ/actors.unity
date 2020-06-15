@@ -32,7 +32,7 @@ namespace Pixeye.Actors
     //===============================//
     // Launch methods
     //===============================//
-    
+
     // used when actor is created in session.
     internal void BootstrapCreated(Layer layer)
     {
@@ -53,6 +53,7 @@ namespace Pixeye.Actors
       // When childs are initialized manually from the parent, layer will treat them as eligable
       // objects to bootstrap. To prevent double bootstrap we check the layer. If it is not null
       // then we know that the monocache was already activated.
+
       if (Layer != null) return;
       BootstrapCreated(layer);
     }

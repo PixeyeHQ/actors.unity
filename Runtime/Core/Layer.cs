@@ -9,13 +9,12 @@ using UnityEngine.SceneManagement;
 
 namespace Pixeye.Actors
 {
-  public abstract class Layer : MonoBehaviour
+  public sealed class Layer
   {
-    
     internal static int NEXT_FREE_ID;
     internal static Dictionary<string, int> USED_IDS = new Dictionary<string, int>(StringComparer.Ordinal);
     internal static Layer ActiveLayer; // current main scene;
-    internal Scene Scene => gameObject.scene;
+
 
     internal ProcessorCoroutine processorCoroutine;
     internal ProcessorCoroutine processorCoroutineUnscaled;
@@ -25,6 +24,7 @@ namespace Pixeye.Actors
 
     public Action Closed = delegate { };
 
+    public Scene Scene => gameObject.scene;
     public ProcessorUpdate Engine;
     public ImplObj Obj;
     public Time Time;
@@ -32,29 +32,32 @@ namespace Pixeye.Actors
     public ImplEntity Entity;
     public ImplEcs Ecs;
     public ImplObserver Observer;
-    
-    public virtual int ID => id;
 
+    public int ID => id;
+
+    internal GameObject gameObject;
     internal Pool pool;
 
     internal int id;
     internal bool isReleasing = true;
 
+    internal Action OnLayerDestroy;
     internal Dictionary<int, object> objects = new Dictionary<int, object>();
 
-
-    protected virtual void Awake()
+    internal Layer(GameObject gameObject, Action OnLayerDestroy)
     {
+      this.OnLayerDestroy = OnLayerDestroy;
+      this.gameObject     = gameObject;
       if (!USED_IDS.TryGetValue(gameObject.scene.name, out id))
       {
         id = NEXT_FREE_ID++;
         USED_IDS.Add(gameObject.scene.name, id);
       }
 
-
       Time = new Time();
       LayerKernel.LayersInUse.Add(this);
     }
+
 
     public Buffer<Y> GetBuffer<Y>() where Y : struct
     {
@@ -163,76 +166,7 @@ namespace Pixeye.Actors
 
     #endregion
 
-    #region POOLING
-
-    [SerializeField] [HideInInspector] internal List<PoolNode> nodes = new List<PoolNode>();
-#if UNITY_EDITOR
-    public void ClearNodes()
-    {
-      for (int i = 0; i < nodes.Count; i++)
-      {
-        var n = nodes[i];
-        n.createdObjs.Clear();
-        n.prefab = null;
-      }
-
-      nodes.Clear();
-    }
-
-    public void AddToNode(GameObject prefab, GameObject instance, int pool)
-    {
-      var id                  = prefab.GetInstanceID();
-      var nodesValid          = nodes.FindValidNodes(id);
-      var conditionNodeCreate = true;
-      var nodesToKill         = new List<int>();
-
-      for (var i = 0; i < nodesValid.Count; i++)
-      {
-        var node = nodes[nodesValid[i]];
-
-        var index = node.createdObjs.FindInstanceID(instance);
-        if (index != -1 && pool != node.pool)
-        {
-          node.createdObjs.RemoveAt(index);
-        }
-        else if (index == -1 && pool == node.pool)
-        {
-          conditionNodeCreate = false;
-          node.createdObjs.Add(instance);
-        }
-
-        if (index != -1 && pool == node.pool)
-        {
-          conditionNodeCreate = false;
-        }
-
-        if (node.createdObjs.Count == 0)
-        {
-          node.prefab = null;
-          nodesToKill.Add(nodesValid[i]);
-        }
-      }
-
-      for (var i = 0; i < nodesToKill.Count; i++)
-      {
-        nodes.RemoveAt(nodesToKill[i]);
-      }
-
-      if (conditionNodeCreate)
-      {
-        var node = new PoolNode();
-        node.id          = id;
-        node.prefab      = prefab;
-        node.pool        = pool;
-        node.createdObjs = new List<GameObject>();
-        node.createdObjs.Add(instance);
-
-        nodes.Add(node);
-      }
-    }
-#endif
-
-    #endregion
+     
 
     internal void Release()
     {
@@ -251,46 +185,6 @@ namespace Pixeye.Actors
           wiped.Dispose();
         }
       }
-    }
-
-
-    /// Scene entry point, load your custom stuff from here.
-    protected abstract void Setup();
-
-    /// Clean *your* custom scene stuff from here.
-    protected virtual void OnLayerDestroy()
-    {
-    }
-
-
-    void Update()
-    {
-#if UNITY_EDITOR
-      if (Engine == null) return;
-#endif
-      Engine.Update();
-    }
- 
-    void FixedUpdate()
-    {
-#if UNITY_EDITOR
-      if (Engine == null) return;
-#endif
-      Engine.FixedUpdate();
-    }
-
-    void LateUpdate()
-    {
-#if UNITY_EDITOR
-      if (Engine == null) return;
-#endif
-      Engine.LateUpdate();
-    }
-
-
-    void OnApplicationQuit()
-    {
-      isReleasing = true;
     }
   }
 

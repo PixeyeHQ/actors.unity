@@ -6,6 +6,7 @@ using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections;
+using System.Collections.Generic;
 
 #if ODIN_INSPECTOR
 using Sirenix.OdinInspector;
@@ -14,33 +15,73 @@ using Sirenix.OdinInspector;
 namespace Pixeye.Actors
 {
   /// A scene point of entry. The developer defines here scene dependencies and processing that will work on the scene. 
-  public abstract class Layer<T> : Layer
+  public abstract class Layer<T> : MonoBehaviour, IPooledLayer
   {
-    public static new ProcessorUpdate Engine => InternalInstance.core.Engine;
-    public static new ImplEntity Entity => InternalInstance.core.Entity;
-    public static new ImplEcs Ecs => InternalInstance.core.Ecs;
-    public static new ImplObserver Observer => InternalInstance.core.Observer;
-    public static new ImplActor Actor => InternalInstance.core.Actor;
-    public static new Time Time => InternalInstance.core.Time;
-    public static new ImplObj Obj => InternalInstance.core.Obj;
-    public static new int ID => InternalInstance.id;
-    
-    internal static Layer<T> InternalInstance;
-    internal Layer core;
+    public static ProcessorUpdate Engine => InstanceInternal.self.Engine;
+    public static ImplEntity Entity => InstanceInternal.self.Entity;
+    public static ImplEcs Ecs => InstanceInternal.self.Ecs;
+    public static ImplObserver Observer => InstanceInternal.self.Observer;
+    public static ImplActor Actor => InstanceInternal.self.Actor;
+    public static Time Time => InstanceInternal.self.Time;
+    public static ImplObj Obj => InstanceInternal.self.Obj;
 
-  
+    public static int ID => InstanceInternal.self.id;
 
-    protected sealed override void Awake()
+    internal static Layer<T> InstanceInternal;
+ 
+    [SerializeField, HideInInspector]
+    public Layer self;
+
+    void Awake()
     {
-      core = this;
-      base.Awake();
+      self = new Layer(gameObject, OnLayerDestroy);
       Bootstrap(); // Setup actors logic for a scene.
       Setup();     // Entry point for developers.
     }
 
     void Start()
     {
-      isReleasing = false;
+      self.isReleasing = false;
+    }
+
+    void Update()
+    {
+#if UNITY_EDITOR
+      if (self == null || self.Engine == null) return;
+#endif
+      self.Engine.Update();
+    }
+
+    void FixedUpdate()
+    {
+#if UNITY_EDITOR
+      if (self == null || self.Engine == null) return;
+#endif
+      self.Engine.FixedUpdate();
+    }
+
+    void LateUpdate()
+    {
+#if UNITY_EDITOR
+      if (self == null || self.Engine == null) return;
+#endif
+      self.Engine.LateUpdate();
+    }
+
+    void OnApplicationQuit()
+    {
+#if UNITY_EDITOR
+      if (self == null) return;
+#endif
+      self.isReleasing = true;
+    }
+
+    /// Scene entry point, load your custom stuff from here.
+    protected abstract void Setup();
+
+    /// Clean *your* custom scene stuff from here.
+    protected virtual void OnLayerDestroy()
+    {
     }
 
     void Bootstrap()
@@ -50,10 +91,10 @@ namespace Pixeye.Actors
       var buildIndex = gameObject.scene.buildIndex;
       if (buildIndex != -1)
       {
-        LayerKernel.Layers[buildIndex] = this;
+        LayerKernel.Layers[buildIndex] = self;
       }
 
-      InternalInstance = this;
+      InstanceInternal = this;
 
       #endregion
 
@@ -61,41 +102,34 @@ namespace Pixeye.Actors
 
       Processor.NEXT_FREE_ID = 0; // drop so the processors of the new layer can grab fresh ID.
 
-      core.Engine = new ProcessorUpdate();
+      self.Engine = new ProcessorUpdate();
       Engine.Add(this);
 
       // cant add two same classes in toolbox :( temporary solution.
-      processorCoroutineUnscaled            = new ProcessorCoroutine();
-      processorCoroutineUnscaled.timescaled = false;
-      processorCoroutineUnscaled.Bootstrap(this);
+      self.processorCoroutineUnscaled            = new ProcessorCoroutine();
+      self.processorCoroutineUnscaled.timescaled = false;
+      self.processorCoroutineUnscaled.Bootstrap(self);
 
-      processorCoroutine = new ProcessorCoroutine();
-      processorCoroutine.Bootstrap(this);
+      self.processorCoroutine = new ProcessorCoroutine();
+      self.processorCoroutine.Bootstrap(self);
 
-      pool     = Add<Pool>();
-      core.Obj = Add<ImplObj>();
+      self.pool = Add<Pool>();
+      self.Obj  = Add<ImplObj>();
 
-      processorSignals = Add<ProcessorSignals>();
-      processorEcs     = Add<ProcessorEcs>();
-      core.Actor       = Add<ImplActor>();
-      core.Entity      = Add<ImplEntity>();
-      core.Ecs         = Add<ImplEcs>();
-      core.Observer    = Add<ImplObserver>();
+      self.processorSignals = Add<ProcessorSignals>();
+      self.processorEcs     = Add<ProcessorEcs>();
+      self.Actor            = Add<ImplActor>();
+      self.Entity           = Add<ImplEntity>();
+      self.Ecs              = Add<ImplEcs>();
+      self.Observer         = Add<ImplObserver>();
 
       Add<ProcessorObserver>();
 
-      Engine.layer = InternalInstance;
+      Engine.layer = self;
 
       #endregion
 
       #region Update Layer
-
-      if (gameObject.scene.name != LayerKernel.KernelSceneName)
-        if (SceneMain.NextActiveSceneName != null && SceneMain.NextActiveSceneName == gameObject.scene.name)
-        {
-          SceneMain.NextActiveSceneName = default;
-          ActiveLayer                   = this;
-        }
 
       Run(CoWaitForSceneLoad());
 
@@ -104,11 +138,11 @@ namespace Pixeye.Actors
         while (!gameObject.scene.isLoaded)
           yield return 0;
 
-        if (ActiveLayer == this)
+        var active = SceneManager.GetActiveScene();
+        if (gameObject.scene == active)
         {
-          SceneManager.SetActiveScene(gameObject.scene);
+          Layer.ActiveLayer = self;
         }
-
 
         if (gameObject.scene.buildIndex >= 0)
           LayerKernel.Initialized[gameObject.scene.buildIndex] = true;
@@ -120,7 +154,7 @@ namespace Pixeye.Actors
       #region Pools & Activations
 
       for (var i = 0; i < nodes.Count; i++)
-        nodes[i].Populate(this);
+        nodes[i].Populate(self);
 
 
       var objs = gameObject.scene.GetRootGameObjects();
@@ -136,7 +170,7 @@ namespace Pixeye.Actors
           {
             if (o is IRequireActorsLayer req && o.enabled)
             {
-              req.Bootstrap(this);
+              req.Bootstrap(self);
             }
           }
         }
@@ -149,22 +183,22 @@ namespace Pixeye.Actors
 
     public static Y Add<Y>() where Y : new()
     {
-      LayerKernel.LayerCurrentInit = InternalInstance;
+      LayerKernel.LayerCurrentInit = InstanceInternal.self;
       var obj = new Y();
       if (obj is IRequireActorsLayer member)
-        member.Bootstrap(InternalInstance);
-      InternalInstance.objects.Add(typeof(Y).GetHashCode(), obj);
+        member.Bootstrap(InstanceInternal.self);
+      InstanceInternal.self.objects.Add(typeof(Y).GetHashCode(), obj);
       return obj;
     }
 
     public static void Remove<Y>()
     {
       var key = typeof(Y).GetHashCode();
-      if (InternalInstance.objects.TryGetValue(key, out var obj))
+      if (InstanceInternal.self.objects.TryGetValue(key, out var obj))
       {
         if (obj is IDisposable member)
           member.Dispose();
-        InternalInstance.objects.Remove(key);
+        InstanceInternal.self.objects.Remove(key);
       }
     }
 
@@ -173,13 +207,18 @@ namespace Pixeye.Actors
       if (obj is IDisposable member)
         member.Dispose();
 
-      InternalInstance.objects.Remove(typeof(Y).GetHashCode());
+      InstanceInternal.self.objects.Remove(typeof(Y).GetHashCode());
     }
 
 
     public static Y Get<Y>() where Y : class
     {
-      return InternalInstance.objects[typeof(Y).GetHashCode()] as Y;
+      return InstanceInternal.self.objects[typeof(Y).GetHashCode()] as Y;
+    }
+
+    public static Buffer<Y> GetBuffer<Y>() where Y : struct
+    {
+      return InstanceInternal.self.GetBuffer<Y>();
     }
 
     #endregion
@@ -187,58 +226,59 @@ namespace Pixeye.Actors
     #region Coroutines
 
     /// Run coroutine on the top of this layer.
-    public new static RoutineCall Run(IEnumerator routine)
+    public static RoutineCall Run(IEnumerator routine)
     {
-      return InternalInstance.processorCoroutine.Run(routine);
+      return InstanceInternal.self.processorCoroutine.Run(routine);
     }
 
     /// Run coroutine on the top of this layer.
-    public new static RoutineCall Run(float delay, IEnumerator routine)
+    public static RoutineCall Run(float delay, IEnumerator routine)
     {
-      return InternalInstance.processorCoroutine.Run(delay, routine);
+      return InstanceInternal.self.processorCoroutine.Run(delay, routine);
     }
 
 
     /// Run coroutine on the top of this layer.
-    public new static RoutineCall RunUnscaled(IEnumerator routine)
+    public static RoutineCall RunUnscaled(IEnumerator routine)
     {
-      return InternalInstance.processorCoroutineUnscaled.Run(routine);
+      return InstanceInternal.self.processorCoroutineUnscaled.Run(routine);
     }
 
     /// Run coroutine on the top of this layer.
-    public new static RoutineCall RunUnscaled(float delay, IEnumerator routine)
+    public static RoutineCall RunUnscaled(float delay, IEnumerator routine)
     {
-      return InternalInstance.processorCoroutineUnscaled.Run(delay, routine);
+      return InstanceInternal.self.processorCoroutineUnscaled.Run(delay, routine);
     }
 
     /// Stop coroutine on the top of this layer.
-    public new static bool Stop(IEnumerator routine)
+    public static bool Stop(IEnumerator routine)
     {
-      return InternalInstance.processorCoroutine.Stop(routine);
+      return InstanceInternal.self.processorCoroutine.Stop(routine);
     }
 
     /// Stop coroutine on the top of this layer.
-    public new static bool StopUnscaled(IEnumerator routine)
+    public static bool StopUnscaled(IEnumerator routine)
     {
-      return InternalInstance.processorCoroutineUnscaled.Stop(routine);
+      return InstanceInternal.self.processorCoroutineUnscaled.Stop(routine);
     }
 
 
-    public new static IEnumerator WaitFrame => null;
+    public static IEnumerator WaitFrame => null;
 
-    public new static IEnumerator Wait(float t)
+    public static IEnumerator Wait(float t)
     {
-      InternalInstance.processorCoroutine.delays[InternalInstance.processorCoroutine.currentIndex] = t;
+      InstanceInternal.self.processorCoroutine.delays[InstanceInternal.self.processorCoroutine.currentIndex] = t;
       return null;
     }
 
-    public new static IEnumerator WaitUnscaled(float t)
+    public static IEnumerator WaitUnscaled(float t)
     {
-      InternalInstance.processorCoroutineUnscaled.delays[InternalInstance.processorCoroutineUnscaled.currentIndex] = t;
+      InstanceInternal.self.processorCoroutineUnscaled.delays[
+        InstanceInternal.self.processorCoroutineUnscaled.currentIndex] = t;
       return null;
     }
 
-    public new static RoutineCall WaitFor(float t, Action action)
+    public static RoutineCall WaitFor(float t, Action action)
     {
       var routine = Run(CoDelay());
 
@@ -251,7 +291,7 @@ namespace Pixeye.Actors
       return routine;
     }
 
-    public new static RoutineCall WaitForUnscaled(float t, Action action)
+    public static RoutineCall WaitForUnscaled(float t, Action action)
     {
       var routine = RunUnscaled(CoDelay());
 
@@ -268,9 +308,82 @@ namespace Pixeye.Actors
 
     #region Signals
 
-    public new static void Send<Y>(in Y signal) => InternalInstance.processorSignals.Dispatch(signal);
-    public new static void AddSignal(object signal) => InternalInstance.processorSignals.Add(signal);
-    public new static void RemoveSignal(object signal) => InternalInstance.processorSignals.Remove(signal);
+    public static void Send<Y>(in Y signal) => InstanceInternal.self.processorSignals.Dispatch(signal);
+    public static void AddSignal(object signal) => InstanceInternal.self.processorSignals.Add(signal);
+    public static void RemoveSignal(object signal) => InstanceInternal.self.processorSignals.Remove(signal);
+
+    #endregion
+
+
+    #region POOLING
+
+    [SerializeField, HideInInspector]
+    internal List<PoolNode> nodes = new List<PoolNode>();
+#if UNITY_EDITOR
+    void IPooledLayer.ClearNodes()
+    {
+      for (int i = 0; i < nodes.Count; i++)
+      {
+        var n = nodes[i];
+        n.createdObjs.Clear();
+        n.prefab = null;
+      }
+
+      nodes.Clear();
+    }
+
+    void IPooledLayer.AddToNode(GameObject prefab, GameObject instance, int pool)
+    {
+      var id                  = prefab.GetInstanceID();
+      var nodesValid          = nodes.FindValidNodes(id);
+      var conditionNodeCreate = true;
+      var nodesToKill         = new List<int>();
+
+      for (var i = 0; i < nodesValid.Count; i++)
+      {
+        var node = nodes[nodesValid[i]];
+
+        var index = node.createdObjs.FindInstanceID(instance);
+        if (index != -1 && pool != node.pool)
+        {
+          node.createdObjs.RemoveAt(index);
+        }
+        else if (index == -1 && pool == node.pool)
+        {
+          conditionNodeCreate = false;
+          node.createdObjs.Add(instance);
+        }
+
+        if (index != -1 && pool == node.pool)
+        {
+          conditionNodeCreate = false;
+        }
+
+        if (node.createdObjs.Count == 0)
+        {
+          node.prefab = null;
+          nodesToKill.Add(nodesValid[i]);
+        }
+      }
+
+      for (var i = 0; i < nodesToKill.Count; i++)
+      {
+        nodes.RemoveAt(nodesToKill[i]);
+      }
+
+      if (conditionNodeCreate)
+      {
+        var node = new PoolNode();
+        node.id          = id;
+        node.prefab      = prefab;
+        node.pool        = pool;
+        node.createdObjs = new List<GameObject>();
+        node.createdObjs.Add(instance);
+
+        nodes.Add(node);
+      }
+    }
+#endif
 
     #endregion
   }

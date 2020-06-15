@@ -192,16 +192,16 @@ namespace Pixeye.Actors
       _managed.parent = default;
     }
 
-    public void MoveTo<T>() where T : Layer
+    public void MoveTo<T>()
     {
       DebugMoveTo<T>();
-      managed.layer.processorEcs.SwapLayer(this, Layer<T>.InternalInstance);
+      managed.layer.processorEcs.SwapLayer(this, Layer<T>.InstanceInternal.self);
     }
 
     [Conditional("ACTORS_DEBUG")]
     void DebugMoveTo<T>()
     {
-      if (Layer<T>.InternalInstance == null)
+      if (Layer<T>.InstanceInternal == null)
       {
         Debug.Log($"Layer {typeof(T)} doesn't exist in the game.");
         throw new Exception();
