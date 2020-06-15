@@ -21,7 +21,7 @@ The framework favors simplicity and doesn't try to "abstract away" Unity workflo
 - Fast coroutines working in any class.
 - Update methods working in any class.
 
-| [How To Install](#HowToInstall) - [Projects](#Gallery) - [About](#About)|
+| [How To Install](#HowToInstall) - [Projects](#Gallery) - [About](#About) - [Changelog](https://github.com/PixeyeHQ/actors.unity/blob/develop/Changelog.md)|
 :----------------------------------------------------------: |
  
 
