@@ -252,7 +252,7 @@ Obj.Create(Pool.Entities,"Obj Alpaca");
 ```   
 In case you used pool you must provide the pool ID.     
 ```csharp
- var transform = Obj.Create("Obj Alpaca");
+ var transform = Obj.Create((Pool.Entities, "Obj Alpaca");
  transform.gameObject.Release(Pool.Entities);
 ```        
 
