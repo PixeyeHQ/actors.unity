@@ -1,14 +1,15 @@
 <p align="center">
     <img src="http://pixeye.games/images/logo_actors-1024.png" width="512" height="512" alt="Actors">
 </p>
-
+ 
 [![Twitter Follow](https://img.shields.io/twitter/follow/PixeyeHQ?color=blue&label=Follow%20on%20Twitter&logo=%20&logoColor=%20&style=flat-square)](https://twitter.com/PixeyeHQ)
 [![Discord](https://img.shields.io/discord/320945300892286996.svg?label=Discord)](http://discord.pixeye.games)
 [![license](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](https://github.com/dimmpixeye/Actors-Unity3d-Framework/blob/master/LICENSE)
 [![openupm](https://img.shields.io/npm/v/com.pixeye.ecs?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.pixeye.ecs/)
 [![stars](https://img.shields.io/github/stars/PixeyeHQ/actors.unity?style=social)](https://github.com/PixeyeHQ/actors.unity/stargazers)
-
+ 
 #### Actors is a framework empowering developers to make better games faster on Unity.
+
 ## ⭐ Why Actors ?
 The framework favors simplicity and doesn't try to "abstract away" Unity workflows bringing first-class support for combining ECS with classic Unity component system.
 - Deterministic worflow.
@@ -23,6 +24,7 @@ The framework favors simplicity and doesn't try to "abstract away" Unity workflo
 
 | [How To Install](#HowToInstall) - [Projects](#Gallery) - [About](#About) - [Changelog](https://github.com/PixeyeHQ/actors.unity/blob/develop/Changelog.md)|
 :----------------------------------------------------------: |
+
  
 
 ## 📖 ECS Overview 
