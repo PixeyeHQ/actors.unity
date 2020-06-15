@@ -36,7 +36,10 @@ namespace Pixeye.Actors
     {
       self = new Layer(gameObject, OnLayerDestroy);
 
-    
+      //temporary
+      if (gameObject.scene.name == SceneMain.NextActiveSceneName)
+        Layer.ActiveLayer = self;
+      
 
       Bootstrap(); // Setup actors logic for a scene.
       Setup();     // Entry point for developers.
