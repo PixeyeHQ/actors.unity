@@ -41,6 +41,7 @@ namespace Pixeye.Actors
       Layer.Engine.AddProc(this);
       Layer.processorEcs.Add(this);
       Layer.processorEcs.processors.Add(this);
+     
       Layer.processorSignals.Add(this);
 
       Entity   = Layer.Entity;
@@ -83,7 +84,7 @@ namespace Pixeye.Actors
     internal static SignalsEcs<T>[] Layers = new SignalsEcs<T>[LayerKernel.LAYERS_AMOUNT_TOTAL];
 
     internal BufferCircular<Element> elements = new BufferCircular<Element>(4);
-   
+
     // case: several processors gets signal.
     // without lock we get invalid signal receive order.
     // https://i.gyazo.com/22eb327ea969ba9ca7e608e5893d9449.png  <- without lock

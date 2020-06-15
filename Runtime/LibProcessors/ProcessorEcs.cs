@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.IL2CPP.CompilerServices;
 
+
 namespace Pixeye.Actors
 {
   [Il2CppSetOption(Option.NullChecks, false)]
@@ -70,7 +71,7 @@ namespace Pixeye.Actors
       // we always need to cleanup transforms as they can be pooled.
       // if the next entity id is not used in pool and will still have
       // a link to the transform it will destroy a transform.
-      managed.transform = null;  
+      managed.transform = null;
 
       ptr->age              = entity.age;
       ptr->isAlive          = true;
@@ -131,7 +132,6 @@ namespace Pixeye.Actors
 
       for (int i = 0; i < groups.Count; i++)
       {
-        //  Groups.Remove(groups[i]);
         groups[i].Dispose();
       }
 

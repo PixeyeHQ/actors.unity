@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using Unity.IL2CPP.CompilerServices;
 
+
 namespace Pixeye.Actors
 {
   [Il2CppSetOption(Option.NullChecks, false)]
@@ -67,6 +68,20 @@ namespace Pixeye.Actors
         composition.includedTags = includeTagsFilter;
         composition.GenerateExclude(excludeCompFilter);
 
+        var types = myFieldInfo.FieldType.GetGenericArguments();
+
+        composition.included = new ComponentMask[types.Length];
+        var nextIndex = 0;
+        foreach (var nextType in types)
+        {
+          var componentID = Storage.TypeNames[nextType.GetHashCode()];
+          composition.included[nextIndex].generation = Storage.Generations[componentID];
+          composition.included[nextIndex].mask       = Storage.Masks[componentID];
+          composition.included[nextIndex].id         = componentID;
+          composition.includeComponents[componentID] = true;
+          nextIndex++;
+        }
+
         composition.hash = HashCode.OfEach(myFieldInfo.FieldType.GetGenericArguments())
           .AndEach(composition.includedTags).And(17).AndEach(composition.excludedTags).And(31)
           .AndEach(excludeCompFilter);
@@ -96,12 +111,18 @@ namespace Pixeye.Actors
         if (groupNext.composition.hash.value == composition.hash.value && groupNext.layer.id == layer.id)
         {
           if (!groupNext.initialized)
+          {
+            groups.Add(groupNext);
             groupNext.Initialize(composition, layer);
+            groupNext.initialized = true;
+          }
+
           return groupNext;
         }
       }
 
       var group = CreateGroup();
+
       groups.Add(group);
       Groups.Add(group);
       return group;
@@ -112,7 +133,6 @@ namespace Pixeye.Actors
         {
           var gr = fieldObj as GroupCore;
           gr.id = GroupNextID++;
-
 
           gr.Initialize(composition, layer);
           return gr;

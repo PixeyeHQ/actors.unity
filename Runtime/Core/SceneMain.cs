@@ -33,16 +33,14 @@ namespace Pixeye.Actors
       LayerKernel.LoadJobs.Add(SceneManager.UnloadSceneAsync(Layer.ActiveLayer.Scene));
       LayerKernel.LoadJobs.Add(Resources.UnloadUnusedAssets());
       LayerKernel.LoadJobs.Add(SceneManager.LoadSceneAsync(buildIndex, LoadSceneMode.Additive));
-
-
+      Layer.ActiveLayer = null;
       LayerKernel.RunUnscaled(CoChangeOP());
-
+      
       IEnumerator CoChangeOP()
       {
         while (LayerKernel.LoadJobs.Count > 0)
           yield return 0;
-        
-        SceneManager.SetActiveScene(SceneManager.GetSceneByBuildIndex(nextIndex));
+        NextActiveSceneName = SceneManager.GetSceneByBuildIndex(nextIndex).name;
       }
     }
   }

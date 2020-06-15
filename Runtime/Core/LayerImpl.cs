@@ -28,13 +28,16 @@ namespace Pixeye.Actors
     public static int ID => InstanceInternal.self.id;
 
     internal static Layer<T> InstanceInternal;
- 
+
     [SerializeField, HideInInspector]
     public Layer self;
 
     void Awake()
     {
       self = new Layer(gameObject, OnLayerDestroy);
+
+    
+
       Bootstrap(); // Setup actors logic for a scene.
       Setup();     // Entry point for developers.
     }
@@ -138,10 +141,11 @@ namespace Pixeye.Actors
         while (!gameObject.scene.isLoaded)
           yield return 0;
 
-        var active = SceneManager.GetActiveScene();
-        if (gameObject.scene == active)
+ 
+        if (gameObject.scene.name == SceneMain.NextActiveSceneName)
         {
           Layer.ActiveLayer = self;
+          SceneManager.SetActiveScene(gameObject.scene);
         }
 
         if (gameObject.scene.buildIndex >= 0)
