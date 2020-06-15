@@ -228,6 +228,36 @@ As already said, layers are very important part of the framework. Each layer rep
   * **Monocached**  : Base monobehavior classes in the framework. They get the reference of a layer when initialized.
   * **Actors**     : Inherited from monocache class. They represent entity view.
 
+### 📘 Obj
+**Obj** is a module that controls gameobject instantiating. Entities and actors with prefabs are created through **obj** module.
+**💬 How to instantiate gameobjects?**   
+**🔖 From string:** the prefab will be taken from your resources folder. You provide the path. The result will be cached so next time you use the string it will take prefab from the cache. Transform of the created gameobject will be returned.
+```csharp
+Obj.Create("Obj Alpaca");
+```
+**🔖 From prefab:**: you directly provide a prefab. Transform of the created gameobject will be returned.
+```csharp
+GameObject PrefabAlpaca; 
+Obj.Create(PrefabAlpaca);
+```
+**🔖 Pooling gameobjects:**: you can take a gameobject from a pool. Transform of the created gameobject will be returned.
+// create new gameobject from prefab.
+```csharp
+Obj.Create(Pool.Entities,"Obj Alpaca");
+```        
+**💬 How to release gameobjects?**  
+```csharp
+ var transform = Obj.Create("Obj Alpaca");
+ transform.gameObject.Release();
+```   
+In case you used pool you must provide the pool ID.     
+```csharp
+ var transform = Obj.Create("Obj Alpaca");
+ transform.gameObject.Release(Pool.Entities);
+```        
+
+> 💡 *You don't need to manually release gameobjects created by entities/actors. Those objects are controlled by entities and will be released with them. You also don't need to define pool id in the entity.Release method as entity already knows if it is pooled.*
+
 ### 📘 Time
 **Time** is a module that controls time flow. Each **layer** has it's own time and timescale.
 ```csharp
