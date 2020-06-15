@@ -390,6 +390,16 @@ namespace Pixeye.Actors
         nodes.Add(node);
       }
     }
+#else
+// we don't need these in the release so we leave them blank.
+    void IPooledLayer.ClearNodes()
+    {
+    }
+
+    void IPooledLayer.AddToNode(GameObject prefab, GameObject instance, int pool)
+    {
+      
+    }
 #endif
 
     #endregion
