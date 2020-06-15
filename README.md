@@ -20,61 +20,46 @@ The framework favors simplicity and doesn't try to "abstract away" Unity workflo
 - Fast coroutines working in any class.
 - Update methods working in any class.
 
-## 📖 ECS Basic Overview
+## 📖 ECS Overview
 **🔖 Entities** are containers for components. Entity ID is represented by ent structure.
 
 **💬 How to create an entity?**
 ```csharp
-public void SomeMethod()
-{
-    // Bare entity
-    ent e = Entity.Create();
-}
+// Bare entity
+ent e = Entity.Create();
 ```
 Entities can hold information about unity objects as well!
 ```csharp
-public void SomeMethod()
-{    
-     // New entity with a new GO ( GameObject ).
-     // The GO prefab will be taken from the Resources folder by string ID.
-     ent e = Entity.Create("Obj Fluffy Unicorn");
-     // Access to the transform of Obj Fluffy Unicorn gameobject.
-     e.transform.position = new Vector3(0,0,0) ;
-}
+// New entity with a new GO ( GameObject ).
+// The GO prefab will be taken from the Resources folder by string ID.
+ent e = Entity.Create("Obj Fluffy Unicorn");
+// Access to the transform of Obj Fluffy Unicorn gameobject.
+e.transform.position = new Vector3(0,0,0) ;
 ```
 You can pool gameobject by adding ```true``` variable in the end of the method.
 ```csharp
 public GameObject prefabFluffyUnicorn;
-public void SomeMethod()
-{    
-     // New entity with a new GO ( GameObject ).
-     // The GO will be created from the provided prefab.
-     // The GO will be pooled.
-     ent e = Entity.Create(prefabFluffyUnicorn, true);
-     // Access to the transform of Obj Fluffy Unicorn gameobject.
-     e.transform.position = new Vector3(0,0,0) ;
-}
+// New entity with a new GO ( GameObject ).
+// The GO will be created from the provided prefab.
+// The GO will be pooled.
+ent e = Entity.Create(prefabFluffyUnicorn, true);
+// Access to the transform of Obj Fluffy Unicorn gameobject.
+e.transform.position = new Vector3(0,0,0) ;
 ```
-```csharp
-public void SomeMethod()
-{    
-     // New entity with a new GO ( GameObject ).
-     // The GO prefab will be taken from the Resources folder by string ID. 
-     // The GO will be pooled.
-     ent e = Entity.Create("Obj Fluffy Unicorn", true);
-     // Access to the transform of Obj Fluffy Unicorn gameobject.
-     e.transform.position = new Vector3(0,0,0) ;
-}
+```csharp  
+// New entity with a new GO ( GameObject ).
+// The GO prefab will be taken from the Resources folder by string ID. 
+// The GO will be pooled.
+ent e = Entity.Create("Obj Fluffy Unicorn", true);
+// Access to the transform of Obj Fluffy Unicorn gameobject.
+e.transform.position = new Vector3(0,0,0) ;
 ```
 Entity API is layer specific. You will find more info about layers below. If you want to create an entity on a different layer you need to use slightly different approach:
 ```csharp
-public void SomeMethod()
-{    
-     // we use LayerApp API to create entity inside of the LayerApp.
-     ent e = LayerApp.Entity.Create("Obj Fluffy Unicorn", true);
-     // Access to the transform of Obj Fluffy Unicorn gameobject.
-     e.transform.position = new Vector3(0,0,0) ;
-}
+// we use LayerApp API to create entity inside of the LayerApp.
+ent e = LayerApp.Entity.Create("Obj Fluffy Unicorn", true);
+// Access to the transform of Obj Fluffy Unicorn gameobject.
+e.transform.position = new Vector3(0,0,0) ;
 ```
 
 **🔖 Components** are containers for data.
@@ -93,7 +78,45 @@ To create a new component right click in project window and select Create->Actor
 
 > 💡 *For comfortable workflow a component is created together with special helper class. While you can live without that helper all examples are provided with use of it.*
 
+**💬 How to add components?**   
+There are several ways to add components depending on the context of your code.
+In case you want to setup your new entity use ```Set``` method. Use ```Set``` method only with newly created entities.
 
+```csharp
+public void SomeMethod()
+{    
+     ent e = Entity.Create("Obj Bunny");
+     // Add components
+     var cCute       = e.Set<ComponentCute>();
+     var cJumping    = e.Set<ComponentJumping>();
+     var cConsumable = e.Set<ComponentConsumable>();
+     var cPoo        = e.Set<ComponentCanPoo>();
+
+     // Component Cute
+     cCute.attractivness = float.PositiveInfinity;
+     // Component Jumping
+     cJumping.power = 100;
+}
+```
+Use ```Get``` method when you unsure if entity has particular component. This method will check and add component if it doesn't exist.
+```csharp
+public void SomeMethod()
+{    
+     // where e is some entity.
+     // Add components
+     var cCute       = e.Get<ComponentCute>();
+     var cJumping    = e.Get<ComponentJumping>();
+     var cConsumable = e.Get<ComponentConsumable>();
+     var cPoo        = e.Get<ComponentCanPoo>();
+
+     // Component Cute
+     cCute.attractivness = float.PositiveInfinity;
+     // Component Jumping
+     cJumping.power = 100;
+
+}
+```
+ 
 **🔖 Systems** in Actors are called **Processors**. Processors execute game logic with **groups**. Groups are containers for entities filtered by components mask.
 ```csharp
   public class ProcessorAlpaca : Processor, ITick
@@ -204,6 +227,36 @@ As already said, layers are very important part of the framework. Each layer rep
   * **Processors** : Created in the layer and get the reference of it.
   * **Monocached**  : Base monobehavior classes in the framework. They get the reference of a layer when initialized.
   * **Actors**     : Inherited from monocache class. They represent entity view.
+
+### 📘 Obj
+**Obj** is a module that controls gameobject instantiating. Entities and actors with prefabs are created through **obj** module.
+**💬 How to instantiate gameobjects?**   
+**🔖 From string:** the prefab will be taken from your resources folder. You provide the path. The result will be cached so next time you use the string it will take prefab from the cache. Transform of the created gameobject will be returned.
+```csharp
+Obj.Create("Obj Alpaca");
+```
+**🔖 From prefab:**: you directly provide a prefab. Transform of the created gameobject will be returned.
+```csharp
+GameObject PrefabAlpaca; 
+Obj.Create(PrefabAlpaca);
+```
+**🔖 Pooling gameobjects:**: you can take a gameobject from a pool. Transform of the created gameobject will be returned.
+// create new gameobject from prefab.
+```csharp
+Obj.Create(Pool.Entities,"Obj Alpaca");
+```        
+**💬 How to release gameobjects?**  
+```csharp
+ var transform = Obj.Create("Obj Alpaca");
+ transform.gameObject.Release();
+```   
+In case you used pool you must provide the pool ID.     
+```csharp
+ var transform = Obj.Create((Pool.Entities, "Obj Alpaca");
+ transform.gameObject.Release(Pool.Entities);
+```        
+
+> 💡 *You don't need to manually release gameobjects created by entities/actors. Those objects are controlled by entities and will be released with them. You also don't need to define pool id in the entity.Release method as entity already knows if it is pooled.*
 
 ### 📘 Time
 **Time** is a module that controls time flow. Each **layer** has it's own time and timescale.
@@ -565,6 +618,23 @@ Actor in the inspector
 Actors on scene may be pooled. To do this you need to toggle ```IsPooled``` variable in the actor's inspector panel.
 
 ## 📖 Advanced
+### 📘 ECS entity childs
+You can child an entity. Child entities will be released along with the parent.
+```csharp
+var e = Entity.Create();
+var eChild = Entity.Create();
+eChild.SetParent(e);
+// you can remove the parent from a child.
+eChild.Unparent();
+```
+### 📘 ECS moving entities to another layer
+You can move entities to different layers. This is a relatively complex operation where entity will be removed from the current layer ECS systems and migrated to the new layer ECS. If an entity is with gameobject then gameobject will be moved to the layer's scene.
+```csharp
+// assuming we create alpaca in the LayerGame
+var e = Entity.Create("Obj Alpaca");
+e.MoveTo<LayerField>();
+```
+ 
 ### 📘 ECS Events
 You can perfrom actions when entities are added or removed from the groups.  
 **💬 How to use ecs events?**   
