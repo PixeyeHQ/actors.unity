@@ -11,6 +11,7 @@ namespace Pixeye.Actors
 {
   public abstract class Layer : MonoBehaviour
   {
+    
     internal static int NEXT_FREE_ID;
     internal static Dictionary<string, int> USED_IDS = new Dictionary<string, int>(StringComparer.Ordinal);
     internal static Layer ActiveLayer; // current main scene;

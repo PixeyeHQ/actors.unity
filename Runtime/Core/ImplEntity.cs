@@ -30,7 +30,7 @@ namespace Pixeye.Actors
     public ent Create(string prefabID, Vector3 position = default, bool pooled = false)
     {
       processorEcs.Create(out var entity, pooled);
-      entity.managed.transform = pooled ? layer.Obj.Spawn(Pool.Entities, prefabID, position) : layer.Obj.Spawn(prefabID, position);
+      entity.managed.transform = pooled ? layer.Obj.Create(Pool.Entities, prefabID, position) : layer.Obj.Create(prefabID, position);
       processorEcs.SetOperation(entity, -1, ProcessorEcs.Action.Activate);
       return entity;
     }
@@ -46,7 +46,7 @@ namespace Pixeye.Actors
     public ent Create(string prefabID, ModelComposer model, Vector3 position = default, bool pooled = false)
     {
       processorEcs.Create(out var entity, pooled);
-      entity.managed.transform = pooled ? layer.Obj.Spawn(Pool.Entities, prefabID, position) : layer.Obj.Spawn(prefabID, position);
+      entity.managed.transform = pooled ? layer.Obj.Create(Pool.Entities, prefabID, position) : layer.Obj.Create(prefabID, position);
       model(entity);
       processorEcs.SetOperation(entity, -1, ProcessorEcs.Action.Activate);
       return entity;
@@ -56,7 +56,7 @@ namespace Pixeye.Actors
     {
       processorEcs.Create(out var entity, pooled);
       entity.managed.transform =
-        pooled ? layer.Obj.Spawn(Pool.Entities, prefabID, parent, position) : layer.Obj.Spawn(prefabID, parent, position);
+        pooled ? layer.Obj.Create(Pool.Entities, prefabID, parent, position) : layer.Obj.Create(prefabID, parent, position);
 
       processorEcs.SetOperation(entity, -1, ProcessorEcs.Action.Activate);
       return entity;
@@ -67,7 +67,7 @@ namespace Pixeye.Actors
     {
       processorEcs.Create(out var entity, pooled);
       entity.managed.transform =
-        pooled ? layer.Obj.Spawn(Pool.Entities, prefabID, parent, position) : layer.Obj.Spawn(prefabID, parent, position);
+        pooled ? layer.Obj.Create(Pool.Entities, prefabID, parent, position) : layer.Obj.Create(prefabID, parent, position);
       model(entity);
       processorEcs.SetOperation(entity, -1, ProcessorEcs.Action.Activate);
       return entity;
@@ -81,7 +81,7 @@ namespace Pixeye.Actors
     {
       processorEcs.Create(out var entity, pooled);
       entity.managed.transform =
-        pooled ? layer.Obj.Spawn(Pool.Entities, prefab, position) : layer.Obj.Spawn(prefab, position);
+        pooled ? layer.Obj.Create(Pool.Entities, prefab, position) : layer.Obj.Create(prefab, position);
 
       processorEcs.SetOperation(entity, -1, ProcessorEcs.Action.Activate);
       return entity;
@@ -91,7 +91,7 @@ namespace Pixeye.Actors
     {
       processorEcs.Create(out var entity, pooled);
       entity.managed.transform =
-        pooled ? layer.Obj.Spawn(Pool.Entities, prefab, position) : layer.Obj.Spawn(prefab, position);
+        pooled ? layer.Obj.Create(Pool.Entities, prefab, position) : layer.Obj.Create(prefab, position);
       model(entity);
       processorEcs.SetOperation(entity, -1, ProcessorEcs.Action.Activate);
       return entity;
@@ -101,7 +101,7 @@ namespace Pixeye.Actors
     {
       processorEcs.Create(out var entity, pooled);
       entity.managed.transform =
-        pooled ? layer.Obj.Spawn(Pool.Entities, prefab, parent, position) : layer.Obj.Spawn(prefab, parent, position);
+        pooled ? layer.Obj.Create(Pool.Entities, prefab, parent, position) : layer.Obj.Create(prefab, parent, position);
 
       processorEcs.SetOperation(entity, -1, ProcessorEcs.Action.Activate);
       return entity;
@@ -112,7 +112,7 @@ namespace Pixeye.Actors
     {
       processorEcs.Create(out var entity, pooled);
       entity.managed.transform =
-        pooled ? layer.Obj.Spawn(Pool.Entities, prefab, parent, position) : layer.Obj.Spawn(prefab, parent, position);
+        pooled ? layer.Obj.Create(Pool.Entities, prefab, parent, position) : layer.Obj.Create(prefab, parent, position);
       model(entity);
       processorEcs.SetOperation(entity, -1, ProcessorEcs.Action.Activate);
       return entity;
