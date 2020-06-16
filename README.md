@@ -242,12 +242,12 @@ As already said, layers are very important part of the framework. Each layer rep
 ```csharp
 Obj.Create("Obj Alpaca");
 ```
-**🔖 From prefab:**: you directly provide a prefab. Transform of the created gameobject will be returned.
+**🔖 From prefab**: you directly provide a prefab. Transform of the created gameobject will be returned.
 ```csharp
 GameObject PrefabAlpaca; 
 Obj.Create(PrefabAlpaca);
 ```
-**🔖 Pooling gameobjects:**: you can take a gameobject from a pool. Transform of the created gameobject will be returned.
+**🔖 Pooling gameobjects**: you can take a gameobject from a pool. Transform of the created gameobject will be returned.
 // create new gameobject from prefab.
 ```csharp
 Obj.Create(Pool.Entities,"Obj Alpaca");
