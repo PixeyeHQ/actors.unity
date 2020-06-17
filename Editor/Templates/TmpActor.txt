@@ -1,0 +1,12 @@
+﻿
+using Pixeye.Actors;
+
+##NAMESPACE##
+{
+  public class ##NAME## : Actor
+  {
+    protected override void Setup()
+    {
+    }
+  }
+}
