@@ -40,14 +40,42 @@ namespace Pixeye.Actors
       if (gameObject.scene.name == SceneMain.NextActiveSceneName)
         Layer.ActiveLayer = self;
       
-
-      Bootstrap(); // Setup actors logic for a scene.
+      Bootstrap(); // Setup layer.
       Setup();     // Entry point for developers.
+      ActivateActors(); // Setup sctors.
     }
 
     void Start()
     {
       self.isReleasing = false;
+    }
+
+    void ActivateActors()
+    {
+      
+      for (var i = 0; i < nodes.Count; i++)
+        nodes[i].Populate(self);
+
+
+      var objs = gameObject.scene.GetRootGameObjects();
+      foreach (var obj in objs)
+      {
+        var transforms = obj.GetComponentsInChildren<Transform>();
+
+        foreach (var tr in transforms)
+        {
+          if (!tr.gameObject.activeInHierarchy) continue;
+          var oo = tr.GetComponents<MonoBehaviour>();
+          foreach (var o in oo)
+          {
+            if (o is IRequireActorsLayer req && o.enabled)
+            {
+              req.Bootstrap(self);
+            }
+          }
+        }
+      }
+ 
     }
 
     void Update()
@@ -144,7 +172,7 @@ namespace Pixeye.Actors
         while (!gameObject.scene.isLoaded)
           yield return 0;
 
- 
+
         if (gameObject.scene.name == SceneMain.NextActiveSceneName)
         {
           Layer.ActiveLayer = self;
@@ -153,34 +181,6 @@ namespace Pixeye.Actors
 
         if (gameObject.scene.buildIndex >= 0)
           LayerKernel.Initialized[gameObject.scene.buildIndex] = true;
-      }
-
-      #endregion
-
-
-      #region Pools & Activations
-
-      for (var i = 0; i < nodes.Count; i++)
-        nodes[i].Populate(self);
-
-
-      var objs = gameObject.scene.GetRootGameObjects();
-      foreach (var obj in objs)
-      {
-        var transforms = obj.GetComponentsInChildren<Transform>();
-
-        foreach (var tr in transforms)
-        {
-          if (!tr.gameObject.activeInHierarchy) continue;
-          var oo = tr.GetComponents<MonoBehaviour>();
-          foreach (var o in oo)
-          {
-            if (o is IRequireActorsLayer req && o.enabled)
-            {
-              req.Bootstrap(self);
-            }
-          }
-        }
       }
 
       #endregion
