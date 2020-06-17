@@ -242,12 +242,12 @@ As already said, layers are very important part of the framework. Each layer rep
 ```csharp
 Obj.Create("Obj Alpaca");
 ```
-**🔖 From prefab:**: you directly provide a prefab. Transform of the created gameobject will be returned.
+**🔖 From prefab**: you directly provide a prefab. Transform of the created gameobject will be returned.
 ```csharp
 GameObject PrefabAlpaca; 
 Obj.Create(PrefabAlpaca);
 ```
-**🔖 Pooling gameobjects:**: you can take a gameobject from a pool. Transform of the created gameobject will be returned.
+**🔖 Pooling gameobjects**: you can take a gameobject from a pool. Transform of the created gameobject will be returned.
 // create new gameobject from prefab.
 ```csharp
 Obj.Create(Pool.Entities,"Obj Alpaca");
@@ -854,7 +854,8 @@ Press Tools->Actors->Update Actors to get a new update.
 This is a list of known projects that uses Actors by far. If you want to add a project, feel free to contact me :)
 #### Until We Die | [Steam](https://store.steampowered.com/app/1197570/Until_We_Die/)
 [![Steam](https://i.gyazo.com/d74cfd05151cc1627cfcd3f7eb296edd.jpg)](https://store.steampowered.com/app/1197570/Until_We_Die/)
-#### Snake Demo | [Github link](https://github.com/PixeyeHQ/actors.unity.snake)
+#### Snake Demo | [Github link](https://store.steampowered.com/app/1197570/Until_We_Die/)
+#### Rocket Science Snake Demo | [Github link](https://github.com/Gavolot/Actors3RocketScienceSnakeGame)
 #### Actors Benchmark | [Github link](https://github.com/PixeyeHQ/actors.unity.benchmark) 
 
 ## 📖 About <a name="About"></a> 
