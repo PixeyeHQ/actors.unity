@@ -202,11 +202,22 @@ namespace Pixeye.Actors
       return managed.childs[index];
     }
 
-
+    /// Moving entity to another scene and layer.
+    /// Please note that if you need to move Actor use the MoveActorTo method.
     public void MoveTo<T>()
     {
       DebugMoveTo<T>();
       managed.layer.processorEcs.SwapLayer(this, Layer<T>.InstanceInternal.self);
+    }
+    
+ 
+    /// Moving Actors to another scene is a complicated topic. Please note that before moving the
+    /// HandleDisable method triggers and after scene changes HandleEnable will be triggered. Those
+    /// methods must be used by you to cleanup and initialize layer related stuff.
+    public void MoveActorTo<T>()
+    {
+      DebugMoveTo<T>();
+      managed.layer.processorEcs.SwapLayerActor(this, Layer<T>.InstanceInternal.self);
     }
 
     [Conditional("ACTORS_DEBUG")]

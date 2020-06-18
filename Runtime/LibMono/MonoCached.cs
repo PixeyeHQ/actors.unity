@@ -49,11 +49,11 @@ namespace Pixeye.Actors
       HandleEnable();
     }
 
-    protected virtual void HandleEnable()
+    public virtual void HandleEnable()
     {
     }
 
-    protected virtual void HandleDisable()
+    public virtual void HandleDisable()
     {
     }
 

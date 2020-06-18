@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Unity.IL2CPP.CompilerServices;
 using UnityEngine.SceneManagement;
+using Debug = UnityEngine.Debug;
 
 
 namespace Pixeye.Actors
@@ -53,16 +54,19 @@ namespace Pixeye.Actors
       throw new Exception();
     }
 
-    internal void SwapLayer(ent entity, Layer otherLayer)
+    internal void SwapLayerActor(ent entity, Layer otherLayer)
     {
       var     eMeta    = entity.meta;
       ref var eManaged = ref entity.managed;
       eManaged.layer = otherLayer;
 
-      if (eManaged.transform != null)
-        SceneManager.MoveGameObjectToScene(eManaged.transform.gameObject, otherLayer.gameObject.scene);
+      var actor = eManaged.transform.GetComponent<Actor>();
+      actor.HandleDisable();
+      actor.Layer = otherLayer;
+      SceneManager.MoveGameObjectToScene(eManaged.transform.gameObject, otherLayer.gameObject.scene);
 
-      for (int j = 0; j < eMeta->groupsAmount; j++)
+
+      for (var j = 0; j < eMeta->groupsAmount; j++)
       {
         var group = Groups[eMeta->groups[j]];
         group.Remove(entity.id);
@@ -70,7 +74,51 @@ namespace Pixeye.Actors
 
       eMeta->groupsAmount = 0;
 
-      for (int j = 0; j < eMeta->componentsAmount; j++)
+      for (var j = 0; j < eMeta->componentsAmount; j++)
+      {
+        var componentID = eMeta->components[j];
+        var storage     = Storage.All[componentID];
+        var groups      = storage.groups[eManaged.layer.id];
+
+        for (var l = 0; l < groups.length; l++)
+        {
+          var group = groups.Elements[l];
+          if (group.composition.Check(eMeta, ref eManaged))
+          {
+            group.Insert(entity);
+            eMeta->AddGroup(group.id);
+          }
+        }
+      }
+
+      actor.HandleEnable();
+
+      foreach (var child in eManaged.childs)
+      {
+        SwapLayer(child, otherLayer);
+      }
+    }
+
+    internal void SwapLayer(ent entity, Layer otherLayer)
+    {
+      var     eMeta    = entity.meta;
+      ref var eManaged = ref entity.managed;
+      eManaged.layer = otherLayer;
+
+      if (eManaged.transform != null)
+      {
+        SceneManager.MoveGameObjectToScene(eManaged.transform.gameObject, otherLayer.gameObject.scene);
+      }
+
+      for (var j = 0; j < eMeta->groupsAmount; j++)
+      {
+        var group = Groups[eMeta->groups[j]];
+        group.Remove(entity.id);
+      }
+
+      eMeta->groupsAmount = 0;
+
+      for (var j = 0; j < eMeta->componentsAmount; j++)
       {
         var componentID = eMeta->components[j];
         var storage     = Actors.Storage.All[componentID];
@@ -112,9 +160,6 @@ namespace Pixeye.Actors
               //var generation  = Storage.Generations[componentID];
               //var mask        = Storage.Masks[componentID];
               var groups = storage.groups[eManaged.layer.id];
-
-
-              //eManaged.generations[generation] |= mask;
 
               for (var l = 0; l < groups.length; l++)
               {
@@ -200,6 +245,9 @@ namespace Pixeye.Actors
               var group = Groups[eMeta->groups[j]];
               group.RemoveFast(entityID);
             }
+
+            ent e = default;
+            e.MoveTo<Layer>();
 
             eMeta->groupsAmount = 0;
 
