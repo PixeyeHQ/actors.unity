@@ -14,6 +14,8 @@ namespace Pixeye.Actors
       this.layer = layer;
     }
 
+    
+    
     //===============================//
     // From string
     //===============================//

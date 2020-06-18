@@ -4,8 +4,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Unity.IL2CPP.CompilerServices;
 using UnityEngine.SceneManagement;
-using Debug = UnityEngine.Debug;
-
+ 
 
 namespace Pixeye.Actors
 {
@@ -245,10 +244,7 @@ namespace Pixeye.Actors
               var group = Groups[eMeta->groups[j]];
               group.RemoveFast(entityID);
             }
-
-            ent e = default;
-            e.MoveTo<Layer>();
-
+ 
             eMeta->groupsAmount = 0;
 
             for (var j = 0; j < eMeta->componentsAmount; j++)
