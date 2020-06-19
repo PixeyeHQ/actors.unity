@@ -47,6 +47,8 @@ namespace Pixeye.Actors
 
       for (int i = 0; i < SceneManager.sceneCount; i++)
       {
+        var scn = SceneManager.GetSceneAt(i);
+        if (!scn.isLoaded) continue;
         GameObject[] rootGameObjects = SceneManager.GetSceneAt(i).GetRootGameObjects();
         foreach (var rootGameObject in rootGameObjects)
         {
@@ -61,16 +63,18 @@ namespace Pixeye.Actors
 
     static void Step()
     {
-      if (EditorApplication.isPlayingOrWillChangePlaymode && !EditorApplication.isPlaying)
-      {
-        CheckScene();
-      }
+      if (EditorApplication.isPlayingOrWillChangePlaymode && !EditorApplication.isPlaying) CheckScene();
     }
 
     public static void CheckScene()
     {
+    
       for (int i = 0; i < SceneManager.sceneCount; i++)
       {
+        var scn = SceneManager.GetSceneAt(i);
+ 
+        if (!scn.isLoaded) continue;
+
         GameObject[] rootGameObjects = SceneManager.GetSceneAt(i).GetRootGameObjects();
         foreach (var rootGameObject in rootGameObjects)
         {
@@ -78,14 +82,13 @@ namespace Pixeye.Actors
           foreach (var ilayer in childrenInterfaces)
           {
             ilayer.ClearNodes();
-       
+
             foreach (var obj in rootGameObjects)
             {
               var actors = obj.GetComponentsInChildren<Actor>();
- 
+
               foreach (var a in actors)
               {
-               
                 if (!a.isPooled) continue;
                 CheckPoolCache(a.gameObject, Pool.Entities, ilayer);
               }

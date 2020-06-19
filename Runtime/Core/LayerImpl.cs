@@ -39,9 +39,9 @@ namespace Pixeye.Actors
       //temporary
       if (gameObject.scene.name == SceneMain.NextActiveSceneName)
         Layer.ActiveLayer = self;
-      
-      Bootstrap(); // Setup layer.
-      Setup();     // Entry point for developers.
+
+      Bootstrap();      // Setup layer.
+      Setup();          // Entry point for developers.
       ActivateActors(); // Setup sctors.
     }
 
@@ -52,7 +52,6 @@ namespace Pixeye.Actors
 
     void ActivateActors()
     {
-      
       for (var i = 0; i < nodes.Count; i++)
         nodes[i].Populate(self);
 
@@ -75,7 +74,6 @@ namespace Pixeye.Actors
           }
         }
       }
- 
     }
 
     void Update()
@@ -222,6 +220,28 @@ namespace Pixeye.Actors
     {
       return InstanceInternal.self.objects[typeof(Y).GetHashCode()] as Y;
     }
+
+    /// performs a search of the gameobject by name on all scenes, cache it and
+    /// returns it transform.
+    public static Transform GetObj(string goName)
+    {
+      return InstanceInternal.self.GetObj(goName);
+    }
+
+    /// performs a search of the gameobject by tag on all scenes, cache it and
+    /// returns it transform.
+    public static Transform GetObjByTag(string tagName)
+    {
+      return InstanceInternal.self.GetObjByTag(tagName);
+    }
+
+    /// performs a search of the gameobject by type on all scenes, cache it and
+    /// returns T.
+    public static T GetObj<T>() where T : MonoBehaviour
+    {
+      return InstanceInternal.self.GetObj<T>();
+    }
+
 
     public static Buffer<Y> GetBuffer<Y>() where Y : struct
     {

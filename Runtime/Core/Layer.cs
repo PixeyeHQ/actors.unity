@@ -43,6 +43,55 @@ namespace Pixeye.Actors
 
     internal Action OnLayerDestroy;
     internal Dictionary<int, object> objects = new Dictionary<int, object>();
+    internal Dictionary<int, Transform> cachemap = new Dictionary<int, Transform>();
+    internal Dictionary<int, Transform> cachemapTag = new Dictionary<int, Transform>();
+
+    /// performs a search of the gameobject by name on all scenes, cache it and
+    /// returns it transform.
+    public Transform GetObj(string goName)
+    {
+      var hash      = goName.GetHashCode();
+      var haveFound = cachemap.TryGetValue(hash, out var transform);
+      if (!haveFound)
+      {
+        var gameobject            = GameObject.Find(goName);
+        if (gameobject) transform = gameobject.transform;
+        if (transform) cachemap.Add(hash, transform);
+      }
+
+      return transform;
+    }
+
+    /// performs a search of the gameobject by tag on all scenes, cache it and
+    /// returns it transform.
+    public Transform GetObjByTag(string tagName)
+    {
+      var hash      = tagName.GetHashCode();
+      var haveFound = cachemapTag.TryGetValue(hash, out var transform);
+      if (!haveFound)
+      {
+        var gameobject            = GameObject.FindWithTag(tagName);
+        if (gameobject) transform = gameobject.transform;
+        if (transform) cachemapTag.Add(hash, transform);
+      }
+
+      return transform;
+    }
+
+    /// performs a search of the gameobject by type on all scenes, cache it and
+    /// returns T.
+    public T GetObj<T>() where T : MonoBehaviour
+    {
+      var hash      = typeof(T).GetHashCode();
+      var haveFound = objects.TryGetValue(hash, out var o);
+      if (!haveFound)
+      {
+        o = GameObject.FindObjectOfType<T>();
+        if (o != null) objects.Add(hash, o);
+      }
+
+      return o as T;
+    }
 
     internal Layer(GameObject gameObject, Action OnLayerDestroy)
     {
@@ -166,7 +215,6 @@ namespace Pixeye.Actors
 
     #endregion
 
-     
 
     internal void Release()
     {
@@ -178,6 +226,7 @@ namespace Pixeye.Actors
       LayerKernel.LayersInUse.Remove(this);
       OnLayerDestroy();
 
+
       foreach (var obj in objects)
       {
         if (obj.Value is IDisposable wiped)
@@ -185,6 +234,10 @@ namespace Pixeye.Actors
           wiped.Dispose();
         }
       }
+
+      cachemap.Clear();
+      cachemapTag.Clear();
+      objects.Clear();
     }
   }
 
