@@ -9,48 +9,108 @@ using UnityEngine;
 
 namespace Pixeye.Actors
 {
-	public static class PostHandleFrameworkPatch
-	{
-		[MenuItem("Tools/Actors/Update Actors", priority = -300)]
-		public static void ShowWindow()
-		{
-			var path = Path.GetDirectoryName(Application.dataPath) + @"\Packages\manifest.json";
+ #if UNITY_2019_4_OR_NEWER
+    [MenuItem("Tools/Actors/Update Actors", priority = -300)]
+    public static void ShowWindow()
+    {
+      var path = Path.GetDirectoryName(Application.dataPath) + @"\Packages\packages-lock.json";
+
+      if (!File.Exists(path)) return;
+
+      string text = String.Empty;
+      using (StreamReader sr = new StreamReader(path, System.Text.Encoding.Default))
+      {
+        text = sr.ReadToEnd();
+      }
+
+      var lines = text.Split(new[] {'\n', '\r'}, StringSplitOptions.RemoveEmptyEntries).ToList();
 
 
-			if (!File.Exists(path)) return;
+      var len             = lines.Count;
+      var lineIndexBegin  = -1;
+      var lineIndexFinish = -1;
+      var hash            = string.Empty;
+      for (int i = 0; i < len; i++)
+      {
+        var line = lines[i];
 
-			string text = String.Empty;
-			using (StreamReader sr = new StreamReader(path, System.Text.Encoding.Default))
-			{
-				text = sr.ReadToEnd();
-			}
+        if (line.Contains("\"com.pixeye.ecs\": {"))
+        {
+          lineIndexBegin = i;
+      
+        }
+        if (lineIndexBegin != -1 && line.Contains("hash"))
+        {
+          hash = line;
+        }
+        if (lineIndexBegin != -1 && line.Contains("},"))
+        {
+          lineIndexFinish = i;
+        }
+
+        if (lineIndexBegin != -1 && i == lineIndexFinish + 1)
+        {
+          break;
+        }
+      }
+ 
+      lines.RemoveRange(lineIndexBegin, lineIndexFinish+1);
+      
+      len = lines.Count;
+      using (StreamWriter sr = new StreamWriter(path))
+      {
+        for (int i = 0; i < len; i++)
+          sr.WriteLine(lines[i]);
+      }
+       
+      hash = hash.Replace("\"hash\":", "").Trim(new Char[] { ' ', '"' });
+      Debug.Log($"<b><size=14>Updating Actors to:</size></b>\nhttps://github.com/PixeyeHQ/actors.unity/tree/{hash}");
+
+      AssetDatabase.Refresh(ImportAssetOptions.Default);
+    }
 
 
-			var lines = text.Split(new[] {'\n', '\r'}, StringSplitOptions.RemoveEmptyEntries).ToList();
+#else
+    [MenuItem("Tools/Actors/Update Actors", priority = -300)]
+    public static void ShowWindow()
+    {
+      var path = Path.GetDirectoryName(Application.dataPath) + @"\Packages\manifest.json";
 
-			var lineIndex = -1;
-			var len       = lines.Count;
-			for (int i = 0; i < len; i++)
-			{
-				var line = lines[i];
 
-				if (!line.Contains("\"lock\": {")) continue;
+      if (!File.Exists(path)) return;
 
-				lineIndex = i;
-				break;
-			}
+      string text = String.Empty;
+      using (StreamReader sr = new StreamReader(path, System.Text.Encoding.Default))
+      {
+        text = sr.ReadToEnd();
+      }
 
-			lines[lineIndex - 1] = "}";
-			lines.RemoveRange(lineIndex, lines.Count - 1 - lineIndex);
 
-			len = lines.Count;
-			using (StreamWriter sr = new StreamWriter(path))
-			{
-				for (int i = 0; i < len; i++)
-					sr.WriteLine(lines[i]);
-			}
+      var lines = text.Split(new[] {'\n', '\r'}, StringSplitOptions.RemoveEmptyEntries).ToList();
 
-			AssetDatabase.Refresh(ImportAssetOptions.Default);
-		}
-	}
+      var lineIndex = -1;
+      var len = lines.Count;
+      for (int i = 0; i < len; i++)
+      {
+        var line = lines[i];
+
+        if (!line.Contains("\"lock\": {")) continue;
+
+        lineIndex = i;
+        break;
+      }
+
+      lines[lineIndex - 1] = "}";
+      lines.RemoveRange(lineIndex, lines.Count - 1 - lineIndex);
+
+      len = lines.Count;
+      using (StreamWriter sr = new StreamWriter(path))
+      {
+        for (int i = 0; i < len; i++)
+          sr.WriteLine(lines[i]);
+      }
+
+      AssetDatabase.Refresh(ImportAssetOptions.Default);
+    }
+#endif
 }
