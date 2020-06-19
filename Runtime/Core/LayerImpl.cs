@@ -237,9 +237,9 @@ namespace Pixeye.Actors
 
     /// performs a search of the gameobject by type on all scenes, cache it and
     /// returns T.
-    public static T GetObj<T>() where T : MonoBehaviour
+    public static Y GetObj<Y>() where Y : MonoBehaviour
     {
-      return InstanceInternal.self.GetObj<T>();
+      return InstanceInternal.self.GetObj<Y>();
     }
 
 
