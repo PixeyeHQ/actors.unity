@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Unity.IL2CPP.CompilerServices;
 using UnityEngine.SceneManagement;
- 
+
 
 namespace Pixeye.Actors
 {
@@ -244,7 +244,7 @@ namespace Pixeye.Actors
               var group = Groups[eMeta->groups[j]];
               group.RemoveFast(entityID);
             }
- 
+
             eMeta->groupsAmount = 0;
 
             for (var j = 0; j < eMeta->componentsAmount; j++)
@@ -354,8 +354,11 @@ namespace Pixeye.Actors
         }
       }
 
+
       if (operationsLength > 0)
       {
+        operationsLength = 0;
+
         for (var i = 0; i < processors.Count; i++)
           processors[i].HandleEcsEvents();
 
@@ -374,6 +377,7 @@ namespace Pixeye.Actors
         for (var ii = 0; ii < groups.Count; ii++)
         {
           var nextGroup = groups[ii];
+
           nextGroup.removed.length = 0;
           nextGroup.added.length   = 0;
         }
@@ -385,8 +389,6 @@ namespace Pixeye.Actors
           storage.toDispose.length = 0;
         }
       }
-
-      operationsLength = 0;
     }
   }
 
