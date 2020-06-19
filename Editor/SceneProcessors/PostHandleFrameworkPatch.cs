@@ -8,13 +8,12 @@ using UnityEditor;
 using UnityEngine;
 
 namespace Pixeye.Actors
-{
- #if UNITY_2019_4_OR_NEWER
-    [MenuItem("Tools/Actors/Update Actors", priority = -300)]
-    public static void ShowWindow()
+ {
+ 
+ 
+    static void ExecuteWithLocks(string path)
     {
-      var path = Path.GetDirectoryName(Application.dataPath) + @"\Packages\packages-lock.json";
-
+    
       if (!File.Exists(path)) return;
 
       string text = String.Empty;
@@ -68,14 +67,26 @@ namespace Pixeye.Actors
 
       AssetDatabase.Refresh(ImportAssetOptions.Default);
     }
-
-
+    
+#if UNITY_2019_4_OR_NEWER
+    [MenuItem("Tools/Actors/Update Actors", priority = -300)]
+    public static void ShowWindow()
+    {
+      var path_locks = Path.GetDirectoryName(Application.dataPath) + @"\Packages\packages-lock.json";
+      ExecuteWithLocks(path_locks);
+    }
 #else
     [MenuItem("Tools/Actors/Update Actors", priority = -300)]
     public static void ShowWindow()
     {
       var path = Path.GetDirectoryName(Application.dataPath) + @"\Packages\manifest.json";
+      var path_locks = Path.GetDirectoryName(Application.dataPath) + @"\Packages\packages-lock.json";
 
+      if (File.Exists(path_locks))
+      {
+        ExecuteWithLocks(path_locks);
+        return;
+      }
 
       if (!File.Exists(path)) return;
 
@@ -113,4 +124,5 @@ namespace Pixeye.Actors
       AssetDatabase.Refresh(ImportAssetOptions.Default);
     }
 #endif
+  }
 }
