@@ -11,6 +11,68 @@ namespace Pixeye.Actors
 {
   public static class PostHandleFrameworkPatch
   {
+#if UNITY_2019_4_OR_NEWER
+    [MenuItem("Tools/Actors/Update Actors", priority = -300)]
+    public static void ShowWindow()
+    {
+      var path = Path.GetDirectoryName(Application.dataPath) + @"\Packages\packages-lock.json";
+
+      if (!File.Exists(path)) return;
+
+      string text = String.Empty;
+      using (StreamReader sr = new StreamReader(path, System.Text.Encoding.Default))
+      {
+        text = sr.ReadToEnd();
+      }
+
+      var lines = text.Split(new[] {'\n', '\r'}, StringSplitOptions.RemoveEmptyEntries).ToList();
+
+
+      var len             = lines.Count;
+      var lineIndexBegin  = -1;
+      var lineIndexFinish = -1;
+      var hash            = string.Empty;
+      for (int i = 0; i < len; i++)
+      {
+        var line = lines[i];
+
+        if (line.Contains("\"com.pixeye.ecs\": {"))
+        {
+          lineIndexBegin = i;
+      
+        }
+        if (lineIndexBegin != -1 && line.Contains("hash"))
+        {
+          hash = line;
+        }
+        if (lineIndexBegin != -1 && line.Contains("},"))
+        {
+          lineIndexFinish = i;
+        }
+
+        if (lineIndexBegin != -1 && i == lineIndexFinish + 1)
+        {
+          break;
+        }
+      }
+ 
+      lines.RemoveRange(lineIndexBegin, lineIndexFinish+1);
+      
+      len = lines.Count;
+      using (StreamWriter sr = new StreamWriter(path))
+      {
+        for (int i = 0; i < len; i++)
+          sr.WriteLine(lines[i]);
+      }
+       
+      hash = hash.Replace("\"hash\":", "").Trim(new Char[] { ' ', '"' });
+      Debug.Log($"<b><size=14>Updating Actors to:</size></b>\nhttps://github.com/PixeyeHQ/actors.unity/tree/{hash}");
+
+      AssetDatabase.Refresh(ImportAssetOptions.Default);
+    }
+
+
+#else
     [MenuItem("Tools/Actors/Update Actors", priority = -300)]
     public static void ShowWindow()
     {
@@ -52,5 +114,6 @@ namespace Pixeye.Actors
 
       AssetDatabase.Refresh(ImportAssetOptions.Default);
     }
+#endif
   }
 }
