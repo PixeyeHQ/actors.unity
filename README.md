@@ -583,7 +583,7 @@ public class MonoAlpaca : Monocached
     {
     }  
     // use instead of the disable method.
-    protected override void HandleEnable()
+    protected override void HandleDisable()
     {
     }    
 }
