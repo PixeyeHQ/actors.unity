@@ -4,7 +4,7 @@
 * [🐞Pooled gameobject of entity gets null reference exception.](https://github.com/PixeyeHQ/actors.unity/issues/36)
 * [🐞Pooled Actors won't initialize after re-activating.](https://github.com/PixeyeHQ/actors.unity/issues/37)
 * [🐞Childs of entities are not initialized.](https://github.com/PixeyeHQ/actors.unity/issues/38)
-* [🐞Groups are not cleaned when scene is reloaded.](https://github.com/PixeyeHQ/actors.unity/issues/39)
+* [🐞Groups are not cleaned when a scene is reloaded.](https://github.com/PixeyeHQ/actors.unity/issues/39)
 * [🐞Actors continue to think that they are on the old layer when using `entity.MoveTo<T>`](https://github.com/PixeyeHQ/actors.unity/issues/40)
 * [🐞Unloading scene in the inspector and hitting play breaks the editor.](https://github.com/PixeyeHQ/actors.unity/issues/41)
 * [🐞Tools->Actors->Update Actors doesn't work in the Unity 2019.4](https://github.com/PixeyeHQ/actors.unity/issues/43)
