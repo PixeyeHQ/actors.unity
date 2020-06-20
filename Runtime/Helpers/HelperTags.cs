@@ -16,53 +16,27 @@ namespace Pixeye.Actors
   [Il2CppSetOption(Option.DivideByZeroChecks, false)]
   public static unsafe class HelperTags
   {
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static bool Overlaps(this int[] tags, EntityMeta* meta)
-    {
-      ref var entityTags    = ref meta->tags;
-      int     entityLenTags = entityTags.length;
+    public static int TagsAmount(in this ent entity, int tagID) => entity.meta->tags.GetAmount(tagID);
 
-      for (int l = 0; l < tags.Length; l++)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string TagToName(in this int tag)
+    {
+      var listTagName = GetMembersString();
+
+      var typeTag = GetTypeTag();
+
+      for (var i = 1; i < listTagName.Count; i++)
       {
-        var next = tags[l];
-        for (int i = 0; i < entityLenTags; i++)
+        var tagId = (int) GetFieldId(listTagName[i], typeTag);
+
+        if (tag == tagId)
         {
-          var tag = entityTags.GetElement(i);
-          if (tag == next) return true;
+          return listTagName[i];
         }
       }
 
-      return false;
+      return default;
     }
-
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static bool IsSubsetOf(this int[] tags, EntityMeta* meta)
-    {
-      ref var entityTags    = ref meta->tags;
-      int     entityLenTags = entityTags.length;
-
-
-      var match = 0;
-      for (int l = 0; l < tags.Length; l++)
-      {
-        var next = tags[l];
-        for (int i = 0; i < entityLenTags; i++)
-        {
-          var tag = entityTags.GetElement(i);
-          if (tag == next) match++;
-        }
-      }
-
-      return match == tags.Length;
-    }
-
-
-    public static int TagsAmount(in this ent entity, int tagID)
-    {
-      return entity.meta->tags.GetAmount(tagID);
-    }
-
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool Has(in this ent entity, int tagID)
@@ -138,6 +112,46 @@ namespace Pixeye.Actors
       }
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal static bool Overlaps(this int[] tags, EntityMeta* meta)
+    {
+      ref var entityTags    = ref meta->tags;
+      int     entityLenTags = entityTags.length;
+
+      for (int l = 0; l < tags.Length; l++)
+      {
+        var next = tags[l];
+        for (int i = 0; i < entityLenTags; i++)
+        {
+          var tag = entityTags.GetElement(i);
+          if (tag == next) return true;
+        }
+      }
+
+      return false;
+    }
+
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal static bool IsSubsetOf(this int[] tags, EntityMeta* meta)
+    {
+      ref var entityTags    = ref meta->tags;
+      int     entityLenTags = entityTags.length;
+
+      var match = 0;
+      for (var l = 0; l < tags.Length; l++)
+      {
+        var next = tags[l];
+        for (int i = 0; i < entityLenTags; i++)
+        {
+          var tag = entityTags.GetElement(i);
+          if (tag == next) match++;
+        }
+      }
+
+      return match == tags.Length;
+    }
+
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     static Type GetTypeTag()
@@ -189,27 +203,6 @@ namespace Pixeye.Actors
       }
 
       return memberString;
-    }
-
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static string TagToName(in this int tag)
-    {
-      var listTagName = GetMembersString();
-
-      var typeTag = GetTypeTag();
-
-      for (var i = 1; i < listTagName.Count; i++)
-      {
-        var tagId = (int) GetFieldId(listTagName[i], typeTag);
-
-        if (tag == tagId)
-        {
-          return listTagName[i];
-        }
-      }
-
-      return default;
     }
   }
 }

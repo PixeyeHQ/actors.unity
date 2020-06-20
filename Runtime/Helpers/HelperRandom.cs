@@ -47,8 +47,7 @@ namespace Pixeye.Actors
     {
       return Actors.Random.Source.NextDouble() > chance ? arg0 : arg1;
     }
-
-
+ 
     public static int Between(this object o, int a, int b, float chance = 0.5f)
     {
       return UnityEngine.Random.value > chance ? a : b;
@@ -83,8 +82,7 @@ namespace Pixeye.Actors
     {
       return ref vals[UnityEngine.Random.Range(0, vals.Length)];
     }
-
-
+ 
     public static T Random<T>(this List<T> list, T[] itemsToExclude)
     {
       var val = list[UnityEngine.Random.Range(0, list.Count)];

@@ -6,8 +6,6 @@ namespace Pixeye.Actors
 {
   public static class HelperGameObjects
   {
-    static FastString strPath = new FastString(256);
-
     public static Layer GetLayer(this GameObject go)
     {
       return LayerKernel.Layers[go.scene.buildIndex];
@@ -15,10 +13,8 @@ namespace Pixeye.Actors
 
     public static Layer GetLayer(this Transform tr)
     {
-      
       return LayerKernel.Layers[tr.gameObject.scene.buildIndex];
     }
-
 
     public static string GetGameObjectPath(Transform transform)
     {
@@ -59,7 +55,7 @@ namespace Pixeye.Actors
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static Actor AddGetActor(this Transform co)
+    internal static Actor GetActor(this Transform co)
     {
       var c = co.GetComponent<Actor>();
       if (c == null)
@@ -124,7 +120,6 @@ namespace Pixeye.Actors
       return results;
     }
 
-
     public static void Release(this GameObject o, int poolID = 0)
     {
       if (poolID <= 0)
@@ -160,7 +155,6 @@ namespace Pixeye.Actors
       return obj.GetComponent<T>();
     }
 
-
     public static List<int> FindValidNodes(this List<PoolNode> list, int id)
     {
       var l = new List<int>();
@@ -185,11 +179,11 @@ namespace Pixeye.Actors
       return -1;
     }
 
-    public static int FindInstanceID<T>(this List<T> list, T target) where T : UnityEngine.Object
+    public static int FindInstanceID<T>(this List<T> list, T target) where T : Object
     {
-      int targetID = target.GetInstanceID();
+      var targetID = target.GetInstanceID();
 
-      for (int i = 0; i < list.Count; i++)
+      for (var i = 0; i < list.Count; i++)
       {
         if (list[i].GetInstanceID() == targetID)
           return i;
@@ -197,7 +191,6 @@ namespace Pixeye.Actors
 
       return -1;
     }
-
 
     public static void Destroy(this Transform tr)
     {

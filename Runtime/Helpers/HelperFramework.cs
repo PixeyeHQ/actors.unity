@@ -3,12 +3,16 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 
-
 namespace Pixeye.Actors
 {
-  public static unsafe partial class HelperEcs
+  public static unsafe class HelperFramework
   {
     static readonly FastString fstr = new FastString(500);
+
+    public static bool Every(this float step, float time)
+    {
+      return step % time == 0;
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     [Conditional("ACTORS_DEBUG")]
@@ -93,6 +97,42 @@ namespace Pixeye.Actors
       }
 
       return false;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Transform transform(this ent entity, int index)
+    {
+      return entity.managed.transform.GetChild(index);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Transform transform(this ent entity, int index1, int index2)
+    {
+      return entity.managed.transform.GetChild(index1).GetChild(index2);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Transform transform(this ent entity, int index1, int index2, int index3)
+    {
+      return entity.managed.transform.GetChild(index1).GetChild(index2).GetChild(index3);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Transform transform(this ent entity, int index1, int index2, int index3, int index4)
+    {
+      return entity.managed.transform.GetChild(index1).GetChild(index2).GetChild(index3).GetChild(index4);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Transform transform(this ent entity, int[] siblings)
+    {
+      var transform = entity.managed.transform;
+      foreach (var sibling in siblings)
+      {
+        transform = transform.GetChild(sibling);
+      }
+
+      return transform;
     }
   }
 }

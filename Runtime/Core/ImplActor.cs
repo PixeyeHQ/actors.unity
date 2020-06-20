@@ -24,7 +24,7 @@ namespace Pixeye.Actors
     public Actor Create(string prefabID, Vector3 position = default, bool pooled = false)
     {
       var transform = pooled ? layer.Obj.Create(Pool.Entities, prefabID, position) : layer.Obj.Create(prefabID, position);
-      var actor     = transform.AddGetActor();
+      var actor     = transform.GetActor();
       actor.isPooled = pooled;
 
       actor.BootstrapCreated(layer);
@@ -38,7 +38,7 @@ namespace Pixeye.Actors
         pooled
           ? layer.Obj.Create(Pool.Entities, prefabID, parent, position)
           : layer.Obj.Create(prefabID, parent, position);
-      var actor = transform.AddGetActor();
+      var actor = transform.GetActor();
       actor.isPooled = pooled;
       actor.BootstrapCreated(layer);
       return actor;
@@ -48,7 +48,7 @@ namespace Pixeye.Actors
     public Actor Create(string prefabID, ModelComposer model, Vector3 position = default, bool pooled = false)
     {
       var transform = pooled ? layer.Obj.Create(Pool.Entities, prefabID, position) : layer.Obj.Create(prefabID, position);
-      var actor     = transform.AddGetActor();
+      var actor     = transform.GetActor();
       actor.isPooled = pooled;
 
       actor.BootstrapCreated(layer, model);
@@ -62,7 +62,7 @@ namespace Pixeye.Actors
       var transform = pooled
         ? layer.Obj.Create(Pool.Entities, prefabID, parent, position)
         : layer.Obj.Create(prefabID, parent, position);
-      var actor = transform.AddGetActor();
+      var actor = transform.GetActor();
       actor.isPooled = pooled;
 
       actor.BootstrapCreated(layer, model);
@@ -77,7 +77,7 @@ namespace Pixeye.Actors
     public Actor Create(GameObject prefab, Vector3 position = default, bool pooled = false)
     {
       var transform = pooled ? layer.Obj.Create(Pool.Entities, prefab, position) : layer.Obj.Create(prefab, position);
-      var actor     = transform.AddGetActor();
+      var actor     = transform.GetActor();
       actor.isPooled = pooled;
 
       actor.BootstrapCreated(layer);
@@ -89,7 +89,7 @@ namespace Pixeye.Actors
     {
       var transform =
         pooled ? layer.Obj.Create(Pool.Entities, prefab, parent, position) : layer.Obj.Create(prefab, parent, position);
-      var actor = transform.AddGetActor();
+      var actor = transform.GetActor();
       actor.isPooled = pooled;
 
       actor.BootstrapCreated(layer);
@@ -100,7 +100,7 @@ namespace Pixeye.Actors
     public Actor Create(GameObject prefab, ModelComposer model, Vector3 position = default, bool pooled = false)
     {
       var transform = pooled ? layer.Obj.Create(Pool.Entities, prefab, position) : layer.Obj.Create(prefab, position);
-      var actor     = transform.AddGetActor();
+      var actor     = transform.GetActor();
       actor.isPooled = pooled;
 
       actor.BootstrapCreated(layer, model);
@@ -113,7 +113,7 @@ namespace Pixeye.Actors
     {
       var transform =
         pooled ? layer.Obj.Create(Pool.Entities, prefab, parent, position) : layer.Obj.Create(prefab, parent, position);
-      var actor = transform.AddGetActor();
+      var actor = transform.GetActor();
       actor.isPooled = pooled;
 
       actor.BootstrapCreated(layer, model);

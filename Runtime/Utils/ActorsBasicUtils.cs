@@ -43,6 +43,12 @@ namespace Pixeye.Actors
 
     public static class Unity
     {
+      public static float value
+      {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => UnityEngine.Random.value;
+      }
+
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
       public static float Range(float min, float max) => UnityEngine.Random.Range(min, max);
 
