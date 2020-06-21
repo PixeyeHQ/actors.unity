@@ -42,6 +42,20 @@ namespace Pixeye.Actors
     }
 
     [Conditional("ACTORS_DEBUG")]
+    static void DebugNoComponent<T>(ent entity)
+    {
+      var     generation = Storage<T>.Generation;
+      var     mask       = Storage<T>.ComponentMask;
+      ref var _managed   = ref entity.managed;
+
+      if ((_managed.signature[generation] & mask) != mask)
+      {
+        LayerKernel.Debugger.Log(LogType.NO_COMPONENT, entity, typeof(T));
+        throw new Exception();
+      }
+    }
+
+    [Conditional("ACTORS_DEBUG")]
     void DebugAlreadyHave<T>(ent entity)
     {
       var generation = Storage<T>.Generation;
@@ -132,14 +146,20 @@ namespace Pixeye.Actors
     public void Remove<T>()
     {
       DebugDestroyed(this);
-      var     generation = Storage<T>.Generation;
-      var     mask       = Storage<T>.ComponentMask;
-      ref var _managed   = ref managed;
-      if ((_managed.signature[generation] & mask) == mask)
-      {
-        _managed.signature[generation] &= ~mask;
-        _managed.layer.processorEcs.SetOperation(this, Storage<T>.componentId, ProcessorEcs.Action.Remove);
-      }
+      DebugNoComponent<T>(this);
+      
+      ref var _managed = ref managed;
+      _managed.signature[Storage<T>.Generation] &= ~Storage<T>.ComponentMask;
+      _managed.layer.processorEcs.SetOperation(this, Storage<T>.componentId, ProcessorEcs.Action.Remove);
+     
+      // var     generation = Storage<T>.Generation;
+      // var     mask       = Storage<T>.ComponentMask;
+      // ref var _managed   = ref managed;
+      // if ((_managed.signature[generation] & mask) == mask)
+      // {
+      //   _managed.signature[generation] &= ~mask;
+      //   _managed.layer.processorEcs.SetOperation(this, Storage<T>.componentId, ProcessorEcs.Action.Remove);
+      // }
     }
 
 #if !ACTORS_COMPONENTS_STRUCTS

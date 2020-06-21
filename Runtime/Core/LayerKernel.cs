@@ -124,6 +124,10 @@ namespace Pixeye.Actors
       {
         switch (logID)
         {
+          case LogType.NO_COMPONENT:
+            Debug.LogError(
+              $"Entity <b>{contenxt[0]}</b> doesn't have a component <b> {contenxt[1]}</b>");
+            break;
           case LogType.NOT_ACTIVE:
             Debug.LogError(
               $"Entity <b>{contenxt[0]}</b> is not active. You should not add components to an inactive entity. <b> {contenxt[1]}</b> ");
@@ -250,5 +254,6 @@ namespace Pixeye.Actors
     public const int NULL_ENTITY = 3;
     public const int TAGS_LIMIT_REACHED = 4;
     public const int DESTROYED = 5;
+    public const int NO_COMPONENT = 6;
   }
 }

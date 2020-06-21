@@ -38,13 +38,7 @@ namespace Pixeye.Actors
       operation.arg    = arg;
       operation.action = action;
     }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static void SetOld(in ent entity, int arg, Action action)
-    {
-    }
-
-
+ 
     [Conditional("ACTORS_DEBUG")]
     void DebugDontExist(EntityMeta* meta, int entityID, Storage storage)
     {
