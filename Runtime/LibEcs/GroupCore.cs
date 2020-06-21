@@ -32,7 +32,7 @@ namespace Pixeye.Actors
     public int length;
 
 
-    internal bool initialized = false;
+    internal bool initialized;
     internal ProcessorEcs processorEcs;
     internal Layer layer;
 
@@ -53,6 +53,7 @@ namespace Pixeye.Actors
     internal int id;
 
     int position;
+    bool flagChanged;
 
 
     public ref ent this[int index]
@@ -60,6 +61,21 @@ namespace Pixeye.Actors
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
       get => ref entities[index];
     }
+
+    public bool changed
+    {
+      get
+      {
+        if (flagChanged)
+        {
+          flagChanged = false;
+          return true;
+        }
+
+        return false;
+      }
+    }
+
 
     public void Release(int index)
     {
@@ -189,6 +205,7 @@ namespace Pixeye.Actors
         added.source[added.length++] = entity;
 #endif
       }
+      flagChanged = true;
     }
 
 
@@ -215,7 +232,8 @@ namespace Pixeye.Actors
       if (i < --length)
         Array.Copy(entities, i + 1, entities, i, length - i);
 
-      return true;
+      return flagChanged = true;
+      //return true;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -248,6 +266,8 @@ namespace Pixeye.Actors
 #endif
       if (i < --length)
         Array.Copy(entities, i + 1, entities, i, length - i);
+      
+      flagChanged = true;
     }
 
 
@@ -524,7 +544,7 @@ namespace Pixeye.Actors
       var gr = base.Initialize(composition, layer);
 
       Storage<T>.Instance.groups[layer.id].Add(this);
- 
+
       return gr;
     }
 
@@ -547,7 +567,7 @@ namespace Pixeye.Actors
 
       Storage<T>.Instance.groups[layer.id].Add(this);
       Storage<Y>.Instance.groups[layer.id].Add(this);
- 
+
       return gr;
     }
 
@@ -572,7 +592,7 @@ namespace Pixeye.Actors
       Storage<Y>.Instance.groups[layer.id].Add(this);
       Storage<U>.Instance.groups[layer.id].Add(this);
 
- 
+
       return gr;
     }
 
@@ -797,7 +817,7 @@ namespace Pixeye.Actors
       Storage<S>.Instance.groups[layer.id].Add(this);
       Storage<D>.Instance.groups[layer.id].Add(this);
       Storage<F>.Instance.groups[layer.id].Add(this);
- 
+
       return gr;
     }
 
