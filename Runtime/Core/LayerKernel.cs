@@ -183,6 +183,7 @@ namespace Pixeye.Actors
 
     void OnApplicationQuit()
     {
+      ApplicationIsQuitting = true;
 #if UNITY_EDITOR
       Dispose();
 #endif
