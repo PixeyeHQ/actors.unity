@@ -340,8 +340,7 @@ namespace Pixeye.Actors
     public static void RemoveSignal(object signal) => InstanceInternal.self.processorSignals.Remove(signal);
 
     #endregion
-
-
+ 
     #region POOLING
 
     [SerializeField, HideInInspector]

@@ -9,11 +9,12 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Unity.IL2CPP.CompilerServices;
+using UnityEditor.SceneManagement;
+using UnityEngine;
 
 
 namespace Pixeye.Actors
 {
- 
   [Il2CppSetOption(Option.NullChecks, false)]
   [Il2CppSetOption(Option.ArrayBoundsChecks, false)]
   [Il2CppSetOption(Option.DivideByZeroChecks, false)]
@@ -32,6 +33,11 @@ namespace Pixeye.Actors
     internal abstract Type GetComponentType();
 
     public abstract void Dispose(indexes disposed);
+
+    internal abstract void RemoveComponent(ent entity);
+    internal abstract void AddComponent(object component, ent entity);
+    internal abstract void SetComponent(object component, ent entity);
+ 
   }
 
 
@@ -41,6 +47,7 @@ namespace Pixeye.Actors
   public abstract class Storage<T> : Storage
   {
     public static Storage<T> Instance;
+
     public static int componentId;
     internal static int ComponentMask;
     internal static int Generation;
@@ -48,6 +55,64 @@ namespace Pixeye.Actors
     public static T[] components = new T[LayerKernel.Settings.SizeEntities / 2];
     internal int componentsLen = 0;
 
+    internal override void RemoveComponent(ent entity)
+    {
+      ref var _managed = ref entity.managed;
+      entity.managed.signature[Generation] &= ~ComponentMask;
+      _managed.layer.processorEcs.SetOperation(entity, Storage<T>.componentId, ProcessorEcs.Action.Remove);
+    }
+
+    // internal override object GetComponent(ent entity)
+    // {
+    //   ref var _managed = ref entity.managed;
+    //   if ((_managed.signature[Generation] & ComponentMask) == ComponentMask)
+    //   {
+    //     return components[entity.id];
+    //   }
+    //
+    //   return null;
+    //   // return (_managed.signature[Generation] & ComponentMask) == ComponentMask;
+    // }
+
+    internal override unsafe void SetComponent(object component, ent entity)
+    {
+      if (entity.id >= components.Length)
+        Array.Resize(ref components, entity.id + entity.id / 2);
+
+      ref var _managed = ref entity.managed;
+      entity.meta->AddComponent(componentId);
+      _managed.signature[Generation] |= ComponentMask;
+
+      ref var componentInStorage = ref components[entity.id];
+      componentInStorage = (T) component;
+    }
+ 
+    internal override unsafe void AddComponent(object component, ent entity)
+    {
+      if (entity.id >= components.Length)
+        Array.Resize(ref components, entity.id + entity.id / 2);
+
+      ref var _managed = ref entity.managed;
+      entity.meta->AddComponent(componentId);
+      _managed.signature[Generation] |= ComponentMask;
+
+      ref var componentInStorage = ref components[entity.id];
+      componentInStorage = (T) component;
+      _managed.layer.processorEcs.SetOperation(entity, Storage<T>.componentId, ProcessorEcs.Action.Add);
+    }
+    // internal void AddComponent(T obj, ent entity)
+    // {
+    //    
+    //   if (id >= Storage<T>.components.Length)
+    //     Array.Resize(ref Storage<T>.components, id + id / 2);
+    //
+    //   
+    //   meta->AddComponent(Storage<T>.componentId);
+    //   managed.signature[Storage<T>.Generation] |= Storage<T>.ComponentMask;
+    //
+    //   ref var componentInStorage = ref Storage<T>.components[id];
+    //   componentInStorage = component;
+    // }
 
     public Storage()
     {

@@ -4,6 +4,7 @@ using Debug = UnityEngine.Debug;
 using System.Runtime.InteropServices;
 using System.Runtime.CompilerServices;
 using Unity.IL2CPP.CompilerServices;
+using UnityEngine;
 
 
 namespace Pixeye.Actors
@@ -92,6 +93,57 @@ namespace Pixeye.Actors
 
     /// Creates the component for entity.
     /// Use this only in the initialization.
+    public void SetMonoComp<T>(T component) where T : MonoBehaviour
+    {
+      var compID  = Storage.TypeNames[component.GetType().GetHashCode()];
+      var storage = Storage.All[compID];
+      storage.SetComponent(component, this);
+    }
+
+    internal void GetMonoCompInternal<T>(T component) where T : MonoBehaviour
+    {
+      var compID  = Storage.TypeNames[component.GetType().GetHashCode()];
+      var storage = Storage.All[compID];
+      storage.AddComponent(component, this);
+    }
+
+    public void RemoveMonoComp<T>() where T : MonoBehaviour
+    {
+      DebugDestroyed(this);
+      DebugNoComponent<T>(this);
+
+
+      ref var _managed = ref managed;
+      _managed.signature[Storage<T>.Generation] &= ~Storage<T>.ComponentMask;
+      _managed.layer.processorEcs.SetOperation(this, Storage<T>.componentId, ProcessorEcs.Action.Remove);
+
+      Storage<T>.components[id].enabled = false;
+    }
+
+    internal void RemoveMonoComp<T>(T obj) where T : MonoBehaviour
+    {
+      DebugDestroyed(this);
+      DebugNoComponent<T>(this);
+
+      var compID  = Storage.TypeNames[obj.GetType().GetHashCode()];
+      var storage = Storage.All[compID];
+      storage.RemoveComponent(this);
+      obj.enabled = false;
+    }
+
+    public T GetMonoComp<T>() where T : MonoBehaviour
+    {
+      var compID  = Storage.TypeNames[typeof(T).GetHashCode()];
+      var storage = Storage.All[compID];
+      var comp    = transform.AddGet<T>();
+      storage.AddComponent(comp, this);
+      comp.enabled = true;
+      return comp;
+    }
+
+
+    /// Creates the component for entity.
+    /// Use this only in the initialization.
     public void Set<T>(T component)
     {
       DebugCheckNull(this, typeof(T));
@@ -147,19 +199,10 @@ namespace Pixeye.Actors
     {
       DebugDestroyed(this);
       DebugNoComponent<T>(this);
-      
+
       ref var _managed = ref managed;
       _managed.signature[Storage<T>.Generation] &= ~Storage<T>.ComponentMask;
       _managed.layer.processorEcs.SetOperation(this, Storage<T>.componentId, ProcessorEcs.Action.Remove);
-     
-      // var     generation = Storage<T>.Generation;
-      // var     mask       = Storage<T>.ComponentMask;
-      // ref var _managed   = ref managed;
-      // if ((_managed.signature[generation] & mask) == mask)
-      // {
-      //   _managed.signature[generation] &= ~mask;
-      //   _managed.layer.processorEcs.SetOperation(this, Storage<T>.componentId, ProcessorEcs.Action.Remove);
-      // }
     }
 
 #if !ACTORS_COMPONENTS_STRUCTS
