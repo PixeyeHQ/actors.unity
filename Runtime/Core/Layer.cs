@@ -107,6 +107,10 @@ namespace Pixeye.Actors
       LayerKernel.LayersInUse.Add(this);
     }
 
+    public Y Get<Y>()
+    {
+      return (Y) objects[typeof(Y).GetHashCode()];
+    }
 
     public Buffer<Y> GetBuffer<Y>() where Y : struct
     {
