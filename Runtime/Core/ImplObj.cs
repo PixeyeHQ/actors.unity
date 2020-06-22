@@ -79,40 +79,38 @@ namespace Pixeye.Actors
     public Transform Create(GameObject prefab, Vector3 startPosition = default,
       Quaternion startRotation = default)
     {
+      SceneManager.SetActiveScene(layer.Scene);
       var tr = GameObject.Instantiate(prefab, startPosition, startRotation).transform;
-      SceneManager.MoveGameObjectToScene(tr.gameObject, layer.Scene);
-      // tr.SetAsLastSibling();
+      SceneManager.SetActiveScene(SceneMain.Self);
       return tr;
     }
 
     public Transform Create(GameObject prefab, Transform parent, Vector3 startPosition = default,
       Quaternion startRotation = default)
     {
-      return GameObject
+      SceneManager.SetActiveScene(layer.Scene);
+      var tr = GameObject
         .Instantiate(prefab, parent.TransformPoint(startPosition), startRotation * parent.rotation, parent)
         .transform;
+      SceneManager.SetActiveScene(SceneMain.Self);
+      return tr;
     }
 
     public T Create<T>(GameObject prefab, Transform parent, Vector3 startPosition = default,
       Quaternion startRotation = default)
     {
-      var o = Create(prefab, parent, startPosition, startRotation).GetComponentInChildren<T>();
-      return o;
+      return Create(prefab, parent, startPosition, startRotation).GetComponentInChildren<T>();
     }
 
     public T Create<T>(GameObject prefab, Vector3 startPosition = default, Quaternion startRotation = default)
     {
-      var o = Create(prefab, startPosition, startRotation).GetComponentInChildren<T>();
-      return o;
+      return Create(prefab, startPosition, startRotation).GetComponentInChildren<T>();
     }
 
     //Pooled
     public Transform Create(int poolID, GameObject prefab, Transform parent, Vector3 startPosition = default,
       Quaternion startRotation = default)
     {
-      //SceneManager.MoveGameObjectToScene(tr.gameObject, layer.Scene);
-      //tr.SetAsLastSibling();
-
       return layer.pool.pools[poolID].Spawn(prefab, startPosition, startRotation, parent).transform;
     }
 
@@ -125,19 +123,9 @@ namespace Pixeye.Actors
     public T Create<T>(int poolID, GameObject prefab, Vector3 startPosition = default,
       Quaternion startRotation = default)
     {
-      return Create(poolID, prefab, startPosition, startRotation).GetComponentInChildren<T>();
+      return Create(poolID, prefab, null, startPosition, startRotation).GetComponentInChildren<T>();
     }
 
-    public Transform Create(int poolID, GameObject prefab, Vector3 startPosition = default,
-      Quaternion startRotation = default)
-    {
-      var tr = layer.pool.pools[poolID].Spawn(prefab, startPosition, startRotation).transform;
-
-      SceneManager.MoveGameObjectToScene(tr.gameObject, layer.Scene);
-      //tr.SetAsLastSibling();
-
-      return tr;
-    }
 
     //===============================//
     // By String ID
@@ -146,20 +134,20 @@ namespace Pixeye.Actors
     // Default
     public Transform Create(string prefabID, Vector3 startPosition = default, Quaternion startRotation = default)
     {
+      SceneManager.SetActiveScene(layer.Scene);
       var tr = GameObject.Instantiate(Box.Get<GameObject>(prefabID), startPosition, startRotation).transform;
-
-
-      SceneManager.MoveGameObjectToScene(tr.gameObject, layer.Scene);
-      //tr.SetAsLastSibling();
-
+      SceneManager.SetActiveScene(SceneMain.Self);
       return tr;
     }
 
     public Transform Create(string prefabID, Transform parent, Vector3 startPosition = default,
       Quaternion startRotation = default)
     {
-      return GameObject.Instantiate(Box.Get<GameObject>(prefabID), parent.TransformPoint(startPosition),
+      SceneManager.SetActiveScene(layer.Scene);
+      var tr = GameObject.Instantiate(Box.Get<GameObject>(prefabID), parent.TransformPoint(startPosition),
         startRotation * parent.rotation, parent).transform;
+      SceneManager.SetActiveScene(SceneMain.Self);
+      return tr;
     }
 
     public T Create<T>(string prefabID, Transform parent, Vector3 startPosition = default,
@@ -174,14 +162,6 @@ namespace Pixeye.Actors
     }
 
     // Pooled
-    public Transform Create(int poolID, string prefabID, Vector3 startPosition = default,
-      Quaternion startRotation = default)
-    {
-      var tr = layer.pool.pools[poolID].Spawn(Box.Get<GameObject>(prefabID), startPosition, startRotation).transform;
-      SceneManager.MoveGameObjectToScene(tr.gameObject, layer.Scene);
-      return tr;
-    }
-
     public Transform Create(int poolID, string prefabID, Transform parent, Vector3 startPosition = default,
       Quaternion startRotation = default)
     {
@@ -198,7 +178,7 @@ namespace Pixeye.Actors
     public T Create<T>(int poolID, string prefabID, Vector3 startPosition = default,
       Quaternion startRotation = default)
     {
-      return Create(poolID, prefabID, startPosition, startRotation).GetComponentInChildren<T>();
+      return Create(poolID, prefabID, null, startPosition, startRotation).GetComponentInChildren<T>();
     }
 
     #endregion

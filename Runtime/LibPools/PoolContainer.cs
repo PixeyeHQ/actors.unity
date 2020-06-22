@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.IL2CPP.CompilerServices;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Object = UnityEngine.Object;
 
 namespace Pixeye.Actors
@@ -9,12 +10,19 @@ namespace Pixeye.Actors
   [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks | Option.DivideByZeroChecks, false)]
   public class PoolContainer
   {
+    Layer layer;
+
     List<GameObject> activeObjs = new List<GameObject>(500);
 
     Dictionary<int, Stack<GameObject>> cachedObjects =
       new Dictionary<int, Stack<GameObject>>(500, new FastComparable());
 
     Dictionary<int, int> cachedIds = new Dictionary<int, int>(500, new FastComparable());
+
+    public PoolContainer(Layer layer)
+    {
+      this.layer = layer;
+    }
 
     public void RegisterObject(GameObject prefab)
     {
@@ -37,10 +45,8 @@ namespace Pixeye.Actors
       }
     }
 
-    public void AddToPool(GameObject go, GameObject prefab)
-    {
+    public void AddToPool(GameObject go, GameObject prefab) =>
       cachedIds.Add(go.GetInstanceID(), prefab.GetInstanceID());
-    }
 
     public PoolContainer PopulateWith(GameObject prefab, int amount, int amountPerTick = 10, int timeRate = 1)
     {
@@ -96,7 +102,9 @@ namespace Pixeye.Actors
         cachedObjects.Add(key, new Stack<GameObject>(500));
       }
 
+      SceneManager.SetActiveScene(layer.Scene);
       var createdPrefab = Object.Instantiate(prefab, parent);
+      SceneManager.SetActiveScene(SceneMain.Self);
 
       var k = createdPrefab.GetInstanceID();
 
@@ -129,7 +137,9 @@ namespace Pixeye.Actors
         cachedObjects.Add(key, new Stack<GameObject>(600));
       }
 
+      SceneManager.SetActiveScene(layer.Scene);
       var createdPrefab = Object.Instantiate(prefab, parent);
+      SceneManager.SetActiveScene(SceneMain.Self);
 
       var k = createdPrefab.GetInstanceID();
 
@@ -169,8 +179,9 @@ namespace Pixeye.Actors
         rotation *= parent.rotation;
       }
 
+      SceneManager.SetActiveScene(layer.Scene);
       var createdPrefab = Object.Instantiate(prefab, position, rotation, parent);
-
+      SceneManager.SetActiveScene(SceneMain.Self);
       var k = createdPrefab.GetInstanceID();
 
       cachedIds.Add(k, key);
@@ -203,7 +214,9 @@ namespace Pixeye.Actors
     [Il2CppSetOption(Option.NullChecks | Option.ArrayBoundsChecks, false)]
     void Populate(GameObject prefab, int key)
     {
+      SceneManager.SetActiveScene(layer.Scene);
       var go = Object.Instantiate(prefab);
+      SceneManager.SetActiveScene(SceneMain.Self);
       go.SetActive(false);
       cachedIds.Add(go.GetInstanceID(), key);
       cachedObjects[key].Push(go);

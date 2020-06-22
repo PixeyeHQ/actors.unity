@@ -23,7 +23,7 @@ namespace Pixeye.Actors
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Actor Create(string prefabID, Vector3 position = default, bool pooled = false)
     {
-      var transform = pooled ? layer.Obj.Create(Pool.Entities, prefabID, position) : layer.Obj.Create(prefabID, position);
+      var transform = pooled ? layer.Obj.Create(Pool.Entities, prefabID, null, position) : layer.Obj.Create(prefabID, position);
       var actor     = transform.GetActor();
       actor.isPooled = pooled;
 
@@ -47,7 +47,7 @@ namespace Pixeye.Actors
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Actor Create(string prefabID, ModelComposer model, Vector3 position = default, bool pooled = false)
     {
-      var transform = pooled ? layer.Obj.Create(Pool.Entities, prefabID, position) : layer.Obj.Create(prefabID, position);
+      var transform = pooled ? layer.Obj.Create(Pool.Entities, prefabID, null, position) : layer.Obj.Create(prefabID, position);
       var actor     = transform.GetActor();
       actor.isPooled = pooled;
 
@@ -76,7 +76,7 @@ namespace Pixeye.Actors
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Actor Create(GameObject prefab, Vector3 position = default, bool pooled = false)
     {
-      var transform = pooled ? layer.Obj.Create(Pool.Entities, prefab, position) : layer.Obj.Create(prefab, position);
+      var transform = pooled ? layer.Obj.Create(Pool.Entities, prefab, null, position) : layer.Obj.Create(prefab, position);
       var actor     = transform.GetActor();
       actor.isPooled = pooled;
 
@@ -99,7 +99,7 @@ namespace Pixeye.Actors
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Actor Create(GameObject prefab, ModelComposer model, Vector3 position = default, bool pooled = false)
     {
-      var transform = pooled ? layer.Obj.Create(Pool.Entities, prefab, position) : layer.Obj.Create(prefab, position);
+      var transform = pooled ? layer.Obj.Create(Pool.Entities, prefab, null, position) : layer.Obj.Create(prefab, position);
       var actor     = transform.GetActor();
       actor.isPooled = pooled;
 

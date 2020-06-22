@@ -9,6 +9,8 @@ namespace Pixeye.Actors
   {
     internal static string NextActiveSceneName;
 
+    public static Scene Self => Layer.ActiveLayer.Scene;
+    
     public static Action Closed = delegate { };
 
     public static void ChangeTo(int buildIndex)
