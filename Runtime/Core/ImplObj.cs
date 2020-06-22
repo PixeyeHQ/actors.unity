@@ -110,10 +110,9 @@ namespace Pixeye.Actors
     public Transform Create(int poolID, GameObject prefab, Transform parent, Vector3 startPosition = default,
       Quaternion startRotation = default)
     {
-      //SceneManager.MoveGameObjectToScene(tr.gameObject, layer.Scene);
-      //tr.SetAsLastSibling();
-
-      return layer.pool.pools[poolID].Spawn(prefab, startPosition, startRotation, parent).transform;
+      var tr = layer.pool.pools[poolID].Spawn(prefab, startPosition, startRotation, parent).transform;
+      SceneManager.MoveGameObjectToScene(tr.gameObject, layer.Scene);
+      return tr;
     }
 
     public T Create<T>(int poolID, GameObject prefab, Transform parent, Vector3 startPosition = default,
