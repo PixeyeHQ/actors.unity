@@ -18,9 +18,11 @@ namespace Pixeye.Actors
     public Time Time => Layer.Time;
     public ImplObj Obj => Layer.Obj;
 
-    protected virtual void Start()
+    protected virtual void Awake()
     {
       if (!LayerKernel.InstanceInternal || !LayerKernel.Initialized[gameObject.scene.buildIndex]) return;
+      if (Layer != null) return;
+      
       Layer = LayerKernel.Layers[gameObject.scene.buildIndex];
       Setup();
     }

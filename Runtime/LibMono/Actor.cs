@@ -21,11 +21,8 @@ namespace Pixeye.Actors
 #endif
 
     [FoldoutGroup("Main")] public bool isPooled;
-
-    //[FoldoutGroup("Main")] public ScriptableBuild buildFrom;
-
-
-    protected sealed override void Start()
+ 
+    protected sealed override void Awake()
     {
     }
 
