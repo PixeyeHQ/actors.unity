@@ -30,7 +30,7 @@ namespace Pixeye.Actors
     public ent Create(string prefabID, Vector3 position = default, bool pooled = false)
     {
       processorEcs.Create(out var entity, pooled);
-      entity.managed.transform = pooled ? layer.Obj.Create(Pool.Entities, prefabID, null, position) : layer.Obj.Create(prefabID, position);
+      entity.managed.transform = pooled ? layer.Obj.Create(Pool.Entities, prefabID, position) : layer.Obj.Create(prefabID, position);
       processorEcs.SetOperation(entity, -1, ProcessorEcs.Action.Activate);
       return entity;
     }
@@ -46,7 +46,7 @@ namespace Pixeye.Actors
     public ent Create(string prefabID, ModelComposer model, Vector3 position = default, bool pooled = false)
     {
       processorEcs.Create(out var entity, pooled);
-      entity.managed.transform = pooled ? layer.Obj.Create(Pool.Entities, prefabID, null, position) : layer.Obj.Create(prefabID, position);
+      entity.managed.transform = pooled ? layer.Obj.Create(Pool.Entities, prefabID, position) : layer.Obj.Create(prefabID, position);
       model(entity);
       processorEcs.SetOperation(entity, -1, ProcessorEcs.Action.Activate);
       return entity;
@@ -81,7 +81,7 @@ namespace Pixeye.Actors
     {
       processorEcs.Create(out var entity, pooled);
       entity.managed.transform =
-        pooled ? layer.Obj.Create(Pool.Entities, prefab, null, position) : layer.Obj.Create(prefab, position);
+        pooled ? layer.Obj.Create(Pool.Entities, prefab, position) : layer.Obj.Create(prefab, position);
 
       processorEcs.SetOperation(entity, -1, ProcessorEcs.Action.Activate);
       return entity;
@@ -91,7 +91,7 @@ namespace Pixeye.Actors
     {
       processorEcs.Create(out var entity, pooled);
       entity.managed.transform =
-        pooled ? layer.Obj.Create(Pool.Entities, prefab, null, position) : layer.Obj.Create(prefab, position);
+        pooled ? layer.Obj.Create(Pool.Entities, prefab, position) : layer.Obj.Create(prefab, position);
       model(entity);
       processorEcs.SetOperation(entity, -1, ProcessorEcs.Action.Activate);
       return entity;

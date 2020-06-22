@@ -6,6 +6,7 @@ namespace Pixeye.Actors
 {
   public class Pool : IRequireActorsLayer, IDisposable
   {
+ 
     [TagField(categoryName = "Pool")] public const int None = -1;
 
     [TagField(categoryName = "Pool")] public const int Entities = 1;
@@ -19,18 +20,18 @@ namespace Pixeye.Actors
 
     void IRequireActorsLayer.Bootstrap(Layer layer)
     {
+      //this.layer = layer;
       Add(Entities);
       Add(Audio);
       Add(UI);
-
-      void Add(int id)
-      {
-        PoolContainer pool;
-        pool = new PoolContainer(layer);
-        pools.Add(id, pool);
-      }
     }
 
+    void Add(int id)
+    {
+      PoolContainer pool;
+      pool = new PoolContainer();
+      pools.Add(id, pool);
+    }
 
     internal void Despawn(int poolID, GameObject obj)
     {

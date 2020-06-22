@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 namespace Pixeye.Actors
 {
@@ -15,7 +14,6 @@ namespace Pixeye.Actors
     public static Time Time => Layer.ActiveLayer.Time;
     public static ImplObj Obj => Layer.ActiveLayer.Obj;
 
-    
 
     public static void Send<Y>(in Y signal) => Layer.ActiveLayer.processorSignals.Dispatch(signal);
     public static void AddSignal(object signal) => Layer.ActiveLayer.processorSignals.Add(signal);
