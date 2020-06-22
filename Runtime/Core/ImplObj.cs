@@ -147,8 +147,6 @@ namespace Pixeye.Actors
     public Transform Create(string prefabID, Vector3 startPosition = default, Quaternion startRotation = default)
     {
       var tr = GameObject.Instantiate(Box.Get<GameObject>(prefabID), startPosition, startRotation).transform;
-
-
       SceneManager.MoveGameObjectToScene(tr.gameObject, layer.Scene);
       //tr.SetAsLastSibling();
 

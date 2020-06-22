@@ -22,7 +22,7 @@ namespace Pixeye.Actors
 
     [FoldoutGroup("Main")] public bool isPooled;
  
-    protected sealed override void Awake()
+    protected sealed override void Start()
     {
     }
 

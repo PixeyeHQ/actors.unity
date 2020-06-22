@@ -18,7 +18,7 @@ namespace Pixeye.Actors
     public Time Time => Layer.Time;
     public ImplObj Obj => Layer.Obj;
 
-    protected virtual void Awake()
+    protected virtual void Start()
     {
       if (!LayerKernel.InstanceInternal || !LayerKernel.Initialized[gameObject.scene.buildIndex]) return;
       if (Layer != null) return;
@@ -59,7 +59,7 @@ namespace Pixeye.Actors
     {
     }
 
-    /// Initialize here.
+    /// Initialize your logic here. This is a custom Start method.
     protected virtual void Setup()
     {
     }
