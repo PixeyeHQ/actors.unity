@@ -250,6 +250,8 @@ namespace Pixeye.Actors
 
       if (i < --length)
         Array.Copy(entities, i + 1, entities, i, length - i);
+      
+      flagChanged = true;
     }
 
     //===============================//
