@@ -20,16 +20,16 @@ namespace Pixeye.Actors
 
     protected virtual void Start()
     {
-      if (!LayerKernel.InstanceInternal || !LayerKernel.Initialized[gameObject.scene.buildIndex]) return;
+      if (!LayerKernel.InstanceInternal || !LayerKernel.Initialized[SceneSub.SceneIndexFromName(gameObject.scene.name)]) return;
       if (Layer != null) return;
       
-      Layer = LayerKernel.Layers[gameObject.scene.buildIndex];
+      Layer = LayerKernel.Layers[SceneSub.SceneIndexFromName(gameObject.scene.name)];
       Setup();
     }
 
     void OnEnable()
     {
-      if (!LayerKernel.InstanceInternal || !LayerKernel.Initialized[gameObject.scene.buildIndex]) return;
+      if (!LayerKernel.InstanceInternal || !LayerKernel.Initialized[SceneSub.SceneIndexFromName(gameObject.scene.name)]) return;
       HandleEnable();
     }
 

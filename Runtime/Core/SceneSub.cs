@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -16,67 +17,85 @@ namespace Pixeye.Actors
       NotAdded
     }
 
-    static State CheckSceneState(int buildIndex)
-    {
-      if (buildIndex == -1) return State.InvalidIndex;
+        private static readonly Dictionary<string, int> loadScenes = new Dictionary<string, int>();
 
-      for (int i = 0; i < SceneManager.sceneCount; i++)
-      {
-        var scn = SceneManager.GetSceneAt(i);
-        if (scn.buildIndex == buildIndex) return State.AlreadyAdded;
-      }
+        static State CheckSceneState(string sceneName)
+        {
+            if (loadScenes.ContainsKey(sceneName)) { return State.AlreadyAdded; }
+            else { return State.NotAdded; }
+        }
 
-      return State.NotAdded;
+        public static void Add(int buildIndex)
+        {
+            var sceneName = NameFromBuildIndex(buildIndex);
+            Add(sceneName);
+        }
+
+        public static void Add(string sceneName)
+        {
+            var name = System.IO.Path.GetFileNameWithoutExtension(sceneName);
+            var state = CheckSceneState(name);
+            if (state == State.AlreadyAdded) return;
+
+            var sceneIndex = SceneIndexFromName(name);
+            LayerKernel.Initialized[sceneIndex] = false;
+            LayerKernel.LoadJobs.Add(SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive));
+        }
+
+        public static void Remove(int buildIndex)
+        {
+            DebugScene(buildIndex);
+            var sceneName = NameFromBuildIndex(buildIndex);
+            Remove(sceneName);
+        }
+
+        public static void Remove(string sceneName)
+        {
+            var state = CheckSceneState(sceneName);
+            if (state == State.InvalidIndex || state == State.NotAdded) return;
+            RemoveOp(SceneIndexFromName(sceneName));
+        }
+
+        static void RemoveOp(int buildIndex)
+        {
+            if (LayerKernel.Layers[buildIndex] != null) // check if this scene is a part of Actors Layers.
+                LayerKernel.Layers[buildIndex].Release();
+            LayerKernel.LoadJobs.Add(SceneManager.UnloadSceneAsync(buildIndex));
+            LayerKernel.LoadJobs.Add(Resources.UnloadUnusedAssets());
+        }
+
+        internal static int SceneIndexFromName(string sceneName)
+        {
+            int index = -1;
+            if (loadScenes.ContainsKey(sceneName)) {
+                index = loadScenes[sceneName];
+            }
+            else {
+                index = loadScenes.Count;
+                loadScenes.Add(sceneName, loadScenes.Count);
+            }
+            return index;
+        }
+
+        public static string NameFromBuildIndex(int buildIndex)
+        {
+            var path = SceneUtility.GetScenePathByBuildIndex(buildIndex);
+            if (String.IsNullOrEmpty(path)) { 
+                DebugScene(buildIndex);
+                //Return the index of the current scene
+                return SceneManager.GetActiveScene().name; 
+            }
+            return System.IO.Path.GetFileNameWithoutExtension(path);
+        }
+
+        [Conditional("ACTORS_DEBUG")]
+        static void DebugScene(int buildIndex)
+        {
+            if (buildIndex == -1)
+            {
+                Debug.Log($"There is no scene with Build Index {buildIndex}.");
+                throw new Exception();
+            }
+        }
     }
-
-    public static void Add(int buildIndex)
-    {
-      var state = CheckSceneState(buildIndex);
-      if (state == State.AlreadyAdded) return;
-
-      LayerKernel.Initialized[buildIndex] = false;
-      LayerKernel.LoadJobs.Add(SceneManager.LoadSceneAsync(buildIndex, LoadSceneMode.Additive));
-    }
-
-    public static void Add(string sceneName)
-    {
-      var buildIndex = LayerKernel.SceneIndexFromName(sceneName);
-      DebugScene(buildIndex);
-      Add(buildIndex);
-    }
-
-    public static void Remove(int buildIndex)
-    {
-      var state = CheckSceneState(buildIndex);
-      if (state == State.InvalidIndex || state == State.NotAdded) return;
-      RemoveOp(buildIndex);
-    }
-
-    public static void Remove(string sceneName)
-    {
-      var buildIndex = SceneManager.GetSceneByName(sceneName).buildIndex;
-      var state      = CheckSceneState(buildIndex);
-      if (state == State.InvalidIndex || state == State.NotAdded) return;
-
-      RemoveOp(buildIndex);
-    }
-
-    static void RemoveOp(int buildIndex)
-    {
-      if (LayerKernel.Layers[buildIndex] != null) // check if this scene is a part of Actors Layers.
-        LayerKernel.Layers[buildIndex].Release();
-      LayerKernel.LoadJobs.Add(SceneManager.UnloadSceneAsync(buildIndex));
-      LayerKernel.LoadJobs.Add(Resources.UnloadUnusedAssets());
-    }
-
-    [Conditional("ACTORS_DEBUG")]
-    static void DebugScene(int buildIndex)
-    {
-      if (buildIndex == -1)
-      {
-        Debug.Log($"There is no scene with Build Index {buildIndex}.");
-        throw new Exception();
-      }
-    }
-  }
 }

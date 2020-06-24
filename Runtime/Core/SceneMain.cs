@@ -14,25 +14,25 @@ namespace Pixeye.Actors
     public static void ChangeTo(int buildIndex)
     {
       NextActiveSceneName = SceneManager.GetSceneByBuildIndex(buildIndex).name;
-      ChangeOp(buildIndex);
+      ChangeOp(NextActiveSceneName);
     }
 
     public static void ChangeTo(string sceneName)
     {
       NextActiveSceneName = sceneName;
-      ChangeOp(LayerKernel.SceneIndexFromName(sceneName));
+      ChangeOp(sceneName);
     }
 
-    static void ChangeOp(int buildIndex)
+    static void ChangeOp(string sceneName)
     {
-      var nextIndex = buildIndex;
+      var nextScene = sceneName;
 
-      LayerKernel.Initialized[buildIndex] = false;
+      LayerKernel.Initialized[SceneSub.SceneIndexFromName(sceneName)] = false;
       Closed();
       Layer.ActiveLayer.Release();
       LayerKernel.LoadJobs.Add(SceneManager.UnloadSceneAsync(Layer.ActiveLayer.Scene));
       LayerKernel.LoadJobs.Add(Resources.UnloadUnusedAssets());
-      LayerKernel.LoadJobs.Add(SceneManager.LoadSceneAsync(buildIndex, LoadSceneMode.Additive));
+      LayerKernel.LoadJobs.Add(SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive));
       Layer.ActiveLayer = null;
       LayerKernel.RunUnscaled(CoChangeOP());
       
@@ -40,7 +40,7 @@ namespace Pixeye.Actors
       {
         while (LayerKernel.LoadJobs.Count > 0)
           yield return 0;
-        NextActiveSceneName = SceneManager.GetSceneByBuildIndex(nextIndex).name;
+        NextActiveSceneName = nextScene;
       }
     }
   }
