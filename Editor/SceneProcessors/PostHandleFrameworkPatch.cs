@@ -9,8 +9,7 @@ using UnityEngine;
 
 namespace Pixeye.Actors
  {
- 
- 
+   public class PostHandleFrameworkPatch{
     static void ExecuteWithLocks(string path)
     {
     
