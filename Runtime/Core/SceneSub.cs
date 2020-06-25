@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -17,11 +17,11 @@ namespace Pixeye.Actors
       NotAdded
     }
 
-        private static readonly Dictionary<string, int> loadScenes = new Dictionary<string, int>();
+        private static readonly Dictionary<string, int> loadedScenes = new Dictionary<string, int>();
 
         static State CheckSceneState(string sceneName)
         {
-            if (loadScenes.ContainsKey(sceneName)) { return State.AlreadyAdded; }
+            if (loadedScenes.ContainsKey(sceneName)) { return State.AlreadyAdded; }
             else { return State.NotAdded; }
         }
 
@@ -37,8 +37,8 @@ namespace Pixeye.Actors
             var state = CheckSceneState(name);
             if (state == State.AlreadyAdded) return;
 
-            var sceneIndex = SceneIndexFromName(name);
-            LayerKernel.Initialized[sceneIndex] = false;
+            var layerIndex = LayerIndexFromSceneName(name);
+            LayerKernel.Initialized[layerIndex] = false;
             LayerKernel.LoadJobs.Add(SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive));
         }
 
@@ -53,7 +53,7 @@ namespace Pixeye.Actors
         {
             var state = CheckSceneState(sceneName);
             if (state == State.InvalidIndex || state == State.NotAdded) return;
-            RemoveOp(SceneIndexFromName(sceneName));
+            RemoveOp(LayerIndexFromSceneName(sceneName));
         }
 
         static void RemoveOp(int buildIndex)
@@ -64,12 +64,12 @@ namespace Pixeye.Actors
             LayerKernel.LoadJobs.Add(Resources.UnloadUnusedAssets());
         }
     
-        internal static int SceneIndexFromName(string sceneName) {
-            if (!loadScenes.ContainsKey(sceneName))
+        internal static int LayerIndexFromSceneName(string sceneName) {
+            if (!loadedScenes.ContainsKey(sceneName))
             {
-                loadScenes.Add(sceneName, loadScenes.Count);
+                loadedScenes.Add(sceneName, loadedScenes.Count);
             }
-            return loadScenes[sceneName];
+            return loadedScenes[sceneName];
         }
 
         public static string NameFromBuildIndex(int buildIndex)
