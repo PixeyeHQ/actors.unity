@@ -18,6 +18,8 @@ namespace Pixeye.Actors
     }
 
         private static readonly Dictionary<string, int> loadedScenes = new Dictionary<string, int>();
+        private static readonly Stack<int> freeIndexes = new Stack<int>();
+        private static int layerСounter;
 
         static State CheckSceneState(string sceneName)
         {
@@ -53,21 +55,24 @@ namespace Pixeye.Actors
         {
             var state = CheckSceneState(sceneName);
             if (state == State.InvalidIndex || state == State.NotAdded) return;
-            RemoveOp(LayerIndexFromSceneName(sceneName));
+            RemoveOp(sceneName);
         }
 
-        static void RemoveOp(int buildIndex)
+        static void RemoveOp(string sceneName)
         {
-            if (LayerKernel.Layers[buildIndex] != null) // check if this scene is a part of Actors Layers.
-                LayerKernel.Layers[buildIndex].Release();
-            LayerKernel.LoadJobs.Add(SceneManager.UnloadSceneAsync(buildIndex));
-            LayerKernel.LoadJobs.Add(Resources.UnloadUnusedAssets());
+          var layerIndex = LayerIndexFromSceneName(sceneName);
+          if (LayerKernel.Layers[layerIndex] != null) // check if this scene is a part of Actors Layers.
+              LayerKernel.Layers[layerIndex].Release();
+          LayerKernel.LoadJobs.Add(SceneManager.UnloadSceneAsync(sceneName));
+          LayerKernel.LoadJobs.Add(Resources.UnloadUnusedAssets());
+          loadedScenes.Remove(sceneName);
+          freeIndexes.Push(layerIndex);
         }
     
         internal static int LayerIndexFromSceneName(string sceneName) {
             if (!loadedScenes.ContainsKey(sceneName))
             {
-                loadedScenes.Add(sceneName, loadedScenes.Count);
+              loadedScenes.Add(sceneName, (freeIndexes.Count > 0) ? freeIndexes.Pop() : layerСounter++);
             }
             return loadedScenes[sceneName];
         }
