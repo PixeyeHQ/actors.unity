@@ -27,7 +27,7 @@ namespace Pixeye.Actors
     {
       var nextScene = sceneName;
 
-      LayerKernel.Initialized[SceneSub.LayerIndexFromSceneName(sceneName)] = false;
+      LayerKernel.Initialized[SceneSub.GetLayerIndex(sceneName)] = false;
       Closed();
       Layer.ActiveLayer.Release();
       LayerKernel.LoadJobs.Add(SceneManager.UnloadSceneAsync(Layer.ActiveLayer.Scene));
