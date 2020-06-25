@@ -69,7 +69,7 @@ namespace Pixeye.Actors
           freeIndexes.Push(layerIndex);
         }
     
-        internal static int LayerIndexFromSceneName(string sceneName) {
+        internal static int GetLayerIndex(string sceneName) {
             if (!loadedScenes.ContainsKey(sceneName))
             {
               loadedScenes.Add(sceneName, (freeIndexes.Count > 0) ? freeIndexes.Pop() : layerСounter++);
