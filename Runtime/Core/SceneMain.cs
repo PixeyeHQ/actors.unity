@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -27,7 +27,7 @@ namespace Pixeye.Actors
     {
       var nextScene = sceneName;
 
-      LayerKernel.Initialized[SceneSub.SceneIndexFromName(sceneName)] = false;
+      LayerKernel.Initialized[SceneSub.LayerIndexFromSceneName(sceneName)] = false;
       Closed();
       Layer.ActiveLayer.Release();
       LayerKernel.LoadJobs.Add(SceneManager.UnloadSceneAsync(Layer.ActiveLayer.Scene));
