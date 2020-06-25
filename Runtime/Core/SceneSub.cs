@@ -63,18 +63,13 @@ namespace Pixeye.Actors
             LayerKernel.LoadJobs.Add(SceneManager.UnloadSceneAsync(buildIndex));
             LayerKernel.LoadJobs.Add(Resources.UnloadUnusedAssets());
         }
-
-        internal static int SceneIndexFromName(string sceneName)
-        {
-            int index = -1;
-            if (loadScenes.ContainsKey(sceneName)) {
-                index = loadScenes[sceneName];
-            }
-            else {
-                index = loadScenes.Count;
+    
+        internal static int SceneIndexFromName(string sceneName) {
+            if (!loadScenes.ContainsKey(sceneName))
+            {
                 loadScenes.Add(sceneName, loadScenes.Count);
             }
-            return index;
+            return loadScenes[sceneName];
         }
 
         public static string NameFromBuildIndex(int buildIndex)
