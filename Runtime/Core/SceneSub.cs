@@ -39,7 +39,7 @@ namespace Pixeye.Actors
             var state = CheckSceneState(name);
             if (state == State.AlreadyAdded) return;
 
-            var layerIndex = LayerIndexFromSceneName(name);
+            var layerIndex = GetLayerIndex(name);
             LayerKernel.Initialized[layerIndex] = false;
             LayerKernel.LoadJobs.Add(SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive));
         }
@@ -60,7 +60,7 @@ namespace Pixeye.Actors
 
         static void RemoveOp(string sceneName)
         {
-          var layerIndex = LayerIndexFromSceneName(sceneName);
+          var layerIndex = GetLayerIndex(sceneName);
           if (LayerKernel.Layers[layerIndex] != null) // check if this scene is a part of Actors Layers.
               LayerKernel.Layers[layerIndex].Release();
           LayerKernel.LoadJobs.Add(SceneManager.UnloadSceneAsync(sceneName));
