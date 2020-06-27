@@ -19,17 +19,18 @@ namespace Pixeye.Actors
 
         private static readonly Dictionary<string, int> loadedScenes = new Dictionary<string, int>();
         private static readonly Stack<int> freeIndexes = new Stack<int>();
-        private static int layerСounter = SceneManager.sceneCountInBuildSettings;
+        private static int sceneСounter = SceneManager.sceneCountInBuildSettings;
 
         static State CheckSceneState(string sceneName)
         {
             if (String.IsNullOrEmpty(sceneName)) return State.InvalidScene;
-            if (loadedScenes.ContainsKey(sceneName)) { return State.AlreadyAdded; }
+            if (SceneManager.GetSceneByName(sceneName).isLoaded) { return State.AlreadyAdded; }
             else { return State.NotAdded; }
         }
 
         public static void Add(int buildIndex)
         {
+            DebugScene(buildIndex);
             var sceneName = GetSceneName(buildIndex);
             Add(sceneName);
         }
@@ -54,9 +55,10 @@ namespace Pixeye.Actors
 
         public static void Remove(string sceneName)
         {
-            var state = CheckSceneState(sceneName);
+            var name = System.IO.Path.GetFileNameWithoutExtension(sceneName);
+            var state = CheckSceneState(name);
             if (state == State.InvalidScene || state == State.NotAdded) return;
-            RemoveOp(sceneName);
+            RemoveOp(name);
         }
 
         static void RemoveOp(string sceneName)
@@ -77,7 +79,7 @@ namespace Pixeye.Actors
                 var buildIndex = GetBuildIndex(sceneName);
                 if (buildIndex < 0)
                 {
-                    loadedScenes.Add(sceneName, (freeIndexes.Count > 0) ? freeIndexes.Pop() : layerСounter++);
+                    loadedScenes.Add(sceneName, (freeIndexes.Count > 0) ? freeIndexes.Pop() : sceneСounter++);
                 }
                 else
                 {
