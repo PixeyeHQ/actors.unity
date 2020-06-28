@@ -1,6 +1,7 @@
 ﻿//  Project  : ACTORS
 //  Contacts : Pixeye - ask@pixeye.games
 
+using System;
 using Unity.IL2CPP.CompilerServices;
 using UnityEngine;
 
@@ -21,7 +22,7 @@ namespace Pixeye.Actors
 #endif
 
     [Tooltip("This is used to link pools with prefabs. Leave empty in case you don't use this actor with a pools.")]
-    [FoldoutGroup("Main")] public string prefabReferenceName;
+    [FoldoutGroup("Main")] public string prefabReferenceName = String.Empty;
 
     protected sealed override void Start()
     {
@@ -56,6 +57,7 @@ namespace Pixeye.Actors
 
       if (prefabReferenceName != string.Empty)
       { 
+        Debug.Log(prefabReferenceName.);
         layer.Pool[Pool.Entities].RegisterAndAdd(Box.Load<GameObject>(prefabReferenceName), gameObject);
       }
 
