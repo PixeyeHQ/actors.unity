@@ -36,7 +36,7 @@ namespace Pixeye.Actors
     public int ID => id;
 
     internal GameObject gameObject;
-    internal Pool pool;
+    public Pool Pool;
 
     internal int id;
     internal bool isReleasing = true;

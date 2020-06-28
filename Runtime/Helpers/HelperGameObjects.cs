@@ -127,7 +127,7 @@ namespace Pixeye.Actors
       else
       {
         var layer = LayerKernel.Layers[o.gameObject.scene.buildIndex];
-        layer.pool.Despawn(poolID, o);
+        layer.Pool.Despawn(poolID, o);
       }
     }
 
