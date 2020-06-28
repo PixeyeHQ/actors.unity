@@ -12,7 +12,7 @@
 
 ## ⭐ Why Actors ?
 The framework favors simplicity and doesn't try to "abstract away" Unity workflows bringing first-class support for combining ECS with classic Unity component system.
-- Deterministic worflow.
+- Deterministic workflow.
 - ECS with clean syntax and no codegen.
 - ECS integration with Unity gameobjects via Actor components.
 - Logic Layers.
