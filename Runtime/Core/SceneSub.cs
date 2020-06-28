@@ -14,7 +14,7 @@ namespace Pixeye.Actors
         {
             InvalidSceneName,
             NotAdded,
-            AlreadyAdded,
+            IsLoading,
             IsLoaded
         }
 
@@ -26,7 +26,7 @@ namespace Pixeye.Actors
         {
             if (String.IsNullOrEmpty(sceneName)) return State.InvalidSceneName;
             if (SceneManager.GetSceneByName(sceneName).isLoaded) return State.IsLoaded;
-            if (SceneManager.GetSceneByName(sceneName).name != default) { return State.AlreadyAdded; }
+            if (SceneManager.GetSceneByName(sceneName).name != default) { return State.IsLoading; }
             else { return State.NotAdded; }
         }
 
