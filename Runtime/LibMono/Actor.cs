@@ -56,8 +56,7 @@ namespace Pixeye.Actors
       if (Layer != null) return;
 
       if (prefabReferenceName != string.Empty)
-      { 
-        Debug.Log(prefabReferenceName.);
+      {
         layer.Pool[Pool.Entities].RegisterAndAdd(Box.Load<GameObject>(prefabReferenceName), gameObject);
       }
 
