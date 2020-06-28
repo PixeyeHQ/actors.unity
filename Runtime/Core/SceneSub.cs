@@ -12,8 +12,9 @@ namespace Pixeye.Actors
     {
         enum State
         {
-            AlreadyAdded,
             InvalidScene,
+            AlreadyAdded,
+            IsLoaded,
             NotAdded
         }
 
@@ -24,7 +25,9 @@ namespace Pixeye.Actors
         static State CheckSceneState(string sceneName)
         {
             if (String.IsNullOrEmpty(sceneName)) return State.InvalidScene;
-            if (SceneManager.GetSceneByName(sceneName).isLoaded) { return State.AlreadyAdded; }
+            if (SceneManager.GetSceneByName(sceneName).isLoaded) return State.IsLoaded;
+            var scn = SceneManager.GetSceneByName(sceneName);
+            if (scn.name != default) { return State.AlreadyAdded; }
             else { return State.NotAdded; }
         }
 
@@ -39,7 +42,7 @@ namespace Pixeye.Actors
         {
             var name = System.IO.Path.GetFileNameWithoutExtension(sceneName);
             var state = CheckSceneState(name);
-            if (state == State.InvalidScene || state == State.AlreadyAdded) return;
+            if (state != State.NotAdded) return;
 
             var layerIndex = GetLayerIndex(name);
             LayerKernel.Initialized[layerIndex] = false;
@@ -57,7 +60,7 @@ namespace Pixeye.Actors
         {
             var name = System.IO.Path.GetFileNameWithoutExtension(sceneName);
             var state = CheckSceneState(name);
-            if (state == State.InvalidScene || state == State.NotAdded) return;
+            if (state == State.InvalidScene || state != State.IsLoaded) return;
             RemoveOp(name);
         }
 
