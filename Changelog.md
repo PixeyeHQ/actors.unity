@@ -14,7 +14,13 @@
 ⚠️ **IMPORTANT** ⚠️  
 If you have Actors on the scene that must be added to the pool system use field below to add **prefab name** of that object. If you don't want to use pooling system with
 the object just leave a blank field. This action is required to register corresponding prefab in the pool.
-[![Pooling actor](https://i.gyazo.com/a89593aa71f1dd85b31ba318ec5a4015.png)](https://gyazo.com/a89593aa71f1dd85b31ba318ec5a4015)
+<details>
+<summary>
+Adding Actor to the pool.
+</summary>
+<a href="https://gyazo.com/a89593aa71f1dd85b31ba318ec5a4015"><img src="https://i.gyazo.com/a89593aa71f1dd85b31ba318ec5a4015.png" alt="Actor" width="480"/></a>
+</details>
+ 
 
 ### Actors-2020-06-02
 🛠️ **Fixed** 
