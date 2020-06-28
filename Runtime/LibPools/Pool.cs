@@ -6,7 +6,6 @@ namespace Pixeye.Actors
 {
   public class Pool : IRequireActorsLayer, IDisposable
   {
- 
     [TagField(categoryName = "Pool")] public const int None = -1;
 
     [TagField(categoryName = "Pool")] public const int Entities = 1;
@@ -17,6 +16,7 @@ namespace Pixeye.Actors
 
     internal Dictionary<int, PoolContainer> pools = new Dictionary<int, PoolContainer>(4, new FastComparable());
 
+    public PoolContainer this[int index] => pools[index];
 
     void IRequireActorsLayer.Bootstrap(Layer layer)
     {
@@ -59,7 +59,7 @@ namespace Pixeye.Actors
     public void Populate(Layer layer)
     {
       if (pool == Pool.None) return;
-      var poolStash = layer.pool.pools[pool];
+      var poolStash = layer.Pool.pools[pool];
       poolStash.RegisterObject(prefab);
 
       for (var i = 0; i < createdObjs.Count; i++)

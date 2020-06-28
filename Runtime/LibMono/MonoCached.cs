@@ -20,15 +20,16 @@ namespace Pixeye.Actors
 
     protected virtual void Start()
     {
-      if (!LayerKernel.InstanceInternal || !LayerKernel.Initialized[gameObject.scene.buildIndex]) return;
+      if (!LayerKernel.InstanceInternal || !LayerKernel.Initialized[SceneSub.GetLayerIndex(gameObject.scene.name)]) return;
       if (Layer != null) return;
-      Layer = LayerKernel.Layers[gameObject.scene.buildIndex];
+      
+      Layer = LayerKernel.Layers[SceneSub.GetLayerIndex(gameObject.scene.name)];
       Setup();
     }
 
     void OnEnable()
     {
-      if (!LayerKernel.InstanceInternal || !LayerKernel.Initialized[gameObject.scene.buildIndex]) return;
+      if (!LayerKernel.InstanceInternal || !LayerKernel.Initialized[SceneSub.GetLayerIndex(gameObject.scene.name)]) return;
       HandleEnable();
     }
 
@@ -58,7 +59,7 @@ namespace Pixeye.Actors
     {
     }
 
-    /// Initialize here.
+    /// Initialize your logic here. This is a custom Start method.
     protected virtual void Setup()
     {
     }

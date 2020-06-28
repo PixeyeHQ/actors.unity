@@ -15,7 +15,7 @@ using Sirenix.OdinInspector;
 namespace Pixeye.Actors
 {
   /// A scene point of entry. The developer defines here scene dependencies and processing that will work on the scene. 
-  public abstract class Layer<T> : MonoBehaviour, IPooledLayer
+  public abstract class Layer<T> : MonoBehaviour
   {
     public static ProcessorUpdate Engine => InstanceInternal.self.Engine;
     public static ImplEntity Entity => InstanceInternal.self.Entity;
@@ -52,10 +52,7 @@ namespace Pixeye.Actors
 
     void ActivateActors()
     {
-      for (var i = 0; i < nodes.Count; i++)
-        nodes[i].Populate(self);
-
-
+     
       var objs = gameObject.scene.GetRootGameObjects();
       foreach (var obj in objs)
       {
@@ -145,7 +142,7 @@ namespace Pixeye.Actors
       self.processorCoroutine = new ProcessorCoroutine();
       self.processorCoroutine.Bootstrap(self);
 
-      self.pool = Add<Pool>();
+      self.Pool = Add<Pool>();
       self.Obj  = Add<ImplObj>();
 
       self.processorSignals = Add<ProcessorSignals>();
@@ -341,86 +338,5 @@ namespace Pixeye.Actors
 
     #endregion
  
-    #region POOLING
-
-    [SerializeField, HideInInspector]
-    internal List<PoolNode> nodes = new List<PoolNode>();
-#if UNITY_EDITOR
-    void IPooledLayer.ClearNodes()
-    {
-      for (int i = 0; i < nodes.Count; i++)
-      {
-        var n = nodes[i];
-        n.createdObjs.Clear();
-        n.prefab = null;
-      }
-
-      nodes.Clear();
-    }
-
-    void IPooledLayer.AddToNode(GameObject prefab, GameObject instance, int pool)
-    {
-      var id                  = prefab.GetInstanceID();
-      var nodesValid          = nodes.FindValidNodes(id);
-      var conditionNodeCreate = true;
-      var nodesToKill         = new List<int>();
-
-      for (var i = 0; i < nodesValid.Count; i++)
-      {
-        var node = nodes[nodesValid[i]];
-
-        var index = node.createdObjs.FindInstanceID(instance);
-        if (index != -1 && pool != node.pool)
-        {
-          node.createdObjs.RemoveAt(index);
-        }
-        else if (index == -1 && pool == node.pool)
-        {
-          conditionNodeCreate = false;
-          node.createdObjs.Add(instance);
-        }
-
-        if (index != -1 && pool == node.pool)
-        {
-          conditionNodeCreate = false;
-        }
-
-        if (node.createdObjs.Count == 0)
-        {
-          node.prefab = null;
-          nodesToKill.Add(nodesValid[i]);
-        }
-      }
-
-      for (var i = 0; i < nodesToKill.Count; i++)
-      {
-        nodes.RemoveAt(nodesToKill[i]);
-      }
-
-      if (conditionNodeCreate)
-      {
-        var node = new PoolNode();
-        node.id          = id;
-        node.prefab      = prefab;
-        node.pool        = pool;
-        node.createdObjs = new List<GameObject>();
-        node.createdObjs.Add(instance);
-
-        nodes.Add(node);
-      }
-    }
-#else
-// we don't need these in the release so we leave them blank.
-    void IPooledLayer.ClearNodes()
-    {
-    }
-
-    void IPooledLayer.AddToNode(GameObject prefab, GameObject instance, int pool)
-    {
-      
-    }
-#endif
-
-    #endregion
   }
 }

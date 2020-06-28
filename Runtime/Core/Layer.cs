@@ -36,7 +36,7 @@ namespace Pixeye.Actors
     public int ID => id;
 
     internal GameObject gameObject;
-    internal Pool pool;
+    public Pool Pool;
 
     internal int id;
     internal bool isReleasing = true;
@@ -107,6 +107,10 @@ namespace Pixeye.Actors
       LayerKernel.LayersInUse.Add(this);
     }
 
+    public Y Get<Y>()
+    {
+      return (Y) objects[typeof(Y).GetHashCode()];
+    }
 
     public Buffer<Y> GetBuffer<Y>() where Y : struct
     {

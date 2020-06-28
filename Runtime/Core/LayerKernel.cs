@@ -201,28 +201,7 @@ namespace Pixeye.Actors
       UnmanagedMemory.Cleanup();
     }
 
-    internal static string NameFromIndex(int BuildIndex)
-    {
-      var path  = SceneUtility.GetScenePathByBuildIndex(BuildIndex);
-      var slash = path.LastIndexOf('/');
-      var name  = path.Substring(slash + 1);
-      var dot   = name.LastIndexOf('.');
-      return name.Substring(0, dot);
-    }
-
-    internal static int SceneIndexFromName(string sceneName)
-    {
-      for (var i = 0; i < SceneManager.sceneCountInBuildSettings; i++)
-      {
-        var testedScreen = NameFromIndex(i);
-        if (testedScreen == sceneName)
-          return i;
-      }
-
-      return -1;
-    }
-
-    public void Tick(float dt)
+        public void Tick(float dt)
     {
       HandleLoadingProgress();
     }
