@@ -41,11 +41,12 @@ namespace Pixeye.Actors
         {
             var name = System.IO.Path.GetFileNameWithoutExtension(sceneName);
             var state = CheckSceneState(name);
-            if (state == State.InvalidSceneName || state != State.NotAdded) return;
-
-            var layerIndex = GetLayerIndex(name);
-            LayerKernel.Initialized[layerIndex] = false;
-            LayerKernel.LoadJobs.Add(SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive));
+            if (state == State.NotAdded)
+            {
+                var layerIndex = GetLayerIndex(name);
+                LayerKernel.Initialized[layerIndex] = false;
+                LayerKernel.LoadJobs.Add(SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive));
+            }
         }
 
         public static void Remove(int buildIndex)
@@ -59,8 +60,7 @@ namespace Pixeye.Actors
         {
             var name = System.IO.Path.GetFileNameWithoutExtension(sceneName);
             var state = CheckSceneState(name);
-            if (state == State.InvalidSceneName || state != State.IsLoaded) return;
-            RemoveOp(name);
+            if (state == State.IsLoaded) { RemoveOp(name); }
         }
 
         static void RemoveOp(string sceneName)
