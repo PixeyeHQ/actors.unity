@@ -20,8 +20,9 @@ namespace Pixeye.Actors
     internal int _entity;
 #endif
 
-    [FoldoutGroup("Main")] public bool isPooled;
- 
+    [Tooltip("This is used to link pools with prefabs. Leave empty in case you don't use this actor with a pools.")]
+    [FoldoutGroup("Main")] public string prefabReferenceName;
+
     protected sealed override void Start()
     {
     }
@@ -36,7 +37,7 @@ namespace Pixeye.Actors
       Layer = layer;
 
       if (!entity.exist)
-        entity = layer.Entity.CreateForActor(this, (ScriptableBuild) null, isPooled);
+        entity = layer.Entity.CreateForActor(this, (ScriptableBuild) null, prefabReferenceName != string.Empty);
 #if UNITY_EDITOR
       _entity = entity.id;
 #endif
@@ -52,6 +53,12 @@ namespace Pixeye.Actors
       // then we know that the monocache was already activated.
 
       if (Layer != null) return;
+
+      if (prefabReferenceName != string.Empty)
+      { 
+        layer.Pool[Pool.Entities].RegisterAndAdd(Box.Load<GameObject>(prefabReferenceName), gameObject);
+      }
+
       BootstrapCreated(layer);
     }
 
@@ -59,7 +66,7 @@ namespace Pixeye.Actors
     {
       Layer = layer;
       if (!entity.exist)
-        entity = layer.Entity.CreateForActor(this, model, isPooled);
+        entity = layer.Entity.CreateForActor(this, model, prefabReferenceName != string.Empty);
 #if UNITY_EDITOR
       _entity = entity.id;
 #endif

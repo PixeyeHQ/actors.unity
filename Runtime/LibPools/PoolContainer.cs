@@ -16,6 +16,17 @@ namespace Pixeye.Actors
 
     Dictionary<int, int> cachedIds = new Dictionary<int, int>(500, new FastComparable());
 
+
+    internal void RegisterAndAdd(GameObject prefab, GameObject obj)
+    {
+      var               key = prefab.GetInstanceID();
+      Stack<GameObject> stack;
+      var               hasValue = cachedObjects.TryGetValue(key, out stack);
+
+      if (!hasValue) cachedObjects.Add(key, new Stack<GameObject>());
+      cachedIds.Add(obj.GetInstanceID(), key);
+    }
+
     public void RegisterObject(GameObject prefab)
     {
       var               key = prefab.GetInstanceID();
@@ -25,11 +36,13 @@ namespace Pixeye.Actors
       if (!hasValue) cachedObjects.Add(key, new Stack<GameObject>());
     }
 
+
     public void Prepopulate(GameObject prefab, GameObject obj)
     {
       var               key = prefab.GetInstanceID();
       Stack<GameObject> stack;
       var               hasValue = cachedObjects.TryGetValue(key, out stack);
+
       if (!hasValue) cachedObjects.Add(key, new Stack<GameObject>());
       else
       {
