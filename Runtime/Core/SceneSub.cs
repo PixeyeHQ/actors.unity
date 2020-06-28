@@ -41,7 +41,8 @@ namespace Pixeye.Actors
         {
             var name = System.IO.Path.GetFileNameWithoutExtension(sceneName);
             var state = CheckSceneState(name);
-            if (state != State.NotAdded) return;
+            Debug.Log(state);
+            if (state == State.InvalidScene || state != State.NotAdded) return;
 
             var layerIndex = GetLayerIndex(name);
             LayerKernel.Initialized[layerIndex] = false;
@@ -59,6 +60,7 @@ namespace Pixeye.Actors
         {
             var name = System.IO.Path.GetFileNameWithoutExtension(sceneName);
             var state = CheckSceneState(name);
+            Debug.Log(state);
             if (state == State.InvalidScene || state != State.IsLoaded) return;
             RemoveOp(name);
         }
