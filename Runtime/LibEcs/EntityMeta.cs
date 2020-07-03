@@ -89,7 +89,7 @@ namespace Pixeye.Actors
       {
         if (groups[tRemoveIndex] == type)
         {
-          for (var j = tRemoveIndex; j < groupsAmount; ++j)
+          for (var j = tRemoveIndex; j <= groupsAmount; ++j)
             groups[j] = groups[j + 1];
           groupsAmount--; 
           break;
@@ -100,7 +100,7 @@ namespace Pixeye.Actors
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool AlreadyInGroup(int groupID)
     {
-      for (var gIndex = 0; gIndex <= groupsAmount; gIndex++)
+      for (var gIndex = 0; gIndex < groupsAmount; gIndex++)
       {
         if (groups[gIndex] == groupID) return true;
       }
