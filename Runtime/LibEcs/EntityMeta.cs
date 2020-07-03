@@ -62,7 +62,7 @@ namespace Pixeye.Actors
         if (components[tRemoveIndex] == type)
         {
           Storage.All[type].toDispose.Add(entityID);
-          for (var j = tRemoveIndex; j < componentsAmount - 1; ++j)
+          for (var j = tRemoveIndex; j < componentsAmount; ++j)
             components[j] = components[j + 1];
           componentsAmount--;
           break;
@@ -89,9 +89,9 @@ namespace Pixeye.Actors
       {
         if (groups[tRemoveIndex] == type)
         {
-          for (var j = tRemoveIndex; j < groupsAmount - 1; ++j)
+          for (var j = tRemoveIndex; j < groupsAmount; ++j)
             groups[j] = groups[j + 1];
-          groupsAmount--;
+          groupsAmount--; 
           break;
         }
       }
