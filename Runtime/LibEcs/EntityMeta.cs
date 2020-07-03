@@ -57,7 +57,7 @@ namespace Pixeye.Actors
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void RemoveComponent(int type, int entityID)
     {
-      for (var tRemoveIndex = 0; tRemoveIndex < componentsAmount; tRemoveIndex++)
+      for (var tRemoveIndex = 0; tRemoveIndex <= componentsAmount; tRemoveIndex++)
       {
         if (components[tRemoveIndex] == type)
         {
@@ -85,7 +85,7 @@ namespace Pixeye.Actors
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void RemoveGroup(int type)
     {
-      for (var tRemoveIndex = 0; tRemoveIndex < componentsAmount; tRemoveIndex++)
+      for (var tRemoveIndex = 0; tRemoveIndex <= componentsAmount; tRemoveIndex++)
       {
         if (groups[tRemoveIndex] == type)
         {
@@ -100,7 +100,7 @@ namespace Pixeye.Actors
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool AlreadyInGroup(int groupID)
     {
-      for (var gIndex = 0; gIndex < groupsAmount; gIndex++)
+      for (var gIndex = 0; gIndex <= groupsAmount; gIndex++)
       {
         if (groups[gIndex] == groupID) return true;
       }

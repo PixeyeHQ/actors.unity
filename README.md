@@ -12,7 +12,7 @@
 
 ## ⭐ Why Actors ?
 The framework favors simplicity and doesn't try to "abstract away" Unity workflows bringing first-class support for combining ECS with classic Unity component system.
-- Deterministic worflow.
+- Deterministic workflow.
 - ECS with clean syntax and no codegen.
 - ECS integration with Unity gameobjects via Actor components.
 - Logic Layers.
@@ -259,7 +259,7 @@ Obj.Create(Pool.Entities,"Obj Alpaca");
 ```   
 In case you used pool you must provide the pool ID.     
 ```csharp
- var transform = Obj.Create((Pool.Entities, "Obj Alpaca");
+ var transform = Obj.Create(Pool.Entities, "Obj Alpaca");
  transform.gameObject.Release(Pool.Entities);
 ```        
 
