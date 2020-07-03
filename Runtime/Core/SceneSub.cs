@@ -71,7 +71,7 @@ namespace Pixeye.Actors
             LayerKernel.LoadJobs.Add(SceneManager.UnloadSceneAsync(sceneName));
             LayerKernel.LoadJobs.Add(Resources.UnloadUnusedAssets());
             loadedScenes.Remove(sceneName);
-            freeIndexes.Push(layerIndex);
+            if (layerIndex >= SceneManager.sceneCountInBuildSettings) { freeIndexes.Push(layerIndex); }
         }
 
         internal static int GetLayerIndex(string sceneName)
