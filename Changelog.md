@@ -1,6 +1,5 @@
 ## Changelog 
 ### Actors-2020-06-04
-⭐ **Changed** 
 🛠️ **Fixed** 
 * [🐞 Not adding buildIndex scenes to freeIndexes](https://github.com/PixeyeHQ/actors.unity/issues/58)
 * [🐞 Entities don't manage groups and components correctly](https://github.com/PixeyeHQ/actors.unity/issues/59)
