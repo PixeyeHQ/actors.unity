@@ -85,11 +85,11 @@ namespace Pixeye.Actors
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void RemoveGroup(int type)
     {
-      for (var tRemoveIndex = 0; tRemoveIndex <= componentsAmount; tRemoveIndex++)
+      for (var tRemoveIndex = 0; tRemoveIndex <= groupsAmount; tRemoveIndex++)
       {
         if (groups[tRemoveIndex] == type)
         {
-          for (var j = tRemoveIndex; j <= groupsAmount; ++j)
+          for (var j = tRemoveIndex; j < groupsAmount; ++j)
             groups[j] = groups[j + 1];
           groupsAmount--; 
           break;
