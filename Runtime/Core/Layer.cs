@@ -117,6 +117,14 @@ namespace Pixeye.Actors
       return Buffer<Y>.layers[id];
     }
 
+    public Y Add<Y>() where Y : new()
+    {
+      var obj = new Y();
+      if (obj is IRequireActorsLayer member)
+        member.Bootstrap(this);
+      objects.Add(typeof(Y).GetHashCode(), obj);
+      return obj;
+    }
 
     #region SIGNALS
 
