@@ -37,8 +37,8 @@ namespace Pixeye.Actors
     internal Layer layer;
 
 #if ACTORS_EVENTS_MANUAL
-    public ents added;
-    public ents removed;
+    public ents added = new ents();
+    public ents removed = new ents();
 
     internal bool hasEventAdd;
     internal bool hasEventRemove;
@@ -89,7 +89,7 @@ namespace Pixeye.Actors
       if ((op & Op.Add) == Op.Add)
       {
         if (added == null)
-          added = new ents(Framework.Settings.SizeEntities);
+          added = new ents(LayerKernel.Settings.SizeEntities);
 
         hasEventAdd = true;
       }
@@ -97,7 +97,7 @@ namespace Pixeye.Actors
       if ((op & Op.Remove) == Op.Remove)
       {
         if (removed == null)
-          removed = new ents(Framework.Settings.SizeEntities);
+          removed = new ents(LayerKernel.Settings.SizeEntities);
 
         hasEventRemove = true;
       }
