@@ -41,11 +41,11 @@ namespace Pixeye.Actors
         if (!myFieldInfo.FieldType.IsSubclassOf(groupType)) continue;
 
 #if ACTORS_EVENTS_MANUAL
-          // in case we are looking at the group of the derived processor we want to check it's events
-          if (inner == null)
-          {
-            groupEv = Attribute.GetCustomAttribute(myFieldInfo, typeof(EventsAttribute)) as EventsAttribute;
-          }
+        // in case we are looking at the group of the derived processor we want to check it's events
+        // if (inner == null)
+        // {
+        groupEv = Attribute.GetCustomAttribute(myFieldInfo, typeof(EventsAttribute)) as EventsAttribute;
+        //}
 #endif
 
         var groupByAttribute = Attribute.GetCustomAttribute(myFieldInfo, typeof(GroupByAttribute)) as GroupByAttribute;
@@ -96,10 +96,10 @@ namespace Pixeye.Actors
 
 
 #if ACTORS_EVENTS_MANUAL
-          if (groupEv != null)
-          {
-            group.SetSelf(groupEv.op, b as Processor);
-          }
+        if (groupEv != null)
+        {
+          group.SetSelf(groupEv.op, obj as Processor);
+        }
 #endif
       }
     }
