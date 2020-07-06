@@ -1,4 +1,13 @@
 ## Changelog 
+### Actors-2020-06-05
+⭐ **Changed** 
+* [📘 Add Layer.Add`<T>`](https://github.com/PixeyeHQ/actors.unity/issues/61)
+
+🛠️ **Fixed** 
+* [🐞 Entities don't manage groups correctly](https://github.com/PixeyeHQ/actors.unity/issues/60)
+* [🐞 ACTORS_EVENTS_MANUAL doesn't work correctly](https://github.com/PixeyeHQ/actors.unity/issues/62)
+ 
+
 ### Actors-2020-06-04
 🛠️ **Fixed** 
 * [🐞 Not adding buildIndex scenes to freeIndexes](https://github.com/PixeyeHQ/actors.unity/issues/58)
