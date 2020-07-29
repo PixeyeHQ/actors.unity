@@ -644,7 +644,7 @@ e.MoveTo<LayerField>();
 ```
  
 ### 📘 ECS Events
-You can perfrom actions when entities are added or removed from the groups.  
+You can perform actions when entities are added or removed from the groups.  
 **💬 How to use ecs events?**   
 You need to use the HandleEcsEvents method and iterate through added/removed stack of the group.
 ```csharp
