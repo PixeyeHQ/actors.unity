@@ -28,6 +28,10 @@ namespace Pixeye.Actors
     {
     }
 
+    protected sealed override void OnEnable()
+    {
+    }
+
     //===============================//
     // Launch methods
     //===============================//
