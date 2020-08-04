@@ -182,7 +182,12 @@ namespace Pixeye.Actors
     }
 
     #region Services
-
+    public static void Add(object obj)
+    {
+      LayerKernel.LayerCurrentInit = InstanceInternal.self;
+      InstanceInternal.self.objects.Add(obj.GetType().GetHashCode(), obj);
+    }
+    
     public static Y Add<Y>() where Y : new()
     {
       LayerKernel.LayerCurrentInit = InstanceInternal.self;
