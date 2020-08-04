@@ -142,13 +142,13 @@ namespace Pixeye.Actors
         throw new Exception($"Couldn't find object typeof {typeof(T)}");
 #endif
 
-      var len = (start + end - start - 1) * times;
+      var len = (start + end - start) * times;
 
       // Return new array.
       var res = new T[len];
       for (var i = 0; i < len; i++)
       {
-        res[i] = source[(len - i) / times + start];
+        res[i] = source[(len - i - 1) / times + start];
       }
 
       return res;
