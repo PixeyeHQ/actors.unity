@@ -20,6 +20,11 @@ namespace Pixeye.Actors
       source = new T[size];
     }
     
+    public int Length
+    {
+      get => this.length;
+    }
+    
     public void Add(T val)
     {
       if (length == source.Length)
