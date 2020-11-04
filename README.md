@@ -857,6 +857,7 @@ This is a list of known projects that uses Actors by far. If you want to add a p
 #### Snake Demo | [Github link](https://github.com/PixeyeHQ/actors.unity.snake)
 #### Rocket Science Snake Demo | [Github link](https://github.com/Gavolot/Actors3RocketScienceSnakeGame)
 #### Actors Benchmark | [Github link](https://github.com/PixeyeHQ/actors.unity.benchmark) 
+#### 2D Roguelike Actors | [Github link](https://github.com/Allexeee/2D-Roguelike-Actors) 
 
 ## 📖 About <a name="About"></a> 
 ### 💬 How to help
