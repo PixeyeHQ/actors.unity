@@ -164,10 +164,9 @@ namespace Pixeye.Actors
                   eMeta->AddGroup(group.id);
                 }
               }
-
-              eMeta->isDirty = false;
             }
-
+            // Pixeye: Even if no components were added on initilization clean entity dirty flag. Fixes #78 
+            eMeta->isDirty = false;
             operation.entity.RenameGameobject();
           }
             break;
