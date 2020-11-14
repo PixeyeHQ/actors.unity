@@ -183,17 +183,31 @@ namespace Pixeye.Actors
             for (var l = 0; l < groups.length; l++)
             {
               var group = groups.Elements[l];
-
-              if (group.composition.Check(eMeta, ref eManaged))
+              
+              var inGroup = eMeta->AlreadyInGroup(group.id);
+              var canBeAdded = group.composition.Check(eMeta, ref eManaged);
+              
+              if (inGroup == false)
               {
+                if (!canBeAdded) continue;
                 group.Insert(operation.entity);
                 eMeta->AddGroup(group.id);
               }
-              else
+              else if (!canBeAdded)
               {
-                if (group.TryRemove(entityID))
-                  eMeta->RemoveGroup(group.id);
+                group.RemoveFast(entityID);
+                eMeta->RemoveGroup(group.id);
               }
+//              if (group.composition.Check(eMeta, ref eManaged))
+//              {
+//                group.Insert(operation.entity);
+//                eMeta->AddGroup(group.id);
+//              }
+//              else
+//              {
+//                if (group.TryRemove(entityID))
+//                  eMeta->RemoveGroup(group.id);
+//              }
             }
 
             operation.entity.RenameGameobject();
