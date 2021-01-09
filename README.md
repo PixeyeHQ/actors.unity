@@ -840,7 +840,7 @@ openupm add com.pixeye.ecs
 #### Manual Installation 
 - Download latest package from the [Release](https://github.com/PixeyeHQ/actors.unity/releases) section
 - Import ```actors.unitypackage``` to your Unity Project
-- Optionally import ```actors-template.unitypackage``` from the Install folder of Actors
+
 #### How To Update
 <details> <summary>
 Press Tools->Actors->Update Actors to get a new update.
