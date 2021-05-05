@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -20,7 +21,7 @@ namespace Pixeye.Actors
       Remove,
       Kill,
       Empty,
-      Activate
+      Activate 
     }
 
     internal int operationsLength;
@@ -134,16 +135,36 @@ namespace Pixeye.Actors
       }
     }
 
+    
+    List<ent> ents_to_release = new List<ent>();
+
+    internal void ClearEnts()
+    {
+      foreach (var e in ents_to_release)
+      {
+        ent.Released.Add(e);
+      }
+
+      ents_to_release.Clear();
+    }
+    
     internal void Execute()
     {
+      int amount = 0;
       for (var i = 0; i < operationsLength; i++)
       {
+        
         ref var operation = ref operations[i];
+     
+       
         var     entityID  = operation.entity.id;
         var     eMeta     = Entities.Get<EntityMeta>(entityID); // POINTER
         ref var eManaged  = ref EntitiesManaged[entityID];
+
+     
         switch (operation.action)
         {
+        
           case Action.Activate:
           {
             for (int j = 0; j < eMeta->componentsAmount; j++)
@@ -273,8 +294,10 @@ namespace Pixeye.Actors
 
             eManaged.childs.length = 0;
 
+ 
             if (eManaged.transform != null)
             {
+             
               eManaged.transform.gameObject.Release(eManaged.isPooled ? Pool.Entities : 0);
             }
 
@@ -287,7 +310,9 @@ namespace Pixeye.Actors
             if (operation.entity.age == int.MaxValue)
               operation.entity.age = 0;
 
-            ent.Released.Add(operation.entity);
+            ents_to_release.Add(operation.entity);
+           
+         
           }
             break;
           case Action.Remove:
@@ -355,7 +380,8 @@ namespace Pixeye.Actors
             if (operation.entity.age == int.MaxValue)
               operation.entity.age = 0;
 
-            ent.Released.Add(operation.entity);
+          
+            ents_to_release.Add(operation.entity);
           }
             break;
         }
@@ -364,6 +390,8 @@ namespace Pixeye.Actors
 
       if (operationsLength > 0)
       {
+
+        
         operationsLength = 0;
 
         for (var i = 0; i < processors.Count; i++)
