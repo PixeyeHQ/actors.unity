@@ -186,8 +186,6 @@ namespace Pixeye.Actors
         ticksProc[i].Tick(delta);
         layer.processorEcs.Execute();
       }
-
-      layer.processorEcs.ClearEnts();
     }
 
     public void FixedUpdate()
