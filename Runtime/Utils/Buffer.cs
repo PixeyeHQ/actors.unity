@@ -27,6 +27,7 @@ namespace Pixeye.Actors
     int queueIndex;
 
     public ref T this[int index] => ref elements[pointers[index]];
+    public ref T GetByPointer(int pointer) => ref elements[pointer];
 
     public Buffer(int size)
     {

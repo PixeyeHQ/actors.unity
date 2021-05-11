@@ -35,6 +35,11 @@ namespace Pixeye.Actors
       get => ref ProcessorEcs.EntitiesManaged[id].transform;
     }
 
+    public void SetTransform(Transform tr)
+    {
+      ProcessorEcs.EntitiesManaged[id].transform = tr;
+    }
+
     public Layer layer
     {
       [MethodImpl(MethodImplOptions.AggressiveInlining)]

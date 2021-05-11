@@ -1,7 +1,3 @@
-<p align="center">
-    <img src="http://pixeye.games/images/logo_actors-1024.png" width="512" height="512" alt="Actors">
-</p>
- 
 [![Twitter Follow](https://img.shields.io/twitter/follow/PixeyeHQ?color=blue&label=Follow%20on%20Twitter&logo=%20&logoColor=%20&style=flat-square)](https://twitter.com/PixeyeHQ)
 [![Discord](https://img.shields.io/discord/320945300892286996.svg?label=Discord)](http://discord.pixeye.games)
 [![license](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](https://github.com/dimmpixeye/Actors-Unity3d-Framework/blob/master/LICENSE)
@@ -840,7 +836,7 @@ openupm add com.pixeye.ecs
 #### Manual Installation 
 - Download latest package from the [Release](https://github.com/PixeyeHQ/actors.unity/releases) section
 - Import ```actors.unitypackage``` to your Unity Project
-- Optionally import ```actors-template.unitypackage``` from the Install folder of Actors
+
 #### How To Update
 <details> <summary>
 Press Tools->Actors->Update Actors to get a new update.
@@ -857,6 +853,7 @@ This is a list of known projects that uses Actors by far. If you want to add a p
 #### Snake Demo | [Github link](https://github.com/PixeyeHQ/actors.unity.snake)
 #### Rocket Science Snake Demo | [Github link](https://github.com/Gavolot/Actors3RocketScienceSnakeGame)
 #### Actors Benchmark | [Github link](https://github.com/PixeyeHQ/actors.unity.benchmark) 
+#### 2D Roguelike Actors | [Github link](https://github.com/Allexeee/2D-Roguelike-Actors) 
 
 ## 📖 About <a name="About"></a> 
 ### 💬 How to help
