@@ -25,11 +25,14 @@ namespace Pixeye.Actors
       
       Layer = LayerKernel.Layers[SceneSub.GetLayerIndex(gameObject.scene.name)];
       Setup();
+      HandleEnable();
     }
 
-    void OnEnable()
+    protected virtual void OnEnable()
     {
       if (!LayerKernel.InstanceInternal || !LayerKernel.Initialized[SceneSub.GetLayerIndex(gameObject.scene.name)]) return;
+      if (Layer == null) return;
+
       HandleEnable();
     }
 

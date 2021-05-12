@@ -11,39 +11,39 @@ namespace Pixeye.Actors
 {
   public sealed class Layer
   {
-    internal static int NEXT_FREE_ID;
+    internal static int                     NEXT_FREE_ID;
     internal static Dictionary<string, int> USED_IDS = new Dictionary<string, int>(StringComparer.Ordinal);
-    internal static Layer ActiveLayer; // current main scene;
+    internal static Layer                   ActiveLayer; // current main scene;
 
 
     internal ProcessorCoroutine processorCoroutine;
     internal ProcessorCoroutine processorCoroutineUnscaled;
 
     internal ProcessorSignals processorSignals;
-    internal ProcessorEcs processorEcs;
+    internal ProcessorEcs     processorEcs;
 
     public Action Closed = delegate { };
 
-    public Scene Scene => gameObject.scene;
+    public Scene           Scene => gameObject.scene;
     public ProcessorUpdate Engine;
-    public ImplObj Obj;
-    public Time Time;
-    public ImplActor Actor;
-    public ImplEntity Entity;
-    public ImplEcs Ecs;
-    public ImplObserver Observer;
+    public ImplObj         Obj;
+    public Time            Time;
+    public ImplActor       Actor;
+    public ImplEntity      Entity;
+    public ImplEcs         Ecs;
+    public ImplObserver    Observer;
 
     public int ID => id;
 
     internal GameObject gameObject;
-    public Pool Pool;
+    public   Pool       Pool;
 
-    internal int id;
+    internal int  id;
     internal bool isReleasing = true;
 
-    internal Action OnLayerDestroy;
-    internal Dictionary<int, object> objects = new Dictionary<int, object>();
-    internal Dictionary<int, Transform> cachemap = new Dictionary<int, Transform>();
+    internal Action                     OnLayerDestroy;
+    internal Dictionary<int, object>    objects     = new Dictionary<int, object>();
+    internal Dictionary<int, Transform> cachemap    = new Dictionary<int, Transform>();
     internal Dictionary<int, Transform> cachemapTag = new Dictionary<int, Transform>();
 
     /// performs a search of the gameobject by name on all scenes, cache it and
@@ -115,6 +115,11 @@ namespace Pixeye.Actors
     public Buffer<Y> GetBuffer<Y>() where Y : struct
     {
       return Buffer<Y>.layers[id];
+    }
+
+    public void Add(object obj)
+    {
+      objects.Add(obj.GetType().GetHashCode(), obj);
     }
 
     public Y Add<Y>() where Y : new()

@@ -49,6 +49,26 @@ namespace Pixeye.Actors
       }
     }
 
+
+    /// Use when an entity is an observer and you want to release this entity.
+    public static void ReleaseObserver(this ent entity)
+    {
+      if (entity.exist)
+      {
+        entity.ComponentObserver().length = 0;
+        entity.Release();
+      }
+    }
+
+    /// Use when an entity contains an observer and you want to stop the observer without releasing entity.
+    public static void StopObserver(this ent entity)
+    {
+      if (entity.exist)
+      {
+        entity.ComponentObserver().length = 0;
+      }
+    }
+
     public static ent GetEntity(this GameObject obj)
     {
       var actor = obj.GetComponent<Actor>();

@@ -15,13 +15,27 @@ namespace Pixeye.Actors
   {
     internal const int LAYERS_AMOUNT_TOTAL = 128;
 
-     
+
     public static bool[] Initialized = new bool[LAYERS_AMOUNT_TOTAL];
     public static bool ApplicationIsQuitting;
     public static bool IsQuittingOrChangingScene() => ApplicationIsQuitting;
 
     public static List<AsyncOperation> LoadJobs = new List<AsyncOperation>();
     public static Action<float> OnSceneLoading = delegate { };
+
+    public static int GetEntitiesCount
+    {
+      get
+      {
+        var amount = 0;
+        foreach (var layer in LayersInUse)
+        {
+          amount += layer.processorEcs.entities.length;
+        }
+
+        return amount;
+      }
+    }
 
     public static int GetTicksCount
     {
@@ -40,7 +54,7 @@ namespace Pixeye.Actors
     public static SettingsActors Settings = new SettingsActors();
 
     internal static Layer LayerCurrentInit; // only for setup stuff to provide layer to the processors constructors.
- 
+
     internal const string KernelSceneName = "Actors Framework";
     internal static Layer[] Layers = new Layer[128];
     internal static readonly List<Layer> LayersInUse = new List<Layer>();
@@ -201,7 +215,7 @@ namespace Pixeye.Actors
       UnmanagedMemory.Cleanup();
     }
 
-        public void Tick(float dt)
+    public void Tick(float dt)
     {
       HandleLoadingProgress();
     }

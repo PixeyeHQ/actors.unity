@@ -112,6 +112,8 @@ namespace Pixeye.Actors
           managed.signature[ii] = 0;
         }
 
+        managed.childs.length = 0;
+        
         meta->isAlive          = false;
         meta->componentsAmount = 0;
         meta->groupsAmount     = 0;
