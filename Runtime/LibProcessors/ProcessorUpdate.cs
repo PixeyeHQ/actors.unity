@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using Unity.IL2CPP.CompilerServices;
 
+//[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("DebuggerTest")]
 namespace Pixeye.Actors
 {
   [Il2CppSetOption(Option.NullChecks, false)]

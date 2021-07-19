@@ -43,11 +43,13 @@ namespace Pixeye.Actors
       Bootstrap();      // Setup layer.
       Setup();          // Entry point for developers.
       ActivateActors(); // Setup sctors.
+      
     }
 
     void Start()
     {
       self.isReleasing = false;
+      PostSetup();
     }
 
     void ActivateActors()
@@ -107,6 +109,8 @@ namespace Pixeye.Actors
 
     /// Scene entry point, load your custom stuff from here.
     protected abstract void Setup();
+
+    protected virtual void PostSetup(){}
 
     /// Clean *your* custom scene stuff from here.
     protected virtual void OnLayerDestroy()

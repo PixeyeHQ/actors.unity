@@ -1,15 +1,17 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Pixeye.Actors.Debugger;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Object = System.Object;
 
 namespace Pixeye.Actors
 {
-  public sealed class Layer
+  public sealed class Layer : IEnumerable
   {
     internal static int                     NEXT_FREE_ID;
     internal static Dictionary<string, int> USED_IDS = new Dictionary<string, int>(StringComparer.Ordinal);
@@ -256,6 +258,55 @@ namespace Pixeye.Actors
       cachemapTag.Clear();
       objects.Clear();
     }
+
+    #region ENUMERATOR
+
+    // public Dictionary<int, object>.Enumerator GetEnumerator()
+    // {
+    //   return objects.GetEnumerator();
+    // }
+    
+    public Enumerator GetEnumerator()
+    {
+      return new Enumerator(objects);
+    }
+    
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+      return GetEnumerator();
+    }
+    
+    public struct Enumerator: IEnumerator
+    {
+      private Dictionary<int, object>.Enumerator _enumerator;
+      private object _current;
+      
+      public object Current => _current;
+      
+      internal Enumerator(Dictionary<int, object> objects)
+      {
+        _current    = default;
+        _enumerator = objects.GetEnumerator();
+      }
+      public bool MoveNext()
+      {
+        if (!_enumerator.MoveNext()) return false;
+        _current = _enumerator.Current.Value;
+        return true;
+      }
+    
+      public void Reset()
+      {
+        _current = default;
+      }
+    
+      public void Dispose()
+      {
+      }
+    }
+
+    #endregion
+    
   }
 
   public enum InitMode

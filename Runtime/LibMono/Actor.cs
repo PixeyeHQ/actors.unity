@@ -24,7 +24,7 @@ namespace Pixeye.Actors
     [Tooltip("This is used to link pools with prefabs. Leave empty in case you don't use this actor with a pools.")]
     [FoldoutGroup("Main")] public string prefabReferenceName = String.Empty;
 
-    protected sealed override void Start()
+    protected override void Start()
     {
     }
 

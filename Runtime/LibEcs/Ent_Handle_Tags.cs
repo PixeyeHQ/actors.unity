@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using Pixeye.Actors.Debugger;
 
 namespace Pixeye.Actors
 {
@@ -14,6 +15,21 @@ namespace Pixeye.Actors
         throw new ArgumentException();
       }
     }
+    
+    /// for a visual debugger. Doesn't affect the logic of the framework
+    [Conditional("ACTORS_DEBUG")]
+    internal static void SendDataToVisualDebugger(Debugger.TagActions action, int tagID, ent entity)
+    {
+      TagOperation op;
+      op.Entity = entity;
+      op.Action = action;
+      op.Arg    = tagID;
+      
+      var instance = Debugger.ActorsDebugger.Instance;
+      if(instance != null)
+        instance.ProcessorDebug?.ExecuteTagDebug(ref op, entity.layer.ID - 1);
+    }
+    
 
     /// Add one tag from the subset.
     public void Set(int tagID)
@@ -32,11 +48,15 @@ namespace Pixeye.Actors
             buffer.size[index] += 1;
           }
 
+          SendDataToVisualDebugger(TagActions.Add, tagID, this);
+          
           return;
         }
       }
 
       DebugCheckLimits(len, this);
+      
+      SendDataToVisualDebugger(TagActions.Add, tagID, this);
 
       buffer.SetElement(buffer.length, tagID);
 
@@ -67,6 +87,8 @@ namespace Pixeye.Actors
             {
               buffer.size[index] += 1;
             }
+            
+            SendDataToVisualDebugger(TagActions.Add, tID, this);
 
             allowToAdd = false;
             break;
@@ -77,6 +99,8 @@ namespace Pixeye.Actors
 
         DebugCheckLimits(buffer.length, this);
         buffer.SetElement(buffer.length, tID);
+        
+        SendDataToVisualDebugger(TagActions.Add, tID, this);
 
         if (!isDirty)
         {
@@ -102,6 +126,8 @@ namespace Pixeye.Actors
             HandleChanges(tagID);
           }
 
+          SendDataToVisualDebugger(TagActions.Remove, tagID, this);
+          
           return;
         }
       }
@@ -126,6 +152,8 @@ namespace Pixeye.Actors
               buffer.RemoveAt(index);
               HandleChanges(tID);
             }
+            
+            SendDataToVisualDebugger(TagActions.Remove, tID, this);
           }
         }
       }
@@ -146,6 +174,7 @@ namespace Pixeye.Actors
           buffer.size[index] = 0;
           buffer.RemoveAt(index);
           HandleChanges(tID);
+          SendDataToVisualDebugger(TagActions.RemoveAll, tID, this);
           return;
         }
       }
@@ -168,6 +197,7 @@ namespace Pixeye.Actors
             buffer.size[index] = 0;
             buffer.RemoveAt(index);
             HandleChanges(tID);
+            SendDataToVisualDebugger(TagActions.RemoveAll, tID, this);
             break;
           }
         }
@@ -188,6 +218,8 @@ namespace Pixeye.Actors
         buffer.length--;
         HandleChanges(tID);
       }
+      
+      SendDataToVisualDebugger(TagActions.ClearTags, -1, this);
     }
 
     internal void HandleChanges(int tagID)

@@ -40,6 +40,7 @@ namespace Pixeye.Actors
       }
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Has(in ent entity)
     {
       for (var i = 0; i < length; i++)
@@ -51,8 +52,22 @@ namespace Pixeye.Actors
 
       return false;
     }
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public int IndexOf(in ent entity)
+    {
+      for (var i = 0; i < length; i++)
+      {
+        ref var val = ref source[i];
+        if (entity.id == val.id && entity.age == val.age)
+          return i;
+      }
+
+      return -1;
+    }
 
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Add(ent entity)
     {
       if (length >= source.Length)
@@ -62,6 +77,7 @@ namespace Pixeye.Actors
     }
 
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Add(params ent[] entity)
     {
       foreach (var e in entity)
@@ -74,6 +90,7 @@ namespace Pixeye.Actors
     }
 
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Add(ents entities)
     {
       for (int i = 0; i < entities.length; i++)
@@ -83,6 +100,7 @@ namespace Pixeye.Actors
     }
 
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Remove(in ent entity)
     {
       var index = -1;
@@ -104,9 +122,22 @@ namespace Pixeye.Actors
     }
 
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void RemoveAt(int index)
     {
       Array.Copy(source, index + 1, source, index, --length - index);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Clear()
+    {
+      length = 0;
+    }
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void ClearAt(int index)
+    {
+      length = index + 1;
     }
 
     public override string ToString()
@@ -185,6 +216,8 @@ namespace Pixeye.Actors
     public int[] source;
     public int length;
 
+    private IEqualityComparer<int> _comparer;
+
     public int this[int index]
     {
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -195,10 +228,12 @@ namespace Pixeye.Actors
     {
       source = new int[cap > 0 ? cap : 5];
       length = 0;
+      _comparer = EqualityComparer<int>.Default;
     }
 
     public void Add(int id)
     {
+      
       if (length >= source.Length)
         Array.Resize(ref source, length << 1);
 
@@ -221,6 +256,12 @@ namespace Pixeye.Actors
       //source = new int[source.Length];
       length = 0;
     }
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void ClearAt(int index)
+    {
+      length = index + 1;
+    }
 
     public bool Remove(int id)
     {
@@ -238,6 +279,20 @@ namespace Pixeye.Actors
       if (removed && index < --length)
         Array.Copy(source, index + 1, source, index, length - index);
       return removed;
+    }
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public int IndexOf(int item)
+    {
+      for (int i = length - 1; i >= 0; i--)
+      {
+        if (_comparer.Equals(source[i], item))
+        {
+          return i;
+        }
+      }
+
+      return -1;
     }
 
 

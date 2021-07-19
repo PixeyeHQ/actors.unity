@@ -86,7 +86,10 @@ namespace Pixeye.Actors
           .AndEach(composition.includedTags).And(17).AndEach(composition.excludedTags).And(31)
           .AndEach(excludeCompFilter);
 
-        var group = SetupGroup(myFieldInfo.FieldType, myFieldInfo.GetValue(obj), composition, layer);
+        var setCapacityAttribute = Attribute.GetCustomAttribute(myFieldInfo, typeof(SetGroupCapacityAttribute)) as SetGroupCapacityAttribute;
+        var capacity = setCapacityAttribute?.Capacity ?? LayerKernel.Settings.SizeEntities;
+        
+        var group = SetupGroup(myFieldInfo.FieldType, myFieldInfo.GetValue(obj), composition, capacity, layer);
         myFieldInfo.SetValue(obj, group);
 
         if (bindAttribute != null)
@@ -104,7 +107,7 @@ namespace Pixeye.Actors
       }
     }
 
-    GroupCore SetupGroup(Type groupType, object fieldObj, Composition composition, Layer layer)
+    GroupCore SetupGroup(Type groupType, object fieldObj, Composition composition, int capacity, Layer layer)
     {
       foreach (var groupNext in Groups)
       {
@@ -113,7 +116,7 @@ namespace Pixeye.Actors
           if (!groupNext.initialized)
           {
             groups.Add(groupNext);
-            groupNext.Initialize(composition, layer);
+            groupNext.Initialize(composition, capacity, layer);
             groupNext.initialized = true;
           }
 
@@ -134,14 +137,14 @@ namespace Pixeye.Actors
           var gr = fieldObj as GroupCore;
           gr.id = GroupNextID++;
 
-          gr.Initialize(composition, layer);
+          gr.Initialize(composition, capacity, layer);
           return gr;
         }
         else
         {
           var gr = Activator.CreateInstance(groupType, true) as GroupCore;
 
-          gr.Initialize(composition, layer);
+          gr.Initialize(composition, capacity, layer);
           gr.id = GroupNextID++;
           return gr;
         }

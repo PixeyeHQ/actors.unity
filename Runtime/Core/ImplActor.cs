@@ -25,10 +25,10 @@ namespace Pixeye.Actors
     {
       var transform = pooled ? layer.Obj.Create(Pool.Entities, prefabID, position) : layer.Obj.Create(prefabID, position);
       var actor     = transform.GetActor();
-    //  actor.isPooled = pooled;
+      if(pooled)
+        actor.prefabReferenceName = prefabID;
 
       actor.BootstrapCreated(layer);
-      actor.entity.managed.isPooled = pooled;
       return actor;
     }
 
@@ -40,8 +40,10 @@ namespace Pixeye.Actors
           ? layer.Obj.Create(Pool.Entities, prefabID, parent, position)
           : layer.Obj.Create(prefabID, parent, position);
       var actor = transform.GetActor();
+      if(pooled)
+        actor.prefabReferenceName = prefabID;
+     // actor.isPooled = pooled;
       actor.BootstrapCreated(layer);
-      actor.entity.managed.isPooled = pooled;
       return actor;
     }
 
@@ -50,9 +52,10 @@ namespace Pixeye.Actors
     {
       var transform = pooled ? layer.Obj.Create(Pool.Entities, prefabID, position) : layer.Obj.Create(prefabID, position);
       var actor     = transform.GetActor();
+      if(pooled)
+        actor.prefabReferenceName = prefabID;
 
       actor.BootstrapCreated(layer, model);
-      actor.entity.managed.isPooled = pooled;
       return actor;
     }
 
@@ -64,9 +67,10 @@ namespace Pixeye.Actors
         ? layer.Obj.Create(Pool.Entities, prefabID, parent, position)
         : layer.Obj.Create(prefabID, parent, position);
       var actor = transform.GetActor();
+      if(pooled)
+        actor.prefabReferenceName = prefabID;
 
       actor.BootstrapCreated(layer, model);
-      actor.entity.managed.isPooled = pooled;
       return actor;
     }
 
@@ -79,9 +83,10 @@ namespace Pixeye.Actors
     {
       var transform = pooled ? layer.Obj.Create(Pool.Entities, prefab, position) : layer.Obj.Create(prefab, position);
       var actor     = transform.GetActor();
- 
+      if(pooled)
+        actor.prefabReferenceName = prefab.name;
+
       actor.BootstrapCreated(layer);
-      actor.entity.managed.isPooled = pooled;
       return actor;
     }
 
@@ -91,9 +96,10 @@ namespace Pixeye.Actors
       var transform =
         pooled ? layer.Obj.Create(Pool.Entities, prefab, parent, position) : layer.Obj.Create(prefab, parent, position);
       var actor = transform.GetActor();
+      if(pooled)
+        actor.prefabReferenceName = prefab.name;
 
       actor.BootstrapCreated(layer);
-      actor.entity.managed.isPooled = pooled;
       return actor;
     }
 
@@ -102,10 +108,10 @@ namespace Pixeye.Actors
     {
       var transform = pooled ? layer.Obj.Create(Pool.Entities, prefab, position) : layer.Obj.Create(prefab, position);
       var actor     = transform.GetActor();
-
+      if(pooled)
+        actor.prefabReferenceName = prefab.name;
 
       actor.BootstrapCreated(layer, model);
-      actor.entity.managed.isPooled = pooled;
       return actor;
     }
 
@@ -116,9 +122,10 @@ namespace Pixeye.Actors
       var transform =
         pooled ? layer.Obj.Create(Pool.Entities, prefab, parent, position) : layer.Obj.Create(prefab, parent, position);
       var actor = transform.GetActor();
+      if(pooled)
+        actor.prefabReferenceName = prefab.name;
 
       actor.BootstrapCreated(layer, model);
-      actor.entity.managed.isPooled = pooled;
       return actor;
     }
   }

@@ -1,4 +1,5 @@
-﻿namespace Pixeye.Actors
+﻿
+namespace Pixeye.Actors
 {
   public static class Every
   {

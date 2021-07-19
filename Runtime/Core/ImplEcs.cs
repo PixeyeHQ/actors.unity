@@ -13,22 +13,27 @@
 
     /// Get group by binding id.
     public GroupCore Group(int index) => layer.processorEcs.bindings[index];
+    
+    public void RegisterGroups(object source)
+    {
+      layer.processorEcs.Add(source);
+    }
 
     public ref T Send<T>() where T : struct
     {
       var     q = SignalsEcs<T>.Layers[layer.id];
-      ref var e = ref q.elements.Add();
+      ref var e = ref q.Add();
       e.firstReceiver = -1;
       return ref e.signal;
     }
-
+    
     public void Send<T>(in T obj) where T : struct
     {
       if (SignalsEcs<T>.Layers[layer.id] == null) return;
       var     q = SignalsEcs<T>.Layers[layer.id];
-      ref var e = ref q.elements.Add();
+      ref var e = ref q.Add();
       e.firstReceiver = -1;
-      e.signal        = obj;
+      e.signal = obj;
     }
 
     /// Updates operations for groups.

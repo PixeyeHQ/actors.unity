@@ -82,15 +82,9 @@ namespace Pixeye.Actors
   public class SignalsEcs<T>
   {
     internal static SignalsEcs<T>[] Layers = new SignalsEcs<T>[LayerKernel.LAYERS_AMOUNT_TOTAL];
-
-    internal BufferCircular<Element> elements = new BufferCircular<Element>(4);
-
-    // case: several processors gets signal.
-    // without lock we get invalid signal receive order.
-    // https://i.gyazo.com/22eb327ea969ba9ca7e608e5893d9449.png  <- without lock
-    // https://i.gyazo.com/7c293f0d558496d78cde3897b6e72751.png  <- with    lock
-    // there might be a better solution but I didn't find out yet.
-    internal bool lockSignal;
+    internal Element[] elements = new Element[8];
+    internal int length;
+    internal int head;
 
     internal static SignalsEcs<T> Get(int layerID)
     {
@@ -99,27 +93,54 @@ namespace Pixeye.Actors
       if (s == null) s = Layers[layerID] = new SignalsEcs<T>();
       else
       {
-        s.elements.length = 0;
-        s.lockSignal      = false;
+        s.length = 0;
+        s.head = 0;
       }
 
       return s;
     }
 
-    internal bool Handle(int processorID)
+    internal ref Element Add()
     {
-      if (elements.length == 0) return false;
-      if (lockSignal)
+      if (length == elements.Length)
       {
-        lockSignal = false;
-        return false;
+        Array.Resize(ref elements, length << 1);
       }
 
-      ref var element = ref elements.Peek();
+      return ref elements[length++];
+    }
+
+    private Element _default;
+    internal ref Element Dequeue()
+    {
+      if (length == 0 || head == length)
+      {
+        head = 0;
+        return ref _default;
+      }
+
+      return ref elements[head++];
+    }
+    
+    public ref Element Peek()
+    {
+      return ref elements[head];
+    }
+
+    public ref Element GetByIndex(int index)
+    {
+      return ref elements[index];
+    }
+
+    internal bool Handle(int index, int processorID)
+    {
+      if (length == 0) return false;
+
+      ref var element = ref elements[index];
+      
       if (element.firstReceiver == processorID)
       {
-        lockSignal = true;
-        elements.Dequeue();
+        Dequeue();
         return false;
       }
 
@@ -127,7 +148,7 @@ namespace Pixeye.Actors
       {
         element.firstReceiver = processorID;
       }
-
+      
       return true;
     }
 
@@ -149,11 +170,14 @@ namespace Pixeye.Actors
 
     void IReceiveEcsEvent.Receive()
     {
-      if (signalsT.Handle(processorID))
+      for (int i = signalsT.head; i < signalsT.length; i++)
       {
-        var stopSignal = false;
-        ReceiveEcs(ref signalsT.elements.Peek().signal, ref stopSignal);
-        if (stopSignal) signalsT.elements.Dequeue();
+        if (signalsT.Handle(i, processorID))
+        {
+          var stopSignal = false;
+          ReceiveEcs(ref signalsT.GetByIndex(i).signal, ref stopSignal);
+          if (stopSignal) signalsT.Dequeue();
+        }
       }
     }
 
@@ -174,18 +198,24 @@ namespace Pixeye.Actors
 
     void IReceiveEcsEvent.Receive()
     {
-      if (signalsT.Handle(processorID))
+      for (int i = signalsT.head; i < signalsT.length; i++)
       {
-        var stopSignal = false;
-        ReceiveEcs(ref signalsT.elements.Peek().signal, ref stopSignal);
-        if (stopSignal) signalsT.elements.Dequeue();
+        if (signalsT.Handle(i, processorID))
+        {
+          var stopSignal = false;
+          ReceiveEcs(ref signalsT.GetByIndex(i).signal, ref stopSignal);
+          if (stopSignal) signalsT.Dequeue();
+        }
       }
 
-      if (signalsY.Handle(processorID))
+      for (int i = signalsY.head; i < signalsY.length; i++)
       {
-        var stopSignal = false;
-        ReceiveEcs(ref signalsY.elements.Peek().signal, ref stopSignal);
-        if (stopSignal) signalsY.elements.Dequeue();
+        if (signalsY.Handle(i, processorID))
+        {
+          var stopSignal = false;
+          ReceiveEcs(ref signalsY.GetByIndex(i).signal, ref stopSignal);
+          if (stopSignal) signalsY.Dequeue();
+        }
       }
     }
 
@@ -208,25 +238,34 @@ namespace Pixeye.Actors
 
     void IReceiveEcsEvent.Receive()
     {
-      if (signalsT.Handle(processorID))
+      for (int i = signalsT.head; i < signalsT.length; i++)
       {
-        var stopSignal = false;
-        ReceiveEcs(ref signalsT.elements.Peek().signal, ref stopSignal);
-        if (stopSignal) signalsT.elements.Dequeue();
+        if (signalsT.Handle(i, processorID))
+        {
+          var stopSignal = false;
+          ReceiveEcs(ref signalsT.GetByIndex(i).signal, ref stopSignal);
+          if (stopSignal) signalsT.Dequeue();
+        }
       }
 
-      if (signalsY.Handle(processorID))
+      for (int i = signalsY.head; i < signalsY.length; i++)
       {
-        var stopSignal = false;
-        ReceiveEcs(ref signalsY.elements.Peek().signal, ref stopSignal);
-        if (stopSignal) signalsY.elements.Dequeue();
+        if (signalsY.Handle(i, processorID))
+        {
+          var stopSignal = false;
+          ReceiveEcs(ref signalsY.GetByIndex(i).signal, ref stopSignal);
+          if (stopSignal) signalsY.Dequeue();
+        }
       }
-
-      if (signalsU.Handle(processorID))
+      
+      for (int i = signalsU.head; i < signalsU.length; i++)
       {
-        var stopSignal = false;
-        ReceiveEcs(ref signalsU.elements.Peek().signal, ref stopSignal);
-        if (stopSignal) signalsU.elements.Dequeue();
+        if (signalsU.Handle(i, processorID))
+        {
+          var stopSignal = false;
+          ReceiveEcs(ref signalsU.GetByIndex(i).signal, ref stopSignal);
+          if (stopSignal) signalsU.Dequeue();
+        }
       }
     }
 
@@ -252,32 +291,44 @@ namespace Pixeye.Actors
 
     void IReceiveEcsEvent.Receive()
     {
-      if (signalsT.Handle(processorID))
+      for (int i = signalsT.head; i < signalsT.length; i++)
       {
-        var stopSignal = false;
-        ReceiveEcs(ref signalsT.elements.Peek().signal, ref stopSignal);
-        if (stopSignal) signalsT.elements.Dequeue();
+        if (signalsT.Handle(i, processorID))
+        {
+          var stopSignal = false;
+          ReceiveEcs(ref signalsT.GetByIndex(i).signal, ref stopSignal);
+          if (stopSignal) signalsT.Dequeue();
+        }
       }
 
-      if (signalsY.Handle(processorID))
+      for (int i = signalsY.head; i < signalsY.length; i++)
       {
-        var stopSignal = false;
-        ReceiveEcs(ref signalsY.elements.Peek().signal, ref stopSignal);
-        if (stopSignal) signalsY.elements.Dequeue();
+        if (signalsY.Handle(i, processorID))
+        {
+          var stopSignal = false;
+          ReceiveEcs(ref signalsY.GetByIndex(i).signal, ref stopSignal);
+          if (stopSignal) signalsY.Dequeue();
+        }
       }
-
-      if (signalsU.Handle(processorID))
+      
+      for (int i = signalsU.head; i < signalsU.length; i++)
       {
-        var stopSignal = false;
-        ReceiveEcs(ref signalsU.elements.Peek().signal, ref stopSignal);
-        if (stopSignal) signalsU.elements.Dequeue();
+        if (signalsU.Handle(i, processorID))
+        {
+          var stopSignal = false;
+          ReceiveEcs(ref signalsU.GetByIndex(i).signal, ref stopSignal);
+          if (stopSignal) signalsU.Dequeue();
+        }
       }
-
-      if (signalsI.Handle(processorID))
+      
+      for (int i = signalsI.head; i < signalsI.length; i++)
       {
-        var stopSignal = false;
-        ReceiveEcs(ref signalsI.elements.Peek().signal, ref stopSignal);
-        if (stopSignal) signalsI.elements.Dequeue();
+        if (signalsI.Handle(i, processorID))
+        {
+          var stopSignal = false;
+          ReceiveEcs(ref signalsI.GetByIndex(i).signal, ref stopSignal);
+          if (stopSignal) signalsI.Dequeue();
+        }
       }
     }
 
@@ -306,39 +357,54 @@ namespace Pixeye.Actors
 
     void IReceiveEcsEvent.Receive()
     {
-      if (signalsT.Handle(processorID))
+      for (int i = signalsT.head; i < signalsT.length; i++)
       {
-        var stopSignal = false;
-        ReceiveEcs(ref signalsT.elements.Peek().signal, ref stopSignal);
-        if (stopSignal) signalsT.elements.Dequeue();
+        if (signalsT.Handle(i, processorID))
+        {
+          var stopSignal = false;
+          ReceiveEcs(ref signalsT.GetByIndex(i).signal, ref stopSignal);
+          if (stopSignal) signalsT.Dequeue();
+        }
       }
 
-      if (signalsY.Handle(processorID))
+      for (int i = signalsY.head; i < signalsY.length; i++)
       {
-        var stopSignal = false;
-        ReceiveEcs(ref signalsY.elements.Peek().signal, ref stopSignal);
-        if (stopSignal) signalsY.elements.Dequeue();
+        if (signalsY.Handle(i, processorID))
+        {
+          var stopSignal = false;
+          ReceiveEcs(ref signalsY.GetByIndex(i).signal, ref stopSignal);
+          if (stopSignal) signalsY.Dequeue();
+        }
       }
-
-      if (signalsU.Handle(processorID))
+      
+      for (int i = signalsU.head; i < signalsU.length; i++)
       {
-        var stopSignal = false;
-        ReceiveEcs(ref signalsU.elements.Peek().signal, ref stopSignal);
-        if (stopSignal) signalsU.elements.Dequeue();
+        if (signalsU.Handle(i, processorID))
+        {
+          var stopSignal = false;
+          ReceiveEcs(ref signalsU.GetByIndex(i).signal, ref stopSignal);
+          if (stopSignal) signalsU.Dequeue();
+        }
       }
-
-      if (signalsI.Handle(processorID))
+      
+      for (int i = signalsI.head; i < signalsI.length; i++)
       {
-        var stopSignal = false;
-        ReceiveEcs(ref signalsI.elements.Peek().signal, ref stopSignal);
-        if (stopSignal) signalsI.elements.Dequeue();
+        if (signalsI.Handle(i, processorID))
+        {
+          var stopSignal = false;
+          ReceiveEcs(ref signalsI.GetByIndex(i).signal, ref stopSignal);
+          if (stopSignal) signalsI.Dequeue();
+        }
       }
-
-      if (signalsO.Handle(processorID))
+      
+      for (int i = signalsO.head; i < signalsO.length; i++)
       {
-        var stopSignal = false;
-        ReceiveEcs(ref signalsO.elements.Peek().signal, ref stopSignal);
-        if (stopSignal) signalsO.elements.Dequeue();
+        if (signalsO.Handle(i, processorID))
+        {
+          var stopSignal = false;
+          ReceiveEcs(ref signalsO.GetByIndex(i).signal, ref stopSignal);
+          if (stopSignal) signalsO.Dequeue();
+        }
       }
     }
 
@@ -370,46 +436,64 @@ namespace Pixeye.Actors
 
     void IReceiveEcsEvent.Receive()
     {
-      if (signalsT.Handle(processorID))
+      for (int i = signalsT.head; i < signalsT.length; i++)
       {
-        var stopSignal = false;
-        ReceiveEcs(ref signalsT.elements.Peek().signal, ref stopSignal);
-        if (stopSignal) signalsT.elements.Dequeue();
+        if (signalsT.Handle(i, processorID))
+        {
+          var stopSignal = false;
+          ReceiveEcs(ref signalsT.GetByIndex(i).signal, ref stopSignal);
+          if (stopSignal) signalsT.Dequeue();
+        }
       }
 
-      if (signalsY.Handle(processorID))
+      for (int i = signalsY.head; i < signalsY.length; i++)
       {
-        var stopSignal = false;
-        ReceiveEcs(ref signalsY.elements.Peek().signal, ref stopSignal);
-        if (stopSignal) signalsY.elements.Dequeue();
+        if (signalsY.Handle(i, processorID))
+        {
+          var stopSignal = false;
+          ReceiveEcs(ref signalsY.GetByIndex(i).signal, ref stopSignal);
+          if (stopSignal) signalsY.Dequeue();
+        }
       }
-
-      if (signalsU.Handle(processorID))
+      
+      for (int i = signalsU.head; i < signalsU.length; i++)
       {
-        var stopSignal = false;
-        ReceiveEcs(ref signalsU.elements.Peek().signal, ref stopSignal);
-        if (stopSignal) signalsU.elements.Dequeue();
+        if (signalsU.Handle(i, processorID))
+        {
+          var stopSignal = false;
+          ReceiveEcs(ref signalsU.GetByIndex(i).signal, ref stopSignal);
+          if (stopSignal) signalsU.Dequeue();
+        }
       }
-
-      if (signalsI.Handle(processorID))
+      
+      for (int i = signalsI.head; i < signalsI.length; i++)
       {
-        var stopSignal = false;
-        ReceiveEcs(ref signalsI.elements.Peek().signal, ref stopSignal);
-        if (stopSignal) signalsI.elements.Dequeue();
+        if (signalsI.Handle(i, processorID))
+        {
+          var stopSignal = false;
+          ReceiveEcs(ref signalsI.GetByIndex(i).signal, ref stopSignal);
+          if (stopSignal) signalsI.Dequeue();
+        }
       }
-
-      if (signalsO.Handle(processorID))
+      
+      for (int i = signalsO.head; i < signalsO.length; i++)
       {
-        var stopSignal = false;
-        ReceiveEcs(ref signalsO.elements.Peek().signal, ref stopSignal);
-        if (stopSignal) signalsO.elements.Dequeue();
+        if (signalsO.Handle(i, processorID))
+        {
+          var stopSignal = false;
+          ReceiveEcs(ref signalsO.GetByIndex(i).signal, ref stopSignal);
+          if (stopSignal) signalsO.Dequeue();
+        }
       }
-
-      if (signalsP.Handle(processorID))
+      
+      for (int i = signalsP.head; i < signalsP.length; i++)
       {
-        var stopSignal = false;
-        ReceiveEcs(ref signalsP.elements.Peek().signal, ref stopSignal);
-        if (stopSignal) signalsP.elements.Dequeue();
+        if (signalsP.Handle(i, processorID))
+        {
+          var stopSignal = false;
+          ReceiveEcs(ref signalsP.GetByIndex(i).signal, ref stopSignal);
+          if (stopSignal) signalsP.Dequeue();
+        }
       }
     }
 
@@ -444,53 +528,74 @@ namespace Pixeye.Actors
 
     void IReceiveEcsEvent.Receive()
     {
-      if (signalsT.Handle(processorID))
+      for (int i = signalsT.head; i < signalsT.length; i++)
       {
-        var stopSignal = false;
-        ReceiveEcs(ref signalsT.elements.Peek().signal, ref stopSignal);
-        if (stopSignal) signalsT.elements.Dequeue();
+        if (signalsT.Handle(i, processorID))
+        {
+          var stopSignal = false;
+          ReceiveEcs(ref signalsT.GetByIndex(i).signal, ref stopSignal);
+          if (stopSignal) signalsT.Dequeue();
+        }
       }
 
-      if (signalsY.Handle(processorID))
+      for (int i = signalsY.head; i < signalsY.length; i++)
       {
-        var stopSignal = false;
-        ReceiveEcs(ref signalsY.elements.Peek().signal, ref stopSignal);
-        if (stopSignal) signalsY.elements.Dequeue();
+        if (signalsY.Handle(i, processorID))
+        {
+          var stopSignal = false;
+          ReceiveEcs(ref signalsY.GetByIndex(i).signal, ref stopSignal);
+          if (stopSignal) signalsY.Dequeue();
+        }
       }
-
-      if (signalsU.Handle(processorID))
+      
+      for (int i = signalsU.head; i < signalsU.length; i++)
       {
-        var stopSignal = false;
-        ReceiveEcs(ref signalsU.elements.Peek().signal, ref stopSignal);
-        if (stopSignal) signalsU.elements.Dequeue();
+        if (signalsU.Handle(i, processorID))
+        {
+          var stopSignal = false;
+          ReceiveEcs(ref signalsU.GetByIndex(i).signal, ref stopSignal);
+          if (stopSignal) signalsU.Dequeue();
+        }
       }
-
-      if (signalsI.Handle(processorID))
+      
+      for (int i = signalsI.head; i < signalsI.length; i++)
       {
-        var stopSignal = false;
-        ReceiveEcs(ref signalsI.elements.Peek().signal, ref stopSignal);
-        if (stopSignal) signalsI.elements.Dequeue();
+        if (signalsI.Handle(i, processorID))
+        {
+          var stopSignal = false;
+          ReceiveEcs(ref signalsI.GetByIndex(i).signal, ref stopSignal);
+          if (stopSignal) signalsI.Dequeue();
+        }
       }
-
-      if (signalsO.Handle(processorID))
+      
+      for (int i = signalsO.head; i < signalsO.length; i++)
       {
-        var stopSignal = false;
-        ReceiveEcs(ref signalsO.elements.Peek().signal, ref stopSignal);
-        if (stopSignal) signalsO.elements.Dequeue();
+        if (signalsO.Handle(i, processorID))
+        {
+          var stopSignal = false;
+          ReceiveEcs(ref signalsO.GetByIndex(i).signal, ref stopSignal);
+          if (stopSignal) signalsO.Dequeue();
+        }
       }
-
-      if (signalsP.Handle(processorID))
+      
+      for (int i = signalsP.head; i < signalsP.length; i++)
       {
-        var stopSignal = false;
-        ReceiveEcs(ref signalsP.elements.Peek().signal, ref stopSignal);
-        if (stopSignal) signalsP.elements.Dequeue();
+        if (signalsP.Handle(i, processorID))
+        {
+          var stopSignal = false;
+          ReceiveEcs(ref signalsP.GetByIndex(i).signal, ref stopSignal);
+          if (stopSignal) signalsP.Dequeue();
+        }
       }
-
-      if (signalsA.Handle(processorID))
+      
+      for (int i = signalsA.head; i < signalsA.length; i++)
       {
-        var stopSignal = false;
-        ReceiveEcs(ref signalsA.elements.Peek().signal, ref stopSignal);
-        if (stopSignal) signalsA.elements.Dequeue();
+        if (signalsA.Handle(i, processorID))
+        {
+          var stopSignal = false;
+          ReceiveEcs(ref signalsA.GetByIndex(i).signal, ref stopSignal);
+          if (stopSignal) signalsA.Dequeue();
+        }
       }
     }
 

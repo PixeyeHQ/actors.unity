@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Unity.IL2CPP.CompilerServices;
 using UnityEngine.SceneManagement;
+using Debug = UnityEngine.Debug;
 
 
 namespace Pixeye.Actors
@@ -45,6 +46,16 @@ namespace Pixeye.Actors
       if (meta->componentsAmount != 0) return;
       LayerKernel.Debugger.Log(LogType.REMOVE_NON_EXISTANT, entityID, storage.GetComponentType().Name);
       throw new Exception();
+    }
+    
+    /// for a visual debugger. Doesn't affect the logic of the framework
+    [Conditional("ACTORS_DEBUG")]
+    void SendDataToActorsVisualDebugger()
+    {
+      if(operationsLength == 0) return;
+      var instance = Pixeye.Actors.Debugger.ActorsDebugger.Instance;
+      if(instance != null) 
+        instance.ProcessorDebug?.ExecuteDebug(in operations, operationsLength, layer.ID - 1);
     }
 
     internal void SwapLayerActor(ent entity, Layer otherLayer)
@@ -280,7 +291,7 @@ namespace Pixeye.Actors
 
             eMeta->tags.Clear();
             eMeta->isAlive = false;
-
+            
             entities.Remove(operation.entity);
 
             operation.entity.age += 1;
@@ -360,7 +371,10 @@ namespace Pixeye.Actors
             break;
         }
       }
-
+      
+#if UNITY_EDITOR
+      SendDataToActorsVisualDebugger();
+#endif
 
       if (operationsLength > 0)
       {

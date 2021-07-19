@@ -12,6 +12,7 @@ namespace Pixeye.Actors
 
     IEnumerator[] running = new IEnumerator[36];
     internal float[] delays = new float[36];
+    internal bool[] paused = new bool[36];
 
     internal int currentIndex;
     int length;
@@ -33,6 +34,7 @@ namespace Pixeye.Actors
       }
 
       running[length] = routine;
+      paused[length] = false;
 
       delays[length++] = delay;
 
@@ -46,9 +48,11 @@ namespace Pixeye.Actors
       {
         Array.Resize(ref running, length << 1);
         Array.Resize(ref delays, length << 1);
+        Array.Resize(ref paused, length << 1);
       }
 
       running[length] = routine;
+      paused[length] = false;
 
       delays[length++] = 0;
 
@@ -68,7 +72,24 @@ namespace Pixeye.Actors
         return false;
 
       running[i] = null;
+      paused[i] = false;
       delays[i]  = 0f;
+      return true;
+    }
+
+    internal bool Pause(IEnumerator routine)
+    {
+      var i = 0;
+
+      for (; i < length; i++)
+      {
+        if (routine == running[i]) break;
+      }
+
+      if (i < 0)
+        return false;
+      
+      paused[i] = true;
       return true;
     }
 
@@ -113,6 +134,8 @@ namespace Pixeye.Actors
         {
           for (var i = length - 1; i >= 0; i--)
           {
+            if(paused[i]) continue;
+            
             if (delays[i] > 0f)
               delays[i] -= accum;
 
@@ -122,6 +145,7 @@ namespace Pixeye.Actors
               {
                 Array.Copy(running, i + 1, running, i, length - i);
                 Array.Copy(delays, i + 1, delays, i, length - i);
+                Array.Copy(paused, i + 1, paused, i, length - i);
               }
             }
           }
@@ -133,6 +157,8 @@ namespace Pixeye.Actors
       {
         for (var i = length - 1; i >= 0; i--)
         {
+          if(paused[i]) continue;
+          
           if (delays[i] > 0f)
             delays[i] -= dt;
 
@@ -142,6 +168,7 @@ namespace Pixeye.Actors
             {
               Array.Copy(running, i + 1, running, i, length - i);
               Array.Copy(delays, i + 1, delays, i, length - i);
+              Array.Copy(paused, i + 1, paused, i, length - i);
             }
           }
         }
@@ -190,12 +217,17 @@ namespace Pixeye.Actors
     /// Reference to the routine's enumerator.
     public IEnumerator enumerator;
 
+    //public bool Started; 
+    
+    public bool IsPaused;
+
 
     /// Construct a coroutine. Never call this manually, only use return values from Coroutines.Run().
     internal RoutineCall(ProcessorCoroutine processorCoroutines, IEnumerator enumerator)
     {
       this.processorCoroutines = processorCoroutines;
       this.enumerator          = enumerator;
+      IsPaused                 = false;
     }
 
 
@@ -205,6 +237,11 @@ namespace Pixeye.Actors
       return IsRunning && processorCoroutines.Stop(enumerator);
     }
 
+    /// Pause this coroutine if it is running.
+    public bool Pause()
+    {
+      return IsPaused = IsRunning && processorCoroutines.Pause(enumerator);
+    }
 
     /// A routine to wait until this coroutine has finished running.
     public IEnumerator Wait()

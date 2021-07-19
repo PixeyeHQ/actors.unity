@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Runtime.CompilerServices;
 using Unity.IL2CPP.CompilerServices;
+using UnityEngine;
 
 namespace Pixeye.Actors
 {
@@ -20,11 +21,8 @@ namespace Pixeye.Actors
       source = new T[size];
     }
     
-    public int Length
-    {
-      get => this.length;
-    }
-    
+    public int Length => this.length;
+
     public void Add(T val)
     {
       if (length == source.Length)
@@ -78,6 +76,13 @@ namespace Pixeye.Actors
     public ref T Peek()
     {
       return ref source[tail];
+    }
+
+    public void Clear()
+    {
+      length = 0;
+      tail = 0;
+      head = 0;
     }
 
     #region ENUMERATOR
