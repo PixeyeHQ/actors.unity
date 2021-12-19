@@ -29,10 +29,7 @@ namespace Pixeye.Actors
   public abstract class GroupCore : IEnumerable, IEquatable<GroupCore>, IDisposable
   {
     public ent[] entities;
-
-    public int length;
-
-
+    internal int length;
     internal bool initialized;
     internal ProcessorEcs processorEcs;
     internal Layer layer;
@@ -48,14 +45,12 @@ namespace Pixeye.Actors
     public ents removed;
 #endif
 
-
     protected internal Composition composition;
 
     internal int id;
 
     int position;
     bool flagChanged;
-
 
     public ref ent this[int index]
     {
@@ -76,6 +71,8 @@ namespace Pixeye.Actors
         return false;
       }
     }
+
+    public int Length => length;
 
 
     public void Release(int index)
@@ -274,6 +271,16 @@ namespace Pixeye.Actors
         Array.Copy(entities, i + 1, entities, i, length - i);
       
       flagChanged = true;
+    }
+
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public ent Find(ent entity)
+    {
+      var i = HelperArray.BinarySearch(ref entities, entity.id, 0, length - 1);
+      if (i == -1)
+        return i;
+      return entities[i];
     }
 
 
@@ -512,12 +519,6 @@ namespace Pixeye.Actors
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
       public bool MoveNext()
       {
-        // if (++position < groupEntities.length)
-        // {
-        //   groupEntities.processorEcs.Execute();
-        //   return true;
-        // }
-
         return ++position < groupEntities.length;
       }
 
@@ -555,6 +556,8 @@ namespace Pixeye.Actors
     {
       var gr = base.Initialize(composition, capacity, layer);
 
+      //if(Storage<T>)
+      
       Storage<T>.Instance.groups[layer.id].Add(this);
 
       return gr;

@@ -18,8 +18,11 @@ using Pixeye.Actors;
    {
      public const string ##NAME2## = "##NAMESPACE2##.##NAME##";
      [MethodImpl(MethodImplOptions.AggressiveInlining)]
-     public static ref ##NAME## ##NAME##(in this ent entity) =>
-       ref Storage<##NAME##>.components[entity.id];
+     public static ref ##NAME## ##NAME##(in this ent entity)
+     {
+       ent.DebugNoComponent<##NAME##>(entity);
+       return ref Storage<##NAME##>.components[entity.id];
+     }
    }
  
    [Il2CppSetOption(Option.NullChecks, false)]

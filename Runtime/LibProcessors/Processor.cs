@@ -61,7 +61,7 @@ namespace Pixeye.Actors
     {
     }
 
-    public virtual void HandleEcsEvents()
+    public virtual void HandleGroupsEvents()
     {
     }
 
@@ -175,13 +175,13 @@ namespace Pixeye.Actors
         if (signalsT.Handle(i, processorID))
         {
           var stopSignal = false;
-          ReceiveEcs(ref signalsT.GetByIndex(i).signal, ref stopSignal);
+          ReceiveEcsSignal(ref signalsT.GetByIndex(i).signal, ref stopSignal);
           if (stopSignal) signalsT.Dequeue();
         }
       }
     }
 
-    public abstract void ReceiveEcs(ref T signal, ref bool stopSignal);
+    public abstract void ReceiveEcsSignal(ref T signal, ref bool stopSignal);
   }
 
   public abstract class Processor<T, Y> : Processor, IReceiveEcsEvent

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using Pixeye.Actors.Debugger;
+//using Pixeye.Actors.Debugger;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif

@@ -157,6 +157,14 @@ namespace Pixeye.Actors
       processorEcs.SetOperation(entity, -1, ProcessorEcs.Action.Activate);
       return entity;
     }
+    
+    public ent CreateFor(Transform tr)
+    {
+      processorEcs.Create(out var entity, false);
+      entity.managed.transform = tr;
+      processorEcs.SetOperation(entity, -1, ProcessorEcs.Action.Activate);
+      return entity;
+    }
 
     public ent CreateFor(string name)
     {

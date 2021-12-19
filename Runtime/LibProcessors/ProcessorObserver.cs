@@ -16,7 +16,7 @@ namespace Pixeye.Actors
 #endif
     public Group<ComponentObserver> source = new Group<ComponentObserver>();
 
-    public override void HandleEcsEvents()
+    public override void HandleGroupsEvents()
     {
       foreach (var entity in source.removed)
       {

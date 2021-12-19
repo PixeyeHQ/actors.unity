@@ -42,7 +42,7 @@ namespace Pixeye.Actors
     }
 
     [Conditional("ACTORS_DEBUG")]
-    static void DebugNoComponent<T>(ent entity)
+    public static void DebugNoComponent<T>(ent entity)
     {
       var     generation = Storage<T>.Generation;
       var     mask       = Storage<T>.ComponentMask;
@@ -56,7 +56,7 @@ namespace Pixeye.Actors
     }
 
     [Conditional("ACTORS_DEBUG")]
-    void DebugAlreadyHave<T>(ent entity)
+    public void DebugAlreadyHave<T>(ent entity)
     {
       var generation = Storage<T>.Generation;
       var mask       = Storage<T>.ComponentMask;

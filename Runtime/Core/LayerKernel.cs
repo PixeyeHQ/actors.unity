@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -117,6 +118,7 @@ namespace Pixeye.Actors
     {
       var types    = AppDomain.CurrentDomain.GetAssemblies().SelectMany(t => t.GetTypes());
       var storages = types.Where(t => t.IsSubclassOf(typeof(Storage)) && !t.ContainsGenericParameters);
+
       foreach (var item in storages)
       {
         Activator.CreateInstance(item);

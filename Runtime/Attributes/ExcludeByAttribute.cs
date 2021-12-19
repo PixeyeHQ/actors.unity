@@ -18,6 +18,18 @@ namespace Pixeye.Actors
       this.filter = filter;
     }
 
+    public ExcludeByAttribute(params Type[] args)
+    {
+      var fType = new List<int>();
+      for (int i = 0; i < args.Length; i++)
+      {
+        var t = args[i];
+        fType.Add(Storage.TypeNames[t.GetHashCode()]);
+      }
+
+      filterType = fType.ToArray();
+    }
+    
     public ExcludeByAttribute(params object[] args)
     {
       var f     = new List<int>();
@@ -44,7 +56,6 @@ namespace Pixeye.Actors
       {
         fType.Add(Storage.TypeNames[ByName(args[i]).GetHashCode()]);
       }
-
 
       filterType = fType.ToArray();
     }

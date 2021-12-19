@@ -140,6 +140,14 @@ namespace Pixeye.Actors
       length = index + 1;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public ent GetLast()
+    {
+      if(length > 0)
+        return source[length - 1];
+      return -1;
+    }
+
     public override string ToString()
     {
       var s = "";

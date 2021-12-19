@@ -49,14 +49,14 @@ namespace Pixeye.Actors
     }
     
     /// for a visual debugger. Doesn't affect the logic of the framework
-    [Conditional("ACTORS_DEBUG")]
-    void SendDataToActorsVisualDebugger()
-    {
-      if(operationsLength == 0) return;
-      var instance = Pixeye.Actors.Debugger.ActorsDebugger.Instance;
-      if(instance != null) 
-        instance.ProcessorDebug?.ExecuteDebug(in operations, operationsLength, layer.ID - 1);
-    }
+    // [Conditional("ACTORS_DEBUG")]
+    // void SendDataToActorsVisualDebugger()
+    // {
+    //   if(operationsLength == 0) return;
+    //   var instance = Pixeye.Actors.Debugger.ActorsDebugger.Instance;
+    //   if(instance != null) 
+    //     instance.ProcessorDebug?.ExecuteDebug(in operations, operationsLength, layer.ID - 1);
+    // }
 
     internal void SwapLayerActor(ent entity, Layer otherLayer)
     {
@@ -373,7 +373,7 @@ namespace Pixeye.Actors
       }
       
 #if UNITY_EDITOR
-      SendDataToActorsVisualDebugger();
+      //SendDataToActorsVisualDebugger();
 #endif
 
       if (operationsLength > 0)
@@ -381,7 +381,7 @@ namespace Pixeye.Actors
         operationsLength = 0;
 
         for (var i = 0; i < processors.Count; i++)
-          processors[i].HandleEcsEvents();
+          processors[i].HandleGroupsEvents();
 
 #if ACTORS_EVENTS_MANUAL
         for (var ii = 0; ii < groups.Count; ii++)

@@ -110,7 +110,9 @@ namespace Pixeye.Actors
     /// Scene entry point, load your custom stuff from here.
     protected abstract void Setup();
 
-    protected virtual void PostSetup(){}
+    protected virtual void PostSetup()
+    {
+    }
 
     /// Clean *your* custom scene stuff from here.
     protected virtual void OnLayerDestroy()
@@ -189,6 +191,10 @@ namespace Pixeye.Actors
     public static void Add(object obj)
     {
       LayerKernel.LayerCurrentInit = InstanceInternal.self;
+      if (obj is IRequireActorsLayer member)
+        member.Bootstrap(InstanceInternal.self);
+      if(obj is IProcessorInit init)
+        init.Initialize();
       InstanceInternal.self.objects.Add(obj.GetType().GetHashCode(), obj);
     }
     
@@ -198,6 +204,8 @@ namespace Pixeye.Actors
       var obj = new Y();
       if (obj is IRequireActorsLayer member)
         member.Bootstrap(InstanceInternal.self);
+      if(obj is IProcessorInit init)
+        init.Initialize();
       InstanceInternal.self.objects.Add(typeof(Y).GetHashCode(), obj);
       return obj;
     }
