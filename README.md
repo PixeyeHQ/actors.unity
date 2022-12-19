@@ -4,6 +4,8 @@
 [![openupm](https://img.shields.io/npm/v/com.pixeye.ecs?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.pixeye.ecs/)
 [![stars](https://img.shields.io/github/stars/PixeyeHQ/actors.unity?style=social)](https://github.com/PixeyeHQ/actors.unity/stargazers)
  
+#### [Not supported by developers]
+
 #### Actors is a framework empowering developers to make better games faster on Unity.
 
 ## ⭐ Why Actors ?
